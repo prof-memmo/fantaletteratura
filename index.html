@@ -57,10 +57,11 @@
                     <div class="input-group">
                         <input type="password" id="docente-password-input" class="input-control" placeholder="Password docente" onkeypress="if(event.key==='Enter') loginDocente()">
                     </div>
-                    <button type="button" class="btn" onclick="loginDocente()">Entra con Email</button>
+                    <button type="button" class="btn" onclick="loginDocente()">Entra / Registrati con Email</button>
                     <button type="button" class="btn mt-1" style="background: #fff; color: #444; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; gap: 10px;" onclick="loginGoogle()">
-                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" height="18"> Entra con Google
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" height="18"> Entra / Registrati con Google
                     </button>
+                    <p class="text-center mt-1" style="font-size: 0.75rem; color: #aaa;">Se è il tuo primo accesso, verrai guidato alla pagina di iscrizione.</p>
                     <div style="text-align: center; margin: 15px 0; color: #ccc;">- oppure -</div>
                     <button type="button" class="btn btn-secondary mb-2" onclick="navigateTo('view-studenti')">Entra come Studente</button>
                     <button type="button" class="btn" style="background: #f1c40f !important; color: #000 !important; font-size: 1rem; font-weight: 800; border: 2px solid #000; box-shadow: 0 4px 15px rgba(241, 196, 15, 0.4);" onclick="openInviteModal()"><i class="fa-solid fa-paper-plane"></i> INVITA UN COLLEGA</button>
