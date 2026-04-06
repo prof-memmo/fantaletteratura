@@ -52,10 +52,16 @@
                 <div class="glass" style="padding: 20px; margin-top: 30px;" id="login-section">
                     <p class="text-center" style="font-size: 0.9rem; color: #fff;">Inserisci il tuo indirizzo email per entrare come docente.</p>
                     <div class="input-group">
-                        <input type="email" id="docente-email-input" class="input-control" placeholder="Email docente" onkeypress="if(event.key==='Enter') loginDocente()">
+                        <input type="email" id="docente-email-input" class="input-control" placeholder="Email docente">
                     </div>
-                    <button type="button" class="btn" onclick="loginDocente()">Entra come Docente</button>
-                    <div style="text-align: center; margin: 15px 0; color: #666;">- oppure -</div>
+                    <div class="input-group">
+                        <input type="password" id="docente-password-input" class="input-control" placeholder="Password docente" onkeypress="if(event.key==='Enter') loginDocente()">
+                    </div>
+                    <button type="button" class="btn" onclick="loginDocente()">Entra con Email</button>
+                    <button type="button" class="btn mt-1" style="background: #fff; color: #444; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; gap: 10px;" onclick="loginGoogle()">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" height="18"> Entra con Google
+                    </button>
+                    <div style="text-align: center; margin: 15px 0; color: #ccc;">- oppure -</div>
                     <button type="button" class="btn btn-secondary mb-2" onclick="navigateTo('view-studenti')">Entra come Studente</button>
                     <button type="button" class="btn" style="background: #f1c40f !important; color: #000 !important; font-size: 1rem; font-weight: 800; border: 2px solid #000; box-shadow: 0 4px 15px rgba(241, 196, 15, 0.4);" onclick="openInviteModal()"><i class="fa-solid fa-paper-plane"></i> INVITA UN COLLEGA</button>
                 </div>
@@ -110,6 +116,14 @@
                     Scegliete la vostra squadra, le star, iniziate la missione e lasciate che i libri vi portino lontano…<br>
                     Buon Fantaletteratura! 📖🔥</p>
                     
+                    <div id="student-code-section" class="mt-2 pt-2" style="border-top: 1px solid rgba(255,255,255,0.1);">
+                        <p style="font-weight: 600; margin-bottom: 10px; color: var(--primary-color);">Codice Squadra</p>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px;">Inserisci il codice fornito dal tuo docente (es: FL-A1B2) per vedere le classifiche.</p>
+                        <div class="input-group">
+                            <input type="text" id="student-code-input" class="input-control student-code-input" placeholder="FL-XXXX" maxlength="7">
+                        </div>
+                    </div>
+
                     <div id="student-consent-section" class="mt-2 pt-2" style="border-top: 1px solid rgba(255,255,255,0.1);">
                         <label class="checkbox-container mb-1">
                             <input type="checkbox" id="student-check-age">
@@ -123,7 +137,7 @@
                         </label>
                     </div>
 
-                    <button type="button" class="btn mt-2" id="btn-student-entry" onclick="checkStudentConsent()">Guarda le Classifiche</button>
+                    <button type="button" class="btn mt-1" id="btn-student-entry" onclick="checkStudentConsent()">Entra nel Gioco</button>
                 </div>
             </section>
 
@@ -143,6 +157,11 @@
                     <div class="input-group">
                         <label>Città</label>
                         <input type="text" class="input-control" placeholder="Citta">
+                    </div>
+                    <div class="input-group">
+                        <label>Scegli una Password</label>
+                        <input type="password" id="iscrizione-password" class="input-control" placeholder="Minimo 6 caratteri">
+                        <small style="font-size: 0.7rem; color: #aaa;">Servirà per i futuri accessi senza Google.</small>
                     </div>
                     
                     <div class="consent-group mt-2">
@@ -562,22 +581,37 @@
         </div>
     </div>
 
-    <!-- Modale Invia Invito / Invita Collega -->
-    <div id="invite-torneo-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-dark); z-index:2000; overflow-y:auto;">
-        <div style="padding: 15px; position: sticky; top: 0; background:var(--bg-dark); z-index:10; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center;">
-            <h3 style="margin:0;">Invita un Collega</h3>
-            <button class="btn-secondary" onclick="document.getElementById('invite-torneo-modal').style.display='none'" style="padding: 5px 15px; width:auto; border-radius:20px; border:none;"><i class="fa-solid fa-xmark"></i></button>
+    <!-- Modale Condivisione Universale -->
+    <div id="share-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:3000; overflow-y:auto; backdrop-filter: blur(10px);">
+        <div style="padding: 15px; position: sticky; top: 0; z-index:10; display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <h3 style="margin:0;" id="share-modal-title">Condividi</h3>
+            <button class="btn-secondary" onclick="document.getElementById('share-modal').style.display='none'" style="padding: 5px 15px; width:auto; border-radius:20px; border:none;"><i class="fa-solid fa-xmark"></i></button>
         </div>
-        <div style="padding: 20px;">
-            <input type="hidden" id="invite-torneo-id">
-            <p style="font-size:0.8rem; color:#aaa; margin-bottom:15px;">Inserisci l'indirizzo email del docente che vuoi invitare a questo torneo.</p>
-            <div class="input-group">
-                <label>Email Collega</label>
-                <input type="email" id="invite-collega-email" class="input-control" placeholder="Es: mario.rossi@scuola.it">
+        <div style="padding: 25px;">
+            <p id="share-modal-desc" style="font-size:0.9rem; color:var(--text-muted); margin-bottom:20px; text-align:center;">Scegli dove vuoi condividere Fantaletteratura!</p>
+            
+            <div class="share-grid">
+                <a href="#" class="share-btn whatsapp" id="share-wa">
+                    <i class="fa-brands fa-whatsapp"></i>
+                    <span>WhatsApp</span>
+                </a>
+                <a href="#" class="share-btn classroom" id="share-classroom">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span>Classroom</span>
+                </a>
+                <a href="#" class="share-btn teams" id="share-teams">
+                    <i class="fa-solid fa-users-rectangle"></i>
+                    <span>MS Teams</span>
+                </a>
+                <a href="#" class="share-btn copy" id="share-copy" onclick="copyShareLink()">
+                    <i class="fa-solid fa-copy"></i>
+                    <span>Copia Link</span>
+                </a>
             </div>
-            <button type="button" class="btn" onclick="inviaInvitoTorneo()">Spedisci Invito</button>
         </div>
     </div>
+
+    <!-- Modale Invia Invito (Legacy / Mail) - Manteniamo per fallback -->
 
     <!-- Modale Legale: Privacy Policy -->
     <div id="modal-privacy" class="modal-legal" style="display:none;">
@@ -662,6 +696,15 @@
             <button class="btn" onclick="closeWipModal()" style="max-width:220px; margin:0 auto;">Ok, torno dopo!</button>
         </div>
     </div>
+
+    <!-- Firebase SDK (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Configurazione & Service Layer -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-service.js"></script>
 
     <!-- Scripts -->
     <script src="js/data.js"></script>

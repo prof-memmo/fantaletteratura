@@ -11,16 +11,18 @@ let currentTeamMode = null;       // modalità scelta nel form "Crea Squadra"
 let currentLeaderboardMode = null; // modalità selezionata nelle classifiche
 
 
-function loadGameState() {
-    let saved = localStorage.getItem(STORAGE_KEY);
-    if(saved) {
-        try {
-            let state = JSON.parse(saved);
+async function loadGameState() {
+    // Carichiamo lo stato globale da Firebase (Realtime)
+    fanta_db.getSnapshotSettings((state) => {
+        if(state) {
             if(state.revealedAuthors) {
                 AUTHORS.forEach(a => {
                     if(state.revealedAuthors.includes(a.id)) {
                         a.isPointsRevealed = true;
                         a.isSchedaRevealed = true;
+                    } else {
+                        a.isPointsRevealed = false;
+                        a.isSchedaRevealed = false;
                     }
                 });
             }
@@ -34,18 +36,22 @@ function loadGameState() {
                     if(state.schedaRevealed.includes(a.id)) a.isSchedaRevealed = true;
                 });
             }
-        } catch(e) { }
-    }
+            // Aggiorniamo le viste se necessario
+            if (typeof populateSchede === 'function') populateSchede();
+            if (typeof renderAdminAutori === 'function') renderAdminAutori();
+        }
+    });
 }
 
-function saveGameState() {
+async function saveGameState() {
     let ptsRevealed = AUTHORS.filter(a => a.isPointsRevealed).map(a => a.id);
     let schRevealed = AUTHORS.filter(a => a.isSchedaRevealed).map(a => a.id);
     let state = {
         pointsRevealed: ptsRevealed,
-        schedaRevealed: schRevealed
+        schedaRevealed: schRevealed,
+        revealedAuthors: ptsRevealed // manteniamo per compatibilità
     };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    await fanta_db.saveSettings(state);
 }
 
 function initApp() {
@@ -119,10 +125,12 @@ function setupNavigation() {
     // Handle menu links
     menuLinks.forEach(link => {
         link.addEventListener('click', (e) => {
-            e.preventDefault();
             const viewId = link.getAttribute('data-view');
-            navigateTo(viewId);
-            closeMenu();
+            if (viewId) {
+                e.preventDefault();
+                navigateTo(viewId);
+                closeMenu();
+            }
         });
     });
 
@@ -137,6 +145,21 @@ function setupNavigation() {
 }
 
 function navigateTo(viewId, pushHistory = true) {
+    if (!viewId) return;
+
+    // STUDENT CODE GUARD
+    const isStudentProtected = ['view-classifiche', 'view-schede'].includes(viewId);
+    const hasStudentCode = localStorage.getItem('fanta_active_team_code');
+    const isDocente = !!currentUserEmail;
+
+    if (isStudentProtected && !hasStudentCode && !isDocente) {
+        // Se non è loggato come docente e non ha un codice studente, 
+        // lo mandiamo alla sezione studenti per inserire il codice
+        alert("Per accedere a questa sezione devi inserire il codice fornito dal tuo docente.");
+        navigateTo('view-studenti', pushHistory);
+        return;
+    }
+
     // Hide all views
     document.querySelectorAll('.view').forEach(view => {
         view.classList.remove('active');
@@ -473,7 +496,7 @@ function calculateBudget() {
 /* =========================================
    ADMIN PANEL
 ========================================= */
-function setupAdminPanel() {
+async function setupAdminPanel() {
     const autoriList = document.getElementById('admin-autori-list');
     const adminTabs = document.querySelectorAll('.admin-tab-btn');
     const adminViews = document.querySelectorAll('.admin-view');
@@ -531,22 +554,26 @@ function setupAdminPanel() {
         }
     };
 
-    window.renderAdminRichieste = function() {
+    window.renderAdminRichieste = async function() {
         const list = document.getElementById('admin-requests-list');
         if (!list) return;
+        list.innerHTML = '<p class="text-center">Caricamento richieste...</p>';
+        
+        let requests = await fanta_db.getTeacherRequests();
         list.innerHTML = '';
-        let requests = JSON.parse(localStorage.getItem('fanta_pending_requests')) || [];
         if (requests.length === 0) {
             list.innerHTML = '<i>Nessuna richiesta in sospeso.</i>';
         } else {
             requests.forEach(req => {
+                let consentLog = req.createdAt ? `<div style="font-size:0.7rem; color:var(--accent-gold); margin-top:5px;"><i class="fa-solid fa-clock"></i> Ricevuta: ${req.createdAt.toDate ? req.createdAt.toDate().toLocaleString() : req.createdAt}</div>` : '';
                 list.innerHTML += `
                     <div class="glass" style="padding:15px; margin-bottom:10px; border-left:4px solid var(--accent-gold);">
                         <div style="font-weight:bold; color:var(--primary-color); font-size:1.1rem;">${req.name}</div>
                         <div style="font-size:0.85rem; margin-top:5px; color:var(--text-muted);">${req.email} | ${req.school} (${req.city})</div>
+                        ${consentLog}
                         <div style="display:flex; gap:10px; margin-top:15px;">
                             <button class="btn" style="flex:1; padding:8px; font-size:0.8rem;" onclick="approvaRichiesta('${req.email}')">Approva</button>
-                            <button class="btn btn-secondary" style="flex:1; padding:8px; font-size:0.8rem; color: #ff5f5f; border-color: #ff5f5f;" onclick="rifiutaRichiesta('${req.email}')">Rifiuta</button>
+                            <button class="btn btn-secondary" style="flex:1; padding:8px; font-size:0.8rem; color: #ff5f5f; border-color: #ff5f5f;" onclick="rifiutaRichiesta('${req.id}')">Rifiuta</button>
                         </div>
                     </div>
                 `;
@@ -554,30 +581,24 @@ function setupAdminPanel() {
         }
     };
 
-    window.approvaRichiesta = function(email) {
-        let requests = JSON.parse(localStorage.getItem('fanta_pending_requests')) || [];
+    window.approvaRichiesta = async function(email) {
+        let requests = await fanta_db.getTeacherRequests();
         let req = requests.find(r => r.email === email);
         if(!req) return;
-        
-        // Salviamo il log del consenso prima di rimuovere la richiesta
-        let logs = JSON.parse(localStorage.getItem('fanta_pending_requests_logs')) || {};
-        logs[email] = { timestamp: req.consentTimestamp || 'N/A' };
-        localStorage.setItem('fanta_pending_requests_logs', JSON.stringify(logs));
 
-        let approved = JSON.parse(localStorage.getItem('fanta_approved_users')) || [];
-        if(!approved.includes(email)) {
-            approved.push(email);
-            localStorage.setItem('fanta_approved_users', JSON.stringify(approved));
-        }
-        
-        let registered = JSON.parse(localStorage.getItem('fanta_registered_users')) || [];
-        if(!registered.includes(email)) {
-            registered.push(email);
-            localStorage.setItem('fanta_registered_users', JSON.stringify(registered));
-        }
+        // Aggiungiamo alla collezione 'users' su Firestore
+        await window.db.collection("users").doc(email).set({
+            email: email,
+            name: req.name,
+            school: req.school,
+            city: req.city,
+            role: 'teacher',
+            approvedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
 
-        requests = requests.filter(r => r.email !== email);
-        localStorage.setItem('fanta_pending_requests', JSON.stringify(requests));
+        // Rimuoviamo dalla collezione 'pending_requests'
+        await window.db.collection("pending_requests").doc(req.id).delete();
+        
         alert("Docente approvato con successo! Invio della mail in corso...");
         const appUrl = window.location.origin + window.location.pathname.replace('admin.html', 'index.html');
         const nomeDocente = req.name || 'Prof';
@@ -621,59 +642,69 @@ function setupAdminPanel() {
             `— Il Team di Fantaletteratura`
         );
         window.location.href = `mailto:${email}?subject=${emailSubject}&body=${emailBody}`;
-        window.renderAdminRichieste();
-        window.renderAdminDocenti();
+        
+        await window.renderAdminRichieste();
+        await window.renderAdminDocenti();
     };
 
-    window.rifiutaRichiesta = function(email) {
+    window.rifiutaRichiesta = async function(id) {
         if(!confirm("Cancellare richiesta?")) return;
-        let requests = JSON.parse(localStorage.getItem('fanta_pending_requests')) || [];
-        requests = requests.filter(r => r.email !== email);
-        localStorage.setItem('fanta_pending_requests', JSON.stringify(requests));
-        window.renderAdminRichieste();
+        try {
+            await window.db.collection("pending_requests").doc(id).delete();
+            await window.renderAdminRichieste();
+        } catch(e) {
+            console.error(e);
+            alert("Errore durante la cancellazione.");
+        }
     };
 
-    window.renderAdminDocenti = function(filterText = '') {
+    window.renderAdminDocenti = async function(filterText = '') {
         const list = document.getElementById('admin-docenti-list');
         if (!list) return;
-        list.innerHTML = '';
-        let users = JSON.parse(localStorage.getItem('fanta_registered_users')) || [];
-        // Supporto per log di accettazione se presente
-        let requestsLogs = JSON.parse(localStorage.getItem('fanta_pending_requests_logs')) || {};
+        list.innerHTML = '<p class="text-center">Caricamento docenti...</p>';
         
-        let filteredUsers = users.filter(email => {
+        const snapshot = await window.db.collection("users").where("role", "==", "teacher").get();
+        let users = snapshot.docs.map(doc => doc.data());
+        
+        list.innerHTML = '';
+        let filteredUsers = users.filter(u => {
             const query = filterText.toLowerCase();
-            return email.toLowerCase().includes(query);
+            return u.email.toLowerCase().includes(query) || u.name.toLowerCase().includes(query);
         });
 
         if (filteredUsers.length === 0) list.innerHTML = '<i>Nessun docente trovato.</i>';
-        filteredUsers.forEach(email => {
-            let log = requestsLogs[email] ? `<br><small class="text-muted">Accettato: ${requestsLogs[email].timestamp}</small>` : '';
+        filteredUsers.forEach(u => {
+            let log = u.approvedAt ? `<br><small class="text-muted">Approvato: ${u.approvedAt.toDate ? u.approvedAt.toDate().toLocaleString() : u.approvedAt}</small>` : '';
             list.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid rgba(255,255,255,0.05);">
-                <div><span>${email}</span>${log}</div>
-                <button class="btn btn-secondary text-danger" style="padding:4px 8px; font-size:0.75rem; width:auto; background:var(--bg-card); border-color:var(--danger-color);" onclick="eliminaDocente('${email}')"><i class="fa-solid fa-trash"></i></button>
+                <div><span>${u.email}</span> &mdash; <strong>${u.name}</strong>${log}</div>
+                <button class="btn btn-secondary text-danger" style="padding:4px 8px; font-size:0.75rem; width:auto; background:var(--bg-card); border-color:var(--danger-color);" onclick="eliminaDocente('${u.email}')"><i class="fa-solid fa-trash"></i></button>
             </div>`;
         });
     };
 
-    window.eliminaDocente = function(email) {
+    window.eliminaDocente = async function(email) {
         if(!confirm('Eliminare account?')) return;
-        let users = JSON.parse(localStorage.getItem('fanta_registered_users')) || [];
-        users = users.filter(u => u !== email);
-        localStorage.setItem('fanta_registered_users', JSON.stringify(users));
-        window.renderAdminDocenti();
+        try {
+            await fanta_db.deleteUser(email);
+            window.renderAdminDocenti();
+        } catch (e) {
+            console.error(e);
+            alert("Errore durante l'eliminazione del docente.");
+        }
     };
 
-    window.renderAdminRichieste = function() {
+    window.renderAdminRichieste = async function() {
         const list = document.getElementById('admin-requests-list');
         if (!list) return;
+        list.innerHTML = '<p class="text-center">Caricamento richieste...</p>';
+        
+        let requests = await fanta_db.getTeacherRequests();
         list.innerHTML = '';
-        let requests = JSON.parse(localStorage.getItem('fanta_pending_requests')) || [];
         if (requests.length === 0) {
             list.innerHTML = '<i>Nessuna richiesta in sospeso.</i>';
         } else {
             requests.forEach(req => {
-                let consentLog = req.consentTimestamp ? `<div style="font-size:0.7rem; color:var(--accent-gold); margin-top:5px;"><i class="fa-solid fa-clock"></i> Consenso: ${req.consentTimestamp}</div>` : '';
+                let consentLog = req.createdAt ? `<div style="font-size:0.7rem; color:var(--accent-gold); margin-top:5px;"><i class="fa-solid fa-clock"></i> Ricevuta: ${req.createdAt.toDate ? req.createdAt.toDate().toLocaleString() : req.createdAt}</div>` : '';
                 list.innerHTML += `
                     <div class="glass" style="padding:15px; margin-bottom:10px; border-left:4px solid var(--accent-gold);">
                         <div style="font-weight:bold; color:var(--primary-color); font-size:1.1rem;">${req.name}</div>
@@ -681,7 +712,7 @@ function setupAdminPanel() {
                         ${consentLog}
                         <div style="display:flex; gap:10px; margin-top:15px;">
                             <button class="btn" style="flex:1; padding:8px; font-size:0.8rem;" onclick="approvaRichiesta('${req.email}')">Approva</button>
-                            <button class="btn btn-secondary" style="flex:1; padding:8px; font-size:0.8rem; color: #ff5f5f; border-color: #ff5f5f;" onclick="rifiutaRichiesta('${req.email}')">Rifiuta</button>
+                            <button class="btn btn-secondary" style="flex:1; padding:8px; font-size:0.8rem; color: #ff5f5f; border-color: #ff5f5f;" onclick="rifiutaRichiesta('${req.id}')">Rifiuta</button>
                         </div>
                     </div>
                 `;
@@ -689,14 +720,17 @@ function setupAdminPanel() {
         }
     };
 
-    window.renderAdminSquadre = function(modeFilter) {
+    window.renderAdminSquadre = async function(modeFilter) {
         const list = document.getElementById('admin-squadre-list');
         if (!list) return;
-        list.innerHTML = '';
-        let teams = getAllTeams();
+        list.innerHTML = '<p class="text-center">Caricamento squadre...</p>';
+        
+        let teams = await getAllTeams();
         if (modeFilter && modeFilter !== 'all') {
             teams = teams.filter(t => (t.mode || 'terze') === modeFilter);
         }
+        
+        list.innerHTML = '';
         if (teams.length === 0) list.innerHTML = '<i>Nessuna squadra trovata.</i>';
         teams.forEach(t => {
             const modeInfo = t.mode ? GAME_MODES[t.mode] : null;
@@ -711,28 +745,35 @@ function setupAdminPanel() {
         });
     };
 
-    window.eliminaSquadra = function(tid) {
+    window.eliminaSquadra = async function(tid) {
         if(!confirm('Eliminare squadra?')) return;
-        let locals = JSON.parse(localStorage.getItem('fanta_local_teams')) || [];
-        locals = locals.filter(t => t.id !== tid);
-        localStorage.setItem('fanta_local_teams', JSON.stringify(locals));
-        window.renderAdminSquadre();
+        try {
+            await fanta_db.deleteTeam(tid);
+            window.renderAdminSquadre();
+        } catch (e) {
+            console.error(e);
+            alert("Errore durante l'eliminazione della squadra.");
+        }
     };
 
-    window.renderAdminMissioniPending = function() {
+    window.renderAdminMissioniPending = async function() {
         const list = document.getElementById('admin-missioni-pending-list');
         if(!list) return;
+        list.innerHTML = '<p class="text-center">Caricamento missioni...</p>';
+        
+        const pending = await fanta_db.getPendingMissions();
+        const allTeams = await fanta_db.getTeams();
+        
         list.innerHTML = '';
-        let pending = JSON.parse(localStorage.getItem('fanta_missioni_pending')) || [];
         if(pending.length === 0) {
             list.innerHTML = '<i>Nessuna missione in attesa.</i>';
             if(document.getElementById('btn-approva-tutte')) document.getElementById('btn-approva-tutte').disabled = true;
         } else {
             if(document.getElementById('btn-approva-tutte')) document.getElementById('btn-approva-tutte').disabled = false;
             pending.forEach(m => {
-                let t = getAllTeams().find(x => x.id === m.teamId);
+                let t = allTeams.find(x => x.id === m.teamId);
                 list.innerHTML += `<div class="glass" style="padding:10px; margin-bottom:10px; border-left:3px solid var(--accent-gold);">
-                    <div style="font-weight:bold;">${m.titolo}</div><small>${t?t.name:'Squadra Errata'}</small>
+                    <div style="font-weight:bold;">${m.titolo}</div><small>${t?t.name:'Squadra Sconosciuta'}</small>
                     <div style="display:flex; gap:10px; margin-top:8px;">
                         <button class="btn" style="padding:4px; font-size:0.75rem; width:auto;" onclick="approvaMissione('${m.id}', '${m.teamId}')">Ok</button>
                         <button class="btn btn-secondary" style="padding:4px; font-size:0.75rem; width:auto;" onclick="rifiutaMissione('${m.id}')">No</button>
@@ -838,19 +879,19 @@ function setupAdminPanel() {
 
     // --- INITIAL STARTUP ---
     if (window.location.pathname.includes('admin.html')) {
-        window.renderAdminAutori();
-        window.renderAdminDocenti();
-        window.renderAdminSquadre();
-        window.renderAdminMissioni();
-        window.renderAdminMissioniPending();
-        window.renderAdminClassifica();
-        window.renderAdminRichieste();
-        window.renderAdminTornei();
-        window.renderAdminProfilo();
+        await window.renderAdminAutori();
+        await window.renderAdminDocenti();
+        await window.renderAdminSquadre();
+        await window.renderAdminMissioni();
+        await window.renderAdminMissioniPending();
+        await window.renderAdminClassifica();
+        await window.renderAdminRichieste();
+        await window.renderAdminTornei();
+        await window.renderAdminProfilo();
     }
 }
 
-window.renderAdminProfilo = function() {
+window.renderAdminProfilo = async function() {
     const sqList = document.getElementById('admin-profilo-squadre-list');
     const trList = document.getElementById('admin-profilo-tornei-list');
     const emailField = document.getElementById('admin-profilo-email');
@@ -859,7 +900,7 @@ window.renderAdminProfilo = function() {
     if(emailField) emailField.value = currentUserEmail;
 
     // Render Squadre
-    let teams = getAllTeams().filter(t => t.ownerEmail === currentUserEmail);
+    let teams = (await getAllTeams()).filter(t => t.ownerEmail === currentUserEmail);
     sqList.innerHTML = '';
     if(teams.length === 0) {
         sqList.innerHTML = '<i>Nessuna squadra creata.</i>';
@@ -868,7 +909,7 @@ window.renderAdminProfilo = function() {
             let authPts = 0;
             t.authors.forEach(aid => {
                 const a = AUTHORS.find(x => x.id === aid);
-                if(a && a.isPointsRevealed) authPts += a.points;
+                if(a && a.isPointsRevealed) authPts += (a.points || 0);
             });
             let misPts = (t.missionsCompleted || 0) * 5;
             sqList.innerHTML += `<div class="glass" style="padding:15px; margin-bottom:15px; border-left:4px solid var(--primary-color);">
@@ -884,61 +925,50 @@ window.renderAdminProfilo = function() {
         });
     }
 
-    // Reuse renderTornei logic but for admin-view
-    const tourneysList = document.getElementById('admin-profilo-tornei-list');
-    if(!tourneysList) return;
-    
-    let tourneys = JSON.parse(localStorage.getItem('fanta_tournaments')) || [];
-    let localTeams = JSON.parse(localStorage.getItem('fanta_local_teams')) || [];
-    let myTeamsIds = localTeams.filter(t => t.ownerEmail === currentUserEmail).map(t => t.id);
-    let myTourneys = tourneys.filter(t => t.ownerEmail === currentUserEmail || t.teams.some(teamId => myTeamsIds.includes(teamId)));
-    
-    tourneysList.innerHTML = '';
-    if(myTourneys.length === 0) {
-        tourneysList.innerHTML = '<i>Nessun torneo privato.</i>';
-    } else {
-        myTourneys.forEach(tour => {
-            let btnInvita = `<button class="btn btn-secondary" style="font-size:0.7rem; padding:4px 8px; width:auto; border-radius:15px;" onclick="openInviteModal('${tour.id}')"><i class="fa-solid fa-paper-plane"></i> Invita</button>`;
-            tourneysList.innerHTML += `<div class="glass" style="padding:10px; margin-bottom:10px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-                    <strong class="text-primary">${tour.name}</strong>
-                    ${btnInvita}
-                </div>
-                <small>${tour.teams.length} squadre partecipanti</small>
-            </div>`;
-        });
+    if(trList) trList.innerHTML = '<i>Funzionalità tornei in aggiornamento...</i>';
+};
+
+window.approvaMissione = async function(mid, tid) {
+    try {
+        const allTeams = await fanta_db.getTeams();
+        const team = allTeams.find(t => t.id === tid);
+        if(team) {
+            const newCount = (team.missionsCompleted || 0) + 1;
+            await window.db.collection("teams").doc(tid).update({ missionsCompleted: newCount });
+        }
+        await fanta_db.approveMission(mid);
+        if(typeof window.renderAdminMissioni === 'function') window.renderAdminMissioni();
+        if(typeof window.renderAdminMissioniPending === 'function') window.renderAdminMissioniPending();
+    } catch (e) {
+        console.error("Errore approvazione missione:", e);
     }
 };
 
-window.approvaMissione = function(mid, tid) {
-    let locals = JSON.parse(localStorage.getItem('fanta_local_teams')) || [];
-    let tIdx = locals.findIndex(t => t.id === tid);
-    if(tIdx > -1) { locals[tIdx].missionsCompleted = (locals[tIdx].missionsCompleted || 0) + 1; localStorage.setItem('fanta_local_teams', JSON.stringify(locals)); }
-    window.rifiutaMissione(mid); 
-    if(typeof window.renderAdminMissioni === 'function') window.renderAdminMissioni();
+window.rifiutaMissione = async function(mid) {
+    try {
+        await window.db.collection("missions").doc(mid).delete();
+        if(typeof window.renderAdminMissioniPending === 'function') window.renderAdminMissioniPending();
+    } catch (e) {
+        console.error("Errore rifiuto missione:", e);
+    }
 };
 
-window.rifiutaMissione = function(mid) {
-    let pending = JSON.parse(localStorage.getItem('fanta_missioni_pending')) || [];
-    pending = pending.filter(m => m.id !== mid);
-    localStorage.setItem('fanta_missioni_pending', JSON.stringify(pending));
-    if(typeof window.renderAdminMissioniPending === 'function') window.renderAdminMissioniPending();
-};
-
-window.approvaTutteMissioni = function() {
-    if(!confirm('Approvare tutte?')) return;
-    let pending = JSON.parse(localStorage.getItem('fanta_missioni_pending')) || [];
-    pending.forEach(m => window.approvaMissione(m.id, m.teamId));
+window.approvaTutteMissioni = async function() {
+    if(!confirm('Approvare tutte le missioni in attesa?')) return;
+    const pending = await fanta_db.getPendingMissions();
+    for (const m of pending) {
+        await window.approvaMissione(m.id, m.teamId);
+    }
 };
 
 
 /* =========================================
    LEADERBOARDS DINAMICHE
 ========================================= */
-function showLeaderboard(type) {
+async function showLeaderboard(type) {
     const listContainer = document.getElementById('leaderboard-list');
     const title = document.getElementById('leaderboard-title');
-    listContainer.innerHTML = '';
+    listContainer.innerHTML = '<p class="text-center">Caricamento classifica...</p>';
 
     // Determine current mode
     const modeId = currentLeaderboardMode || 'terze';
@@ -947,7 +977,8 @@ function showLeaderboard(type) {
     const modeBadge = mode ? `<span class="mode-badge ${mode.colorClass}" style="font-size:0.75rem; margin-left:8px;">${mode.emoji} ${mode.shortLabel}</span>` : '';
 
     // Filter teams by mode
-    let allTeams = getAllTeams().filter(t => (t.mode || 'terze') === modeId);
+    let allTeams = (await getAllTeams()).filter(t => (t.mode || 'terze') === modeId);
+    listContainer.innerHTML = '';
 
     // Calcola punteggi
     let calculated = allTeams.map(team => {
@@ -1039,48 +1070,90 @@ function populateSchede() {
 let currentUserEmail = null;
 
 function checkLoginSession() {
-    const savedEmail = localStorage.getItem('fanta_docente_email');
-    if (savedEmail) {
-        setLoggedIn(savedEmail);
-    }
+    fanta_db.onAuthStateChanged(async (user) => {
+        if (user) {
+            const email = user.email.toLowerCase();
+            
+            // Verifichiamo se è approvato
+            const usersRef = window.db.collection("users");
+            const doc = await usersRef.doc(email).get();
+            
+            if (doc.exists) {
+                setLoggedIn(email);
+                if (window.location.hash === '#view-welcome') {
+                    navigateTo('view-prof');
+                }
+            } else {
+                // Non approvato - verifichiamo se ha una richiesta
+                const requests = await fanta_db.getTeacherRequests();
+                const pending = requests.find(r => r.email.toLowerCase() === email);
+                
+                if (pending) {
+                    alert("Account creato con successo! Ora attendi l'approvazione del Game Master per accedere al profilo.");
+                    navigateTo('view-welcome');
+                    await fanta_db.logout();
+                } else {
+                    // Loggato ma senza richiesta? Strano, forse Google.
+                    localStorage.setItem('fanta_temp_email', email);
+                    navigateTo('view-iscrizione');
+                    await fanta_db.logout();
+                }
+            }
+        } else {
+            setLoggedOut();
+        }
+    });
 }
 
-function loginDocente(event) {
+async function loginDocente(event) {
     if(event) event.preventDefault();
-    const emailInput = document.getElementById('docente-email-input').value.trim();
-    if (!emailInput) {
-        alert("Inserisci un'email valida.");
+    const emailInput = document.getElementById('docente-email-input').value.trim().toLowerCase();
+    const passwordInput = document.getElementById('docente-password-input').value.trim();
+
+    if (!emailInput || !passwordInput) {
+        alert("Inserisci email e password.");
         return;
     }
 
-    // Verifica se l'utente è approvato
-    let approved = JSON.parse(localStorage.getItem('fanta_approved_users')) || [];
-    if (!approved.includes(emailInput)) {
-        // Nessun alert qui come richiesto, l'utente viene solo reindirizzato
-        navigateTo('view-iscrizione');
-        // Pre-popoliamo l'email nella pagina di iscrizione se possibile o la salviamo temporaneamente
-        localStorage.setItem('fanta_temp_email', emailInput);
-        return;
+    try {
+        await fanta_db.login(emailInput, passwordInput);
+    } catch (error) {
+        console.error("Login fallito:", error);
+        alert("Accesso fallito. Verifica email e password o assicurati di essere stato approvato.");
     }
-
-    localStorage.setItem('fanta_docente_email', emailInput);
-    setLoggedIn(emailInput);
-    navigateTo('view-prof'); // Reindirizza subito alla pagina Buongiorno Prof
 }
 
-function inviaRichiestaIscrizione(event) {
+async function loginGoogle() {
+    try {
+        const result = await fanta_db.loginWithGoogle();
+        const user = result.user;
+        const email = user.email.toLowerCase();
+
+        // checkLoginSession gestirà la logica di approvazione/reindirizzamento
+    } catch (error) {
+        console.error("Google Login Error:", error);
+        alert("Errore durante l'accesso con Google.");
+    }
+}
+
+async function inviaRichiestaIscrizione(event) {
     if(event) event.preventDefault();
-    const email = localStorage.getItem('fanta_temp_email') || "";
+    const email = (localStorage.getItem('fanta_temp_email') || document.querySelector('#docente-email-input')?.value || "").toLowerCase();
     const name = document.querySelector('#view-iscrizione input[placeholder="Nome docente"]').value.trim();
     const school = document.querySelector('#view-iscrizione input[placeholder="Nome scuola"]').value.trim();
     const city = document.querySelector('#view-iscrizione input[placeholder="Citta"]').value.trim();
+    const password = document.getElementById('iscrizione-password').value.trim();
 
     const isDocente = document.getElementById('teacher-check-docente').checked;
     const acceptedPrivacy = document.getElementById('teacher-check-privacy').checked;
 
     if (!name || !school || !city || !email) {
-        alert("Completa tutti i campi e inserisci l'email nella home.");
-        if(!email) navigateTo('view-welcome');
+        alert("Completa tutti i campi (e inserisci l'email nella home se necessario).");
+        return;
+    }
+
+    if (password && password.length < 6) {
+        alert("La password deve essere di almeno 6 caratteri.");
         return;
     }
 
@@ -1094,33 +1167,58 @@ function inviaRichiestaIscrizione(event) {
         return;
     }
 
-    let requests = JSON.parse(localStorage.getItem('fanta_pending_requests')) || [];
-    if (requests.some(r => r.email === email)) {
-        alert("Hai già inviato una richiesta di iscrizione. Attendi l'approvazione.");
-        return;
+    try {
+        // 1. Creiamo l'account su Firebase Auth immediatamente
+        try {
+            await window.auth.createUserWithEmailAndPassword(email, password);
+        } catch (authError) {
+            // Se gia in uso (es: Google o vecchia registrazione), proseguiamo
+            if (authError.code !== 'auth/email-already-in-use') {
+                throw authError;
+            }
+        }
+
+        const requests = await fanta_db.getTeacherRequests();
+        if (requests.some(r => r.email.toLowerCase() === email)) {
+            alert("Hai già inviato una richiesta di iscrizione con questa email. Attendi l'approvazione.");
+            return;
+        }
+
+        const now = new Date();
+        const timestamp = now.toLocaleDateString('it-IT') + ' ' + now.toLocaleTimeString('it-IT');
+
+        const requestData = {
+            email,
+            name,
+            school,
+            city,
+            password, 
+            status: 'pending',
+            createdAt: timestamp,
+            isDocente: true
+        };
+
+        await fanta_db.saveTeacherRequest(requestData);
+        alert("Account creato e richiesta inviata con successo! Potrai accedere non appena il Game Master avrà approvato il tuo profilo.");
+        
+        await fanta_db.logout(); 
+        navigateTo('view-welcome');
+        if(document.getElementById('form-iscrizione')) document.getElementById('form-iscrizione').reset();
+    } catch (err) {
+        console.error("Errore registrazione:", err);
+        alert("Errore durante la registrazione: " + (err.message || "riprova più tardi."));
     }
-
-    const now = new Date();
-    const timestamp = now.toLocaleDateString('it-IT') + ' ' + now.toLocaleTimeString('it-IT');
-
-    requests.push({ 
-        email, 
-        name, 
-        school, 
-        city, 
-        status: 'pending', 
-        id: 'req_' + Date.now(),
-        consentTimestamp: timestamp
-    });
-    localStorage.setItem('fanta_pending_requests', JSON.stringify(requests));
-
-    alert("Richiesta inviata con successo! Riceverai una e-mail dal Game Master in caso di approvazione.");
-    navigateTo('view-welcome');
 }
 
-function checkStudentConsent() {
+async function checkStudentConsent() {
+    const codeInput = document.getElementById('student-code-input').value.trim().toUpperCase();
     const ageCheck = document.getElementById('student-check-age').checked;
     const privacyCheck = document.getElementById('student-check-privacy').checked;
+
+    if (!codeInput) {
+        alert("Inserisci il codice della tua squadra per continuare.");
+        return;
+    }
 
     if (!hasReadPrivacy || !hasReadTermini) {
         alert("Per proseguire è necessario aprire e leggere la Privacy Policy e i Termini e Condizioni cliccando sui rispettivi link.");
@@ -1132,12 +1230,27 @@ function checkStudentConsent() {
         return;
     }
 
-    // Salviamo il consenso dello studente nel localStorage (anonimo)
-    const now = new Date();
-    const timestamp = now.toLocaleDateString('it-IT') + ' ' + now.toLocaleTimeString('it-IT');
-    localStorage.setItem('fanta_student_consent', timestamp);
+    try {
+        const team = await fanta_db.getTeamByCode(codeInput);
+        if (!team) {
+            alert("Codice non valido. Verifica con il tuo docente.");
+            return;
+        }
 
-    navigateTo('view-classifiche');
+        // Salviamo il codice e lo stato dello studente
+        localStorage.setItem('fanta_active_team_code', codeInput);
+        localStorage.setItem('fanta_active_team_id', team.id);
+        
+        const now = new Date();
+        const timestamp = now.toLocaleDateString('it-IT') + ' ' + now.toLocaleTimeString('it-IT');
+        localStorage.setItem('fanta_student_consent', timestamp);
+
+        alert(`Benvenuto! Accesso effettuato per la squadra: ${team.name}`);
+        navigateTo('view-classifiche');
+    } catch (e) {
+        console.error("Errore validazione codice:", e);
+        alert("Si è verificato un errore durante la verifica del codice. Riprova tra poco.");
+    }
 }
 
 function inviaMessaggioContatto(event) {
@@ -1166,10 +1279,12 @@ function inviaMessaggioContatto(event) {
 }
 
 function eliminaAccountTotale() {
-    if (confirm("ATTENZIONE: Se procedi, verranno rimossi DEFINITIVAMENTE tutti i tuoi dati, le squadre che hai creato e i tuoi tornei da questo dispositivo. Vuoi continuare?")) {
-        localStorage.clear();
-        alert("Tutti i dati sono stati rimossi. Verrai reindirizzato alla Home.");
-        window.location.reload();
+    if (confirm("ATTENZIONE: Se procedi, verranno rimossi DEFINITIVAMENTE tutti i tuoi dati locali e verrai disconnesso. Vuoi continuare?")) {
+        fanta_db.logout().finally(() => {
+            localStorage.clear();
+            alert("Dati locali rimossi. Verrai reindirizzato alla Home.");
+            window.location.reload();
+        });
     }
 }
 
@@ -1184,8 +1299,9 @@ function azzeraTutteSpunte() {
     alert("Tutte le spunte sono state rimosse!");
 }
 
-function logoutDocente() {
-    localStorage.removeItem('fanta_docente_email');
+async function logoutDocente() {
+    await fanta_db.logout();
+    localStorage.removeItem('fanta_temp_email'); // Pulizia opzionale
     currentUserEmail = null;
     const loginSec = document.getElementById('login-section');
     const loggedSec = document.getElementById('logged-in-section');
@@ -1233,7 +1349,11 @@ function closeLegalModal(type) {
     const modal = document.getElementById(`modal-${type}`);
     if (modal) {
         modal.style.display = 'none';
-        document.body.style.overflow = 'auto'; // Ripristina scroll del body
+        // Non ripristiniamo l'overflow se un'altra modale è aperta
+        if (!document.querySelector('.modal-legal[style*="display: flex"]') && 
+            !document.querySelector('.modal-legal[style*="display: block"]')) {
+            document.body.style.overflow = 'auto';
+        }
     }
 }
 
@@ -1243,7 +1363,7 @@ window.onclick = function(event) {
         event.target.style.display = 'none';
         document.body.style.overflow = 'auto';
     }
-    // Mantieni logica modali esistenti se necessario
+    if (event.target.id === 'share-modal') event.target.style.display = 'none';
     if (event.target.id === 'torneo-modal') event.target.style.display = 'none';
     if (event.target.id === 'join-torneo-modal') event.target.style.display = 'none';
     if (event.target.id === 'invite-torneo-modal') event.target.style.display = 'none';
@@ -1273,10 +1393,14 @@ function setLoggedIn(email) {
     renderProfilo();
 }
 
-function getAllTeams() {
-    let localTeams = JSON.parse(localStorage.getItem('fanta_local_teams')) || [];
-    let globalTeams = (typeof MOCK_TEAMS !== 'undefined' ? MOCK_TEAMS : []);
-    return [...globalTeams, ...localTeams];
+async function getAllTeams() {
+    try {
+        const dbTeams = await fanta_db.getTeams();
+        return dbTeams;
+    } catch (e) {
+        console.error("Errore recupero squadre da Firebase:", e);
+        return [];
+    }
 }
 
 /* =========================================
@@ -1313,22 +1437,31 @@ function setupTeamSave() {
             return;
         }
 
-        let localTeams = JSON.parse(localStorage.getItem('fanta_local_teams')) || [];
-        
         const newTeam = {
-            id: 'local_' + Date.now(),
+            id: 't' + Date.now(),
             name: teamNameInput,
             classe: teamClasseInput,
             ownerEmail: currentUserEmail,
             authors: authorsSelected,
             missionsCompleted: 0,
-            mode: currentTeamMode   // ← salva la modalità
+            mode: currentTeamMode
         };
 
-        localTeams.push(newTeam);
-        localStorage.setItem('fanta_local_teams', JSON.stringify(localTeams));
-
-        alert("Squadra creata con successo! Vai al profilo per vederla.");
+        // Salvataggio su Firebase
+        fanta_db.saveTeam(newTeam).then(() => {
+            alert("Squadra creata con successo! Caricamento in corso...");
+            // Reset form
+            document.querySelector('#view-squadra input[placeholder="Es: I Promessi Sposi"]').value = "";
+            document.getElementById('team-classe-input').value = "";
+            teamSelection = { 1: null, 2: null, 3: null, 4: null, 5: null };
+            calculateBudget();
+            
+            renderProfilo();
+            navigateTo('view-profilo');
+        }).catch(err => {
+            console.error("Errore Firebase:", err);
+            alert("Errore durante il salvataggio. Verifica la tua connessione.");
+        });
         
         // Reset form
         document.querySelector('#view-squadra input[placeholder="Es: I Promessi Sposi"]').value = "";
@@ -1361,27 +1494,25 @@ function setupTeamSave() {
     });
 }
 
-function renderProfilo() {
+async function renderProfilo() {
     if(!currentUserEmail) return;
     
-    let localTeams = JSON.parse(localStorage.getItem('fanta_local_teams')) || [];
-    let myTeams = localTeams.filter(t => t.ownerEmail === currentUserEmail);
+    const allTeams = await getAllTeams();
+    const myTeams = allTeams.filter(t => t.ownerEmail === currentUserEmail);
     
     const squadreList = document.getElementById('profilo-squadre-list');
     if(!squadreList) return;
 
-    
     // Calcoliamo i punteggi globali per determinare le posizioni
-    let allTeams = getAllTeams();
     let calculatedLeaderboard = allTeams.map(t => {
         let authPoints = 0;
         t.authors.forEach(aid => {
             const author = AUTHORS.find(a => a.id === aid);
-            if(author && author.isPointsRevealed) authPoints += author.points;
+            if(author && author.isPointsRevealed) authPoints += (author.points || 0);
         });
         return {
             id: t.id,
-            points: authPoints + (t.missionsCompleted * 5)
+            points: authPoints + ((t.missionsCompleted || 0) * 5)
         };
     });
     calculatedLeaderboard.sort((a, b) => b.points - a.points);
@@ -1397,13 +1528,12 @@ function renderProfilo() {
             }).join(', ');
 
              // Troviamo posizione e punteggio per QUESTA squadra
-             let stats = calculatedLeaderboard.find(s => s.id === team.id);
              let rank = calculatedLeaderboard.findIndex(s => s.id === team.id) + 1;
              
              let authPts = 0;
              team.authors.forEach(aid => {
                  const a = AUTHORS.find(x => x.id === aid);
-                 if(a && a.isPointsRevealed) authPts += a.points;
+                 if(a && a.isPointsRevealed) authPts += (a.points || 0);
              });
              let misPts = (team.missionsCompleted || 0) * 5;
 
@@ -1432,6 +1562,16 @@ function renderProfilo() {
                         </div>
                      </div>
 
+                     <div style="width:100%; margin-bottom:15px; padding:10px; border-radius:12px; background:rgba(141, 160, 63, 0.05); border:1px dashed var(--primary-color); display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <span style="font-size:0.7rem; text-transform:uppercase; color:var(--text-muted); display:block;">Codice Studenti</span>
+                            <span class="join-code-badge" style="margin:0;">${team.joinCode || '---'}</span>
+                        </div>
+                        <button class="btn" style="width:auto; padding:6px 12px; font-size:0.75rem; border-radius:20px;" onclick="shareInvite({type:'student', code:'${team.joinCode}', teamName:'${team.name}'})">
+                            <i class="fa-solid fa-share-nodes"></i> Condividi
+                        </button>
+                     </div>
+
                      <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(75, 93, 22, 0.05); padding:12px; border-radius:12px; width:100%; border:1px solid rgba(75, 93, 22, 0.1);">
                          <div>
                              <div style="font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); letter-spacing:1px;">Totale Globale</div>
@@ -1451,47 +1591,53 @@ function renderProfilo() {
     renderTornei();
 }
 
-function renderNotifiche() {
+async function renderNotifiche() {
     const list = document.getElementById('profilo-notifiche-list');
     if(!list || !currentUserEmail) return;
     
-    let invites = JSON.parse(localStorage.getItem('fanta_invites')) || [];
-    let myPending = invites.filter(i => i.toEmail === currentUserEmail && i.status === 'pending');
+    list.innerHTML = '<p class="text-center">Caricamento notifiche...</p>';
     
-    list.innerHTML = '';
-    if(myPending.length === 0) {
-        list.innerHTML = '<i>Nessuna nuova notifica.</i>';
-        return;
-    }
-    
-    let tourneys = JSON.parse(localStorage.getItem('fanta_tournaments')) || [];
-    
-    myPending.forEach(inv => {
-        let t = tourneys.find(x => x.id === inv.tournamentId);
-        let tName = t ? t.name : "Torneo Sconosciuto";
+    try {
+        const myPending = await fanta_db.getInvites(currentUserEmail);
+        list.innerHTML = '';
         
-        list.innerHTML += `
-            <div style="background:rgba(255,193,7,0.1); padding:10px; border-radius:8px; border-left:3px solid #ffc107; font-size:0.9rem; margin-bottom:10px;">
-                <p style="margin:0 0 10px 0;"><b>${inv.fromEmail}</b> ti ha invitato al torneo <b>${tName}</b>.</p>
-                <div style="display:flex; gap:10px;">
-                    <button class="btn" style="padding:4px 10px; font-size:0.75rem; width:auto; background:var(--primary-color);" onclick="openJoinTorneoModal('${inv.tournamentId}', '${inv.id}')">Accetta e Iscrivi Squadre</button>
-                    <button class="btn btn-secondary" style="padding:4px 10px; font-size:0.75rem; width:auto;" onclick="rifiutaInvito('${inv.id}')">Rifiuta</button>
+        if(myPending.length === 0) {
+            list.innerHTML = '<i>Nessuna nuova notifica.</i>';
+            return;
+        }
+        
+        const tourneys = await fanta_db.getTournaments();
+        
+        myPending.filter(i => i.status === 'pending').forEach(inv => {
+            let t = tourneys.find(x => x.id === inv.tournamentId);
+            let tName = t ? t.name : "Torneo Sconosciuto";
+            
+            list.innerHTML += `
+                <div style="background:rgba(255,193,7,0.1); padding:10px; border-radius:8px; border-left:3px solid #ffc107; font-size:0.9rem; margin-bottom:10px;">
+                    <p style="margin:0 0 10px 0;"><b>${inv.fromEmail}</b> ti ha invitato al torneo <b>${tName}</b>.</p>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn" style="padding:4px 10px; font-size:0.75rem; width:auto; background:var(--primary-color);" onclick="openJoinTorneoModal('${inv.tournamentId}', '${inv.id}')">Accetta e Iscrivi Squadre</button>
+                        <button class="btn btn-secondary" style="padding:4px 10px; font-size:0.75rem; width:auto;" onclick="rifiutaInvito('${inv.id}')">Rifiuta</button>
+                    </div>
                 </div>
-            </div>
-        `;
-    });
+            `;
+        });
+    } catch (e) {
+        console.error("Errore caricamento notifiche:", e);
+        list.innerHTML = '<i>Errore nel caricamento delle notifiche.</i>';
+    }
 }
 
-function openTorneoModal() {
+async function openTorneoModal() {
     const modal = document.getElementById('torneo-modal');
     if(!modal) return;
     
     const checkboxes = document.getElementById('torneo-squadre-checkboxes');
+    checkboxes.innerHTML = '<p class="text-center">Caricamento squadre...</p>';
+    
+    const myTeams = (await getAllTeams()).filter(t => t.ownerEmail === currentUserEmail);
+    
     checkboxes.innerHTML = '';
-    
-    let localTeams = JSON.parse(localStorage.getItem('fanta_local_teams')) || [];
-    let myTeams = localTeams.filter(t => t.ownerEmail === currentUserEmail);
-    
     if(myTeams.length < 2) {
         checkboxes.innerHTML = '<p class="text-danger">Devi creare almeno 2 squadre per organizzare un torneo privato!</p>';
     } else {
@@ -1509,34 +1655,30 @@ function openTorneoModal() {
     modal.style.display = 'block';
 }
 
-function creaTorneo(event) {
+async function creaTorneo(event) {
     if(event) event.preventDefault();
     const nome = document.getElementById('torneo-nome-input').value.trim();
-    if(!nome) {
-        alert("Inserisci il nome del torneo.");
-        return;
-    }
+    if(!nome) { alert("Inserisci il nome del torneo."); return; }
     
     const selectedIds = Array.from(document.querySelectorAll('.torneo-team-chk:checked')).map(chk => chk.value);
-    if(selectedIds.length < 2) {
-        alert("Seleziona almeno 2 squadre per creare il torneo.");
-        return;
+    if(selectedIds.length < 2) { alert("Seleziona almeno 2 squadre per creare il torneo."); return; }
+    
+    try {
+        await fanta_db.saveTournament({
+            name: nome,
+            ownerEmail: currentUserEmail,
+            teams: selectedIds
+        });
+        
+        document.getElementById('torneo-modal').style.display = 'none';
+        renderTornei();
+    } catch (e) {
+        console.error("Errore creazione torneo:", e);
+        alert("Errore durante la creazione del torneo.");
     }
-    
-    let tourneys = JSON.parse(localStorage.getItem('fanta_tournaments')) || [];
-    tourneys.push({
-        id: 'tour_' + Date.now(),
-        name: nome,
-        ownerEmail: currentUserEmail,
-        teams: selectedIds
-    });
-    localStorage.setItem('fanta_tournaments', JSON.stringify(tourneys));
-    
-    document.getElementById('torneo-modal').style.display = 'none';
-    renderTornei();
 }
 
-function openJoinTorneoModal(tourId, inviteId) {
+async function openJoinTorneoModal(tourId, inviteId) {
     const modal = document.getElementById('join-torneo-modal');
     if(!modal) return;
     
@@ -1544,11 +1686,11 @@ function openJoinTorneoModal(tourId, inviteId) {
     document.getElementById('join-invite-id').value = inviteId;
     
     const checkboxes = document.getElementById('join-torneo-squadre');
+    checkboxes.innerHTML = '<p class="text-center">Caricamento squadre...</p>';
+    
+    const myTeams = (await getAllTeams()).filter(t => t.ownerEmail === currentUserEmail);
+    
     checkboxes.innerHTML = '';
-    
-    let localTeams = JSON.parse(localStorage.getItem('fanta_local_teams')) || [];
-    let myTeams = localTeams.filter(t => t.ownerEmail === currentUserEmail);
-    
     if(myTeams.length === 0) {
         checkboxes.innerHTML = '<p class="text-danger">Non hai ancora creato squadre!</p>';
     } else {
@@ -1564,70 +1706,101 @@ function openJoinTorneoModal(tourId, inviteId) {
     modal.style.display = 'block';
 }
 
-function joinTorneo(event) {
+async function joinTorneo(event) {
     if(event) event.preventDefault();
     const tourId = document.getElementById('join-torneo-id').value;
     const invId = document.getElementById('join-invite-id').value;
     
-    let tourneys = JSON.parse(localStorage.getItem('fanta_tournaments')) || [];
-    let tourIdx = tourneys.findIndex(t => t.id === tourId);
-    if(tourIdx === -1) {
-        alert("Torneo non trovato.");
-        return;
+    try {
+        const tourneys = await fanta_db.getTournaments();
+        const tournament = tourneys.find(t => t.id === tourId);
+        if(!tournament) { alert("Torneo non trovato."); return; }
+        
+        const selectedIds = Array.from(document.querySelectorAll('.join-team-chk:checked')).map(chk => chk.value);
+        if(selectedIds.length === 0) { alert("Seleziona almeno una tua squadra da iscrivere."); return; }
+        
+        const updatedTeams = [...new Set([...(tournament.teams || []), ...selectedIds])];
+        await window.db.collection("tournaments").doc(tourId).update({ teams: updatedTeams });
+        await fanta_db.updateInviteStatus(invId, 'accepted');
+        
+        document.getElementById('join-torneo-modal').style.display = 'none';
+        alert("Squadre iscritte con successo!");
+        renderProfilo(); 
+    } catch (e) {
+        console.error("Errore partecipazione torneo:", e);
+        alert("Errore durante la partecipazione al torneo.");
     }
-    
-    const selectedIds = Array.from(document.querySelectorAll('.join-team-chk:checked')).map(chk => chk.value);
-    if(selectedIds.length === 0) {
-        alert("Seleziona almeno una tua squadra da iscrivere.");
-        return;
-    }
-    
-    tourneys[tourIdx].teams = [...new Set([...tourneys[tourIdx].teams, ...selectedIds])];
-    localStorage.setItem('fanta_tournaments', JSON.stringify(tourneys));
-    
-    let invites = JSON.parse(localStorage.getItem('fanta_invites')) || [];
-    let invIdx = invites.findIndex(i => i.id === invId);
-    if(invIdx > -1) {
-        invites[invIdx].status = 'accepted';
-        localStorage.setItem('fanta_invites', JSON.stringify(invites));
-    }
-    
-    document.getElementById('join-torneo-modal').style.display = 'none';
-    alert("Squadre iscritte con successo!");
-    renderProfilo(); 
 }
 
-function rifiutaInvito(invId) {
+async function rifiutaInvito(invId) {
     if(!confirm("Vuoi rimuovere questo invito?")) return;
-    let invites = JSON.parse(localStorage.getItem('fanta_invites')) || [];
-    invites = invites.filter(i => i.id !== invId); 
-    localStorage.setItem('fanta_invites', JSON.stringify(invites));
-    renderProfilo();
+    try {
+        await fanta_db.deleteInvite(invId);
+        renderProfilo();
+    } catch (e) {
+        console.error("Errore rifiuto invito:", e);
+    }
 }
 
-function openInviteModal(tourId) {
-    const modal = document.getElementById('invite-torneo-modal');
-    if(!modal) return;
+async function shareInvite(options = {}) {
+    // options: { type: 'general'|'tournament'|'student', tourId, code, teamName }
+    const appUrl = window.location.origin + window.location.pathname;
+    let shareTitle = "Fantaletteratura";
+    let shareText = "Partecipa anche tu a Fantaletteratura, la sfida tra capolavori della letteratura!";
     
-    document.getElementById('invite-torneo-id').value = tourId || '';
-    document.getElementById('invite-collega-email').value = '';
-    
-    // Aggiornamento dei testi se è un invito generico o un torneo
-    const modalTitle = modal.querySelector('h3');
-    const modalText = modal.querySelector('p');
-    
-    if(!tourId) {
-        if(modalTitle) modalTitle.textContent = "Invita un Collega";
-        if(modalText) modalText.textContent = "Inserisci l'email del docente che vuoi invitare a iscriversi a Fantaletteratura.";
-    } else {
-        if(modalTitle) modalTitle.textContent = "Invita al Torneo";
-        if(modalText) modalText.textContent = "Inserisci l'email del docente che vuoi invitare a partecipare a questo torneo privato.";
+    if (options.type === 'student') {
+        shareTitle = `Unisciti alla squadra ${options.teamName}`;
+        shareText = `Ciao! Unisciti alla mia squadra ${options.teamName} su Fantaletteratura. \nUsa il codice: ${options.code}\nEntra qui: ${appUrl}`;
+    } else if (options.type === 'tournament') {
+        shareTitle = "Invito al Torneo";
+        shareText = `Partecipa al mio torneo privato su Fantaletteratura! Iscrivi le tue squadre usando questo link: ${appUrl}`;
     }
+
+    // Se disponibile API di sistema (Mobile)
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: shareTitle,
+                text: shareText,
+                url: appUrl
+            });
+            return;
+        } catch (err) {
+            console.log("Share API fallita o annullata", err);
+        }
+    }
+
+    // Fallback: Modale Custom (Desktop)
+    const modal = document.getElementById('share-modal');
+    if (!modal) return;
+
+    document.getElementById('share-modal-title').textContent = shareTitle;
+    document.getElementById('share-modal-desc').textContent = shareText;
+
+    // Configura i link
+    const encodedText = encodeURIComponent(shareText);
+    const encodedUrl = encodeURIComponent(appUrl);
+
+    document.getElementById('share-wa').href = `https://wa.me/?text=${encodedText}`;
+    document.getElementById('share-classroom').href = `https://classroom.google.com/u/0/share?url=${encodedUrl}`;
+    document.getElementById('share-teams').href = `https://teams.microsoft.com/share?href=${encodedUrl}&msgText=${encodedText}`;
     
+    window.currentShareText = shareText; // Per copia link
     modal.style.display = 'block';
 }
 
-function inviaInvitoTorneo(event) {
+function copyShareLink() {
+    const textToCopy = window.currentShareText || "Fantaletteratura: " + window.location.origin + window.location.pathname;
+    navigator.clipboard.writeText(textToCopy).then(() => {
+        alert("Link e messaggio copiati negli appunti!");
+    });
+}
+
+function openInviteModal(tourId) {
+    shareInvite({ type: tourId ? 'tournament' : 'general', tourId: tourId });
+}
+
+async function inviaInvitoTorneo(event) {
     if(event) event.preventDefault();
     const tourId = document.getElementById('invite-torneo-id').value;
     const targetEmail = document.getElementById('invite-collega-email').value.trim();
@@ -1637,117 +1810,118 @@ function inviaInvitoTorneo(event) {
 
     const isGeneral = !tourId;
     
-    let users = JSON.parse(localStorage.getItem('fanta_registered_users')) || [];
-    if(!users.includes(targetEmail)) {
-        const subject = encodeURIComponent("Benvenuto in Fantaletteratura!");
-        let bodyPlain = `Ciao! \n\nHai ricevuto un invito a partecipare a Fantaletteratura, la sfida tra capolavori! \n\n` +
-            `Fantaletteratura è un gioco didattico dove classi e studenti creano squadre di autori letterari per sfidarsi a colpi di missioni e punteggi. \n\n`;
+    try {
+        const requests = await fanta_db.getTeacherRequests();
+        const snapshotUsers = await window.db.collection("users").where("email", "==", targetEmail).get();
+        const isRegistered = !snapshotUsers.empty;
+
+        if(!isRegistered) {
+            const subject = encodeURIComponent("Benvenuto in Fantaletteratura!");
+            let bodyPlain = `Ciao! \n\nHai ricevuto un invito a partecipare a Fantaletteratura, la sfida tra capolavori! \n\n` +
+                `Fantaletteratura è un gioco didattico dove classi e studenti creano squadre di autori letterari per sfidarsi a colpi di missioni e punteggi. \n\n`;
+                
+            if (isGeneral) {
+                bodyPlain += `Un tuo collega ti ha appena invitato a iscriverti come docente. Accedi subito per registrare la tua classe e iniziare la sfida!\n\n`;
+            } else {
+                bodyPlain += `Un tuo collega ti ha appena invitato ad un torneo privato. Accedi subito per registrare la tua classe e iniziare la sfida!\n\n`;
+            }
             
-        if (isGeneral) {
-            bodyPlain += `Un tuo collega ti ha appena invitato a iscriverti come docente. Accedi subito per registrare la tua classe e iniziare la sfida!\n\n`;
-        } else {
-            bodyPlain += `Un tuo collega ti ha appena invitato ad un torneo privato. Accedi subito per registrare la tua classe e iniziare la sfida!\n\n`;
+            bodyPlain += `Puoi accedere qui: ${window.location.origin}${window.location.pathname}\n\nBuona fortuna!`;
+            
+            const body = encodeURIComponent(bodyPlain);
+            window.location.href = `mailto:${targetEmail}?subject=${subject}&body=${body}`;
         }
         
-        bodyPlain += `Puoi accedere qui: ${window.location.origin}${window.location.pathname}\n\nBuona fortuna!`;
+        await fanta_db.saveInvite({
+            tournamentId: tourId || 'general',
+            fromEmail: currentUserEmail,
+            toEmail: targetEmail
+        });
         
-        const body = encodeURIComponent(bodyPlain);
-        window.location.href = `mailto:${targetEmail}?subject=${subject}&body=${body}`;
-        // we still record the invite
+        document.getElementById('invite-torneo-modal').style.display = 'none';
+        alert(isGeneral ? "Invito generico spedito!" : "Invito al torneo spedito!");
+    } catch (e) {
+        console.error("Errore invio invito:", e);
+        alert("Errore durante l'invio dell'invito.");
     }
-    
-    let invites = JSON.parse(localStorage.getItem('fanta_invites')) || [];
-    // Evita duplicati pendenti
-    if(!isGeneral && invites.some(i => i.toEmail === targetEmail && i.tournamentId === tourId && i.status === 'pending')) {
-        alert("Hai già inviato un invito a questa persona per questo torneo!");
-        return;
-    }
-    
-    invites.push({
-        id: 'inv_' + Date.now(),
-        tournamentId: tourId || 'general',
-        fromEmail: currentUserEmail,
-        toEmail: targetEmail,
-        status: 'pending'
-    });
-    localStorage.setItem('fanta_invites', JSON.stringify(invites));
-    
-    document.getElementById('invite-torneo-modal').style.display = 'none';
-    alert(isGeneral ? "Invito generico spedito!" : "Invito al torneo spedito!");
 }
 
-function renderTornei() {
+async function renderTornei() {
     const tourneysList = document.getElementById('profilo-tornei-list');
     if(!tourneysList || !currentUserEmail) return;
     
-    let tourneys = JSON.parse(localStorage.getItem('fanta_tournaments')) || [];
+    tourneysList.innerHTML = '<p class="text-center">Caricamento tornei...</p>';
     
-    let localTeams = JSON.parse(localStorage.getItem('fanta_local_teams')) || [];
-    let myTeamsIds = localTeams.filter(t => t.ownerEmail === currentUserEmail).map(t => t.id);
+    try {
+        const tourneys = await fanta_db.getTournaments();
+        const allTeams = await fanta_db.getTeams();
+        const myTeamsIds = allTeams.filter(t => t.ownerEmail === currentUserEmail).map(t => t.id);
 
-    // Mostra il torneo se il docente lo ha creato O se ci ha iscritto delle sue squadre
-    let myTourneys = tourneys.filter(t => {
-        return t.ownerEmail === currentUserEmail || t.teams.some(teamId => myTeamsIds.includes(teamId));
-    });
-    
-    tourneysList.innerHTML = '';
-    if(myTourneys.length === 0) {
-        tourneysList.innerHTML = '<i>Nessun torneo. Creane uno o unisciti tramite codice.</i>';
-        return;
+        // Mostra il torneo se il docente lo ha creato O se ci ha iscritto delle sue squadre
+        let myTourneys = tourneys.filter(t => {
+            return t.ownerEmail === currentUserEmail || (t.teams && t.teams.some(teamId => myTeamsIds.includes(teamId)));
+        });
+        
+        tourneysList.innerHTML = '';
+        if(myTourneys.length === 0) {
+            tourneysList.innerHTML = '<i>Nessun torneo. Creane uno o unisciti tramite invito.</i>';
+            return;
+        }
+        
+        myTourneys.forEach(tour => {
+            let calculated = (tour.teams || []).map(tid => {
+                let tObj = allTeams.find(x => x.id === tid);
+                if(!tObj) return null;
+                let authPts = 0;
+                tObj.authors.forEach(aid => {
+                    let a = AUTHORS.find(x => x.id === aid);
+                    if(a && a.isPointsRevealed) authPts += a.points;
+                });
+                return {
+                    team: tObj.name,
+                    totale: authPts + ((tObj.missionsCompleted || 0) * 5)
+                };
+            }).filter(x => x !== null);
+            
+            calculated.sort((a,b) => b.totale - a.totale);
+            
+            let rankHtml = calculated.map((item, idx) => `
+                <div style="display:flex; justify-content:space-between; font-size:0.9rem; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                    <span>${idx+1}. ${item.team}</span>
+                    <span class="text-primary" style="font-weight:bold">${item.totale} pt</span>
+                </div>
+            `).join('');
+            
+            let btnInvita = `<button class="btn btn-secondary" style="font-size:0.75rem; padding:4px 8px; width:auto; float:right;" onclick="openInviteModal('${tour.id}')"><i class="fa-solid fa-paper-plane"></i> Invita Collega</button>`;
+
+            tourneysList.innerHTML += `
+                <div style="background:rgba(255,255,255,0.05); padding:10px 15px; border-radius:8px; border-left:3px solid var(--primary-color); margin-bottom:15px;">
+                    ${btnInvita}
+                    <div style="font-weight:bold; font-size:1.1rem; margin-bottom:10px; color:var(--primary-color);"> <i class="fa-solid fa-trophy"></i> ${tour.name}</div>
+                    ${rankHtml}
+                </div>
+            `;
+        });
+    } catch (e) {
+        console.error("Errore caricamento tornei:", e);
+        tourneysList.innerHTML = '<i>Errore nel caricamento dei tornei.</i>';
     }
-    
-    myTourneys.forEach(tour => {
-        let allTeams = getAllTeams();
-        
-        let calculated = tour.teams.map(tid => {
-            let tObj = allTeams.find(x => x.id === tid);
-            if(!tObj) return null;
-            let authPts = 0;
-            tObj.authors.forEach(aid => {
-                let a = AUTHORS.find(x => x.id === aid);
-                if(a && a.isPointsRevealed) authPts += a.points;
-            });
-            return {
-                team: tObj.name,
-                totale: authPts + (tObj.missionsCompleted * 5)
-            };
-        }).filter(x => x !== null);
-        
-        calculated.sort((a,b) => b.totale - a.totale);
-        
-        let rankHtml = calculated.map((item, idx) => `
-            <div style="display:flex; justify-content:space-between; font-size:0.9rem; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
-                <span>${idx+1}. ${item.team}</span>
-                <span class="text-primary" style="font-weight:bold">${item.totale} pt</span>
-            </div>
-        `).join('');
-        
-        let btnInvita = `<button class="btn btn-secondary" style="font-size:0.75rem; padding:4px 8px; width:auto; float:right;" onclick="openInviteModal('${tour.id}')"><i class="fa-solid fa-paper-plane"></i> Invita Collega</button>`;
-
-        tourneysList.innerHTML += `
-            <div style="background:rgba(255,255,255,0.05); padding:10px 15px; border-radius:8px; border-left:3px solid var(--primary-color);">
-                ${btnInvita}
-                <div style="font-weight:bold; font-size:1.1rem; margin-bottom:10px; color:var(--primary-color);"> <i class="fa-solid fa-trophy"></i> ${tour.name}</div>
-                ${rankHtml}
-            </div>
-        `;
-    });
 }
 
 /* =========================================
    MISSIONI (USER SIDE)
 ========================================= */
 
-function renderMissioniUtente() {
+async function renderMissioniUtente() {
     if(!currentUserEmail) return;
     
     // 1. Popola la select delle squadre nel modale
     const select = document.getElementById('missione-squadra-select');
+    const allTeams = await getAllTeams();
+    const myTeams = allTeams.filter(t => t.ownerEmail === currentUserEmail);
+    
     if(select) {
         select.innerHTML = '<option value="">-- Seleziona una squadra --</option>';
-        let localTeams = JSON.parse(localStorage.getItem('fanta_local_teams')) || [];
-        let myTeams = localTeams.filter(t => t.ownerEmail === currentUserEmail);
-        
         myTeams.forEach(t => {
             select.innerHTML += `<option value="${t.id}">${t.name} (${t.classe})</option>`;
         });
@@ -1757,17 +1931,15 @@ function renderMissioniUtente() {
     const list = document.getElementById('missioni-pending-list');
     if(list) {
         list.innerHTML = '';
-        let pending = JSON.parse(localStorage.getItem('fanta_missioni_pending')) || [];
-        let localTeams = JSON.parse(localStorage.getItem('fanta_local_teams')) || [];
-        let myTeamsIds = localTeams.filter(t => t.ownerEmail === currentUserEmail).map(t => t.id);
-        
-        let myPending = pending.filter(m => myTeamsIds.includes(m.teamId));
+        const pending = await fanta_db.getPendingMissions();
+        const myTeamsIds = myTeams.map(t => t.id);
+        const myPending = pending.filter(m => myTeamsIds.includes(m.teamId));
         
         if(myPending.length === 0) {
             list.innerHTML = '<div class="glass" style="padding:15px; text-align:center; color:var(--text-muted); font-size:0.85rem;"><i>Nessuna missione in coda. Inviandone una apparirà qui!</i></div>';
         } else {
             myPending.forEach(m => {
-                let teamObj = localTeams.find(t => t.id === m.teamId);
+                let teamObj = myTeams.find(t => t.id === m.teamId);
                 let teamName = teamObj ? teamObj.name : "Squadra Sconosciuta";
                 list.innerHTML += `
                     <div class="glass" style="padding:15px; margin-bottom:10px; border-left:4px solid var(--accent-gold); display:flex; justify-content:space-between; align-items:center;">
@@ -1795,7 +1967,7 @@ function openNuovaMissioneModal() {
     }
 }
 
-function inviaMissione(event) {
+async function inviaMissione(event) {
     if(event) event.preventDefault();
     const select = document.getElementById('missione-squadra-select');
     const input = document.getElementById('missione-titolo-input');
@@ -1805,20 +1977,24 @@ function inviaMissione(event) {
     if(!select.value) { alert("Seleziona la squadra che ha svolto l'attività!"); return; }
     if(!input.value.trim()) { alert("Inserisci una breve descrizione della missione svolta!"); return; }
     
-    let pending = JSON.parse(localStorage.getItem('fanta_missioni_pending')) || [];
-    pending.push({
-        id: 'mis_' + Date.now(),
+    const missionData = {
         teamId: select.value,
         titolo: input.value.trim(),
-        timestamp: new Date().toISOString()
-    });
-    localStorage.setItem('fanta_missioni_pending', JSON.stringify(pending));
-    
-    // Reset form e chiudi modale
-    input.value = "";
-    document.getElementById('nuova-missione-modal').style.display = 'none';
-    
-    alert("Missione inviata! Riceverai 5 punti sulla classifica missioni non appena il Game Master l'avrà verificata.");
-    renderMissioniUtente();
+        ownerEmail: currentUserEmail
+    };
+
+    try {
+        await fanta_db.saveMission(missionData);
+        alert("Missione inviata! Riceverai 5 punti sulla classifica missioni non appena il Game Master l'avrà verificata.");
+        
+        // Reset form e chiudi modale
+        input.value = "";
+        document.getElementById('nuova-missione-modal').style.display = 'none';
+        
+        await renderMissioniUtente();
+    } catch (e) {
+        console.error("Errore invio missione:", e);
+        alert("Errore durante l'invio della missione.");
+    }
 }
 

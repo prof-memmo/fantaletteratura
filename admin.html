@@ -259,22 +259,31 @@
         </div>
     </div>
 
-    <!-- Modale Invia Invito / Invita Collega (necessario anche in admin) -->
-    <div id="invite-torneo-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-dark); z-index:2000; overflow-y:auto;">
-        <div style="padding: 15px; position: sticky; top: 0; background:var(--bg-dark); z-index:10; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center;">
-            <h3 style="margin:0;">Invita un Collega</h3>
-            <button class="btn-secondary" onclick="document.getElementById('invite-torneo-modal').style.display='none'" style="padding: 5px 15px; width:auto; border-radius:20px; border:none;"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div style="padding: 20px;">
-            <input type="hidden" id="invite-torneo-id">
-            <p style="font-size:0.8rem; color:#aaa; margin-bottom:15px;">Inserisci l'indirizzo email del docente che vuoi invitare a Fantaletteratura.</p>
-            <div class="input-group">
-                <label>Email Collega</label>
-                <input type="email" id="invite-collega-email" class="input-control" placeholder="Es: mario.rossi@scuola.it">
+    <!-- Modale Condivisione Universale (WhatsApp, Classroom, Teams, etc) -->
+    <div id="share-modal" class="modal-wip" style="padding-top: 10vh; z-index: 3000;">
+        <div class="modal-wip-content" style="max-width: 450px;">
+            <div id="share-modal-title" style="font-family: var(--font-heading); font-size: 1.5rem; color: var(--primary-color); margin-bottom: 10px;">Condividi</div>
+            <p id="share-modal-desc" style="font-size: 0.9rem; margin-bottom: 20px;">Scegli dove condividere l'invito:</p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                <a id="share-wa" href="#" target="_blank" class="btn" style="background:#25D366; color:white; font-size:0.8rem; height: auto; padding: 12px 5px;"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
+                <a id="share-classroom" href="#" target="_blank" class="btn" style="background:#009688; color:white; font-size:0.8rem; height: auto; padding: 12px 5px;"><i class="fa-solid fa-graduation-cap"></i> Classroom</a>
+                <a id="share-teams" href="#" target="_blank" class="btn" style="background:#464EB8; color:white; font-size:0.8rem; height: auto; padding: 12px 5px;"><i class="fa-solid fa-users-viewfinder"></i> MS Teams</a>
+                <button onclick="copyShareLink()" class="btn" style="background:var(--accent-gold); color:black; font-size:0.8rem; height: auto; padding: 12px 5px;"><i class="fa-solid fa-copy"></i> Copia Link</button>
             </div>
-            <button type="button" class="btn" onclick="inviaInvitoTorneo()">Spedisci Invito</button>
+            
+            <button class="btn btn-secondary" onclick="document.getElementById('share-modal').style.display='none'" style="width:100%;">Chiudi</button>
         </div>
     </div>
+
+    <!-- Firebase SDK (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Configurazione & Service Layer -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-service.js"></script>
 
     <!-- Scripts -->
     <script src="js/data.js"></script>
