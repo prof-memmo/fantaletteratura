@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fantaletteratura</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="app-container">
+        <!-- Top Navigation -->
+        <header class="top-nav glass">
+            <button class="menu-btn" id="open-menu"><i class="fa-solid fa-bars"></i></button>
+            <div class="page-title" id="page-title">Fantaletteratura</div>
+            <div style="width: 24px;"></div> <!-- Spacer for flexbox -->
+        </header>
+
+        <!-- Side Drawer Menu -->
+        <div class="menu-overlay" id="menu-overlay"></div>
+        <nav class="side-menu" id="side-menu">
+            <div class="menu-header" style="display: flex; flex-direction: column; align-items: center;">
+                <h2 style="margin: 0;">Fantaletteratura</h2>
+                <p style="font-size: 0.8rem; margin:0;">La sfida tra capolavori</p>
+            </div>
+            <ul class="menu-items">
+                <li><a href="#" data-view="view-welcome" class="menu-link active"><i class="fa-solid fa-house fa-fw"></i> Home</a></li>
+                <li><a href="#" data-view="view-regolamento" class="menu-link"><i class="fa-solid fa-scale-balanced fa-fw"></i> Regolamento</a></li>
+                <li><a href="#" data-view="view-classifiche" class="menu-link"><i class="fa-solid fa-trophy fa-fw"></i> Classifiche</a></li>
+                <li><a href="#" data-view="view-schede" class="menu-link"><i class="fa-solid fa-file-lines fa-fw"></i> Schede</a></li>
+                <li><a href="#" data-view="view-contatti" class="menu-link"><i class="fa-solid fa-envelope fa-fw"></i> Contatti</a></li>
+                <li><a href="#" data-view="view-profilo" class="menu-link hidden" id="menu-link-profilo"><i class="fa-solid fa-user fa-fw"></i> Profilo Utente</a></li>
+                <li style="padding: 0 20px; margin-top: 15px;"><hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1);"></li>
+                <li><a href="#" class="menu-link" onclick="event.preventDefault(); openLegalModal('privacy')"><i class="fa-solid fa-user-lock fa-fw"></i> Privacy Policy</a></li>
+                <li><a href="#" class="menu-link" onclick="event.preventDefault(); openLegalModal('termini')"><i class="fa-solid fa-file-invoice fa-fw"></i> Termini e Condizioni</a></li>
+                <li style="margin-top: 15px;"><a href="admin.html" class="admin-link text-primary" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem;"><i class="fa-solid fa-lock fa-fw"></i> Pannello Admin</a></li>
+            </ul>
+        </nav>
+
+        <!-- VIEWS -->
+        <main id="main-content">
+            
+            <!-- VIEW: Welcome Home -->
+            <section id="view-welcome" class="view active">
+
+                <h1 class="text-center">Benvenuto!<br>Clicca sul pulsante, crea la tua squadra e completa le missioni!</h1>
+                <div class="logo-container">
+                    <img src="assets/logo.jpg" alt="Logo Fantaletteratura" class="logo-circle">
+                </div>
+                <div class="glass" style="padding: 20px; margin-top: 30px;" id="login-section">
+                    <p class="text-center" style="font-size: 0.9rem; color: #fff;">Inserisci il tuo indirizzo email per entrare come docente.</p>
+                    <div class="input-group">
+                        <input type="email" id="docente-email-input" class="input-control" placeholder="Email docente" onkeypress="if(event.key==='Enter') loginDocente()">
+                    </div>
+                    <button type="button" class="btn" onclick="loginDocente()">Entra come Docente</button>
+                    <div style="text-align: center; margin: 15px 0; color: #666;">- oppure -</div>
+                    <button type="button" class="btn btn-secondary mb-2" onclick="navigateTo('view-studenti')">Entra come Studente</button>
+                    <button type="button" class="btn" style="background: #f1c40f !important; color: #000 !important; font-size: 1rem; font-weight: 800; border: 2px solid #000; box-shadow: 0 4px 15px rgba(241, 196, 15, 0.4);" onclick="openInviteModal()"><i class="fa-solid fa-paper-plane"></i> INVITA UN COLLEGA</button>
+                </div>
+                
+                <div class="glass" style="padding: 20px; margin-top: 30px; display: none;" id="logged-in-section">
+                    <h3 class="text-center mb-1 text-primary" id="logged-in-welcome">Benvenuto!</h3>
+                    <p class="text-center" style="font-size: 0.9rem; margin-bottom:20px;">Hai effettuato l'accesso all'area personale.</p>
+                    <button class="btn mb-1" onclick="navigateTo('view-profilo')">Vai alle tue Squadre / Profilo</button>
+                    <button class="btn btn-secondary mb-1" onclick="navigateTo('view-squadra')" style="border-width:2px;">Iscrivi una Nuova Squadra</button>
+                    <div style="text-align:center; margin-top:15px;"><a href="#" onclick="logoutDocente()" style="color:var(--danger-color); font-size:0.8rem; text-decoration:none;">Disconnetti</a></div>
+                </div>
+            </section>
+
+            <!-- VIEW: Buongiorno Prof -->
+            <section id="view-prof" class="view">
+
+                <h2>Buongiorno Prof!</h2>
+                <div class="glass" style="padding: 15px; font-size: 0.95rem;">
+                    <p>Grazie per partecipare a Fantaletteratura, il gioco didattico ispirato al Fantasanremo che porta la letteratura in classe in modo creativo, cooperativo e coinvolgente.</p>
+                    <p>📚 L'obiettivo del gioco è stimolare l'interesse per autori, testi e contesti letterari attraverso una dinamica a squadre, missioni didattiche e punteggi legati alle attività svolte dagli studenti.</p>
+                    <p>👥 Ogni classe/scuola forma le proprie squadre. Le squadre scelgono 5 autori rientrando nel budget di 20000 lire, completano missioni e attività letterarie per guadagnare punti.<br>
+                    I punteggi vengono aggiornati periodicamente nelle classifiche.<br>
+                    Esistono tre Classifiche: la Classifica Autori, la Classifica Missioni e la Classifica Globale che implementa le due.</p>
+                    <p>🎯 Come docente referente potrai: creare e gestire le squadre, inserire gli autori, controllare il punteggio, proporre missioni e attività creative e inserirle sull'app (ogni missione vale 5 punti), guidare i ragazzi nel percorso di scoperta letteraria.</p>
+                    <p>💡 L’obiettivo non è la competizione fine a sé stessa, ma rendere la letteratura un terreno di gioco, riflessione e divertimento.</p>
+                    <p>Per qualsiasi dubbio o suggerimento, siamo qui per supportarvi. Buon viaggio nel mondo della parola, della storia e dell’immaginazione! ✨ Buon Fantaletteratura!</p>
+                    <div style="margin-top:20px;">
+                        <button class="btn" style="width:100%;" onclick="navigateTo('view-squadra')">Iscrivi una classe</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: Buongiorno Studenti -->
+            <section id="view-studenti" class="view">
+
+                <h2>👋 Buongiorno Studenti!</h2>
+                <div class="glass" style="padding: 15px; font-size: 0.95rem;">
+                    <p>👋 Benvenuti nel gioco che trasforma la letteratura in una sfida a squadre, piena di missioni, creatività e punti da conquistare!</p>
+                    <p>🎯 <strong>Cosa si fa?</strong><br>
+                    Formate la vostra squadra<br>
+                    Scegliete 5 autori restando nel budget di 20000 lire.<br>
+                    Partecipate alle missioni.<br>
+                    Guadagnate punti con attività, letture, performance e idee originali.<br>
+                    Salite in classifica e provate a diventare… Campioni di Fantaletteratura! 🏆</p>
+                    <p>💡 <strong>Perché farlo?</strong><br>
+                    Per scoprire gli autori in modo diverso: con gioco, collaborazione, fantasia e un pizzico di competizione!</p>
+                    <p>🤝 <strong>Regole semplici</strong><br>
+                    Collaborate nella vostra squadra<br>
+                    Partecipate alle attività proposte<br>
+                    Rispettate gli avversari e… divertitevi!</p>
+                    <p>🌟 <strong>Pronti?</strong><br>
+                    Scegliete la vostra squadra, le star, iniziate la missione e lasciate che i libri vi portino lontano…<br>
+                    Buon Fantaletteratura! 📖🔥</p>
+                    
+                    <div id="student-consent-section" class="mt-2 pt-2" style="border-top: 1px solid rgba(255,255,255,0.1);">
+                        <label class="checkbox-container mb-1">
+                            <input type="checkbox" id="student-check-age">
+                            <span class="checkmark"></span>
+                            Ho almeno 16 anni o sono sotto la supervisione di un adulto
+                        </label>
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="student-check-privacy">
+                            <span class="checkmark"></span>
+                            Accetto la <a href="#" onclick="event.preventDefault(); openLegalModal('privacy')" style="color:var(--primary-color);">Privacy Policy</a> e i <a href="#" onclick="event.preventDefault(); openLegalModal('termini')" style="color:var(--primary-color);">Termini e Condizioni</a>
+                        </label>
+                    </div>
+
+                    <button type="button" class="btn mt-2" id="btn-student-entry" onclick="checkStudentConsent()">Guarda le Classifiche</button>
+                </div>
+            </section>
+
+            <!-- VIEW: Iscrizione -->
+            <section id="view-iscrizione" class="view">
+
+                <h2><i class="fa-solid fa-feather-pointed"></i> Iscriviti a Fantaletteratura</h2>
+                <form id="form-iscrizione" class="glass" style="padding: 20px;">
+                    <div class="input-group">
+                        <label>Docente</label>
+                        <input type="text" class="input-control" placeholder="Nome docente">
+                    </div>
+                    <div class="input-group">
+                        <label>Scuola</label>
+                        <input type="text" class="input-control" placeholder="Nome scuola">
+                    </div>
+                    <div class="input-group">
+                        <label>Città</label>
+                        <input type="text" class="input-control" placeholder="Citta">
+                    </div>
+                    
+                    <div class="consent-group mt-2">
+                        <label class="checkbox-container mb-1">
+                            <input type="checkbox" id="teacher-check-docente">
+                            <span class="checkmark"></span>
+                            Sono docente
+                        </label>
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="teacher-check-privacy">
+                            <span class="checkmark"></span>
+                            Accetto la <a href="#" onclick="event.preventDefault(); openLegalModal('privacy')" style="color:var(--primary-color);">Privacy Policy</a> e i <a href="#" onclick="event.preventDefault(); openLegalModal('termini')" style="color:var(--primary-color);">Termini e Condizioni</a>
+                        </label>
+                    </div>
+                    
+                    <button type="button" class="btn mt-2" onclick="inviaRichiestaIscrizione()">Invia la tua richiesta di iscrizione per l'approvazione</button>
+                </form>
+            </section>
+
+            <!-- VIEW: Crea Squadra -->
+            <section id="view-squadra" class="view">
+
+                <h2><i class="fa-solid fa-book-open"></i> Carica una nuova squadra</h2>
+
+                <!-- Budget bar (nascosta finché non si sceglie modalità) -->
+                <div class="budget-container" id="budget-container" style="display:none;">
+                    <div class="budget-header">
+                        <span>Budget disponibile</span>
+                        <span id="budget-text" class="text-primary">20.000 lire</span>
+                    </div>
+                    <div class="budget-bar-bg">
+                        <div class="budget-bar-fill" id="budget-bar"></div>
+                    </div>
+                    <div class="budget-status" id="budget-status">Hai ancora 20000 lire da spendere!</div>
+                </div>
+
+                <div class="glass" style="padding: 20px;">
+                    <div class="input-group">
+                        <label>Nome della squadra</label>
+                        <input type="text" class="input-control" placeholder="Es: I Promessi Sposi">
+                    </div>
+                    <div class="input-group">
+                        <label>Classe</label>
+                        <input type="text" id="team-classe-input" class="input-control" placeholder="Es: 3A">
+                    </div>
+
+                    <!-- SELEZIONE MODALITÀ -->
+                    <label style="margin-bottom: 12px; display: block; font-size:0.9rem; color:var(--text-muted);">Scegli la modalità di gioco per questa squadra</label>
+                    <div class="mode-selector-grid" id="mode-selector-grid">
+                        <button class="mode-selector-btn" id="mode-btn-terze" onclick="selectTeamMode('terze')">
+                            <div class="mode-btn-title color-green">📘 Contemporanea: Autori Italiani</div>
+                            <div class="mode-btn-desc">Autori italiani dell'Ottocento e del Novecento</div>
+                        </button>
+                        <button class="mode-selector-btn" id="mode-btn-seconde" onclick="selectTeamMode('seconde')">
+                            <div class="mode-btn-title color-orange">📙 Età Moderna</div>
+                            <div class="mode-btn-desc">Autori dalle origini della letteratura italiana fino al Settecento</div>
+                        </button>
+                        <button class="mode-selector-btn" id="mode-btn-avanzato" onclick="selectTeamMode('avanzato')">
+                            <div class="mode-btn-title color-gold">📒 Contemporanea: Autori Italiani e Internazionali</div>
+                            <div class="mode-btn-desc">Autori italiani e internazionali</div>
+                        </button>
+                    </div>
+
+                    <!-- SLOT AUTORI (nascosti finché non si sceglie modalità) -->
+                    <div id="author-slots-section" style="display:none;">
+                        <label style="margin-bottom: 10px; display: block;">Seleziona le 5 Star</label>
+                        <div style="display:flex; flex-direction:column; gap:10px; margin-bottom: 20px;">
+                            <div class="author-slot-wrapper">
+                                <button class="btn btn-secondary author-slot-btn" data-slot="1" style="display:flex; justify-content:space-between; align-items:center;"><span class="slot-name"><i class="fa-solid fa-plus"></i> Scegli la 1ª star</span> <span class="slot-cost text-primary"></span></button>
+                                <button class="author-remove-btn" data-slot="1" onclick="removeAuthorFromSlot(1)" title="Rimuovi autore"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                            <div class="author-slot-wrapper">
+                                <button class="btn btn-secondary author-slot-btn" data-slot="2" style="display:flex; justify-content:space-between; align-items:center;"><span class="slot-name"><i class="fa-solid fa-plus"></i> Scegli la 2ª star</span> <span class="slot-cost text-primary"></span></button>
+                                <button class="author-remove-btn" data-slot="2" onclick="removeAuthorFromSlot(2)" title="Rimuovi autore"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                            <div class="author-slot-wrapper">
+                                <button class="btn btn-secondary author-slot-btn" data-slot="3" style="display:flex; justify-content:space-between; align-items:center;"><span class="slot-name"><i class="fa-solid fa-plus"></i> Scegli la 3ª star</span> <span class="slot-cost text-primary"></span></button>
+                                <button class="author-remove-btn" data-slot="3" onclick="removeAuthorFromSlot(3)" title="Rimuovi autore"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                            <div class="author-slot-wrapper">
+                                <button class="btn btn-secondary author-slot-btn" data-slot="4" style="display:flex; justify-content:space-between; align-items:center;"><span class="slot-name"><i class="fa-solid fa-plus"></i> Scegli la 4ª star</span> <span class="slot-cost text-primary"></span></button>
+                                <button class="author-remove-btn" data-slot="4" onclick="removeAuthorFromSlot(4)" title="Rimuovi autore"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                            <div class="author-slot-wrapper">
+                                <button class="btn btn-secondary author-slot-btn" data-slot="5" style="display:flex; justify-content:space-between; align-items:center;"><span class="slot-name"><i class="fa-solid fa-plus"></i> Scegli la 5ª star</span> <span class="slot-cost text-primary"></span></button>
+                                <button class="author-remove-btn" data-slot="5" onclick="removeAuthorFromSlot(5)" title="Rimuovi autore"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                        </div>
+                        <button class="btn" id="btn-save-team" disabled>Salva Squadra</button>
+                    </div>
+                </div>
+
+                <!-- Modale per scelta Star -->
+                <div id="author-selector-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-dark); z-index:2000; overflow-y:auto;">
+                    <div style="padding: 15px; position: sticky; top: 0; background:var(--bg-dark); z-index:10; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center;">
+                        <h3 style="margin:0;">Scegli una star</h3>
+                        <button class="btn-secondary" id="close-author-modal" style="padding: 5px 15px; width:auto; border-radius:20px; border:none;"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div style="padding: 15px;">
+                        <div class="input-group">
+                            <input type="text" id="search-author" class="input-control" placeholder="Cerca autore..." style="margin-bottom: 15px;">
+                        </div>
+                        <div id="author-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px;">
+                            <!-- Inseriti JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: Regolamento -->
+            <section id="view-regolamento" class="view">
+
+                <div class="glass" style="padding: 20px;">
+                    <div class="text-center mb-2">
+                        <img src="assets/logo.jpg" alt="Logo Fantaletteratura" style="max-height: 120px; width: auto; display: block; margin: 0 auto 15px;">
+                    </div>
+                    <h2 class="text-center mb-2">Regolamento<br>Fantaletteratura</h2>
+                    <ul class="rules-list" style="font-size: 0.95rem; line-height: 1.5; padding-left: 20px;">
+                        <li>Il gioco nasce da una libera interpretazione e ha scopo puramente ludico e didattico.</li>
+                        <li>Ogni classe/scuola forma una squadra.</li>
+                        <li>Ogni squadra ha un budget iniziale di <strong>20000 lire</strong> per acquistare 5 autori.</li>
+                        <li>Per ogni artista saranno attribuiti bonus e malus in base alla scheda autore.</li>
+                        <li>I punteggi saranno aggiornati mensilmente per uno o più autori e per le missioni.</li>
+                        <li>I bonus e i malus sono fissi perchè legati alla vita e alle opere dell'autore raccolte in una scheda segretissima!</li>
+                        <li>La scheda sara mostrata solo nel riepilogo mensile nella pagina "Schede" quando i prof la sbloccheranno assieme ai punti.</li>
+                        <li>Esistono bonus dinamici che possono essere caricati sul profilo di squadra in "Missioni" e formeranno un'altra classifica.</li>
+                        <li>I bonus dinamici sono legati ad attività di classe, approfondimenti, performance e scoperte e hanno un valore di 5 punti.</li>
+                        <li>Esistono tre Classifiche: Autori, Missioni e Globale.</li>
+                        <li><strong>Novità Tornei:</strong> I docenti possono creare tornei interni invitando altri colleghi tramite l'App. Ogni docente, tramite un Codice Invito, potrà iscrivere le proprie squadre a quel torneo privato organizzando gare tra classi o scuole diverse!</li>
+                        <li>Vince chi, nella prima settimana di Giugno, ha totalizzato il maggior numero di punti.</li>
+                        <li>Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma sempre rispettoso che anima il gioco. Nessun bonus o malus può essere interpretato come un'esortazione a compiere atti illeciti o irrispettosi nei confronti di altri individui o della collettività.</li>
+                        <li>Il regolamento potrà subire variazioni</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- VIEW: Classifiche (Menu) -->
+            <section id="view-classifiche" class="view">
+
+                <div class="glass text-center" style="padding: 20px; margin-bottom: 20px;">
+                    <p style="font-style: italic; font-size: 0.9rem;">"La cosa importante è non smettere mai di domandare. La curiosità ha il suo motivo di esistere. Non si può fare altro che restare stupiti quando si contemplano i misteri dell'eternità, della vita, della struttura meravigliosa della realtà. È sufficiente se si cerca di comprendere soltanto un poco di questo mistero tutti i giorni. Non perdere mai una sacra curiosità."</p>
+                    <h4 class="text-primary mt-2">Albert Einstein</h4>
+                </div>
+                <h3 class="text-center mb-2">Scegli la modalità</h3>
+                <div class="leaderboard-mode-tabs" style="margin-bottom:20px;">
+                    <button class="lb-mode-tab" id="lb-tab-terze" onclick="selectLeaderboardMode('terze')">📘 Contemporanea: Autori Italiani</button>
+                    <button class="lb-mode-tab" id="lb-tab-seconde" onclick="selectLeaderboardMode('seconde')">📙 Età Moderna</button>
+                    <button class="lb-mode-tab" id="lb-tab-avanzato" onclick="selectLeaderboardMode('avanzato')">📒 Contemporanea: Autori Italiani e Internazionali</button>
+                </div>
+                <div id="lb-type-buttons" class="card-list" style="display: none; flex-direction: column; gap: 12px;">
+                    <h4 class="text-center mb-1" id="lb-mode-selected-label" style="color:var(--text-muted); font-size:0.9rem;"></h4>
+                    <button class="btn" id="lb-btn-autori" onclick="showLeaderboard('autori')"><i class="fa-solid fa-feather"></i> Classifica Autori</button>
+                    <button class="btn" id="lb-btn-missioni" onclick="showLeaderboard('missioni')"><i class="fa-solid fa-scroll"></i> Classifica Missioni</button>
+                    <button class="btn" id="lb-btn-globale" onclick="showLeaderboard('globale')"><i class="fa-solid fa-trophy"></i> Classifica Globale</button>
+                </div>
+            </section>
+
+            <!-- VIEW: Dettaglio Classifica -->
+            <section id="view-classifica-dettaglio" class="view">
+
+                <button class="btn-secondary" style="padding: 5px 15px; border-radius:20px; margin-bottom: 15px; border:none;" onclick="navigateTo('view-classifiche')">
+                    <i class="fa-solid fa-arrow-left"></i> Indietro
+                </button>
+                <h2 id="leaderboard-title">Classifica</h2>
+                <div class="input-group mt-2">
+                    <input type="text" class="input-control" placeholder="Cerca squadra..." id="search-leaderboard">
+                </div>
+                <div class="leaderboard-list-inner">
+                    <div id="leaderboard-list" class="mt-2"></div>
+                </div>
+            </section>
+
+            <!-- VIEW: Schede -->
+            <section id="view-schede" class="view">
+
+                <div class="glass mb-2" style="padding: 15px;">
+                    <p class="mb-0"><i class="fa-solid fa-bullhorn text-primary"></i> Hai visto le ultime novità?</p>
+                </div>
+                <h2 class="mb-2"><i class="fa-solid fa-scroll"></i> Tutte le schede</h2>
+                <div class="input-group">
+                    <input type="text" class="input-control" placeholder="Cerca scheda...">
+                </div>
+                <div class="grid-2 mt-2" id="schede-grid"></div>
+            </section>
+
+            <!-- VIEW: Privacy Policy -->
+            <section id="view-privacy" class="view">
+                <h2 class="mb-2">Policy privacy</h2>
+                <div class="glass" style="padding: 20px; font-size: 0.85rem;">
+                    <p>Il gioco Fantaletteratura rispetta la tua privacy e protegge i tuoi dati personali in conformità al GDPR.</p>
+                    <p>Per consultare il testo completo, visita le pagine dedicate:</p>
+                    <div style="display:flex; flex-direction:column; gap:10px; margin-top:15px;">
+                        <button class="btn btn-secondary" onclick="openLegalModal('privacy')"><i class="fa-solid fa-user-lock"></i> Leggi Privacy Policy</button>
+                        <button class="btn btn-secondary" onclick="openLegalModal('termini')"><i class="fa-solid fa-file-invoice"></i> Leggi Termini e Condizioni</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-contatti" class="view">
+
+                <div class="contact-split">
+                    <!-- Parte Sinistra: Blu/Verde Palette -->
+                    <div class="contact-left">
+                        <h2>Mettiamoci in contatto</h2>
+                        <p>Hai domande, vuoi provare un gioco nella tua classe o proporre una collaborazione? Scrivimi!</p>
+                        
+                        <div class="avatar-circle-container">
+                            <img src="assets/prof_memmo.png" alt="Prof Memmo" class="avatar-circle">
+                        </div>
+
+                        <div class="contact-email-box">
+                            <div class="email-icon-circle">
+                                <i class="fa-regular fa-envelope"></i>
+                            </div>
+                            <span>prof.memmo@gmail.com</span>
+                        </div>
+                    </div>
+
+                    <!-- Parte Destra: Form Bianco -->
+                    <div class="contact-right">
+                        <form action="#">
+                            <div class="input-group">
+                                <label>Nome</label>
+                                <input type="text" class="input-control" placeholder="Il tuo nome">
+                            </div>
+                            <div class="input-group">
+                                <label>Email</label>
+                                <input type="email" class="input-control" placeholder="La tua email">
+                            </div>
+                            <div class="input-group">
+                                <label>Messaggio</label>
+                                <textarea class="input-control" placeholder="Come posso aiutarti?" rows="5" id="contatti-messaggio"></textarea>
+                            </div>
+                            
+                            <div class="input-group" id="contact-consent-section" style="margin-bottom: 15px;">
+                                <label class="checkbox-container" style="font-size: 0.8rem;">
+                                    <input type="checkbox" id="contact-check-privacy">
+                                    <span class="checkmark"></span>
+                                    Accetto la <a href="#" onclick="event.preventDefault(); openLegalModal('privacy')" style="color:var(--primary-color);">Privacy Policy</a>
+                                </label>
+                            </div>
+                            
+                            <button type="button" class="btn" style="width: 100%; border-radius: 30px;" onclick="inviaMessaggioContatto()">Invia Messaggio</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- VIEW: Missioni -->
+            <section id="view-missioni" class="view">
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Carica Missione</h2>
+                    <button type="button" class="btn" onclick="openNuovaMissioneModal()" style="width: auto; padding: 8px 15px; border-radius:20px; font-size:0.8rem;"><i class="fa-solid fa-upload"></i> Carica Missione</button>
+                </div>
+                
+                <div class="glass mb-2" style="padding: 15px; font-size: 0.9rem; line-height: 1.4;">
+                    <p>Hai completato una missione? Hai diritto a un bonus dinamico di <b>5 punti</b> per la tua squadra!</p>
+                    <p style="margin-top:5px; color:var(--text-muted); font-size:0.8rem;">I bonus sono legati ad attività di classe, performance e scoperte letterarie validate dal Game Master.</p>
+                </div>
+                
+                <h4 class="mb-1" style="color:var(--text-muted)">Le tue missioni in attesa di validazione:</h4>
+                <div id="missioni-pending-list" style="display:flex; flex-direction:column; gap:10px;">
+                    <i>Nessuna missione in coda.</i>
+                </div>
+            </section>
+
+             <!-- VIEW: Profilo -->
+             <section id="view-profilo" class="view">
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                     <h2>Profilo Utente</h2>
+                     <button class="btn btn-secondary" style="width: auto; padding: 8px 15px; border-radius:20px; font-size:0.8rem;" onclick="logoutDocente()"><i class="fa-solid fa-right-from-bracket"></i> Esci</button>
+                 </div>
+                <div class="glass mb-2" style="padding: 15px;">
+                    <input type="text" id="profilo-email" class="input-control mb-1" value="" readonly style="background: rgba(255,255,255,0.05); color: #aaa;">
+                    
+                    <button type="button" class="btn mb-2" onclick="navigateTo('view-missioni'); openNuovaMissioneModal();"><i class="fa-solid fa-list-check"></i> Carica una Missione</button>
+                    <button type="button" class="btn mb-2" onclick="navigateTo('view-squadra')"><i class="fa-solid fa-plus-circle"></i> Carica una nuova squadra</button>
+                    <button type="button" class="btn mb-2" style="background: var(--accent-gold);" onclick="openInviteModal()"><i class="fa-solid fa-paper-plane"></i> Invita un Collega</button>
+                    
+                    <h3 class="mt-2 text-primary">Le tue squadre</h3>
+                    <div id="profilo-squadre-list" style="padding: 10px 0; color: var(--text-muted); font-size: 0.9rem;">
+                        <div class="glass" style="padding:20px; text-align:center;"><i>Nessuna squadra creata. Premi il tasto sopra per iniziare!</i></div>
+                    </div>
+
+                    <h3 class="mt-2 text-primary">Missioni Convalidate</h3>
+                    <div id="profilo-missioni-list" style="padding: 10px 0; color: var(--text-muted); font-size: 0.9rem;">
+                        <i>Ancora nessuna missione per le tue squadre.</i>
+                    </div>
+                </div>
+
+                <div class="glass mb-2" style="padding: 15px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <h3 style="margin:0;"><i class="fa-solid fa-bell text-primary"></i> Le tue Notifiche</h3>
+                    </div>
+                    <div id="profilo-notifiche-list" style="display:flex; flex-direction:column; gap:10px;">
+                        <i>Nessuna nuova notifica.</i>
+                    </div>
+                </div>
+
+                <div class="glass mb-2" style="padding: 15px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <h3 style="margin:0;">Tornei Interni</h3>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn" style="width: auto; padding: 5px 10px; font-size: 0.8rem; background: var(--primary-color)" onclick="openTorneoModal()"><i class="fa-solid fa-plus"></i> Crea</button>
+                        </div>
+                    </div>
+                    <p style="font-size:0.8rem; margin-bottom: 15px; color: var(--text-muted);">Crea classifiche isolate per classi o scuole, sfidando le squadre che hai creato.</p>
+                    <div id="profilo-tornei-list" style="display:flex; flex-direction:column; gap:10px;">
+                        <i>Nessun torneo privato creato.</i>
+                    </div>
+                </div>
+
+
+                
+                <div class="glass mb-2" style="padding: 15px;">
+                    <button class="btn" style="background: var(--danger-color); font-size: 0.9rem;" onclick="eliminaAccountTotale()"><i class="fa-solid fa-trash-can"></i> Elimina Account e Dati</button>
+                    <p style="font-size:0.7rem; color:var(--text-muted); margin-top:10px; line-height:1.2;">Attenzione: questa operazione rimuoverà definitivamente tutti i tuoi dati, le squadre e i tornei da questo dispositivo.</p>
+                </div>
+            </section>
+        </main>
+
+        <!-- Final Footer (Desktop & Hidden Area) -->
+        <footer style="padding: 20px; text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 20px;">
+            <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 10px;">
+                <a href="#" onclick="event.preventDefault(); openLegalModal('privacy')" style="color: inherit; text-decoration: none;">Privacy Policy</a>
+                <a href="#" onclick="event.preventDefault(); openLegalModal('termini')" style="color: inherit; text-decoration: none;">Termini e Condizioni</a>
+            </div>
+            <p>&copy; 2026 Fantaletteratura - A cura di Guglielmo Piersanti</p>
+        </footer>
+
+        <!-- Bottom Navigation Tabs -->
+        <nav class="bottom-bar">
+            <a href="#" class="tab-item active" data-view="view-welcome">
+                <i class="fa-regular fa-envelope"></i>
+                <span>Home</span>
+            </a>
+            <a href="#" class="tab-item" data-view="view-regolamento">
+                <i class="fa-solid fa-bolt"></i>
+                <span>Regolamento</span>
+            </a>
+            <a href="#" class="tab-item" data-view="view-classifiche">
+                <i class="fa-solid fa-layer-group"></i>
+                <span>Classifiche</span>
+            </a>
+            <a href="#" class="tab-item" data-view="view-schede">
+                <i class="fa-regular fa-message"></i>
+                <span>Schede</span>
+            </a>
+            <a href="#" class="tab-item hidden" data-view="view-profilo" id="tab-item-profilo">
+                <i class="fa-solid fa-user"></i>
+                <span>Profilo</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- ========================
+         MODALI GLOBALI (fuori dalle view per garantire visibilità)
+         ======================== -->
+
+    <!-- Modale Nuova Missione -->
+    <div id="nuova-missione-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-dark); z-index:2000; overflow-y:auto;">
+        <div style="padding: 15px; position: sticky; top: 0; background:var(--bg-dark); z-index:10; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0;">Carica Missione</h3>
+            <button class="btn-secondary" onclick="document.getElementById('nuova-missione-modal').style.display='none'" style="padding: 5px 15px; width:auto; border-radius:20px; border:none;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div style="padding: 20px;">
+            <p style="font-size:0.8rem; color:#aaa; margin-bottom:15px;">Seleziona la squadra che ha svolto l'attività e descrivila brevemente.</p>
+            <div class="input-group">
+                <label>Squadra</label>
+                <select id="missione-squadra-select" class="input-control" style="background:var(--bg-dark); color:#fff; border:1px solid rgba(255,255,255,0.2);">
+                    <!-- Popolato da JS -->
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Titolo / Descrizione Missione</label>
+                <input type="text" id="missione-titolo-input" class="input-control" placeholder="Es: Lettura recitata del Canto V in classe">
+            </div>
+            <button type="button" class="btn mt-2" onclick="inviaMissione()">Carica Missione</button>
+        </div>
+    </div>
+
+    <!-- Modale Creazione Torneo -->
+    <div id="torneo-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-dark); z-index:2000; overflow-y:auto;">
+        <div style="padding: 15px; position: sticky; top: 0; background:var(--bg-dark); z-index:10; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0;">Crea Nuovo Torneo</h3>
+            <button class="btn-secondary" onclick="document.getElementById('torneo-modal').style.display='none'" style="padding: 5px 15px; width:auto; border-radius:20px; border:none;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div style="padding: 20px;">
+            <div class="input-group">
+                <label>Nome del Torneo</label>
+                <input type="text" id="torneo-nome-input" class="input-control" placeholder="Es: Quarte vs Quinte">
+            </div>
+            <h4 class="mb-1">Seleziona squadre partecipanti</h4>
+            <div id="torneo-squadre-checkboxes" style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
+                <!-- Inserite da JS -->
+            </div>
+            <button type="button" class="btn" onclick="creaTorneo()">Salva Torneo</button>
+        </div>
+    </div>
+
+    <!-- Modale Unisciti a Torneo (Accetta Invito) -->
+    <div id="join-torneo-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-dark); z-index:2000; overflow-y:auto;">
+        <div style="padding: 15px; position: sticky; top: 0; background:var(--bg-dark); z-index:10; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0;">Iscriviti al Torneo</h3>
+            <button class="btn-secondary" onclick="document.getElementById('join-torneo-modal').style.display='none'" style="padding: 5px 15px; width:auto; border-radius:20px; border:none;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div style="padding: 20px;">
+            <input type="hidden" id="join-torneo-id">
+            <input type="hidden" id="join-invite-id">
+            <p style="font-size:0.8rem; color:#aaa; margin-bottom:15px;">Quali squadre vuoi aggregare a questo torneo?</p>
+            <div id="join-torneo-squadre" style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
+                <!-- Inserite da JS -->
+            </div>
+            <button type="button" class="btn" onclick="joinTorneo()">Conferma e Iscriviti</button>
+        </div>
+    </div>
+
+    <!-- Modale Invia Invito / Invita Collega -->
+    <div id="invite-torneo-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-dark); z-index:2000; overflow-y:auto;">
+        <div style="padding: 15px; position: sticky; top: 0; background:var(--bg-dark); z-index:10; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0;">Invita un Collega</h3>
+            <button class="btn-secondary" onclick="document.getElementById('invite-torneo-modal').style.display='none'" style="padding: 5px 15px; width:auto; border-radius:20px; border:none;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div style="padding: 20px;">
+            <input type="hidden" id="invite-torneo-id">
+            <p style="font-size:0.8rem; color:#aaa; margin-bottom:15px;">Inserisci l'indirizzo email del docente che vuoi invitare a questo torneo.</p>
+            <div class="input-group">
+                <label>Email Collega</label>
+                <input type="email" id="invite-collega-email" class="input-control" placeholder="Es: mario.rossi@scuola.it">
+            </div>
+            <button type="button" class="btn" onclick="inviaInvitoTorneo()">Spedisci Invito</button>
+        </div>
+    </div>
+
+    <!-- Modale Legale: Privacy Policy -->
+    <div id="modal-privacy" class="modal-legal" style="display:none;">
+        <div class="modal-legal-content glass">
+            <div class="modal-legal-header">
+                <h3>🔒 Privacy Policy</h3>
+                <button class="close-legal" onclick="closeLegalModal('privacy')">&times;</button>
+            </div>
+            <div class="modal-legal-body">
+                <h4 class="text-primary">1. Titolare del trattamento</h4>
+                <p>Il titolare del trattamento è Guglielmo Piersanti, contattabile all’indirizzo email: prof.memmo@gmail.com</p>
+                <h4 class="text-primary">2. Finalità dell’app</h4>
+                <p>“Fantaletteratura” è un’app didattica, utilizzata a scopo educativo e ludico e senza fini di lucro.</p>
+                <h4 class="text-primary">3. Dati raccolti</h4>
+                <p>L’app può raccogliere i seguenti dati personali: indirizzo e-mail; informazioni di utilizzo relative ai giochi online (punteggi, attività didattiche ecc.); messaggio inviato tramite modulo di contatto; dati tecnici forniti automaticamente dalla piattaforma (es. tipo di dispositivo, dati di log)</p>
+                <h4 class="text-primary">4. Finalità del trattamento</h4>
+                <p>I dati vengono trattati esclusivamente per consentire l’accesso all’app e alle sue funzionalità, gestire l’esperienza didattica e le classifiche interne, migliorare il funzionamento del servizio, rispondere alle richieste inviate tramite il modulo di contatto, fornire assistenza o informazioni richieste dall’utente. Non vengono utilizzati per scopi commerciali o pubblicitari.</p>
+                <h4 class="text-primary">5. Base giuridica</h4>
+                <p>Il trattamento dei dati si basa sull’utilizzo dell’app e sul consenso dell’utente.</p>
+                <h4 class="text-primary">6. Conservazione dei dati</h4>
+                <p>I dati sono trattati in modo lecito e sicuro. Non vengono venduti né ceduti a terzi. Sono mantenuti solo per il tempo necessario al funzionamento didattico dell’app o su richiesta o in maniera autonoma tramite il profilo utente, salvo obblighi di legge. Vengono utilizzati servizi terzi per l’archiviazione dei dati (Firebase).</p>
+                <h4 class="text-primary">8. Diritti dell’utente</h4>
+                <p>L'utente può richiedere in qualsiasi momento: accesso ai propri dati, rettifica o cancellazione, limitazione del trattamento, revoca del consenso. Per esercitare questi diritti, è possibile contattare il titolare all’indirizzo email sopra indicato.</p>
+                <h4 class="text-primary">9. Cookie</h4>
+                <p>Il sito non utilizza cookie di profilazione.</p>
+                <h4 class="text-primary">9. Utenti minori</h4>
+                <p>L’app è destinata a un uso didattico. Per l'utilizzo da parte di minori, è responsabilità di un adulto assicurare le autorizzazioni necessarie. I genitori o tutori possono richiedere la cancellazione dei dati contattando il titolare.</p>
+                <h4 class="text-primary">10. Modifiche alla Policy</h4>
+                <p>La presente informativa può essere aggiornata. Gli utenti verranno informati in caso di modifiche rilevanti.</p>
+                <h4 class="text-primary">11. Riferimenti normativi</h4>
+                <p>Questa informativa è redatta in conformità al GDPR.</p>
+            </div>
+            <div class="modal-legal-footer">
+                <button type="button" class="btn" onclick="closeLegalModal('privacy')">Ho capito</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modale Legale: Termini e Condizioni -->
+    <div id="modal-termini" class="modal-legal" style="display:none;">
+        <div class="modal-legal-content glass">
+            <div class="modal-legal-header">
+                <h3>📜 Termini e Condizioni</h3>
+                <button class="close-legal" onclick="closeLegalModal('termini')">&times;</button>
+            </div>
+            <div class="modal-legal-body">
+                <p><strong>Ultimo aggiornamento: 31/04/26</strong></p>
+                <h4 class="text-primary">1. Titolare del sito</h4>
+                <p>Il presente sito web è gestito da: Guglielmo Piersanti. Email di contatto: prof.memmo@gmail.com</p>
+                <h4 class="text-primary">2. Accettazione dei termini</h4>
+                <p>L’accesso e l’utilizzo del sito implicano l’accettazione dei presenti Termini e Condizioni. Se non si accettano tali condizioni, si invita a non utilizzare il sito.</p>
+                <h4 class="text-primary">3. Descrizione del servizio</h4>
+                <p>Il sito ha finalità informative ed educative. Gli utenti possono: Consultare i contenuti disponibili e usufruire della piattaforma di gioco. Contattare il gestore tramite modulo di contatto.</p>
+                <h4 class="text-primary">4. Utilizzo del sito</h4>
+                <p>L’utente si impegna a utilizzare il sito in modo lecito e corretto, evitando di: Inviare messaggi offensivi, illeciti o spam; Tentare di compromettere la sicurezza del sito; Utilizzare il sito per scopi fraudolenti.</p>
+                <h4 class="text-primary">5. Modulo di contatto</h4>
+                <p>L’utente è responsabile dei dati e dei contenuti inviati tramite il modulo di contatto. È vietato: Inserire dati falsi o di terzi senza autorizzazione; Inviare contenuti illeciti o non pertinenti.</p>
+                <h4 class="text-primary">6. Proprietà intellettuale</h4>
+                <p>Tutti i contenuti del sito (testi, materiali, ecc.) sono di proprietà del titolare, salvo diversa indicazione. È vietata la copia, distribuzione o utilizzo senza autorizzazione.</p>
+                <h4 class="text-primary">7. Limitazione di responsabilità</h4>
+                <p>Il sito è fornito “così com’è”. Il titolare non garantisce l’assenza di errori o interruzioni, la completezza o accuratezza dei contenuti. Il titolare non è responsabile per: Danni derivanti dall’utilizzo del sito; Problemi tecnici o interruzioni del servizio; Contenuti inviati dagli utenti tramite modulo di contatto.</p>
+                <h4 class="text-primary">8. Link esterni</h4>
+                <p>Il sito può contenere link a siti esterni. Il titolare non è responsabile del contenuto o delle politiche di tali siti.</p>
+                <h4 class="text-primary">9. Modifiche</h4>
+                <p>Il titolare si riserva il diritto di modificare i presenti Termini in qualsiasi momento. Le modifiche saranno pubblicate su questa pagina.</p>
+                <h4 class="text-primary">10. Legge applicabile</h4>
+                <p>I presenti Termini sono regolati dalla normativa italiana e dal GDPR.</p>
+            </div>
+            <div class="modal-legal-footer">
+                <button type="button" class="btn" onclick="closeLegalModal('termini')">Ho capito</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- WIP Modal — Stiamo lavorando -->
+    <div class="modal-wip" id="modal-wip" onclick="if(event.target===this) closeWipModal()">
+        <div class="modal-wip-content">
+            <span class="modal-wip-emoji">🚧</span>
+            <div class="modal-wip-title">Stiamo lavorando!</div>
+            <div class="modal-wip-badge"><i class="fa-solid fa-pen-nib"></i> Fantaletteratura</div>
+            <p class="modal-wip-desc" id="wip-modal-desc">Questa sezione è in fase di sviluppo — abbi un po' di pazienza! 😊<br>Tanti nuovi contenuti stanno arrivando e sicuramente anche quello che stai cercando!<br><strong>Riprova più tardi.</strong></p>
+            <button class="btn" onclick="closeWipModal()" style="max-width:220px; margin:0 auto;">Ok, torno dopo!</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

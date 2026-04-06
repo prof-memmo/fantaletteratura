@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fantaletteratura - Admin</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="app-container">
+        <!-- Top Navigation -->
+        <header class="top-nav glass">
+            <button class="menu-btn" id="open-menu"><i class="fa-solid fa-bars"></i></button>
+            <div class="page-title" id="page-title">Pannello Admin</div>
+            <div style="width: 24px;"></div> <!-- Spacer for flexbox -->
+        </header>
+
+        <!-- Side Drawer Menu -->
+        <div class="menu-overlay" id="menu-overlay"></div>
+        <nav class="side-menu" id="side-menu">
+            <div class="menu-header" style="display: flex; flex-direction: column; align-items: center;">
+                <h2 style="margin: 0;">Fantaletteratura</h2>
+                <p style="font-size: 0.8rem; margin:0;">La sfida tra capolavori</p>
+            </div>
+            <ul class="menu-items">
+                <li><a href="index.html" class="admin-link text-primary" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem;"><i class="fa-solid fa-house fa-fw"></i> Torna alla Home</a></li>
+                <li style="margin-top: 15px;"><a href="#" class="admin-tab-btn active" data-target="admin-view-autori" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-lock fa-fw"></i> Pagina Admin - gestionale</a></li>
+                <li><a href="#" class="admin-tab-btn" data-target="admin-view-profilo" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-user-gear fa-fw"></i> Mio Profilo Docente</a></li>
+                
+                <div style="padding: 10px 20px; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-top: 15px; letter-spacing: 1px;">Aree Nascoste</div>
+                <li><a href="#" class="admin-tab-btn" data-target="admin-preview-prof" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-chalkboard-user fa-fw"></i> Buongiorno Prof</a></li>
+                <li><a href="#" class="admin-tab-btn" data-target="admin-preview-studenti" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-graduation-cap fa-fw"></i> Buongiorno Studenti</a></li>
+                <li><a href="#" class="admin-tab-btn" data-target="admin-preview-iscrizione" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-pen-to-square fa-fw"></i> Iscriviti a Fantalett.</a></li>
+                <li><a href="#" class="admin-tab-btn" data-target="admin-preview-squadra" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-users fa-fw"></i> Crea la tua squadra</a></li>
+                <li><a href="#" class="admin-tab-btn" data-target="admin-preview-missioni-intro" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-rocket fa-fw"></i> Introduzione Missioni</a></li>
+                <li><a href="#" class="admin-tab-btn" data-target="admin-preview-missioni-carica" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-list-check fa-fw"></i> Carica Missioni</a></li>
+                <li style="padding: 0 20px; margin-top: 10px;"><hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1);"></li>
+                <li><a href="privacy.html" class="admin-link" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-user-lock fa-fw"></i> Privacy Policy</a></li>
+                <li><a href="termini.html" class="admin-link" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-file-invoice fa-fw"></i> Termini e Condizioni</a></li>
+            </ul>
+        </nav>
+
+        <!-- VIEWS -->
+        <main id="main-content">
+            <!-- Admin Navigation -->
+            <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap; padding: 0 15px; margin-bottom: 20px;" id="admin-main-nav">
+                <button class="btn admin-tab-btn active" data-target="admin-view-autori" style="flex:1; padding: 10px 5px; font-size: 0.8rem;"><i class="fa-solid fa-feather"></i> Autori</button>
+                <button class="btn admin-tab-btn" data-target="admin-view-docenti" style="flex:1; padding: 10px 5px; font-size: 0.8rem;"><i class="fa-solid fa-chalkboard-user"></i> Docenti</button>
+                <button class="btn admin-tab-btn" data-target="admin-view-squadre" style="flex:1; padding: 10px 5px; font-size: 0.8rem;"><i class="fa-solid fa-users-rectangle"></i> Squadre</button>
+                <button class="btn admin-tab-btn" data-target="admin-view-missioni" style="flex:1; padding: 10px 5px; font-size: 0.8rem;"><i class="fa-solid fa-scroll"></i> Missioni</button>
+                <button class="btn admin-tab-btn" data-target="admin-view-tornei" style="flex:1; padding: 10px 5px; font-size: 0.8rem;"><i class="fa-solid fa-trophy"></i> Tornei</button>
+                <button class="btn admin-tab-btn" data-target="admin-view-requests" style="flex:1; padding: 10px 5px; font-size: 0.8rem; background: #f1c40f !important; color: #000 !important; font-weight: 800; border: 2px solid #000; box-shadow: 0 4px 10px rgba(241, 196, 15, 0.3); opacity: 1;"><i class="fa-solid fa-envelope-open-text"></i> RICHIESTE</button>
+                <button class="btn admin-tab-btn" data-target="admin-view-profilo" style="flex:1; padding: 10px 5px; font-size: 0.8rem;"><i class="fa-solid fa-user-gear"></i> Profilo</button>
+                <button class="btn admin-tab-btn" data-target="admin-view-classifica" style="width:100%; padding: 10px 5px; font-size: 0.8rem;"><i class="fa-solid fa-ranking-star"></i> Classifica Globale</button>
+            </div>
+
+            <section id="admin-view-autori" class="admin-view active">
+                <div style="display:flex; justify-content:space-between; align-items:center; padding: 0 15px;">
+                    <h2><i class="fa-solid fa-pen-nib"></i> Convalida Autori</h2>
+                    <button type="button" class="btn" style="width:auto; padding:5px 15px; font-size:0.8rem; background:var(--danger-color);" onclick="azzeraTutteSpunte()"><i class="fa-solid fa-rotate-left"></i> Azzera tutto</button>
+                </div>
+                <div class="glass" style="padding: 15px; margin: 0 15px 20px 15px;">
+                    <p style="font-size:0.85rem; margin-bottom:10px; line-height:1.4;">Seleziona la spunta per validare i punti di un autore.</p>
+                    <!-- Filtro modalità -->
+                    <div class="admin-mode-filter" style="margin-bottom:15px;">
+                        <button class="admin-mode-filter-btn f-all" onclick="window.renderAdminAutori('all')">📚 Tutte le modalità</button>
+                        <button class="admin-mode-filter-btn f-green" onclick="window.renderAdminAutori('terze')">📘 Contemporanea: Autori Italiani</button>
+                        <button class="admin-mode-filter-btn f-orange" onclick="window.renderAdminAutori('seconde')">📙 Età Moderna</button>
+                        <button class="admin-mode-filter-btn f-gold" onclick="window.renderAdminAutori('avanzato')">📒 Contemporanea: Autori Italiani e Internazionali</button>
+                    </div>
+                    <div id="admin-autori-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px;">
+                        <!-- Inseriti da JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: Pannello Admin - Docenti -->
+            <section id="admin-view-docenti" class="admin-view" style="display:none;">
+                <h2 style="padding: 0 15px;">Gestione Docenti</h2>
+                <div class="glass" style="padding: 15px; margin: 0 15px 20px 15px;">
+                    <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; border: 1px solid var(--glass-border);">
+                        <i class="fa-solid fa-magnifying-glass" style="color: var(--primary-color);"></i>
+                        <input type="text" id="admin-docenti-search" placeholder="Cerca docente per email..." style="background: transparent; border: none; color: white; width: 100%; outline: none;" oninput="renderAdminDocenti(this.value)">
+                    </div>
+                    <div id="admin-docenti-list" style="display:flex; flex-direction:column; gap:10px;">
+                        <!-- Inseriti da JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: Pannello Admin - Squadre -->
+            <section id="admin-view-squadre" class="admin-view" style="display:none;">
+                <h2 style="padding: 0 15px;">Riepilogo Squadre</h2>
+                <div class="glass" style="padding: 15px; margin: 0 15px 20px 15px;">
+                    <!-- Filtro modalità -->
+                    <div class="admin-mode-filter" style="margin-bottom:15px;">
+                        <button class="admin-mode-filter-btn f-all" onclick="window.renderAdminSquadre('all')">Tutte le modalità</button>
+                        <button class="admin-mode-filter-btn f-green" onclick="window.renderAdminSquadre('terze')">📘 Contemporanea: Autori Italiani</button>
+                        <button class="admin-mode-filter-btn f-orange" onclick="window.renderAdminSquadre('seconde')">📙 Età Moderna</button>
+                        <button class="admin-mode-filter-btn f-gold" onclick="window.renderAdminSquadre('avanzato')">📒 Contemporanea: Autori Italiani e Internazionali</button>
+                    </div>
+                    <div id="admin-squadre-list" style="display:flex; flex-direction:column; gap:10px;">
+                        <!-- Inseriti da JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: Pannello Admin - Missioni -->
+            <section id="admin-view-missioni" class="admin-view" style="display:none;">
+                <h2 style="padding: 0 15px;">Gestione Missioni</h2>
+                <div class="glass" style="padding: 15px; margin: 0 15px 20px 15px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <h3 class="mb-1 text-primary" style="margin:0;">Da Convalidare</h3>
+                        <button type="button" class="btn" id="btn-approva-tutte" style="background:var(--primary-color); padding: 5px 15px; font-size: 0.8rem; width: auto; border-radius: 20px;" disabled onclick="approvaTutteMissioni()"><i class="fa-solid fa-check-double"></i> Approva Tutte</button>
+                    </div>
+                    <div id="admin-missioni-pending-list" style="display:flex; flex-direction:column; gap:10px; margin-bottom:30px;">
+                    </div>
+
+                    <h3 class="mb-1">Tutte le Missioni</h3>
+                    <p style="font-size:0.85rem; margin-bottom:15px;">Elenco punti assegnati per missione completata (5pt).</p>
+                    <div id="admin-missioni-list" style="display:flex; flex-direction:column; gap:10px;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: Pannello Admin - Tornei -->
+            <section id="admin-view-tornei" class="admin-view" style="display:none;">
+                <h2 style="padding: 0 15px;">Gestione Tornei</h2>
+                <div class="glass" style="padding: 15px; margin: 0 15px 20px 15px;">
+                    <div id="admin-tornei-admin-list" style="display:flex; flex-direction:column; gap:10px;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: Pannello Admin - Classifiche -->
+            <section id="admin-view-classifica" class="admin-view" style="display:none;">
+                <h2 style="padding: 0 15px;">Classifica Globale</h2>
+                <div class="glass" style="padding: 15px; margin: 0 15px 20px 15px;">
+                    <!-- Filtro modalità -->
+                    <div class="admin-mode-filter" style="margin-bottom:15px;">
+                        <button class="admin-mode-filter-btn f-all" onclick="window.renderAdminClassifica('all')">Tutte le modalità</button>
+                        <button class="admin-mode-filter-btn f-green" onclick="window.renderAdminClassifica('terze')">📘 Contemporanea: Autori Italiani</button>
+                        <button class="admin-mode-filter-btn f-orange" onclick="window.renderAdminClassifica('seconde')">📙 Età Moderna</button>
+                        <button class="admin-mode-filter-btn f-gold" onclick="window.renderAdminClassifica('avanzato')">📒 Contemporanea: Autori Italiani e Internazionali</button>
+                    </div>
+                    <div id="admin-classifica-list"></div>
+                </div>
+            </section>
+
+            <!-- VIEW: Pannello Admin - Richieste Iscrizione -->
+            <section id="admin-view-requests" class="admin-view" style="display:none;">
+                <h2 style="padding: 0 15px;">Richieste Iscrizione Docenti</h2>
+                <div class="glass" style="padding: 15px; margin: 0 15px 20px 15px;">
+                    <div id="admin-requests-list" style="display:flex; flex-direction:column; gap:10px;"></div>
+                </div>
+            </section>
+
+            <!-- HIDDEN AREAS PREVIEW -->
+            <section id="admin-preview-prof" class="admin-view" style="display:none;">
+                <h2 style="padding: 0 15px;">Buongiorno Prof! (Preview)</h2>
+                <div class="glass" style="padding: 15px; margin: 0 15px 20px 15px; font-size: 0.95rem;">
+                    <p>Grazie per partecipare a Fantaletteratura, il gioco didattico ispirato al Fantasanremo che porta la letteratura in classe in modo creativo, cooperativo e coinvolgente.</p>
+                    <p>📚 L'obiettivo del gioco è stimolare l'interesse per autori, testi e contesti letterari attraverso una dinamica a squadre, missioni didattiche e punteggi legati alle attività svolte dagli studenti.</p>
+                    <p>👥 Ogni classe/scuola forma le proprie squadre. Le squadre scelgono 5 autori rientrando nel budget di 20000 lire, completano missioni e attività letterarie per guadagnare punti.</p>
+                    <p>🎯 Come docente referente potrai: creare e gestire le squadre, inserire gli autori, controllare il punteggio, proporre missioni e attività creative.</p>
+                </div>
+            </section>
+
+            <section id="admin-preview-studenti" class="admin-view" style="display:none;">
+                <h2 style="padding: 0 15px;">👋 Buongiorno Studenti! (Preview)</h2>
+                <div class="glass" style="padding: 15px; margin: 0 15px 20px 15px; font-size: 0.95rem;">
+                    <p>👋 Benvenuti nel gioco che trasforma la letteratura in una sfida a squadre!</p>
+                    <p>🎯 <strong>Cosa si fa?</strong> Formate la vostra squadra, scegliete 5 autori, partecipate alle missioni e scalate la classifica!</p>
+                </div>
+            </section>
+
+            <section id="admin-preview-iscrizione" class="admin-view" style="display:none;">
+                <h2 style="padding: 0 15px;">Iscriviti a Fantaletteratura (Preview)</h2>
+                <div class="glass" style="padding: 20px; margin: 0 15px 20px 15px;">
+                    <div class="input-group"><label>Città</label><input type="text" class="input-control" placeholder="Citta"></div>
+                    
+                    <div class="consent-group mt-2">
+                        <label class="checkbox-container mb-1">
+                            <input type="checkbox" id="teacher-check-docente">
+                            <span class="checkmark"></span>
+                            Sono docente
+                        </label>
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="teacher-check-privacy">
+                            <span class="checkmark"></span>
+                            Accetto la <a href="#" onclick="openLegalModal('privacy')" style="color:var(--primary-color); text-decoration: underline;">Privacy Policy</a> e i <a href="#" onclick="openLegalModal('termini')" style="color:var(--primary-color); text-decoration: underline;">Termini e Condizioni</a>
+                        </label>
+                    </div>
+                    <button type="button" class="btn mt-2" onclick="inviaRichiestaIscrizione()">Invia la tua richiesta</button>
+                </div>
+            </section>
+
+            <section id="admin-preview-squadra" class="admin-view" style="display:none;">
+                <h2 style="padding: 0 15px;">Carica una nuova squadra (Preview)</h2>
+                <div class="glass" style="padding: 20px; margin: 0 15px 20px 15px;">
+                    <div class="input-group"><label>Nome della squadra</label><input type="text" class="input-control" placeholder="Es: I Promessi Sposi"></div>
+                    <div class="input-group"><label>Classe</label><input type="text" class="input-control" placeholder="Es: 3A"></div>
+                    <button type="button" class="btn">Salva Squadra</button>
+                </div>
+            </section>
+
+            <section id="admin-preview-missioni-intro" class="admin-view" style="display:none;">
+                <h2 style="padding: 0 15px;">Le Tue Missioni (Preview)</h2>
+                <div class="glass" style="padding: 20px; margin: 0 15px 20px 15px;">
+                    <p>Hai completato una missione? Hai diritto a un bonus dinamico!</p>
+                    <p class="text-primary"><strong>I bonus hanno un valore di 5 punti.</strong></p>
+                </div>
+            </section>
+
+            <section id="admin-preview-missioni-carica" class="admin-view" style="display:none;">
+                <h2 style="padding: 0 15px;">Carica Missioni (Preview)</h2>
+                <div class="glass" style="padding: 20px; margin: 0 15px 20px 15px;">
+                    <div class="input-group"><label>Squadra</label><select class="input-control"><option>Esempio Squadra</option></select></div>
+                    <div class="input-group"><label>Titolo Missione</label><input type="text" class="input-control"></div>
+                    <button type="button" class="btn">Carica Missione</button>
+                </div>
+            </section>
+
+            <!-- VIEW: Admin Mio Profilo -->
+            <section id="admin-view-profilo" class="admin-view" style="display:none;">
+                <h2 style="padding: 0 15px;"><i class="fa-solid fa-user-gear"></i> Mio Profilo Docente</h2>
+                <div class="glass" style="padding: 15px; margin: 0 15px 20px 15px;">
+                    <input type="text" id="admin-profilo-email" class="input-control mb-1" value="" readonly style="background: rgba(255,255,255,0.05); color: #aaa;">
+                    
+                    <div style="display:flex; gap:10px; margin-bottom: 20px; flex-wrap:wrap;">
+                        <button type="button" class="btn" style="flex:1; min-width:140px;" onclick="window.location.href='index.html#view-missioni'"><i class="fa-solid fa-list-check"></i> Carica Missione</button>
+                        <button type="button" class="btn" style="flex:1; min-width:140px;" onclick="window.location.href='index.html#view-squadra'"><i class="fa-solid fa-plus-circle"></i> Nuova Squadra</button>
+                        <button type="button" class="btn" style="flex:1; min-width:140px; background: var(--accent-gold);" onclick="openInviteModal()"><i class="fa-solid fa-paper-plane"></i> Invita Collega</button>
+                    </div>
+
+                    <h3 class="text-primary">Le tue squadre</h3>
+                    <div id="admin-profilo-squadre-list" style="margin-bottom:20px;"></div>
+
+                    <h3 class="text-primary">Tornei Interni</h3>
+                    <div id="admin-profilo-tornei-list"></div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+
+    <!-- WIP Modal (necessario anche in admin) -->
+    <div class="modal-wip" id="modal-wip" onclick="if(event.target===this) closeWipModal()">
+        <div class="modal-wip-content">
+            <span class="modal-wip-emoji">🚧</span>
+            <div class="modal-wip-title">Stiamo lavorando!</div>
+            <div class="modal-wip-badge"><i class="fa-solid fa-pen-nib"></i> Fantaletteratura</div>
+            <p class="modal-wip-desc" id="wip-modal-desc">Questa sezione è in fase di sviluppo — abbi un po' di pazienza! 😊<br><strong>Riprova più tardi.</strong></p>
+            <button class="btn" onclick="closeWipModal()" style="max-width:220px; margin:0 auto;">Ok, torno dopo!</button>
+        </div>
+    </div>
+
+    <!-- Modale Invia Invito / Invita Collega (necessario anche in admin) -->
+    <div id="invite-torneo-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-dark); z-index:2000; overflow-y:auto;">
+        <div style="padding: 15px; position: sticky; top: 0; background:var(--bg-dark); z-index:10; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0;">Invita un Collega</h3>
+            <button class="btn-secondary" onclick="document.getElementById('invite-torneo-modal').style.display='none'" style="padding: 5px 15px; width:auto; border-radius:20px; border:none;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div style="padding: 20px;">
+            <input type="hidden" id="invite-torneo-id">
+            <p style="font-size:0.8rem; color:#aaa; margin-bottom:15px;">Inserisci l'indirizzo email del docente che vuoi invitare a Fantaletteratura.</p>
+            <div class="input-group">
+                <label>Email Collega</label>
+                <input type="email" id="invite-collega-email" class="input-control" placeholder="Es: mario.rossi@scuola.it">
+            </div>
+            <button type="button" class="btn" onclick="inviaInvitoTorneo()">Spedisci Invito</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
