@@ -381,20 +381,19 @@
                         </div>
                     </div>
 
-                    <!-- Parte Destra: Form Bianco -->
                     <div class="contact-right">
-                        <form action="#">
+                        <form action="https://formspree.io/f/maqlarod" method="POST">
                             <div class="input-group">
                                 <label>Nome</label>
-                                <input type="text" class="input-control" placeholder="Il tuo nome">
+                                <input type="text" name="name" class="input-control" placeholder="Il tuo nome" required>
                             </div>
                             <div class="input-group">
                                 <label>Email</label>
-                                <input type="email" class="input-control" placeholder="La tua email">
+                                <input type="email" name="email" class="input-control" placeholder="La tua email" required>
                             </div>
                             <div class="input-group">
                                 <label>Messaggio</label>
-                                <textarea class="input-control" placeholder="Come posso aiutarti?" rows="5" id="contatti-messaggio"></textarea>
+                                <textarea name="message" class="input-control" placeholder="Come posso aiutarti?" rows="5" id="contatti-messaggio" required></textarea>
                             </div>
                             
                             <div class="input-group" id="contact-consent-section" style="margin-bottom: 15px;">
