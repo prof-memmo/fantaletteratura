@@ -1,164 +1,101 @@
 // Fantaletteratura Web App - Main Application Logic
 
+document.addEventListener('DOMContentLoaded', () => {
+    initApp();
+});
+
 const STORAGE_KEY = 'fanta_state_v1';
 
 // ── GAME MODE STATE ──────────────────────────────────────────
 let currentTeamMode = null;       // modalità scelta nel form "Crea Squadra"
 let currentLeaderboardMode = null; // modalità selezionata nelle classifiche
-let isInitialStateLoaded = false;  // Guardia per evitare sovrascritture accidentali
-let isSyncing = false;             // Lock per evitare rimbalzi da Firebase durante il salvataggio
+
 
 async function loadGameState() {
+    // Carichiamo lo stato globale da Firebase (Realtime)
     fanta_db.getSnapshotSettings((state) => {
-        if (isSyncing) {
-            console.log("Aggiornamento snapshot ignorato (salvataggio in corso)...");
-            return;
-        }
         if(state) {
-            console.log("Stato caricato da Firebase:", state);
-            // Nuova logica: se pointsRevealed esiste, usiamolo
-            if(state.pointsRevealed !== undefined) {
+            if(state.revealedAuthors) {
                 AUTHORS.forEach(a => {
-                    a.isPointsRevealed = state.pointsRevealed.includes(a.id);
-                });
-            } else if (state.revealedAuthors) {
-                // Fallback retrocompatibilità
-                AUTHORS.forEach(a => {
-                    a.isPointsRevealed = state.revealedAuthors.includes(a.id);
-                });
-            }
-
-            // Stessa cosa per schedaRevealed
-            if(state.schedaRevealed !== undefined) {
-                AUTHORS.forEach(a => {
-                    a.isSchedaRevealed = state.schedaRevealed.includes(a.id);
+                    if(state.revealedAuthors.includes(a.id)) {
+                        a.isPointsRevealed = true;
+                        a.isSchedaRevealed = true;
+                    } else {
+                        a.isPointsRevealed = false;
+                        a.isSchedaRevealed = false;
+                    }
                 });
             }
-
-            isInitialStateLoaded = true; // Sblocchiamo il salvataggio
-            console.log("Sistema sincronizzato con successo.");
-
-            // Rimuoviamo l'overlay di caricamento se presente
-                const syncOverlay = document.getElementById('sync-overlay');
-                if (syncOverlay) {
-                    syncOverlay.style.opacity = '0';
-                    setTimeout(() => { if(syncOverlay.parentNode) syncOverlay.remove(); }, 500);
-                }
-
-            // Aggiorniamo le viste
+            if(state.pointsRevealed) {
+                AUTHORS.forEach(a => {
+                    if(state.pointsRevealed.includes(a.id)) a.isPointsRevealed = true;
+                });
+            }
+            if(state.schedaRevealed) {
+                AUTHORS.forEach(a => {
+                    if(state.schedaRevealed.includes(a.id)) a.isSchedaRevealed = true;
+                });
+            }
+            // Aggiorniamo le viste se necessario
             if (typeof populateSchede === 'function') populateSchede();
             if (typeof renderAdminAutori === 'function') renderAdminAutori();
-            
-            // Forziamo il refresh delle classifiche se aperte
-            if (window.location.pathname.includes('admin.html')) {
-                if(typeof window.renderAdminClassifica === 'function') window.renderAdminClassifica();
-            }
         }
     });
 }
 
 async function saveGameState() {
-    if (!isInitialStateLoaded) {
-        console.warn("Salvataggio differito: lo stato iniziale non è ancora stato caricato.");
-        // Tentiamo comunque se è passato troppo tempo
-    }
-
-    // Feedback visivo temporaneo
-    const feedback = document.createElement('div');
-    feedback.id = 'save-indicator';
-    feedback.style = 'position:fixed; top:20px; right:20px; background:var(--primary-color); color:var(--bg-dark); padding:10px 20px; border-radius:30px; font-weight:bold; z-index:10000; box-shadow:0 10px 30px rgba(0,0,0,0.5); font-size:0.85rem; pointer-events:none;';
-    feedback.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Salvataggio...';
-    document.body.appendChild(feedback);
-
-    isSyncing = true;
-    try {
-        let ptsRevealed = AUTHORS.filter(a => a.isPointsRevealed).map(a => a.id);
-        let schRevealed = AUTHORS.filter(a => a.isSchedaRevealed).map(a => a.id);
-        let state = {
-            pointsRevealed: ptsRevealed,
-            schedaRevealed: schRevealed,
-            revealedAuthors: ptsRevealed // manteniamo per compatibilità
-        };
-
-        await fanta_db.saveSettings(state);
-        showAdminDebug("Database Aggiornato: " + schRevealed.length + " schede pubblicate.");
-        
-        feedback.style.background = '#4caf50';
-        feedback.innerHTML = '<i class="fa-solid fa-check"></i> Salvato!';
-        setTimeout(() => { if(feedback.parentNode) feedback.remove(); }, 2000);
-    } catch (e) {
-        showAdminDebug("ERRORE FIREBASE: " + e.message, true);
-        console.error("Errore salvataggio game state:", e);
-        feedback.style.background = 'var(--danger-color)';
-        feedback.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Errore!';
-        alert("Errore critico durante il salvataggio.\nErrore: " + e.message);
-        setTimeout(() => { if(feedback.parentNode) feedback.remove(); }, 5000);
-    } finally {
-        isSyncing = false;
-    }
-}
-
-function showAdminDebug(msg, isError = false) {
-    if (!window.location.pathname.includes('admin.html')) return;
-    let console = document.getElementById('admin-debug-console');
-    if (!console) {
-        console = document.createElement('div');
-        console.id = 'admin-debug-console';
-        console.style = 'position:fixed; bottom:0; left:0; width:100%; background:#111; color:#0f0; font-family:monospace; font-size:10px; padding:5px 10px; z-index:999999; border-top:1px solid #333; opacity:0.8;';
-        document.body.appendChild(console);
-    }
-    console.style.color = isError ? '#ff4444' : '#0f0';
-    console.innerText = `[${new Date().toLocaleTimeString()}] ${msg}`;
+    let ptsRevealed = AUTHORS.filter(a => a.isPointsRevealed).map(a => a.id);
+    let schRevealed = AUTHORS.filter(a => a.isSchedaRevealed).map(a => a.id);
+    let state = {
+        pointsRevealed: ptsRevealed,
+        schedaRevealed: schRevealed,
+        revealedAuthors: ptsRevealed // manteniamo per compatibilità
+    };
+    await fanta_db.saveSettings(state);
 }
 
 function initApp() {
-    // PRIMA COSA: rendi l'app visibile, qualsiasi cosa succeda dopo
-    const container = document.getElementById('app-container');
-    if (container) container.style.display = 'block';
+    // Visibilità immediata — previene la schermata grigia
+    const _c = document.getElementById('app-container');
+    if (_c) _c.style.display = 'block';
 
-    try {
-        loadGameState();
+    loadGameState();
 
-        // Overlay di sincronizzazione per l'admin
-        if (window.location.pathname.includes('admin.html')) {
-            const overlay = document.createElement('div');
-            overlay.id = 'sync-overlay';
-            overlay.style = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10,10,15,0.9); z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center; transition: opacity 0.5s;';
-            overlay.innerHTML = `
-                <div style="font-size:2rem; color:var(--primary-color); margin-bottom:20px;"><i class="fa-solid fa-cloud-arrow-down fa-bounce"></i></div>
-                <div style="color:white; font-weight:bold; letter-spacing:1px;">SINCRONIZZAZIONE DATABASE...</div>
-                <div style="color:rgba(255,255,255,0.5); font-size:0.8rem; margin-top:10px;">Attendere il caricamento dei dati aggiornati</div>
-            `;
-            document.body.appendChild(overlay);
+    // 1. Navigation setup
+    setupNavigation();
+    
+    // 2. Data Initialization
+    populateAuthorSelects();
+    populateSchede();
+    
+    // 3. Event Listeners
+    setupBudgetCalculator();
+    setupAdminPanel();
+    setupTeamSave();
+    
+    checkLoginSession();
+    
+    // Check hash for direct navigation from external pages (like admin)
+    if (window.location.hash) {
+        const viewId = window.location.hash.substring(1);
+        if (document.getElementById(viewId)) {
+            navigateTo(viewId, false);
         }
-
-        setupNavigation();
-        populateAuthorSelects();
-        populateSchede();
-        setupBudgetCalculator();
-        setupAdminPanel();
-        setupTeamSave();
-        checkLoginSession();
-
-        if (window.location.hash) {
-            const viewId = window.location.hash.substring(1);
-            if (document.getElementById(viewId)) navigateTo(viewId, false);
-        }
-
-        window.addEventListener('popstate', (e) => {
-            if (window.location.hash) {
-                const viewId = window.location.hash.substring(1);
-                if (document.getElementById(viewId)) navigateTo(viewId, false);
-            } else {
-                navigateTo('view-welcome', false);
-            }
-        });
-
-        console.log("App Initialized successfully!");
-    } catch(e) {
-        console.error("Errore critico in initApp:", e);
-        // L'app rimane visibile grazie alla riga iniziale
     }
+    
+    // Handle browser back button (popstate mapping to hash changes)
+    window.addEventListener('popstate', (e) => {
+        if(window.location.hash) {
+            const viewId = window.location.hash.substring(1);
+            if(document.getElementById(viewId)) {
+                navigateTo(viewId, false);
+            }
+        } else {
+            navigateTo('view-welcome', false);
+        }
+    });
+    
+    console.log("App Initialized successfully!");
 }
 
 /* =========================================
@@ -613,8 +550,8 @@ async function setupAdminPanel() {
 
             autoriList.innerHTML += `
                 <div class="glass" style="padding:15px; text-align:center; border: 1px solid ${isRevealed ? 'var(--primary-color)' : 'rgba(255,255,255,0.1)'}; display:flex; flex-direction:column; align-items:center;">  
-                    <img src="${author.image}" style="width:50px; height:50px; border-radius:50%; object-fit:cover; background:#fff; margin-bottom:10px;">
-                    <div style="font-weight:bold; font-size:0.9rem; margin-bottom:5px;">${author.name}</div>
+                    <img src="${author.image}" style="width:50px; height:50px; border-radius:50%; object-fit:cover; background:#fff; margin-bottom:10px; ${author.schedaHTML ? 'cursor:pointer;' : ''}" ${onclickAttr}>
+                    <div style="font-weight:bold; font-size:0.9rem; margin-bottom:5px; ${titleStyle}" ${onclickAttr}>${author.name}</div>
                     <div style="font-size:1.2rem; font-weight:bold; color:var(--primary-color);">${author.points} pt</div>
                     <div style="margin-top:15px; display:flex; flex-direction:column; gap:8px; align-items:center; width:100%;">
                         <label style="font-size:0.75rem; cursor:pointer; display:flex; align-items:center; gap:5px;">
@@ -647,30 +584,25 @@ async function setupAdminPanel() {
         if (!list) return;
         list.innerHTML = '<p class="text-center">Caricamento richieste...</p>';
         
-        try {
-            let requests = await fanta_db.getTeacherRequests();
-            list.innerHTML = '';
-            if (requests.length === 0) {
-                list.innerHTML = '<i>Nessuna richiesta in sospeso.</i>';
-            } else {
-                requests.forEach(req => {
-                    let consentLog = req.createdAt ? `<div style="font-size:0.7rem; color:var(--accent-gold); margin-top:5px;"><i class="fa-solid fa-clock"></i> Ricevuta: ${req.createdAt.toDate ? req.createdAt.toDate().toLocaleString() : req.createdAt}</div>` : '';
-                    list.innerHTML += `
-                        <div class="glass" style="padding:15px; margin-bottom:10px; border-left:4px solid var(--accent-gold);">
-                            <div style="font-weight:bold; color:var(--primary-color); font-size:1.1rem;">${req.name}</div>
-                            <div style="font-size:0.85rem; margin-top:5px; color:var(--text-muted);">${req.email} | ${req.school} (${req.city})</div>
-                            ${consentLog}
-                            <div style="display:flex; gap:10px; margin-top:15px;">
-                                <button class="btn" style="flex:1; padding:8px; font-size:0.8rem;" onclick="approvaRichiesta('${req.email}')">Approva</button>
-                                <button class="btn btn-secondary" style="flex:1; padding:8px; font-size:0.8rem; color: #ff5f5f; border-color: #ff5f5f;" onclick="rifiutaRichiesta('${req.id}')">Rifiuta</button>
-                            </div>
+        let requests = await fanta_db.getTeacherRequests();
+        list.innerHTML = '';
+        if (requests.length === 0) {
+            list.innerHTML = '<i>Nessuna richiesta in sospeso.</i>';
+        } else {
+            requests.forEach(req => {
+                let consentLog = req.createdAt ? `<div style="font-size:0.7rem; color:var(--accent-gold); margin-top:5px;"><i class="fa-solid fa-clock"></i> Ricevuta: ${req.createdAt.toDate ? req.createdAt.toDate().toLocaleString() : req.createdAt}</div>` : '';
+                list.innerHTML += `
+                    <div class="glass" style="padding:15px; margin-bottom:10px; border-left:4px solid var(--accent-gold);">
+                        <div style="font-weight:bold; color:var(--primary-color); font-size:1.1rem;">${req.name}</div>
+                        <div style="font-size:0.85rem; margin-top:5px; color:var(--text-muted);">${req.email} | ${req.school} (${req.city})</div>
+                        ${consentLog}
+                        <div style="display:flex; gap:10px; margin-top:15px;">
+                            <button class="btn" style="flex:1; padding:8px; font-size:0.8rem;" onclick="approvaRichiesta('${req.email}')">Approva</button>
+                            <button class="btn btn-secondary" style="flex:1; padding:8px; font-size:0.8rem; color: #ff5f5f; border-color: #ff5f5f;" onclick="rifiutaRichiesta('${req.id}')">Rifiuta</button>
                         </div>
-                    `;
-                });
-            }
-        } catch (err) {
-            console.error("Errore renderAdminRichieste:", err);
-            list.innerHTML = '<i>Errore nel caricamento delle richieste.</i>';
+                    </div>
+                `;
+            });
         }
     };
 
@@ -786,6 +718,32 @@ async function setupAdminPanel() {
         }
     };
 
+    window.renderAdminRichieste = async function() {
+        const list = document.getElementById('admin-requests-list');
+        if (!list) return;
+        list.innerHTML = '<p class="text-center">Caricamento richieste...</p>';
+        
+        let requests = await fanta_db.getTeacherRequests();
+        list.innerHTML = '';
+        if (requests.length === 0) {
+            list.innerHTML = '<i>Nessuna richiesta in sospeso.</i>';
+        } else {
+            requests.forEach(req => {
+                let consentLog = req.createdAt ? `<div style="font-size:0.7rem; color:var(--accent-gold); margin-top:5px;"><i class="fa-solid fa-clock"></i> Ricevuta: ${req.createdAt.toDate ? req.createdAt.toDate().toLocaleString() : req.createdAt}</div>` : '';
+                list.innerHTML += `
+                    <div class="glass" style="padding:15px; margin-bottom:10px; border-left:4px solid var(--accent-gold);">
+                        <div style="font-weight:bold; color:var(--primary-color); font-size:1.1rem;">${req.name}</div>
+                        <div style="font-size:0.85rem; margin-top:5px; color:var(--text-muted);">${req.email} | ${req.school} (${req.city})</div>
+                        ${consentLog}
+                        <div style="display:flex; gap:10px; margin-top:15px;">
+                            <button class="btn" style="flex:1; padding:8px; font-size:0.8rem;" onclick="approvaRichiesta('${req.email}')">Approva</button>
+                            <button class="btn btn-secondary" style="flex:1; padding:8px; font-size:0.8rem; color: #ff5f5f; border-color: #ff5f5f;" onclick="rifiutaRichiesta('${req.id}')">Rifiuta</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+    };
 
     window.renderAdminSquadre = async function(modeFilter) {
         const list = document.getElementById('admin-squadre-list');
@@ -1143,7 +1101,7 @@ function populateSchede() {
         
         const card = `
             <div class="puntata-card" style="align-items:flex-start; overflow:hidden;">
-                <img src="${author.image}" alt="${author.name}" class="puntata-img" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; background:#fff; margin-top:5px; flex-shrink:0; ${author.schedaHTML ? 'cursor:pointer;' : ''}" ${onclickAttr}>
+                <img src="${author.image}" alt="${author.name}" class="puntata-img" style="background:#fff; margin-top:5px; flex-shrink:0; ${author.schedaHTML ? 'cursor:pointer;' : ''}" ${onclickAttr}>
                 <div class="puntata-info" style="width:100%;">
                     <div class="puntata-title" style="${titleStyle}" ${onclickAttr}>${author.name}</div>
                     ${content}
@@ -1183,33 +1141,29 @@ function checkLoginSession() {
             }
             
             // Verifichiamo se è approvato
-            try {
-                const usersRef = window.db.collection("users");
-                const doc = await usersRef.doc(email).get();
-                
-                if (doc.exists) {
-                    setLoggedIn(email);
-                    if (window.location.hash === '#view-welcome') {
-                        navigateTo('view-prof');
-                    }
-                } else {
-                    // Non approvato - verifichiamo se ha una richiesta
-                    const requests = await fanta_db.getTeacherRequests();
-                    const pending = requests.find(r => r.email.toLowerCase() === email);
-                    
-                    if (pending) {
-                        alert("Account in attesa di approvazione dal Game Master.");
-                        navigateTo('view-welcome');
-                        await fanta_db.logout();
-                    } else {
-                        // Loggato ma senza richiesta: salviamo email e slogghiamo
-                        localStorage.setItem('fanta_temp_email', email);
-                        navigateTo('view-iscrizione');
-                        await fanta_db.logout();
-                    }
+            const usersRef = window.db.collection("users");
+            const doc = await usersRef.doc(email).get();
+            
+            if (doc.exists) {
+                setLoggedIn(email);
+                if (window.location.hash === '#view-welcome') {
+                    navigateTo('view-prof');
                 }
-            } catch(e) {
-                console.error("Errore checkLoginSession:", e);
+            } else {
+                // Non approvato - verifichiamo se ha una richiesta
+                const requests = await fanta_db.getTeacherRequests();
+                const pending = requests.find(r => r.email.toLowerCase() === email);
+                
+                if (pending) {
+                    alert("Account in attesa di approvazione dal Game Master.");
+                    navigateTo('view-welcome');
+                    await fanta_db.logout();
+                } else {
+                    // Loggato ma senza richiesta
+                    localStorage.setItem('fanta_temp_email', email);
+                    navigateTo('view-iscrizione');
+                    await fanta_db.logout();
+                }
             }
         } else {
             setLoggedOut();
@@ -1241,18 +1195,14 @@ async function loginDocente(event) {
 
 async function loginGoogle() {
     try {
-        await fanta_db.loginWithGoogle();
-        // Il risultato viene gestito da onAuthStateChanged
+        const result = await fanta_db.loginWithGoogle();
+        const user = result.user;
+        const email = user.email.toLowerCase();
+
+        // checkLoginSession gestirà la logica di approvazione/reindirizzamento
     } catch (error) {
         console.error("Google Login Error:", error);
-        const code = error.code || '';
-        if (code === 'auth/popup-blocked') {
-            alert("Il popup è stato bloccato dal browser. Abilita i popup per questo sito e riprova.");
-        } else if (code === 'auth/popup-closed-by-user') {
-            // Utente ha chiuso il popup: nessun errore
-        } else {
-            alert("Errore Google Login: " + (code || error.message));
-        }
+        alert("Errore durante l'accesso con Google.");
     }
 }
 
@@ -1288,17 +1238,13 @@ async function inviaRichiestaIscrizione(event) {
     }
 
     try {
-        // 1. Creiamo l'account su Firebase Auth solo se NON è Google
-        const currentUser = window.auth.currentUser;
-        const isGoogleUser = currentUser && currentUser.email.toLowerCase() === email;
-
-        if (!isGoogleUser && password) {
-            try {
-                await window.auth.createUserWithEmailAndPassword(email, password);
-            } catch (authError) {
-                if (authError.code !== 'auth/email-already-in-use') {
-                    throw authError;
-                }
+        // 1. Creiamo l'account su Firebase Auth immediatamente
+        try {
+            await window.auth.createUserWithEmailAndPassword(email, password);
+        } catch (authError) {
+            // Se gia in uso (es: Google o vecchia registrazione), proseguiamo
+            if (authError.code !== 'auth/email-already-in-use') {
+                throw authError;
             }
         }
 
@@ -1503,6 +1449,7 @@ function setLoggedIn(email) {
     const loggedWelc = document.getElementById('logged-in-welcome');
     if(loggedWelc) loggedWelc.textContent = "Bentornato, Prof!";
     
+    // Show Profile tabs/links
     const pLink = document.getElementById('menu-link-profilo');
     const pTab = document.getElementById('tab-item-profilo');
     if(pLink) pLink.classList.remove('hidden');
@@ -2137,11 +2084,3 @@ async function inviaMissione(event) {
     }
 }
 
-// --- AUTO-INITIALIZATION ---
-// Garantisce che il motore dell'app si avvii su ogni pagina (incluso admin.html)
-document.addEventListener('DOMContentLoaded', () => {
-    // Se non è già stata avviata tramite onload (fallback), avviala ora
-    if (typeof initApp === 'function') {
-        initApp();
-    }
-});

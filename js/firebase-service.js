@@ -69,11 +69,7 @@ window.fanta_db = {
     },
     getSnapshotSettings: (cb) => {
         return window.db.collection("settings").doc("game_state").onSnapshot(doc => {
-            if (doc.exists) {
-                cb(doc.data());
-            } else {
-                cb({}); // Notifichiamo comunque che il caricamento è finito, anche se vuoto
-            }
+            if (doc.exists) cb(doc.data());
         });
     },
 
