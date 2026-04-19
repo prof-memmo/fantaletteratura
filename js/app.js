@@ -78,9 +78,11 @@ async function saveGameState() {
 }
 
 function initApp() {
-    // Visibilità immediata — previene la schermata grigia
+    // Visibilità immediata — previene la schermata grigia nella HOME
+    // Nel pannello admin aspettiamo la verifica di checkLoginSession per sicurezza
+    const isLoginPage = window.location.pathname.includes('admin.html');
     const _c = document.getElementById('app-container');
-    if (_c) _c.style.display = 'block';
+    if (_c && !isLoginPage) _c.style.display = 'block';
 
     loadGameState();
 
@@ -1159,9 +1161,21 @@ function checkLoginSession() {
             // Prof Memmo ha accesso diretto
             if (email === "prof.memmo@gmail.com") {
                 setLoggedIn(email);
+                
+                // Forza visualizzazione container nel pannello admin dopo la verifica
+                if (window.location.pathname.includes('admin.html')) {
+                    const _c = document.getElementById('app-container');
+                    if (_c) _c.style.display = 'block';
+                    
+                    // Se siamo in admin, rendiamo certi ricaricamenti forzati
+                    if(typeof window.renderAdminAutori === 'function') window.renderAdminAutori();
+                    if(typeof window.renderAdminRichieste === 'function') window.renderAdminRichieste();
+                }
+
                 // Mostra il link al pannello admin nel menù
                 const adminMenuItem = document.getElementById('menu-admin-item');
                 if (adminMenuItem) adminMenuItem.style.display = 'block';
+                
                 if (window.location.hash === '#view-welcome' && !window.location.pathname.includes('admin.html')) {
                     navigateTo('view-prof');
                 }
@@ -1385,7 +1399,6 @@ function azzeraTutteSpunte() {
 
 async function logoutDocente() {
     await fanta_db.logout();
-    localStorage.removeItem('fanta_temp_email'); // Pulizia opzionale
     currentUserEmail = null;
     const loginSec = document.getElementById('login-section');
     const loggedSec = document.getElementById('logged-in-section');
