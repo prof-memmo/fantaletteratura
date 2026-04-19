@@ -1452,7 +1452,23 @@ function setLoggedIn(email) {
     const profAdminEmail = document.getElementById('admin-profilo-email');
     if(profAdminEmail) profAdminEmail.value = email;
     
+    const appContainer = document.getElementById('app-container');
+    if(appContainer) appContainer.style.display = 'block';
+
     renderProfilo();
+}
+
+function setLoggedOut() {
+    currentUserEmail = null;
+    const loginSec = document.getElementById('login-section');
+    const loggedSec = document.getElementById('logged-in-section');
+    if(loginSec) loginSec.style.display = 'block';
+    if(loggedSec) loggedSec.style.display = 'none';
+    
+    const pLink = document.getElementById('menu-link-profilo');
+    const pTab = document.getElementById('tab-item-profilo');
+    if(pLink) pLink.classList.add('hidden');
+    if(pTab) pTab.classList.add('hidden');
 }
 
 async function getAllTeams() {
