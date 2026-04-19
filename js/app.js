@@ -6,9 +6,14 @@ const STORAGE_KEY = 'fanta_state_v1';
 let currentTeamMode = null;       // modalità scelta nel form "Crea Squadra"
 let currentLeaderboardMode = null; // modalità selezionata nelle classifiche
 let isInitialStateLoaded = false;  // Guardia per evitare sovrascritture accidentali
+let isSyncing = false;             // Lock per evitare rimbalzi da Firebase durante il salvataggio
 
 async function loadGameState() {
     fanta_db.getSnapshotSettings((state) => {
+        if (isSyncing) {
+            console.log("Aggiornamento snapshot ignorato (salvataggio in corso)...");
+            return;
+        }
         if(state) {
             console.log("Stato caricato da Firebase:", state);
             // Nuova logica: se pointsRevealed esiste, usiamolo
@@ -65,6 +70,7 @@ async function saveGameState() {
     feedback.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Salvataggio...';
     document.body.appendChild(feedback);
 
+    isSyncing = true;
     try {
         let ptsRevealed = AUTHORS.filter(a => a.isPointsRevealed).map(a => a.id);
         let schRevealed = AUTHORS.filter(a => a.isSchedaRevealed).map(a => a.id);
@@ -75,17 +81,34 @@ async function saveGameState() {
         };
 
         await fanta_db.saveSettings(state);
+        showAdminDebug("Database Aggiornato: " + schRevealed.length + " schede pubblicate.");
         
         feedback.style.background = '#4caf50';
         feedback.innerHTML = '<i class="fa-solid fa-check"></i> Salvato!';
         setTimeout(() => { if(feedback.parentNode) feedback.remove(); }, 2000);
     } catch (e) {
+        showAdminDebug("ERRORE FIREBASE: " + e.message, true);
         console.error("Errore salvataggio game state:", e);
         feedback.style.background = 'var(--danger-color)';
         feedback.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Errore!';
         alert("Errore critico durante il salvataggio.\nErrore: " + e.message);
         setTimeout(() => { if(feedback.parentNode) feedback.remove(); }, 5000);
+    } finally {
+        isSyncing = false;
     }
+}
+
+function showAdminDebug(msg, isError = false) {
+    if (!window.location.pathname.includes('admin.html')) return;
+    let console = document.getElementById('admin-debug-console');
+    if (!console) {
+        console = document.createElement('div');
+        console.id = 'admin-debug-console';
+        console.style = 'position:fixed; bottom:0; left:0; width:100%; background:#111; color:#0f0; font-family:monospace; font-size:10px; padding:5px 10px; z-index:999999; border-top:1px solid #333; opacity:0.8;';
+        document.body.appendChild(console);
+    }
+    console.style.color = isError ? '#ff4444' : '#0f0';
+    console.innerText = `[${new Date().toLocaleTimeString()}] ${msg}`;
 }
 
 function initApp() {
