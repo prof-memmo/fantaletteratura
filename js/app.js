@@ -14,6 +14,7 @@ let currentLeaderboardMode = null; // modalità selezionata nelle classifiche
 async function loadGameState() {
     fanta_db.getSnapshotSettings((state) => {
         if(state) {
+            console.log("Stato caricato da Firebase:", state);
             // Nuova logica: se pointsRevealed esiste, usiamolo
             if(state.pointsRevealed !== undefined) {
                 AUTHORS.forEach(a => {
@@ -33,8 +34,14 @@ async function loadGameState() {
                 });
             }
 
+            // Aggiorniamo le viste
             if (typeof populateSchede === 'function') populateSchede();
             if (typeof renderAdminAutori === 'function') renderAdminAutori();
+            
+            // Forziamo il refresh delle classifiche se aperte
+            if (window.location.pathname.includes('admin.html')) {
+                if(typeof window.renderAdminClassifica === 'function') window.renderAdminClassifica();
+            }
         }
     });
 }
@@ -559,15 +566,19 @@ async function setupAdminPanel() {
         });
     };
 
-    window.toggleAuthorPoints = function(id, type) {
+    window.toggleAuthorPoints = async function(id, type) {
         const author = AUTHORS.find(a => a.id === id);
         if (author) {
             if (type === 'punti') author.isPointsRevealed = !author.isPointsRevealed;
             if (type === 'scheda') author.isSchedaRevealed = !author.isSchedaRevealed;
-            saveGameState();
+            
+            await saveGameState();
+            
+            // Refresh immediato UI
             window.renderAdminAutori();
             window.renderAdminClassifica();
             if (typeof populateSchede === 'function') populateSchede();
+            console.log(`Toggle ${type} per ${id} completato e salvato.`);
         }
     };
 
@@ -1093,7 +1104,7 @@ function populateSchede() {
         
         const card = `
             <div class="puntata-card" style="align-items:flex-start; overflow:hidden;">
-                <img src="${author.image}" alt="${author.name}" class="puntata-img" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; background:#fff; margin-top:5px; flex-shrink:0; ${author.schedaHTML ? 'cursor:pointer;' : ''}" ${onclickAttr}>
+                <img src="${author.image}" alt="${author.name}" class="puntata-img" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; background:#fff; margin-top:5px; flex-shrink:0; ${author.schedaHTML ? 'cursor:pointer;' : ''}" ${onclickAttr}>
                 <div class="puntata-info" style="width:100%;">
                     <div class="puntata-title" style="${titleStyle}" ${onclickAttr}>${author.name}</div>
                     ${content}
@@ -1147,14 +1158,13 @@ function checkLoginSession() {
                 const pending = requests.find(r => r.email.toLowerCase() === email);
                 
                 if (pending) {
-                    alert("Account in attesa di approvazione dal Game Master.");
+                    alert("Il tuo account è in attesa di approvazione dal Game Master. Ti avviseremo via mail appena sarai attivo!");
                     navigateTo('view-welcome');
-                    await fanta_db.logout();
+                    // Rimosso fanta_db.logout() per evitare il loop di "torna indietro"
                 } else {
                     // Loggato ma senza richiesta: lo teniamo loggato solo per compilare il form.
                     localStorage.setItem('fanta_temp_email', email);
                     navigateTo('view-iscrizione');
-                    // Rimuoviamo il logout immediato, altrimenti il sistema "torna indietro".
                 }
             }
         } else {
