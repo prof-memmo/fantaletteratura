@@ -5,9 +5,9 @@ window.fanta_db = {
     login: (email, password) => window.auth.signInWithEmailAndPassword(email, password),
     loginWithGoogle: () => {
         const provider = new firebase.auth.GoogleAuthProvider();
-        provider.setCustomParameters({ prompt: 'select_account' });
         return window.auth.signInWithPopup(provider);
     },
+
     logout: () => window.auth.signOut(),
     onAuthStateChanged: (cb) => window.auth.onAuthStateChanged(cb),
 
@@ -65,8 +65,9 @@ window.fanta_db = {
 
     // --- SETTINGS / GLOBAL STATE ---
     saveSettings: async (settings) => {
-        await window.db.collection("settings").doc("game_state").set(settings, { merge: true });
+        await window.db.collection("settings").doc("game_state").set(settings);
     },
+
     getSnapshotSettings: (cb) => {
         return window.db.collection("settings").doc("game_state").onSnapshot(doc => {
             if (doc.exists) cb(doc.data());
