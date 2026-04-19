@@ -1093,7 +1093,7 @@ function populateSchede() {
         
         const card = `
             <div class="puntata-card" style="align-items:flex-start; overflow:hidden;">
-                <img src="${author.image}" alt="${author.name}" class="puntata-img" style="background:#fff; margin-top:5px; flex-shrink:0; ${author.schedaHTML ? 'cursor:pointer;' : ''}" ${onclickAttr}>
+                <img src="${author.image}" alt="${author.name}" class="puntata-img" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; background:#fff; margin-top:5px; flex-shrink:0; ${author.schedaHTML ? 'cursor:pointer;' : ''}" ${onclickAttr}>
                 <div class="puntata-info" style="width:100%;">
                     <div class="puntata-title" style="${titleStyle}" ${onclickAttr}>${author.name}</div>
                     ${content}
