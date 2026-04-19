@@ -68,10 +68,16 @@
                 </div>
                 
                 <div class="glass" style="padding: 20px; margin-top: 30px; display: none;" id="logged-in-section">
-                    <h3 class="text-center mb-1 text-primary" id="logged-in-welcome">Benvenuto!</h3>
-                    <p class="text-center" style="font-size: 0.9rem; margin-bottom:20px;">Hai effettuato l'accesso all'area personale.</p>
-                    <button class="btn mb-1" onclick="navigateTo('view-profilo')">Vai alle tue Squadre / Profilo</button>
-                    <button class="btn btn-secondary mb-1" onclick="navigateTo('view-squadra')" style="border-width:2px;">Iscrivi una Nuova Squadra</button>
+                    <div id="logged-in-normal-content">
+                        <h3 class="text-center mb-1 text-primary" id="logged-in-welcome">Benvenuto!</h3>
+                        <p class="text-center" style="font-size: 0.9rem; margin-bottom:20px;">Hai effettuato l'accesso all'area personale.</p>
+                        <button class="btn mb-1" onclick="navigateTo('view-profilo')">Vai alle tue Squadre / Profilo</button>
+                        <button class="btn btn-secondary mb-1" onclick="navigateTo('view-squadra')" style="border-width:2px;">Iscrivi una Nuova Squadra</button>
+                    </div>
+                    <div id="logged-in-pending-content" style="display: none;">
+                        <h3 class="text-center mb-1 text-primary">Richiesta in Attesa</h3>
+                        <p class="text-center" style="font-size: 0.9rem; margin-bottom:20px;">Il tuo account è in attesa di approvazione dal Game Master.<br>Ti avviseremo via mail appena sarai attivo!</p>
+                    </div>
                     <div style="text-align:center; margin-top:15px;"><a href="#" onclick="logoutDocente()" style="color:var(--danger-color); font-size:0.8rem; text-decoration:none;">Disconnetti</a></div>
                 </div>
             </section>

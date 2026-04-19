@@ -135,6 +135,7 @@ h1, h2, h3, h4 {
     padding-bottom: var(--bottom-bar-height);
     background: var(--bg-dark);
     box-shadow: 0 0 50px rgba(0,0,0,0.5);
+    display: block !important;
 }
 
 /* Glassmorphism Classes */

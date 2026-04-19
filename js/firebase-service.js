@@ -4,13 +4,9 @@ window.fanta_db = {
     // --- AUTH ---
     login: (email, password) => window.auth.signInWithEmailAndPassword(email, password),
     loginWithGoogle: async () => {
-        // Forza la persistenza locale e pulisce sessioni precedenti
         await window.auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
         const provider = new firebase.auth.GoogleAuthProvider();
-        provider.setCustomParameters({ 
-            prompt: 'select_account',
-            auth_type: 'reauthenticate' 
-        });
+        provider.setCustomParameters({ prompt: 'select_account' });
         return window.auth.signInWithPopup(provider);
     },
     logout: () => window.auth.signOut(),

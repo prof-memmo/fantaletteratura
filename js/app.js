@@ -39,11 +39,11 @@ async function loadGameState() {
             console.log("Sistema sincronizzato con successo.");
 
             // Rimuoviamo l'overlay di caricamento se presente
-            const syncOverlay = document.getElementById('sync-overlay');
-            if (syncOverlay) {
-                syncOverlay.style.opacity = '0';
-                setTimeout(() => syncOverlay.remove(), 500);
-            }
+                const syncOverlay = document.getElementById('sync-overlay');
+                if (syncOverlay) {
+                    syncOverlay.style.opacity = '0';
+                    setTimeout(() => { if(syncOverlay.parentNode) syncOverlay.remove(); }, 500);
+                }
 
             // Aggiorniamo le viste
             if (typeof populateSchede === 'function') populateSchede();
@@ -59,8 +59,8 @@ async function loadGameState() {
 
 async function saveGameState() {
     if (!isInitialStateLoaded) {
-        console.warn("Salvataggio ignorato: lo stato iniziale non è ancora stato caricato.");
-        return;
+        console.warn("Salvataggio differito: lo stato iniziale non è ancora stato caricato.");
+        // Tentiamo comunque se è passato troppo tempo
     }
 
     // Feedback visivo temporaneo
@@ -112,62 +112,53 @@ function showAdminDebug(msg, isError = false) {
 }
 
 function initApp() {
-    loadGameState();
-
-    // Mostra il container dell'app immediatamente
+    // PRIMA COSA: rendi l'app visibile, qualsiasi cosa succeda dopo
     const container = document.getElementById('app-container');
-    if (container) {
-        container.style.display = 'block';
-    }
+    if (container) container.style.display = 'block';
 
-    // Aggiungi overlay di sincronizzazione database per l'admin
-    if (window.location.pathname.includes('admin.html')) {
-        const overlay = document.createElement('div');
-        overlay.id = 'sync-overlay';
-        overlay.style = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10,10,15,0.9); z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center; transition: opacity 0.5s;';
-        overlay.innerHTML = `
-            <div style="font-size:2rem; color:var(--primary-color); margin-bottom:20px;"><i class="fa-solid fa-cloud-arrow-down fa-bounce"></i></div>
-            <div style="color:white; font-weight:bold; letter-spacing:1px;">SINCRONIZZAZIONE DATABASE...</div>
-            <div style="color:rgba(255,255,255,0.5); font-size:0.8rem; margin-top:10px;">Attendere il caricamento dei dati aggiornati</div>
-        `;
-        document.body.appendChild(overlay);
-    }
+    try {
+        loadGameState();
 
-    // 1. Navigation setup
-    setupNavigation();
-    
-    // 2. Data Initialization
-    populateAuthorSelects();
-    populateSchede();
-    
-    // 3. Event Listeners
-    setupBudgetCalculator();
-    setupAdminPanel();
-    setupTeamSave();
-    
-    checkLoginSession();
-    
-    // Check hash for direct navigation from external pages (like admin)
-    if (window.location.hash) {
-        const viewId = window.location.hash.substring(1);
-        if (document.getElementById(viewId)) {
-            navigateTo(viewId, false);
+        // Overlay di sincronizzazione per l'admin
+        if (window.location.pathname.includes('admin.html')) {
+            const overlay = document.createElement('div');
+            overlay.id = 'sync-overlay';
+            overlay.style = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10,10,15,0.9); z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center; transition: opacity 0.5s;';
+            overlay.innerHTML = `
+                <div style="font-size:2rem; color:var(--primary-color); margin-bottom:20px;"><i class="fa-solid fa-cloud-arrow-down fa-bounce"></i></div>
+                <div style="color:white; font-weight:bold; letter-spacing:1px;">SINCRONIZZAZIONE DATABASE...</div>
+                <div style="color:rgba(255,255,255,0.5); font-size:0.8rem; margin-top:10px;">Attendere il caricamento dei dati aggiornati</div>
+            `;
+            document.body.appendChild(overlay);
         }
-    }
-    
-    // Handle browser back button (popstate mapping to hash changes)
-    window.addEventListener('popstate', (e) => {
-        if(window.location.hash) {
+
+        setupNavigation();
+        populateAuthorSelects();
+        populateSchede();
+        setupBudgetCalculator();
+        setupAdminPanel();
+        setupTeamSave();
+        checkLoginSession();
+
+        if (window.location.hash) {
             const viewId = window.location.hash.substring(1);
-            if(document.getElementById(viewId)) {
-                navigateTo(viewId, false);
-            }
-        } else {
-            navigateTo('view-welcome', false);
+            if (document.getElementById(viewId)) navigateTo(viewId, false);
         }
-    });
-    
-    console.log("App Initialized successfully!");
+
+        window.addEventListener('popstate', (e) => {
+            if (window.location.hash) {
+                const viewId = window.location.hash.substring(1);
+                if (document.getElementById(viewId)) navigateTo(viewId, false);
+            } else {
+                navigateTo('view-welcome', false);
+            }
+        });
+
+        console.log("App Initialized successfully!");
+    } catch(e) {
+        console.error("Errore critico in initApp:", e);
+        // L'app rimane visibile grazie alla riga iniziale
+    }
 }
 
 /* =========================================
@@ -664,25 +655,30 @@ async function setupAdminPanel() {
         if (!list) return;
         list.innerHTML = '<p class="text-center">Caricamento richieste...</p>';
         
-        let requests = await fanta_db.getTeacherRequests();
-        list.innerHTML = '';
-        if (requests.length === 0) {
-            list.innerHTML = '<i>Nessuna richiesta in sospeso.</i>';
-        } else {
-            requests.forEach(req => {
-                let consentLog = req.createdAt ? `<div style="font-size:0.7rem; color:var(--accent-gold); margin-top:5px;"><i class="fa-solid fa-clock"></i> Ricevuta: ${req.createdAt.toDate ? req.createdAt.toDate().toLocaleString() : req.createdAt}</div>` : '';
-                list.innerHTML += `
-                    <div class="glass" style="padding:15px; margin-bottom:10px; border-left:4px solid var(--accent-gold);">
-                        <div style="font-weight:bold; color:var(--primary-color); font-size:1.1rem;">${req.name}</div>
-                        <div style="font-size:0.85rem; margin-top:5px; color:var(--text-muted);">${req.email} | ${req.school} (${req.city})</div>
-                        ${consentLog}
-                        <div style="display:flex; gap:10px; margin-top:15px;">
-                            <button class="btn" style="flex:1; padding:8px; font-size:0.8rem;" onclick="approvaRichiesta('${req.email}')">Approva</button>
-                            <button class="btn btn-secondary" style="flex:1; padding:8px; font-size:0.8rem; color: #ff5f5f; border-color: #ff5f5f;" onclick="rifiutaRichiesta('${req.id}')">Rifiuta</button>
+        try {
+            let requests = await fanta_db.getTeacherRequests();
+            list.innerHTML = '';
+            if (requests.length === 0) {
+                list.innerHTML = '<i>Nessuna richiesta in sospeso.</i>';
+            } else {
+                requests.forEach(req => {
+                    let consentLog = req.createdAt ? `<div style="font-size:0.7rem; color:var(--accent-gold); margin-top:5px;"><i class="fa-solid fa-clock"></i> Ricevuta: ${req.createdAt.toDate ? req.createdAt.toDate().toLocaleString() : req.createdAt}</div>` : '';
+                    list.innerHTML += `
+                        <div class="glass" style="padding:15px; margin-bottom:10px; border-left:4px solid var(--accent-gold);">
+                            <div style="font-weight:bold; color:var(--primary-color); font-size:1.1rem;">${req.name}</div>
+                            <div style="font-size:0.85rem; margin-top:5px; color:var(--text-muted);">${req.email} | ${req.school} (${req.city})</div>
+                            ${consentLog}
+                            <div style="display:flex; gap:10px; margin-top:15px;">
+                                <button class="btn" style="flex:1; padding:8px; font-size:0.8rem;" onclick="approvaRichiesta('${req.email}')">Approva</button>
+                                <button class="btn btn-secondary" style="flex:1; padding:8px; font-size:0.8rem; color: #ff5f5f; border-color: #ff5f5f;" onclick="rifiutaRichiesta('${req.id}')">Rifiuta</button>
+                            </div>
                         </div>
-                    </div>
-                `;
-            });
+                    `;
+                });
+            }
+        } catch (err) {
+            console.error("Errore renderAdminRichieste:", err);
+            list.innerHTML = '<i>Errore nel caricamento delle richieste.</i>';
         }
     };
 
@@ -798,32 +794,6 @@ async function setupAdminPanel() {
         }
     };
 
-    window.renderAdminRichieste = async function() {
-        const list = document.getElementById('admin-requests-list');
-        if (!list) return;
-        list.innerHTML = '<p class="text-center">Caricamento richieste...</p>';
-        
-        let requests = await fanta_db.getTeacherRequests();
-        list.innerHTML = '';
-        if (requests.length === 0) {
-            list.innerHTML = '<i>Nessuna richiesta in sospeso.</i>';
-        } else {
-            requests.forEach(req => {
-                let consentLog = req.createdAt ? `<div style="font-size:0.7rem; color:var(--accent-gold); margin-top:5px;"><i class="fa-solid fa-clock"></i> Ricevuta: ${req.createdAt.toDate ? req.createdAt.toDate().toLocaleString() : req.createdAt}</div>` : '';
-                list.innerHTML += `
-                    <div class="glass" style="padding:15px; margin-bottom:10px; border-left:4px solid var(--accent-gold);">
-                        <div style="font-weight:bold; color:var(--primary-color); font-size:1.1rem;">${req.name}</div>
-                        <div style="font-size:0.85rem; margin-top:5px; color:var(--text-muted);">${req.email} | ${req.school} (${req.city})</div>
-                        ${consentLog}
-                        <div style="display:flex; gap:10px; margin-top:15px;">
-                            <button class="btn" style="flex:1; padding:8px; font-size:0.8rem;" onclick="approvaRichiesta('${req.email}')">Approva</button>
-                            <button class="btn btn-secondary" style="flex:1; padding:8px; font-size:0.8rem; color: #ff5f5f; border-color: #ff5f5f;" onclick="rifiutaRichiesta('${req.id}')">Rifiuta</button>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-    };
 
     window.renderAdminSquadre = async function(modeFilter) {
         const list = document.getElementById('admin-squadre-list');
@@ -1201,57 +1171,75 @@ let currentUserEmail = null;
 
 function checkLoginSession() {
     fanta_db.onAuthStateChanged(async (user) => {
-        if (user) {
-            const email = user.email.toLowerCase();
-            
-            if (window.location.pathname.includes('admin.html')) {
-                if (email !== "prof.memmo@gmail.com") {
-                    alert("Accesso negato. Solo l'amministratore può accedere al pannello di controllo.");
-                    window.location.href = 'index.html';
-                    return;
-                } else {
-                    const container = document.getElementById('app-container');
-                    if (container) container.style.display = 'block';
+        try {
+            if (user) {
+                const email = user.email.toLowerCase();
+                currentUserEmail = email;
+                
+                // Admin Area Guard
+                if (window.location.pathname.includes('admin.html')) {
+                    if (email !== "prof.memmo@gmail.com") {
+                        alert("Accesso negato. Solo l'amministratore può accedere al pannello di controllo.");
+                        window.location.href = 'index.html';
+                        return;
+                    } else {
+                        const container = document.getElementById('app-container');
+                        if (container) container.style.display = 'block';
+                    }
                 }
-            }
 
-            if (email === "prof.memmo@gmail.com") {
-                setLoggedIn(email);
-                if (window.location.hash === '#view-welcome' && !window.location.pathname.includes('admin.html')) {
-                    navigateTo('view-prof');
+                // Super-Admin Bypass
+                if (email === "prof.memmo@gmail.com") {
+                    setLoggedIn(email, 'approved');
+                    if (window.location.hash === '#view-welcome' && !window.location.pathname.includes('admin.html')) {
+                        navigateTo('view-prof');
+                    }
+                    return;
                 }
-                return;
-            }
-            
-            // Verifichiamo se è approvato
-            const usersRef = window.db.collection("users");
-            const doc = await usersRef.doc(email).get();
-            
-            if (doc.exists) {
-                setLoggedIn(email);
-                if (window.location.hash === '#view-welcome') {
-                    navigateTo('view-prof');
+                
+                // Verifichiamo lo stato dell'utente su Firestore
+                const usersRef = window.db.collection("users");
+                const doc = await usersRef.doc(email).get();
+                
+                if (doc.exists) {
+                    // UTENTE APPROVATO
+                    setLoggedIn(email, 'approved');
+                    if (window.location.hash === '#view-welcome' || !window.location.hash) {
+                        navigateTo('view-prof');
+                    }
+                } else {
+                    // UTENTE NON APPROVATO - verifichiamo se ha una richiesta pendente
+                    const requests = await fanta_db.getTeacherRequests();
+                    const pending = requests.find(r => r.email.toLowerCase() === email);
+                    
+                    if (pending) {
+                        // RICHIESTA IN ATTESA
+                        setLoggedIn(email, 'pending');
+                        navigateTo('view-welcome');
+                    } else {
+                        // NUOVO UTENTE (MAI ISCRITTO)
+                        setLoggedIn(email, 'authenticated'); // Lo lasciamo nella home ma mostriamo che lo conosciamo
+                        localStorage.setItem('fanta_temp_email', email);
+                        
+                        // Pre-compiliamo l'email nel form se esiste
+                        const iscrizioneEmailInput = document.querySelector('#docente-email-input');
+                        if(iscrizioneEmailInput) iscrizioneEmailInput.value = email;
+                        
+                        alert("Benvenuto! Completa la tua iscrizione per iniziare a giocare.");
+                        navigateTo('view-iscrizione');
+                    }
                 }
             } else {
-                // Non approvato - verifichiamo se ha una richiesta
-                const requests = await fanta_db.getTeacherRequests();
-                const pending = requests.find(r => r.email.toLowerCase() === email);
-                if (pending) {
-                    setLoggedIn(email); // Fondamentale per non essere bloccati dalla navigazione
-                    alert("Il tuo account è in attesa di approvazione dal Game Master. Ti avviseremo via mail appena sarai attivo!");
-                    navigateTo('view-welcome');
-                } else {
-                    // Loggato ma senza richiesta: attiviamo il login interno per permettere la navigazione
-                    setLoggedIn(email); 
-                    localStorage.setItem('fanta_temp_email', email);
-                    navigateTo('view-iscrizione');
+                setLoggedOut();
+                if (window.location.pathname.includes('admin.html')) {
+                    window.location.href = 'index.html';
                 }
             }
-        } else {
-            setLoggedOut();
-            if (window.location.pathname.includes('admin.html')) {
-                window.location.href = 'index.html';
-            }
+        } catch (error) {
+            console.error("Errore critico in checkLoginSession:", error);
+            // In caso di errore Firestore (es: regole), permettiamo comunque al caricamento di finire
+            const container = document.getElementById('app-container');
+            if (container) container.style.display = 'block';
         }
     });
 }
@@ -1276,14 +1264,18 @@ async function loginDocente(event) {
 
 async function loginGoogle() {
     try {
-        const result = await fanta_db.loginWithGoogle();
-        const user = result.user;
-        const email = user.email.toLowerCase();
-
-        // checkLoginSession gestirà la logica di approvazione/reindirizzamento
+        await fanta_db.loginWithGoogle();
+        // Il risultato viene gestito da onAuthStateChanged
     } catch (error) {
         console.error("Google Login Error:", error);
-        alert("Errore durante l'accesso con Google.");
+        const code = error.code || '';
+        if (code === 'auth/popup-blocked') {
+            alert("Il popup è stato bloccato dal browser. Abilita i popup per questo sito e riprova.");
+        } else if (code === 'auth/popup-closed-by-user') {
+            // Utente ha chiuso il popup: nessun errore
+        } else {
+            alert("Errore Google Login: " + (code || error.message));
+        }
     }
 }
 
@@ -1524,22 +1516,51 @@ window.onclick = function(event) {
     if (event.target.id === 'invite-torneo-modal') event.target.style.display = 'none';
 }
 
-function setLoggedIn(email) {
+function setLoggedIn(email, status = 'approved') {
     currentUserEmail = email;
     const loginSec = document.getElementById('login-section');
     const loggedSec = document.getElementById('logged-in-section');
-    if(loginSec) loginSec.style.display = 'none';
-    if(loggedSec) loggedSec.style.display = 'block';
-    
     const loggedWelc = document.getElementById('logged-in-welcome');
-    if(loggedWelc) loggedWelc.textContent = "Bentornato, Prof!";
-    
-    // Show Profile tabs/links
-    const pLink = document.getElementById('menu-link-profilo');
-    const pTab = document.getElementById('tab-item-profilo');
-    if(pLink) pLink.classList.remove('hidden');
-    if(pTab) pTab.classList.remove('hidden');
+    const loggedNormal = document.getElementById('logged-in-normal-content');
+    const loggedPending = document.getElementById('logged-in-pending-content');
 
+    if (status === 'approved') {
+        if(loginSec) loginSec.style.display = 'none';
+        if(loggedSec) loggedSec.style.display = 'block';
+        if(loggedNormal) loggedNormal.style.display = 'block';
+        if(loggedPending) loggedPending.style.display = 'none';
+        if(loggedWelc) loggedWelc.textContent = "Bentornato, Prof!";
+        
+        // Show Profile tabs/links
+        const pLink = document.getElementById('menu-link-profilo');
+        const pTab = document.getElementById('tab-item-profilo');
+        if(pLink) pLink.classList.remove('hidden');
+        if(pTab) pTab.classList.remove('hidden');
+    } else if (status === 'pending') {
+        if(loginSec) loginSec.style.display = 'none';
+        if(loggedSec) {
+            loggedSec.style.display = 'block';
+            if(loggedNormal) loggedNormal.style.display = 'none';
+            if(loggedPending) {
+                loggedPending.style.display = 'block';
+            } else {
+                // Fallback se il contenitore non esiste ancora nell'HTML
+                loggedSec.innerHTML = `
+                    <div class="text-center">
+                        <h3 class="text-primary mb-1">Richiesta in Attesa</h3>
+                        <p style="font-size: 0.9rem; margin-bottom:15px;">Il tuo account è in attesa di approvazione dal Game Master.<br>Riprova più tardi.</p>
+                        <button class="btn btn-secondary" onclick="logoutDocente()">Disconnetti</button>
+                    </div>
+                `;
+            }
+        }
+    } else {
+        // Authenticated but not registered
+        if(loginSec) loginSec.style.display = 'block';
+        if(loggedSec) loggedSec.style.display = 'none';
+    }
+    
+    // Fill emails in forms/profile
     const profEmail = document.getElementById('profilo-email');
     if(profEmail) profEmail.value = email;
     const profAdminEmail = document.getElementById('admin-profilo-email');
@@ -1548,7 +1569,7 @@ function setLoggedIn(email) {
     const appContainer = document.getElementById('app-container');
     if(appContainer) appContainer.style.display = 'block';
 
-    renderProfilo();
+    if(status === 'approved') renderProfilo();
 }
 
 function setLoggedOut() {
