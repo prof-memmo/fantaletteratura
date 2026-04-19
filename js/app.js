@@ -12,31 +12,27 @@ let currentLeaderboardMode = null; // modalità selezionata nelle classifiche
 
 
 async function loadGameState() {
-    // Carichiamo lo stato globale da Firebase (Realtime)
     fanta_db.getSnapshotSettings((state) => {
         if(state) {
-            if(state.revealedAuthors) {
+            // Nuova logica: se pointsRevealed esiste, usiamolo
+            if(state.pointsRevealed !== undefined) {
                 AUTHORS.forEach(a => {
-                    if(state.revealedAuthors.includes(a.id)) {
-                        a.isPointsRevealed = true;
-                        a.isSchedaRevealed = true;
-                    } else {
-                        a.isPointsRevealed = false;
-                        a.isSchedaRevealed = false;
-                    }
+                    a.isPointsRevealed = state.pointsRevealed.includes(a.id);
+                });
+            } else if (state.revealedAuthors) {
+                // Fallback retrocompatibilità
+                AUTHORS.forEach(a => {
+                    a.isPointsRevealed = state.revealedAuthors.includes(a.id);
                 });
             }
-            if(state.pointsRevealed) {
+
+            // Stessa cosa per schedaRevealed
+            if(state.schedaRevealed !== undefined) {
                 AUTHORS.forEach(a => {
-                    if(state.pointsRevealed.includes(a.id)) a.isPointsRevealed = true;
+                    a.isSchedaRevealed = state.schedaRevealed.includes(a.id);
                 });
             }
-            if(state.schedaRevealed) {
-                AUTHORS.forEach(a => {
-                    if(state.schedaRevealed.includes(a.id)) a.isSchedaRevealed = true;
-                });
-            }
-            // Aggiorniamo le viste se necessario
+
             if (typeof populateSchede === 'function') populateSchede();
             if (typeof renderAdminAutori === 'function') renderAdminAutori();
         }
