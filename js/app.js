@@ -33,6 +33,13 @@ async function loadGameState() {
             isInitialStateLoaded = true; // Sblocchiamo il salvataggio
             console.log("Sistema sincronizzato con successo.");
 
+            // Rimuoviamo l'overlay di caricamento se presente
+            const syncOverlay = document.getElementById('sync-overlay');
+            if (syncOverlay) {
+                syncOverlay.style.opacity = '0';
+                setTimeout(() => syncOverlay.remove(), 500);
+            }
+
             // Aggiorniamo le viste
             if (typeof populateSchede === 'function') populateSchede();
             if (typeof renderAdminAutori === 'function') renderAdminAutori();
@@ -88,6 +95,19 @@ function initApp() {
     const container = document.getElementById('app-container');
     if (container) {
         container.style.display = 'block';
+    }
+
+    // Aggiungi overlay di sincronizzazione database per l'admin
+    if (window.location.pathname.includes('admin.html')) {
+        const overlay = document.createElement('div');
+        overlay.id = 'sync-overlay';
+        overlay.style = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10,10,15,0.9); z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center; transition: opacity 0.5s;';
+        overlay.innerHTML = `
+            <div style="font-size:2rem; color:var(--primary-color); margin-bottom:20px;"><i class="fa-solid fa-cloud-arrow-down fa-bounce"></i></div>
+            <div style="color:white; font-weight:bold; letter-spacing:1px;">SINCRONIZZAZIONE DATABASE...</div>
+            <div style="color:rgba(255,255,255,0.5); font-size:0.8rem; margin-top:10px;">Attendere il caricamento dei dati aggiornati</div>
+        `;
+        document.body.appendChild(overlay);
     }
 
     // 1. Navigation setup
@@ -597,6 +617,10 @@ async function setupAdminPanel() {
     };
 
     window.toggleAuthorPoints = async function(id, type) {
+        if (!isInitialStateLoaded) {
+            alert("Database in fase di caricamento. Attendi un istante prima di modificare i dati.");
+            return;
+        }
         const author = AUTHORS.find(a => a.id === id);
         if (author) {
             if (type === 'punti') author.isPointsRevealed = !author.isPointsRevealed;

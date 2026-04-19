@@ -116,7 +116,18 @@ const AUTHORS = [
             <li><strong>🧠 INNOVATORE ⚡️ +10</strong> &rarr; RIVOLUZIONARIO LINGUISTICO E STILISTICO. INVENTORE DELLA PAROLA IN LIBERTÀ.</li>
         </ul>`
     },
-    { id: 'a10', name: 'Giuseppe Ungaretti',          cost: 4000, points: 20, isPointsRevealed: false, isSchedaRevealed: false, image: 'avatar_autori/Ungaretti.png' },
+    { id: 'a10', name: 'Giuseppe Ungaretti',          cost: 4000, points: 20, isPointsRevealed: false, isSchedaRevealed: false, image: 'avatar_autori/Ungaretti.png',
+        schedaHTML: `<ul style="list-style-type:none; padding-left:0; margin:0;">
+            <li><strong>🌍 VIAGGIATORE ✈️ +10</strong> &rarr; NATO IN EGITTO. MILITANTE IN GUERRA, VIAGGI IN EUROPA E AFRICA.</li>
+            <li><strong>🏛️ POLITICO 🗳️ 0</strong> &rarr; NON COINVOLTO POLITICAMENTE.</li>
+            <li><strong>✍️ POLIEDRICO ✒️ +10</strong> &rarr; POESIA, SAGGISTICA.</li>
+            <li><strong>📚 CLASSICO 🏺 0</strong> &rarr; RIFERIMENTI CLASSICI MINIMI. POESIA PURA.</li>
+            <li><strong>🔋 SOLITARIO 🏡 -5</strong> &rarr; VITA RITIRATA E INTENSA CONCENTRAZIONE SULLA POESIA.</li>
+            <li><strong>🤬 SCANDALOSO 🧨 0</strong> &rarr; NESSUNO SCANDALO.</li>
+            <li><strong>🌀 PESSIMISTA 🌫️ -5</strong> &rarr; VISIONE DELLA GUERRA, DELLA SOLITUDINE E DELLA SOFFERENZA.</li>
+            <li><strong>🧠 INNOVATORE ⚡️ +10</strong> &rarr; LINGUAGGIO ERMETICO INNOVATIVO. POESIA.</li>
+        </ul>`
+    },
     { id: 'a11', name: 'Eugenio Montale', cost: 4500, points: 25, isPointsRevealed: false, isSchedaRevealed: false, image: 'avatar_autori/Montale.png',
         schedaHTML: `<ul style="list-style-type:none; padding-left:0; margin:0;">
             <li><strong>🌍 VIAGGIATORE ✈️ +10</strong> &rarr; VIAGGI IN ITALIA E ALL’ESTERO.</li>
@@ -201,7 +212,18 @@ const AUTHORS = [
             <li><strong>🧠 INNOVATORE ⚡️ +10</strong> &rarr; STILE REALISTICO, INNOVAZIONE NARRATIVA.</li>
         </ul>`
     },
-    { id: 'a18', name: 'Alberto Moravia',             cost: 3000, points: 25, isPointsRevealed: false, isSchedaRevealed: false, image: 'avatar_autori/Moravia.png' },
+    { id: 'a18', name: 'Alberto Moravia',             cost: 3000, points: 25, isPointsRevealed: false, isSchedaRevealed: false, image: 'avatar_autori/Moravia.png',
+        schedaHTML: `<ul style="list-style-type:none; padding-left:0; margin:0;">
+            <li><strong>🌍 VIAGGIATORE ✈️ +10</strong> &rarr; VIAGGI FREQUENTI IN EUROPA E AMERICA. CONOSCE IL MONDO E LO RACCONTA.</li>
+            <li><strong>🏛️ POLITICO 🗳️ +5</strong> &rarr; NON ATTIVO POLITICAMENTE. CRITICO VERSO LA SOCIETÀ BORGHESE.</li>
+            <li><strong>✍️ POLIEDRICO ✒️ +10</strong> &rarr; ROMANZI, SAGGI, REPORTAGE GIORNALISTICO, CINEMA.</li>
+            <li><strong>📚 CLASSICO 🏺 0</strong> &rarr; RIFERIMENTI CLASSICI LIMITATI.</li>
+            <li><strong>🔋 SOLITARIO 🏡 -5</strong> &rarr; VITA RIFLESSIVA E RISERVATA.</li>
+            <li><strong>🤬 SCANDALOSO 🧨 0</strong> &rarr; NESSUNO SCANDALO SIGNIFICATIVO.</li>
+            <li><strong>🌀 PESSIMISTA 🌫️ -5</strong> &rarr; VISIONE CRITICA E SPESSO CUPA DELLA SOCIETÀ.</li>
+            <li><strong>🧠 INNOVATORE ⚡️ +10</strong> &rarr; ANALISI PSICOLOGICA E SOCIALE INNOVATIVA.</li>
+        </ul>`
+    },
     { id: 'a19', name: 'Beppe Fenoglio',              cost: 3000, points: 20, isPointsRevealed: false, isSchedaRevealed: false, image: 'avatar_autori/Fenoglio.png',
         schedaHTML: `<ul style="list-style-type:none; padding-left:0; margin:0;">
             <li><strong>🌍 VIAGGIATORE ✈️ +10</strong> &rarr; ESPERIENZE NELLA RESISTENZA E VIAGGI IN PIEMONTE.</li>
