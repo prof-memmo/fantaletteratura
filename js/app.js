@@ -9,7 +9,7 @@ const STORAGE_KEY = 'fanta_state_v1';
 // ── GAME MODE STATE ──────────────────────────────────────────
 let currentTeamMode = null;       // modalità scelta nel form "Crea Squadra"
 let currentLeaderboardMode = null; // modalità selezionata nelle classifiche
-
+let isInitialStateLoaded = false;  // Guardia per evitare sovrascritture accidentali
 
 async function loadGameState() {
     fanta_db.getSnapshotSettings((state) => {
@@ -34,6 +34,9 @@ async function loadGameState() {
                 });
             }
 
+            isInitialStateLoaded = true; // Sblocchiamo il salvataggio
+            console.log("Sistema sincronizzato con successo.");
+
             // Aggiorniamo le viste
             if (typeof populateSchede === 'function') populateSchede();
             if (typeof renderAdminAutori === 'function') renderAdminAutori();
@@ -47,6 +50,10 @@ async function loadGameState() {
 }
 
 async function saveGameState() {
+    if (!isInitialStateLoaded) {
+        console.warn("Salvataggio ignorato: lo stato iniziale non è ancora stato caricato.");
+        return;
+    }
     let ptsRevealed = AUTHORS.filter(a => a.isPointsRevealed).map(a => a.id);
     let schRevealed = AUTHORS.filter(a => a.isSchedaRevealed).map(a => a.id);
     let state = {
@@ -1156,13 +1163,13 @@ function checkLoginSession() {
                 // Non approvato - verifichiamo se ha una richiesta
                 const requests = await fanta_db.getTeacherRequests();
                 const pending = requests.find(r => r.email.toLowerCase() === email);
-                
                 if (pending) {
+                    setLoggedIn(email); // Fondamentale per non essere bloccati dalla navigazione
                     alert("Il tuo account è in attesa di approvazione dal Game Master. Ti avviseremo via mail appena sarai attivo!");
                     navigateTo('view-welcome');
-                    // Rimosso fanta_db.logout() per evitare il loop di "torna indietro"
                 } else {
-                    // Loggato ma senza richiesta: lo teniamo loggato solo per compilare il form.
+                    // Loggato ma senza richiesta: attiviamo il login interno per permettere la navigazione
+                    setLoggedIn(email); 
                     localStorage.setItem('fanta_temp_email', email);
                     navigateTo('view-iscrizione');
                 }
@@ -1240,15 +1247,17 @@ async function inviaRichiestaIscrizione(event) {
     }
 
     try {
-        // 1. Creiamo l'account su Firebase Auth immediatamente
-        try {
-            if (password) {
+        // 1. Creiamo l'account su Firebase Auth solo se NON è Google
+        const currentUser = window.auth.currentUser;
+        const isGoogleUser = currentUser && currentUser.email.toLowerCase() === email;
+
+        if (!isGoogleUser && password) {
+            try {
                 await window.auth.createUserWithEmailAndPassword(email, password);
-            }
-        } catch (authError) {
-            // Se gia in uso (es: Google o vecchia registrazione), proseguiamo
-            if (authError.code !== 'auth/email-already-in-use') {
-                throw authError;
+            } catch (authError) {
+                if (authError.code !== 'auth/email-already-in-use') {
+                    throw authError;
+                }
             }
         }
 
