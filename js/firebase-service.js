@@ -3,8 +3,7 @@
 window.fanta_db = {
     // --- AUTH ---
     login: (email, password) => window.auth.signInWithEmailAndPassword(email, password),
-    loginWithGoogle: async () => {
-        await window.auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+    loginWithGoogle: () => {
         const provider = new firebase.auth.GoogleAuthProvider();
         provider.setCustomParameters({ prompt: 'select_account' });
         return window.auth.signInWithPopup(provider);

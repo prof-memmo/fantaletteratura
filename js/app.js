@@ -630,23 +630,15 @@ async function setupAdminPanel() {
         });
     };
 
-    window.toggleAuthorPoints = async function(id, type) {
-        if (!isInitialStateLoaded) {
-            alert("Database in fase di caricamento. Attendi un istante prima di modificare i dati.");
-            return;
-        }
+    window.toggleAuthorPoints = function(id, type) {
         const author = AUTHORS.find(a => a.id === id);
         if (author) {
             if (type === 'punti') author.isPointsRevealed = !author.isPointsRevealed;
             if (type === 'scheda') author.isSchedaRevealed = !author.isSchedaRevealed;
-            
-            await saveGameState();
-            
-            // Refresh immediato UI
+            saveGameState();
             window.renderAdminAutori();
             window.renderAdminClassifica();
             if (typeof populateSchede === 'function') populateSchede();
-            console.log(`Toggle ${type} per ${id} completato e salvato.`);
         }
     };
 
@@ -1171,75 +1163,60 @@ let currentUserEmail = null;
 
 function checkLoginSession() {
     fanta_db.onAuthStateChanged(async (user) => {
-        try {
-            if (user) {
-                const email = user.email.toLowerCase();
-                currentUserEmail = email;
-                
-                // Admin Area Guard
-                if (window.location.pathname.includes('admin.html')) {
-                    if (email !== "prof.memmo@gmail.com") {
-                        alert("Accesso negato. Solo l'amministratore può accedere al pannello di controllo.");
-                        window.location.href = 'index.html';
-                        return;
-                    } else {
-                        const container = document.getElementById('app-container');
-                        if (container) container.style.display = 'block';
-                    }
-                }
-
-                // Super-Admin Bypass
-                if (email === "prof.memmo@gmail.com") {
-                    setLoggedIn(email, 'approved');
-                    if (window.location.hash === '#view-welcome' && !window.location.pathname.includes('admin.html')) {
-                        navigateTo('view-prof');
-                    }
+        if (user) {
+            const email = user.email.toLowerCase();
+            
+            if (window.location.pathname.includes('admin.html')) {
+                if (email !== "prof.memmo@gmail.com") {
+                    alert("Accesso negato. Solo l'amministratore può accedere al pannello di controllo.");
+                    window.location.href = 'index.html';
                     return;
                 }
-                
-                // Verifichiamo lo stato dell'utente su Firestore
+            }
+
+            if (email === "prof.memmo@gmail.com") {
+                setLoggedIn(email);
+                if (window.location.hash === '#view-welcome' && !window.location.pathname.includes('admin.html')) {
+                    navigateTo('view-prof');
+                }
+                return;
+            }
+            
+            // Verifichiamo se è approvato
+            try {
                 const usersRef = window.db.collection("users");
                 const doc = await usersRef.doc(email).get();
                 
                 if (doc.exists) {
-                    // UTENTE APPROVATO
-                    setLoggedIn(email, 'approved');
-                    if (window.location.hash === '#view-welcome' || !window.location.hash) {
+                    setLoggedIn(email);
+                    if (window.location.hash === '#view-welcome') {
                         navigateTo('view-prof');
                     }
                 } else {
-                    // UTENTE NON APPROVATO - verifichiamo se ha una richiesta pendente
+                    // Non approvato - verifichiamo se ha una richiesta
                     const requests = await fanta_db.getTeacherRequests();
                     const pending = requests.find(r => r.email.toLowerCase() === email);
                     
                     if (pending) {
-                        // RICHIESTA IN ATTESA
-                        setLoggedIn(email, 'pending');
+                        alert("Account in attesa di approvazione dal Game Master.");
                         navigateTo('view-welcome');
+                        await fanta_db.logout();
                     } else {
-                        // NUOVO UTENTE (MAI ISCRITTO)
-                        setLoggedIn(email, 'authenticated'); // Lo lasciamo nella home ma mostriamo che lo conosciamo
+                        // Loggato ma senza richiesta: salviamo email e slogghiamo
                         localStorage.setItem('fanta_temp_email', email);
-                        
-                        // Pre-compiliamo l'email nel form se esiste
-                        const iscrizioneEmailInput = document.querySelector('#docente-email-input');
-                        if(iscrizioneEmailInput) iscrizioneEmailInput.value = email;
-                        
-                        alert("Benvenuto! Completa la tua iscrizione per iniziare a giocare.");
                         navigateTo('view-iscrizione');
+                        await fanta_db.logout();
                     }
                 }
-            } else {
-                setLoggedOut();
-                if (window.location.pathname.includes('admin.html')) {
-                    window.location.href = 'index.html';
-                }
+            } catch(e) {
+                console.error("Errore checkLoginSession:", e);
             }
-        } catch (error) {
-            console.error("Errore critico in checkLoginSession:", error);
-            // In caso di errore Firestore (es: regole), permettiamo comunque al caricamento di finire
-            const container = document.getElementById('app-container');
-            if (container) container.style.display = 'block';
+        } else {
+            setLoggedOut();
+            if (window.location.pathname.includes('admin.html')) {
+                alert("Devi effettuare l'accesso per visualizzare il pannello admin.");
+                window.location.href = 'index.html';
+            }
         }
     });
 }
@@ -1516,51 +1493,21 @@ window.onclick = function(event) {
     if (event.target.id === 'invite-torneo-modal') event.target.style.display = 'none';
 }
 
-function setLoggedIn(email, status = 'approved') {
+function setLoggedIn(email) {
     currentUserEmail = email;
     const loginSec = document.getElementById('login-section');
     const loggedSec = document.getElementById('logged-in-section');
-    const loggedWelc = document.getElementById('logged-in-welcome');
-    const loggedNormal = document.getElementById('logged-in-normal-content');
-    const loggedPending = document.getElementById('logged-in-pending-content');
-
-    if (status === 'approved') {
-        if(loginSec) loginSec.style.display = 'none';
-        if(loggedSec) loggedSec.style.display = 'block';
-        if(loggedNormal) loggedNormal.style.display = 'block';
-        if(loggedPending) loggedPending.style.display = 'none';
-        if(loggedWelc) loggedWelc.textContent = "Bentornato, Prof!";
-        
-        // Show Profile tabs/links
-        const pLink = document.getElementById('menu-link-profilo');
-        const pTab = document.getElementById('tab-item-profilo');
-        if(pLink) pLink.classList.remove('hidden');
-        if(pTab) pTab.classList.remove('hidden');
-    } else if (status === 'pending') {
-        if(loginSec) loginSec.style.display = 'none';
-        if(loggedSec) {
-            loggedSec.style.display = 'block';
-            if(loggedNormal) loggedNormal.style.display = 'none';
-            if(loggedPending) {
-                loggedPending.style.display = 'block';
-            } else {
-                // Fallback se il contenitore non esiste ancora nell'HTML
-                loggedSec.innerHTML = `
-                    <div class="text-center">
-                        <h3 class="text-primary mb-1">Richiesta in Attesa</h3>
-                        <p style="font-size: 0.9rem; margin-bottom:15px;">Il tuo account è in attesa di approvazione dal Game Master.<br>Riprova più tardi.</p>
-                        <button class="btn btn-secondary" onclick="logoutDocente()">Disconnetti</button>
-                    </div>
-                `;
-            }
-        }
-    } else {
-        // Authenticated but not registered
-        if(loginSec) loginSec.style.display = 'block';
-        if(loggedSec) loggedSec.style.display = 'none';
-    }
+    if(loginSec) loginSec.style.display = 'none';
+    if(loggedSec) loggedSec.style.display = 'block';
     
-    // Fill emails in forms/profile
+    const loggedWelc = document.getElementById('logged-in-welcome');
+    if(loggedWelc) loggedWelc.textContent = "Bentornato, Prof!";
+    
+    const pLink = document.getElementById('menu-link-profilo');
+    const pTab = document.getElementById('tab-item-profilo');
+    if(pLink) pLink.classList.remove('hidden');
+    if(pTab) pTab.classList.remove('hidden');
+
     const profEmail = document.getElementById('profilo-email');
     if(profEmail) profEmail.value = email;
     const profAdminEmail = document.getElementById('admin-profilo-email');
@@ -1569,7 +1516,7 @@ function setLoggedIn(email, status = 'approved') {
     const appContainer = document.getElementById('app-container');
     if(appContainer) appContainer.style.display = 'block';
 
-    if(status === 'approved') renderProfilo();
+    renderProfilo();
 }
 
 function setLoggedOut() {
