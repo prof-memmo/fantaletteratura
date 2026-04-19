@@ -88,9 +88,11 @@ async function saveGameState() {
 function initApp() {
     loadGameState();
 
-    // Mostra il container dell'app (necessario per admin.html che nasce nascosto)
+    // Mostra il container dell'app (SOLO se non siamo in admin)
     const container = document.getElementById('app-container');
-    if (container) container.style.display = 'block';
+    if (container && !window.location.pathname.includes('admin.html')) {
+        container.style.display = 'block';
+    }
 
     // 1. Navigation setup
     setupNavigation();
@@ -1162,8 +1164,11 @@ function checkLoginSession() {
             if (window.location.pathname.includes('admin.html')) {
                 if (email !== "prof.memmo@gmail.com") {
                     alert("Accesso negato. Solo l'amministratore può accedere al pannello di controllo.");
-                    navigateTo('view-welcome'); // Usiamo navigazione interna invece di location.href
+                    window.location.href = 'index.html';
                     return;
+                } else {
+                    const container = document.getElementById('app-container');
+                    if (container) container.style.display = 'block';
                 }
             }
 
@@ -1201,7 +1206,9 @@ function checkLoginSession() {
             }
         } else {
             setLoggedOut();
-            // Rimosso reindirizzamento forzato se non autenticato per evitare loop infiniti al boot
+            if (window.location.pathname.includes('admin.html')) {
+                window.location.href = 'index.html';
+            }
         }
     });
 }
