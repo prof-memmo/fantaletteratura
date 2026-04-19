@@ -1147,6 +1147,7 @@ function checkLoginSession() {
         if (user) {
             const email = user.email.toLowerCase();
             
+            // Protezione pannello admin
             if (window.location.pathname.includes('admin.html')) {
                 if (email !== "prof.memmo@gmail.com") {
                     alert("Accesso negato. Solo l'amministratore può accedere al pannello di controllo.");
@@ -1155,6 +1156,7 @@ function checkLoginSession() {
                 }
             }
 
+            // Prof Memmo ha accesso diretto
             if (email === "prof.memmo@gmail.com") {
                 setLoggedIn(email);
                 if (window.location.hash === '#view-welcome' && !window.location.pathname.includes('admin.html')) {
@@ -1163,30 +1165,30 @@ function checkLoginSession() {
                 return;
             }
             
-            // Verifichiamo se è approvato
-            const usersRef = window.db.collection("users");
-            const doc = await usersRef.doc(email).get();
-            
-            if (doc.exists) {
-                setLoggedIn(email);
-                if (window.location.hash === '#view-welcome') {
-                    navigateTo('view-prof');
-                }
-            } else {
-                // Non approvato - verifichiamo se ha una richiesta
-                const requests = await fanta_db.getTeacherRequests();
-                const pending = requests.find(r => r.email.toLowerCase() === email);
+            // Verifica approvazione su Firestore
+            try {
+                const doc = await window.db.collection("users").doc(email).get();
                 
-                if (pending) {
-                    alert("Account in attesa di approvazione dal Game Master.");
-                    navigateTo('view-welcome');
-                    await fanta_db.logout();
+                if (doc.exists) {
+                    // Utente approvato
+                    setLoggedIn(email);
+                    if (window.location.hash === '#view-welcome') {
+                        navigateTo('view-prof');
+                    }
                 } else {
-                    // Loggato ma senza richiesta
+                    // Utente non ancora approvato o nuovo:
+                    // NON leggiamo pending_requests (richiede permessi admin su Firestore)
+                    // Lo mandiamo al form di iscrizione — se ha già una richiesta, il form lo avviserà
                     localStorage.setItem('fanta_temp_email', email);
-                    navigateTo('view-iscrizione');
-                    await fanta_db.logout();
+                    await fanta_db.logout(); // Slogghiamo prima
+                    navigateTo('view-iscrizione'); // Poi mostriamo il form
                 }
+            } catch(e) {
+                console.error("Errore checkLoginSession Firestore:", e);
+                // In caso di errore (es: regole Firestore), mandiamo comunque al form
+                localStorage.setItem('fanta_temp_email', email);
+                await fanta_db.logout();
+                navigateTo('view-iscrizione');
             }
         } else {
             setLoggedOut();
