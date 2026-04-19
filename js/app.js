@@ -1155,10 +1155,10 @@ function checkLoginSession() {
                     navigateTo('view-welcome');
                     await fanta_db.logout();
                 } else {
-                    // Loggato ma senza richiesta
+                    // Loggato ma senza richiesta: lo teniamo loggato solo per compilare il form.
                     localStorage.setItem('fanta_temp_email', email);
                     navigateTo('view-iscrizione');
-                    await fanta_db.logout();
+                    // Rimuoviamo il logout immediato, altrimenti il sistema "torna indietro".
                 }
             }
         } else {
