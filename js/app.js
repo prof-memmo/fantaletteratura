@@ -1159,6 +1159,9 @@ function checkLoginSession() {
             // Prof Memmo ha accesso diretto
             if (email === "prof.memmo@gmail.com") {
                 setLoggedIn(email);
+                // Mostra il link al pannello admin nel menù
+                const adminMenuItem = document.getElementById('menu-admin-item');
+                if (adminMenuItem) adminMenuItem.style.display = 'block';
                 if (window.location.hash === '#view-welcome' && !window.location.pathname.includes('admin.html')) {
                     navigateTo('view-prof');
                 }
@@ -1502,6 +1505,10 @@ function setLoggedOut() {
     const pTab = document.getElementById('tab-item-profilo');
     if(pLink) pLink.classList.add('hidden');
     if(pTab) pTab.classList.add('hidden');
+
+    // Nascondi link pannello admin
+    const adminMenuItem = document.getElementById('menu-admin-item');
+    if (adminMenuItem) adminMenuItem.style.display = 'none';
 }
 
 async function getAllTeams() {
