@@ -524,12 +524,28 @@ async function setupAdminPanel() {
         [...pool].sort((a,b) => a.name.localeCompare(b.name)).forEach(author => {
             const isRevealed = author.isPointsRevealed;
             const isSchedaRevealed = author.isSchedaRevealed;
+            let viewSchedaHtml = '';
+            if (author.schedaHTML) {
+                viewSchedaHtml = `
+                    <details style="margin-top:10px; width:100%; text-align:left; font-size:0.75rem; background:rgba(0,0,0,0.1); padding:5px; border-radius:5px;">
+                        <summary style="cursor:pointer; color:var(--primary-color); outline:none;"><i class="fa-solid fa-eye"></i> Visualizza Scheda</summary>
+                        <div style="margin-top:8px; line-height:1.4;">${author.schedaHTML}</div>
+                    </details>
+                `;
+            } else {
+                viewSchedaHtml = `
+                    <div style="margin-top:10px;">
+                        <a href="schede/${author.id}.pdf" target="_blank" class="text-primary" style="font-size:0.75rem; text-decoration:none;"><i class="fa-solid fa-file-pdf"></i> Visualizza PDF</a>
+                    </div>
+                `;
+            }
+
             autoriList.innerHTML += `
-                <div class="glass" style="padding:15px; text-align:center; border: 1px solid ${isRevealed ? 'var(--primary-color)' : 'rgba(255,255,255,0.1)'};">  
+                <div class="glass" style="padding:15px; text-align:center; border: 1px solid ${isRevealed ? 'var(--primary-color)' : 'rgba(255,255,255,0.1)'}; display:flex; flex-direction:column; align-items:center;">  
                     <img src="${author.image}" style="width:50px; height:50px; border-radius:50%; object-fit:cover; background:#fff; margin-bottom:10px;">
                     <div style="font-weight:bold; font-size:0.9rem; margin-bottom:5px;">${author.name}</div>
                     <div style="font-size:1.2rem; font-weight:bold; color:var(--primary-color);">${author.points} pt</div>
-                    <div style="margin-top:15px; display:flex; flex-direction:column; gap:8px; align-items:center;">
+                    <div style="margin-top:15px; display:flex; flex-direction:column; gap:8px; align-items:center; width:100%;">
                         <label style="font-size:0.75rem; cursor:pointer; display:flex; align-items:center; gap:5px;">
                             <input type="checkbox" ${isRevealed ? 'checked' : ''} onchange="toggleAuthorPoints('${author.id}', 'punti')"> Valida Punteggio
                         </label>
@@ -537,6 +553,7 @@ async function setupAdminPanel() {
                             <input type="checkbox" ${isSchedaRevealed ? 'checked' : ''} onchange="toggleAuthorPoints('${author.id}', 'scheda')"> Pubblica Scheda
                         </label>
                     </div>
+                    ${viewSchedaHtml}
                 </div>
             `;
         });
@@ -1035,6 +1052,19 @@ async function showLeaderboard(type) {
 /* =========================================
    SCHEDE DIARIO
 ========================================= */
+window.openAuthorSchedaModal = function(authorId) {
+    const author = AUTHORS.find(a => a.id === authorId);
+    if (!author || !author.schedaHTML) return;
+    document.getElementById('scheda-autore-title').innerHTML = `Scheda di <strong>${author.name}</strong>`;
+    document.getElementById('scheda-autore-content').innerHTML = `
+        <div style="text-align:center; margin-bottom:15px;">
+            <img src="${author.image}" style="width:80px; height:80px; border-radius:50%; object-fit:cover; background:#fff;">
+        </div>
+        <div style="font-size:0.95rem; line-height:1.6; color:#e0e0e0; margin-bottom:10px;">${author.schedaHTML}</div>
+    `;
+    document.getElementById('scheda-autore-modal').style.display = 'block';
+};
+
 function populateSchede() {
     const grid = document.getElementById('schede-grid');
     if(!grid) return;
@@ -1049,12 +1079,24 @@ function populateSchede() {
     }
 
     revealedAuthors.forEach(author => {
+        let content = '';
+        let titleStyle = '';
+        let onclickAttr = '';
+
+        if (author.schedaHTML) {
+            titleStyle = 'cursor:pointer; color:var(--primary-color); display:inline-block; border-bottom:1px solid currentColor; margin-bottom:5px;';
+            onclickAttr = `onclick="openAuthorSchedaModal('${author.id}')"`;
+            content = `<div class="puntata-author"><button class="btn" style="padding: 4px 10px; font-size: 0.8rem; width: auto;" ${onclickAttr}><i class="fa-solid fa-eye"></i> Apri Scheda</button></div>`;
+        } else {
+            content = `<div class="puntata-author"><a href="schede/${author.id}.pdf" target="_blank" style="color:var(--primary-color); text-decoration:none;"><i class="fa-solid fa-file-pdf"></i> Vedi PDF</a></div>`;
+        }
+        
         const card = `
-            <div class="puntata-card">
-                <img src="${author.image}" alt="${author.name}" class="puntata-img" style="background:#fff;">
-                <div class="puntata-info">
-                    <div class="puntata-title">Scheda di ${author.name}</div>
-                    <div class="puntata-author"><a href="schede/${author.id}.pdf" target="_blank" style="color:var(--primary-color); text-decoration:none;"><i class="fa-solid fa-file-pdf"></i> Vedi Scheda</a></div>
+            <div class="puntata-card" style="align-items:flex-start; overflow:hidden;">
+                <img src="${author.image}" alt="${author.name}" class="puntata-img" style="background:#fff; margin-top:5px; flex-shrink:0; ${author.schedaHTML ? 'cursor:pointer;' : ''}" ${onclickAttr}>
+                <div class="puntata-info" style="width:100%;">
+                    <div class="puntata-title" style="${titleStyle}" ${onclickAttr}>${author.name}</div>
+                    ${content}
                 </div>
             </div>
         `;
@@ -1074,6 +1116,22 @@ function checkLoginSession() {
         if (user) {
             const email = user.email.toLowerCase();
             
+            if (window.location.pathname.includes('admin.html')) {
+                if (email !== "prof.memmo@gmail.com") {
+                    alert("Accesso negato. Solo l'amministratore può accedere al pannello di controllo.");
+                    window.location.href = 'index.html';
+                    return;
+                }
+            }
+
+            if (email === "prof.memmo@gmail.com") {
+                setLoggedIn(email);
+                if (window.location.hash === '#view-welcome' && !window.location.pathname.includes('admin.html')) {
+                    navigateTo('view-prof');
+                }
+                return;
+            }
+            
             // Verifichiamo se è approvato
             const usersRef = window.db.collection("users");
             const doc = await usersRef.doc(email).get();
@@ -1089,11 +1147,11 @@ function checkLoginSession() {
                 const pending = requests.find(r => r.email.toLowerCase() === email);
                 
                 if (pending) {
-                    alert("Account creato con successo! Ora attendi l'approvazione del Game Master per accedere al profilo.");
+                    alert("Account in attesa di approvazione dal Game Master.");
                     navigateTo('view-welcome');
                     await fanta_db.logout();
                 } else {
-                    // Loggato ma senza richiesta? Strano, forse Google.
+                    // Loggato ma senza richiesta
                     localStorage.setItem('fanta_temp_email', email);
                     navigateTo('view-iscrizione');
                     await fanta_db.logout();
@@ -1101,6 +1159,10 @@ function checkLoginSession() {
             }
         } else {
             setLoggedOut();
+            if (window.location.pathname.includes('admin.html')) {
+                alert("Devi effettuare l'accesso per visualizzare il pannello admin.");
+                window.location.href = 'index.html';
+            }
         }
     });
 }
