@@ -208,6 +208,15 @@ function navigateTo(viewId, pushHistory = true) {
         renderProfilo();
     }
 
+    // Gestione campo password in iscrizione per utenti Google
+    if(viewId === 'view-iscrizione') {
+        const isGoogleUser = !!localStorage.getItem('fanta_temp_email');
+        const passGroup = document.getElementById('iscrizione-password-group');
+        if(passGroup) {
+            passGroup.style.display = isGoogleUser ? 'none' : 'block';
+        }
+    }
+
     // Hightlight side-menu active link
     document.querySelectorAll('.menu-link').forEach(link => {
         link.classList.remove('active');
@@ -1266,13 +1275,15 @@ async function inviaRichiestaIscrizione(event) {
     }
 
     try {
-        // 1. Creiamo l'account su Firebase Auth immediatamente
-        try {
-            await window.auth.createUserWithEmailAndPassword(email, password);
-        } catch (authError) {
-            // Se gia in uso (es: Google o vecchia registrazione), proseguiamo
-            if (authError.code !== 'auth/email-already-in-use') {
-                throw authError;
+        // 1. Creiamo l'account su Firebase Auth solo se è stata inserita una password
+        if (password) {
+            try {
+                await window.auth.createUserWithEmailAndPassword(email, password);
+            } catch (authError) {
+                // Se gia in uso (es: Google o vecchia registrazione), proseguiamo
+                if (authError.code !== 'auth/email-already-in-use') {
+                    throw authError;
+                }
             }
         }
 
