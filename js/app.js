@@ -88,6 +88,10 @@ async function saveGameState() {
 function initApp() {
     loadGameState();
 
+    // Mostra il container dell'app (necessario per admin.html che nasce nascosto)
+    const container = document.getElementById('app-container');
+    if (container) container.style.display = 'block';
+
     // 1. Navigation setup
     setupNavigation();
     
@@ -2115,3 +2119,11 @@ async function inviaMissione(event) {
     }
 }
 
+// --- AUTO-INITIALIZATION ---
+// Garantisce che il motore dell'app si avvii su ogni pagina (incluso admin.html)
+document.addEventListener('DOMContentLoaded', () => {
+    // Se non è già stata avviata tramite onload (fallback), avviala ora
+    if (typeof initApp === 'function') {
+        initApp();
+    }
+});
