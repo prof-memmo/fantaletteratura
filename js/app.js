@@ -208,15 +208,6 @@ function navigateTo(viewId, pushHistory = true) {
         renderProfilo();
     }
 
-    // Gestione campo password in iscrizione per utenti Google
-    if(viewId === 'view-iscrizione') {
-        const isGoogleUser = !!localStorage.getItem('fanta_temp_email');
-        const passGroup = document.getElementById('iscrizione-password-group');
-        if(passGroup) {
-            passGroup.style.display = isGoogleUser ? 'none' : 'block';
-        }
-    }
-
     // Hightlight side-menu active link
     document.querySelectorAll('.menu-link').forEach(link => {
         link.classList.remove('active');
@@ -1249,18 +1240,12 @@ async function inviaRichiestaIscrizione(event) {
     const name = document.querySelector('#view-iscrizione input[placeholder="Nome docente"]').value.trim();
     const school = document.querySelector('#view-iscrizione input[placeholder="Nome scuola"]').value.trim();
     const city = document.querySelector('#view-iscrizione input[placeholder="Citta"]').value.trim();
-    const password = document.getElementById('iscrizione-password').value.trim();
 
     const isDocente = document.getElementById('teacher-check-docente').checked;
     const acceptedPrivacy = document.getElementById('teacher-check-privacy').checked;
 
     if (!name || !school || !city || !email) {
         alert("Completa tutti i campi (e inserisci l'email nella home se necessario).");
-        return;
-    }
-
-    if (password && password.length < 6) {
-        alert("La password deve essere di almeno 6 caratteri.");
         return;
     }
 
@@ -1275,18 +1260,9 @@ async function inviaRichiestaIscrizione(event) {
     }
 
     try {
-        // 1. Creiamo l'account su Firebase Auth solo se è stata inserita una password
-        if (password) {
-            try {
-                await window.auth.createUserWithEmailAndPassword(email, password);
-            } catch (authError) {
-                // Se gia in uso (es: Google o vecchia registrazione), proseguiamo
-                if (authError.code !== 'auth/email-already-in-use') {
-                    throw authError;
-                }
-            }
-        }
-
+        // 1. In un flusso solo Google, non creiamo l'account via email/password qui
+        // L'utente è già loggato in Firebase tramite Google se è arrivato con fanta_temp_email
+        
         const requests = await fanta_db.getTeacherRequests();
         if (requests.some(r => r.email.toLowerCase() === email)) {
             alert("Hai già inviato una richiesta di iscrizione con questa email. Attendi l'approvazione.");
@@ -1301,7 +1277,6 @@ async function inviaRichiestaIscrizione(event) {
             name,
             school,
             city,
-            password, 
             status: 'pending',
             createdAt: timestamp,
             isDocente: true
