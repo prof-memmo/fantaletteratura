@@ -54,14 +54,35 @@ async function saveGameState() {
         console.warn("Salvataggio ignorato: lo stato iniziale non è ancora stato caricato.");
         return;
     }
-    let ptsRevealed = AUTHORS.filter(a => a.isPointsRevealed).map(a => a.id);
-    let schRevealed = AUTHORS.filter(a => a.isSchedaRevealed).map(a => a.id);
-    let state = {
-        pointsRevealed: ptsRevealed,
-        schedaRevealed: schRevealed,
-        revealedAuthors: ptsRevealed // manteniamo per compatibilità
-    };
-    await fanta_db.saveSettings(state);
+
+    // Feedback visivo temporaneo
+    const feedback = document.createElement('div');
+    feedback.id = 'save-indicator';
+    feedback.style = 'position:fixed; top:20px; right:20px; background:var(--primary-color); color:var(--bg-dark); padding:10px 20px; border-radius:30px; font-weight:bold; z-index:10000; box-shadow:0 10px 30px rgba(0,0,0,0.5); font-size:0.85rem; pointer-events:none;';
+    feedback.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Salvataggio...';
+    document.body.appendChild(feedback);
+
+    try {
+        let ptsRevealed = AUTHORS.filter(a => a.isPointsRevealed).map(a => a.id);
+        let schRevealed = AUTHORS.filter(a => a.isSchedaRevealed).map(a => a.id);
+        let state = {
+            pointsRevealed: ptsRevealed,
+            schedaRevealed: schRevealed,
+            revealedAuthors: ptsRevealed // manteniamo per compatibilità
+        };
+
+        await fanta_db.saveSettings(state);
+        
+        feedback.style.background = '#4caf50';
+        feedback.innerHTML = '<i class="fa-solid fa-check"></i> Salvato!';
+        setTimeout(() => { if(feedback.parentNode) feedback.remove(); }, 2000);
+    } catch (e) {
+        console.error("Errore salvataggio game state:", e);
+        feedback.style.background = 'var(--danger-color)';
+        feedback.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Errore!';
+        alert("Errore critico durante il salvataggio.\nErrore: " + e.message);
+        setTimeout(() => { if(feedback.parentNode) feedback.remove(); }, 5000);
+    }
 }
 
 function initApp() {
@@ -1137,7 +1158,7 @@ function checkLoginSession() {
             if (window.location.pathname.includes('admin.html')) {
                 if (email !== "prof.memmo@gmail.com") {
                     alert("Accesso negato. Solo l'amministratore può accedere al pannello di controllo.");
-                    window.location.href = 'index.html';
+                    navigateTo('view-welcome'); // Usiamo navigazione interna invece di location.href
                     return;
                 }
             }
@@ -1176,10 +1197,7 @@ function checkLoginSession() {
             }
         } else {
             setLoggedOut();
-            if (window.location.pathname.includes('admin.html')) {
-                alert("Devi effettuare l'accesso per visualizzare il pannello admin.");
-                window.location.href = 'index.html';
-            }
+            // Rimosso reindirizzamento forzato se non autenticato per evitare loop infiniti al boot
         }
     });
 }
