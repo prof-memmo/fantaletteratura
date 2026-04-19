@@ -1,9 +1,5 @@
 // Fantaletteratura Web App - Main Application Logic
 
-document.addEventListener('DOMContentLoaded', () => {
-    initApp();
-});
-
 const STORAGE_KEY = 'fanta_state_v1';
 
 // ── GAME MODE STATE ──────────────────────────────────────────
@@ -88,9 +84,9 @@ async function saveGameState() {
 function initApp() {
     loadGameState();
 
-    // Mostra il container dell'app (SOLO se non siamo in admin)
+    // Mostra il container dell'app immediatamente
     const container = document.getElementById('app-container');
-    if (container && !window.location.pathname.includes('admin.html')) {
+    if (container) {
         container.style.display = 'block';
     }
 
