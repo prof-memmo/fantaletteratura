@@ -1236,7 +1236,9 @@ async function inviaRichiestaIscrizione(event) {
     try {
         // 1. Creiamo l'account su Firebase Auth immediatamente
         try {
-            await window.auth.createUserWithEmailAndPassword(email, password);
+            if (password) {
+                await window.auth.createUserWithEmailAndPassword(email, password);
+            }
         } catch (authError) {
             // Se gia in uso (es: Google o vecchia registrazione), proseguiamo
             if (authError.code !== 'auth/email-already-in-use') {
