@@ -546,8 +546,8 @@ async function setupAdminPanel() {
 
             autoriList.innerHTML += `
                 <div class="glass" style="padding:15px; text-align:center; border: 1px solid ${isRevealed ? 'var(--primary-color)' : 'rgba(255,255,255,0.1)'}; display:flex; flex-direction:column; align-items:center;">  
-                    <img src="${author.image}" style="width:50px; height:50px; border-radius:50%; object-fit:cover; background:#fff; margin-bottom:10px; ${author.schedaHTML ? 'cursor:pointer;' : ''}" ${onclickAttr}>
-                    <div style="font-weight:bold; font-size:0.9rem; margin-bottom:5px; ${titleStyle}" ${onclickAttr}>${author.name}</div>
+                    <img src="${author.image}" style="width:50px; height:50px; border-radius:50%; object-fit:cover; background:#fff; margin-bottom:10px;">
+                    <div style="font-weight:bold; font-size:0.9rem; margin-bottom:5px;">${author.name}</div>
                     <div style="font-size:1.2rem; font-weight:bold; color:var(--primary-color);">${author.points} pt</div>
                     <div style="margin-top:15px; display:flex; flex-direction:column; gap:8px; align-items:center; width:100%;">
                         <label style="font-size:0.75rem; cursor:pointer; display:flex; align-items:center; gap:5px;">
