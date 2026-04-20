@@ -1083,3 +1083,33 @@ h1, h2, h3, h4 {
     margin-left: 10px;
 }
 
+/* International Authors Stylings (Red Cards) */
+.card-international {
+    border: 1px solid var(--danger-color) !important;
+    background: rgba(230, 57, 70, 0.05) !important;
+}
+
+.card-international .text-primary,
+.card-international .author-cost {
+    color: var(--danger-color) !important;
+}
+
+.card-international img {
+    border: 2px solid var(--danger-color);
+}
+
+.mode-gold {
+    background: var(--accent-gold);
+    color: #fff;
+}
+
+.mode-orange {
+    background: #d4721a;
+    color: #fff;
+}
+
+.mode-green {
+    background: #8da03f;
+    color: #fff;
+}
+

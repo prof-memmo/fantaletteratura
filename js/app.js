@@ -7,64 +7,87 @@ document.addEventListener('DOMContentLoaded', () => {
 const STORAGE_KEY = 'fanta_state_v1';
 
 // ── GAME MODE STATE ──────────────────────────────────────────
-let currentTeamMode = null;       // modalità scelta nel form "Crea Squadra"
-let currentLeaderboardMode = null; // modalità selezionata nelle classifiche
+let currentTeamMode = 'terze';        // modalità scelta nel form "Crea Squadra"
+let currentLeaderboardMode = 'terze'; // modalità selezionata nelle classifiche
+window.currentAdminMode = 'terze';    // modalità selezionata nel pannello admin
 
 
-async function loadGameState() {
-    fanta_db.getSnapshotSettings((state) => {
-        if(state) {
-            // Reset completo prima di applicare lo stato da Firestore
-            AUTHORS.forEach(a => {
-                a.isPointsRevealed = false;
-                a.isSchedaRevealed = false;
-            });
-            // Applica pointsRevealed
-            if(state.pointsRevealed) {
-                AUTHORS.forEach(a => {
-                    if(state.pointsRevealed.includes(a.id)) a.isPointsRevealed = true;
-                });
-            }
-            // Applica schedaRevealed
-            if(state.schedaRevealed) {
-                AUTHORS.forEach(a => {
-                    if(state.schedaRevealed.includes(a.id)) a.isSchedaRevealed = true;
-                });
-            }
-            // Retrocompatibilità con vecchio campo revealedAuthors
-            if(state.revealedAuthors && !state.pointsRevealed) {
-                AUTHORS.forEach(a => {
-                    if(state.revealedAuthors.includes(a.id)) {
-                        a.isPointsRevealed = true;
-                        a.isSchedaRevealed = true;
-                    }
-                });
-            }
-            if (typeof populateSchede === 'function') populateSchede();
-            if (typeof renderAdminAutori === 'function') renderAdminAutori();
+async function loadGameState(specificMode = null) {
+    const mode = specificMode || window.currentAdminMode || 'terze';
+    
+    // Pulizia sottoscrizione precedente se necessario (non implementato qui per semplicità Compat)
+    fanta_db.getSnapshotSettings(mode, (state) => {
+        // Fallback: se il documento specifico non esiste, proviamo quello globale per compatibilità
+        if (!state && mode === 'terze') {
+            fanta_db.getSnapshotSettings(null, (s) => processState(s, mode));
+        } else {
+            processState(state, mode);
         }
     });
 }
 
-async function saveGameState() {
+function processState(state, mode) {
+    const modeCfg = GAME_MODES[mode] || GAME_MODES.terze;
+    const pool = modeCfg.authors;
+
+    if(state) {
+        // Reset completo del pool specifico prima di applicare lo stato da Firestore
+        pool.forEach(a => {
+            a.isPointsRevealed = false;
+            a.isSchedaRevealed = false;
+        });
+
+        // Applica pointsRevealed
+        if(state.pointsRevealed) {
+            pool.forEach(a => {
+                if(state.pointsRevealed.includes(a.id)) a.isPointsRevealed = true;
+            });
+        }
+        // Applica schedaRevealed
+        if(state.schedaRevealed) {
+            pool.forEach(a => {
+                if(state.schedaRevealed.includes(a.id)) a.isSchedaRevealed = true;
+            });
+        }
+        
+        // Retrocompatibilità
+        if(state.revealedAuthors && !state.pointsRevealed) {
+            pool.forEach(a => {
+                if(state.revealedAuthors.includes(a.id)) {
+                    a.isPointsRevealed = true;
+                    a.isSchedaRevealed = true;
+                }
+            });
+        }
+        
+        if (typeof populateSchede === 'function') populateSchede(mode);
+        if (typeof renderAdminAutori === 'function') renderAdminAutori(mode);
+    }
+}
+
+async function saveGameState(specificMode = null) {
+    const mode = specificMode || window.currentAdminMode || 'terze';
+    const modeCfg = GAME_MODES[mode] || GAME_MODES.terze;
+    const pool = modeCfg.authors;
+
     // Feedback visivo
     const existing = document.getElementById('save-indicator');
     if (existing) existing.remove();
     const feedback = document.createElement('div');
     feedback.id = 'save-indicator';
     feedback.style = 'position:fixed; top:20px; right:20px; background:var(--primary-color); color:var(--bg-dark); padding:10px 20px; border-radius:30px; font-weight:bold; z-index:10000; box-shadow:0 10px 30px rgba(0,0,0,0.5); font-size:0.85rem; pointer-events:none;';
-    feedback.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Salvataggio...';
+    feedback.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Salvataggio ${modeCfg.label}...`;
     document.body.appendChild(feedback);
 
     try {
-        let ptsRevealed = AUTHORS.filter(a => a.isPointsRevealed).map(a => a.id);
-        let schRevealed = AUTHORS.filter(a => a.isSchedaRevealed).map(a => a.id);
+        let ptsRevealed = pool.filter(a => a.isPointsRevealed).map(a => a.id);
+        let schRevealed = pool.filter(a => a.isSchedaRevealed).map(a => a.id);
         let state = {
             pointsRevealed: ptsRevealed,
             schedaRevealed: schRevealed,
-            revealedAuthors: ptsRevealed
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
-        await fanta_db.saveSettings(state);
+        await fanta_db.saveSettings(mode, state);
         feedback.style.background = '#4caf50';
         feedback.innerHTML = '<i class="fa-solid fa-check"></i> Salvato!';
         setTimeout(() => { if(feedback.parentNode) feedback.remove(); }, 2000);
@@ -90,8 +113,8 @@ function initApp() {
     setupNavigation();
     
     // 2. Data Initialization
-    populateAuthorSelects();
-    populateSchede();
+    populateAuthorSelects(window.currentAdminMode || 'terze');
+    populateSchede(window.currentAdminMode || 'terze');
     
     // 3. Event Listeners
     setupBudgetCalculator();
@@ -351,25 +374,29 @@ function populateAuthorSelects(modeId) {
     if(!grid) return;
 
     // Determine which author pool to use
-    const mode = modeId ? GAME_MODES[modeId] : GAME_MODES['terze'];
-    const pool = (mode && mode.authors && mode.authors.length > 0) ? mode.authors : AUTHORS;
+    const modeKey = modeId || currentTeamMode || 'terze';
+    const modeCfg = GAME_MODES[modeKey] || GAME_MODES.terze;
+    const pool = modeCfg.authors || AUTHORS;
+    const currency = modeCfg.currencyLabel || 'lire';
     
     grid.innerHTML = '';
-    const sortedAuthors = [...pool].sort((a, b) => b.cost - a.cost);
+    // Sort logic update: use cost or points
+    const sortedAuthors = [...pool].sort((a, b) => (b.cost || b.points || 0) - (a.cost || a.points || 0));
     
     sortedAuthors.forEach(author => {
         const card = document.createElement('div');
-        card.className = 'author-card glass';
+        const isInternationalClass = author.isInternational ? 'card-international' : '';
+        card.className = `author-card glass ${isInternationalClass}`;
         card.dataset.id = author.id;
         card.innerHTML = `
             <div class="author-image-wrapper">
                 <img src="${author.image}" alt="${author.name}">
             </div>
             <div style="font-family: var(--font-heading); font-weight:bold; font-size:1.1rem; color:var(--accent-gold);">${author.name}</div>
-            <div class="text-primary" style="font-size:0.9rem; font-weight:600;">${author.cost} lire</div>
+            <div class="text-primary" style="font-size:0.9rem; font-weight:600;">${author.cost || author.points} ${currency}</div>
         `;
         card.addEventListener('click', () => {
-            selectAuthorForSlot(author.id, modeId);
+            selectAuthorForSlot(author.id, modeKey);
         });
         grid.appendChild(card);
     });
@@ -437,6 +464,12 @@ function selectAuthorForSlot(authorId, modeId) {
     const author = pool.find(a => a.id === authorId);
     if (!author) return;
     
+    // Determine mode configuration for currency
+    const modeKey = modeId || currentTeamMode || 'terze';
+    const modeCfg = GAME_MODES[modeKey] || GAME_MODES.terze;
+    const currency = modeCfg.currencyLabel || 'lire';
+    const price = author.cost || author.points || 0;
+    
     // Update button UI
     const btn = document.querySelector(`.author-slot-btn[data-slot="${activeSlot}"]`);
     if(btn) {
@@ -444,7 +477,7 @@ function selectAuthorForSlot(authorId, modeId) {
                             <img src="${author.image}" style="width:30px; height:30px; object-fit:cover; border-radius:50%; background:#fff;"> 
                             <span>${author.name}</span>
                          </div> 
-                         <span class="text-primary">${author.cost} lire</span>`;
+                         <span class="text-primary">${price} ${currency}</span>`;
     }
 
     // Show remove button for this slot
@@ -475,50 +508,61 @@ function calculateBudget() {
     const budgetBar = document.getElementById('budget-bar');
     const budgetText = document.getElementById('budget-text');
     const budgetStatus = document.getElementById('budget-status');
-    const saveBtn = document.getElementById('btn-save-team');
 
     if(!budgetBar) return;
 
-    // Use the right author pool
-    const mode = currentTeamMode ? GAME_MODES[currentTeamMode] : null;
-    const pool = (mode && mode.authors && mode.authors.length > 0) ? mode.authors : AUTHORS;
+    // Use current mode or default to 'terze'
+    const modeId = currentTeamMode || 'terze';
+    const modeCfg = GAME_MODES[modeId] || GAME_MODES.terze;
+    const pool = modeCfg.authors || AUTHORS;
+    const totalBudget = modeCfg.budget || 20000;
+    const currency = modeCfg.currencyLabel || 'lire';
 
-    let totalCost = 0;
-    let selectedCount = 0;
+    let spent = 0;
     
     Object.values(teamSelection).forEach(authorId => {
         if(authorId) {
             const author = pool.find(a => a.id === authorId);
             if(author) {
-                totalCost += author.cost;
-                selectedCount++;
+                // Support both 'cost' (legacy) and 'points' (new)
+                spent += (author.cost || author.points || 0);
             }
         }
     });
 
-    const remaining = MAX_BUDGET - totalCost;
+    const remaining = totalBudget - spent;
     
     // Update Text
-    if(remaining >= 0) {
-        budgetText.textContent = `${remaining} lire`;
-        budgetStatus.textContent = `Hai ancora ${remaining} lire da spendere!`;
-        budgetStatus.style.color = "inherit";
-    } else {
-        budgetText.textContent = "BUDGET SUPERATO";
-        budgetStatus.textContent = "Il tuo budget non è illimitato! Hai solo 20000 lire. Scegli altre star!";
-        budgetStatus.style.color = "var(--danger-color)";
+    if(budgetText) {
+        if(remaining >= 0) {
+            budgetText.textContent = `${remaining.toLocaleString()} ${currency}`;
+        } else {
+            budgetText.textContent = "BUDGET SUPERATO";
+        }
+    }
+
+    if(budgetStatus) {
+        if(remaining >= 0) {
+            budgetStatus.textContent = `Hai ancora ${remaining.toLocaleString()} ${currency} da spendere!`;
+            budgetStatus.style.color = "inherit";
+        } else {
+            budgetStatus.textContent = `Sei fuori budget di ${Math.abs(remaining).toLocaleString()} ${currency}!`;
+            budgetStatus.style.color = "var(--danger-color)";
+        }
     }
 
     // Update Progress Bar
-    const percent = Math.min((totalCost / MAX_BUDGET) * 100, 100);
-    budgetBar.style.width = `${percent}%`;
-    
-    if (totalCost > MAX_BUDGET) {
-        budgetBar.classList.add('over');
-        if (saveBtn) saveBtn.disabled = true;
-    } else {
-        budgetBar.classList.remove('over');
-        if (saveBtn) saveBtn.disabled = (selectedCount !== 5);
+    if(budgetBar) {
+        const percent = Math.min((spent / totalBudget) * 100, 100);
+        budgetBar.style.width = `${percent}%`;
+        
+        if (spent > totalBudget) {
+            budgetBar.classList.add('over');
+            budgetBar.style.background = 'var(--danger-color)';
+        } else {
+            budgetBar.classList.remove('over');
+            budgetBar.style.background = 'var(--primary-color)';
+        }
     }
 }
 
@@ -535,30 +579,58 @@ async function setupAdminPanel() {
 
     // --- RENDERING FUNCTIONS (GLOBAL) ---
 
-    window.renderAdminAutori = function(modeFilter) {
+    window.renderAdminAutori = function(modeFilter = null) {
         if (!autoriList) return;
+        
+        const mode = modeFilter || window.currentAdminMode || 'terze';
+        window.currentAdminMode = mode;
+        
+        // Aggiorna stile bottoni filtro
+        document.querySelectorAll('.admin-mode-filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        const activeBtn = document.querySelector(`.admin-mode-filter-btn[onclick*="'${mode}'"]`);
+        if(activeBtn) activeBtn.classList.add('active');
+
         autoriList.innerHTML = '';
 
-        // Determine author pool based on filter
-        let pool = AUTHORS;
-        if (modeFilter && modeFilter !== 'all' && GAME_MODES[modeFilter]) {
-            pool = GAME_MODES[modeFilter].authors;
+        let pool = [];
+        let modeCfgForLabel = GAME_MODES.terze;
+
+        if (mode === 'all') {
+            // Unione di tutti i pool univoci per visualizzazione globale
+            const seen = new Set();
+            Object.keys(GAME_MODES).forEach(m => {
+                const mCfg = GAME_MODES[m];
+                (mCfg.authors || []).forEach(a => {
+                    if (!seen.has(a.id)) {
+                        pool.push({ ...a, activeMode: m });
+                        seen.add(a.id);
+                    }
+                });
+            });
+        } else {
+            modeCfgForLabel = GAME_MODES[mode] || GAME_MODES.terze;
+            pool = (modeCfgForLabel.authors || AUTHORS).map(a => ({ ...a, activeMode: mode }));
         }
 
-        if (!pool || pool.length === 0) {
-            autoriList.innerHTML = '<p class="text-muted" style="grid-column:1/-1; text-align:center;"><i>Nessun autore in questa modalità ancora.</i></p>';
+        if (pool.length === 0) {
+            autoriList.innerHTML = '<p class="text-muted" style="grid-column:1/-1; text-align:center;"><i>Nessun autore trovato.</i></p>';
             return;
         }
 
         [...pool].sort((a,b) => a.name.localeCompare(b.name)).forEach(author => {
+            const currentMode = author.activeMode;
+            const modeCfg = GAME_MODES[currentMode] || GAME_MODES.terze;
             const isRevealed = author.isPointsRevealed;
             const isSchedaRevealed = author.isSchedaRevealed;
+            const price = author.cost || author.points || 0;
             let viewSchedaHtml = '';
             let titleStyle = '';
             let onclickAttr = '';
             
             if (author.schedaHTML) {
-                onclickAttr = `onclick="openAuthorSchedaModal('${author.id}')"`;
+                onclickAttr = `onclick="openAuthorSchedaModal('${author.id}', '${currentMode}')"`;
                 titleStyle = 'cursor:pointer; color:var(--primary-color); border-bottom:1px solid currentColor;';
                 viewSchedaHtml = `
                     <div style="margin-top:10px; width:100%;">
@@ -573,17 +645,21 @@ async function setupAdminPanel() {
                 `;
             }
 
+            const isInternationalClass = author.isInternational ? 'card-international' : '';
+            const modeBadge = mode === 'all' ? `<div class="mode-badge ${modeCfg.colorClass}" style="font-size:0.6rem; margin-bottom:5px;">${modeCfg.emoji} ${modeCfg.shortLabel}</div>` : '';
+
             autoriList.innerHTML += `
-                <div class="glass" style="padding:15px; text-align:center; border: 1px solid ${isRevealed ? 'var(--primary-color)' : 'rgba(255,255,255,0.1)'}; display:flex; flex-direction:column; align-items:center;">  
-                    <img src="${author.image}" style="width:50px; height:50px; border-radius:50%; object-fit:cover; background:#fff; margin-bottom:10px; ${author.schedaHTML ? 'cursor:pointer;' : ''}" ${onclickAttr}>
-                    <div style="font-weight:bold; font-size:0.9rem; margin-bottom:5px; ${titleStyle}" ${onclickAttr}>${author.name}</div>
-                    <div style="font-size:1.2rem; font-weight:bold; color:var(--primary-color);">${author.points} pt</div>
-                    <div style="margin-top:15px; display:flex; flex-direction:column; gap:8px; align-items:center; width:100%;">
-                        <label style="font-size:0.75rem; cursor:pointer; display:flex; align-items:center; gap:5px;">
-                            <input type="checkbox" ${isRevealed ? 'checked' : ''} onchange="toggleAuthorPoints('${author.id}', 'punti')"> Valida Punteggio
+                <div class="glass ${isInternationalClass}" style="padding:12px; text-align:center; border: 1px solid ${isRevealed ? 'var(--primary-color)' : 'rgba(255,255,255,0.1)'}; display:flex; flex-direction:column; align-items:center;">  
+                    ${modeBadge}
+                    <img src="${author.image}" style="width:45px; height:45px; border-radius:50%; object-fit:cover; background:#fff; margin-bottom:10px; ${author.schedaHTML ? 'cursor:pointer;' : ''}" ${onclickAttr}>
+                    <div style="font-weight:bold; font-size:0.85rem; margin-bottom:5px; ${titleStyle}" ${onclickAttr}>${author.name}</div>
+                    <div style="font-size:1.1rem; font-weight:bold; color:var(--primary-color);">${price} ${modeCfg.currencyLabel || 'pt'}</div>
+                    <div style="margin-top:12px; display:flex; flex-direction:column; gap:5px; align-items:center; width:100%;">
+                        <label style="font-size:0.7rem; cursor:pointer; display:flex; align-items:center; gap:5px;">
+                            <input type="checkbox" ${isRevealed ? 'checked' : ''} onchange="toggleAuthorPoints('${author.id}', 'punti', '${currentMode}')"> Valida Punti
                         </label>
-                        <label style="font-size:0.75rem; cursor:pointer; display:flex; align-items:center; gap:5px;">
-                            <input type="checkbox" ${isSchedaRevealed ? 'checked' : ''} onchange="toggleAuthorPoints('${author.id}', 'scheda')"> Pubblica Scheda
+                        <label style="font-size:0.7rem; cursor:pointer; display:flex; align-items:center; gap:5px;">
+                            <input type="checkbox" ${isSchedaRevealed ? 'checked' : ''} onchange="toggleAuthorPoints('${author.id}', 'scheda', '${currentMode}')"> Scheda
                         </label>
                     </div>
                     ${viewSchedaHtml}
@@ -592,15 +668,20 @@ async function setupAdminPanel() {
         });
     };
 
-    window.toggleAuthorPoints = function(id, type) {
-        const author = AUTHORS.find(a => a.id === id);
+    window.toggleAuthorPoints = function(id, type, mode = 'terze') {
+        const pool = GAME_MODES[mode] ? GAME_MODES[mode].authors : AUTHORS;
+        const author = pool.find(a => a.id === id);
         if (author) {
             if (type === 'punti') author.isPointsRevealed = !author.isPointsRevealed;
             if (type === 'scheda') author.isSchedaRevealed = !author.isSchedaRevealed;
-            saveGameState();
-            window.renderAdminAutori();
-            window.renderAdminClassifica();
-            if (typeof populateSchede === 'function') populateSchede();
+            
+            // Salva nel documento specifico per la modalità
+            saveGameState(mode);
+            
+            // Refresh UI
+            window.renderAdminAutori(mode);
+            if (typeof window.renderAdminClassifica === 'function') window.renderAdminClassifica(mode);
+            if (typeof populateSchede === 'function') populateSchede(mode);
         }
     };
 
@@ -957,8 +1038,12 @@ window.renderAdminProfilo = async function() {
     } else {
         teams.forEach(t => {
             let authPts = 0;
+            const teamMode = t.mode || 'terze';
+            const modeCfg = GAME_MODES[teamMode] || GAME_MODES.terze;
+            const pool = modeCfg.authors || AUTHORS;
+            
             t.authors.forEach(aid => {
-                const a = AUTHORS.find(x => x.id === aid);
+                const a = pool.find(x => x.id === aid);
                 if(a && a.isPointsRevealed) authPts += (a.points || 0);
             });
             let misPts = (t.missionsCompleted || 0) * 5;
@@ -1085,8 +1170,11 @@ async function showLeaderboard(type) {
 /* =========================================
    SCHEDE DIARIO
 ========================================= */
-window.openAuthorSchedaModal = function(authorId) {
-    const author = AUTHORS.find(a => a.id === authorId);
+window.openAuthorSchedaModal = function(authorId, modeKey = null) {
+    const mode = modeKey || currentTeamMode || 'terze';
+    const pool = (GAME_MODES[mode] && GAME_MODES[mode].authors) ? GAME_MODES[mode].authors : AUTHORS;
+    const author = pool.find(a => a.id === authorId);
+    
     if (!author || !author.schedaHTML) return;
     document.getElementById('scheda-autore-title').innerHTML = `Scheda di <strong>${author.name}</strong>`;
     document.getElementById('scheda-autore-content').innerHTML = `
@@ -1098,13 +1186,16 @@ window.openAuthorSchedaModal = function(authorId) {
     document.getElementById('scheda-autore-modal').style.display = 'block';
 };
 
-function populateSchede() {
+function populateSchede(modeId = null) {
     const grid = document.getElementById('schede-grid');
     if(!grid) return;
     
     grid.innerHTML = '';
 
-    const revealedAuthors = AUTHORS.filter(a => a.isSchedaRevealed);
+    const modeKey = modeId || currentTeamMode || 'terze';
+    const modeCfg = GAME_MODES[modeKey] || GAME_MODES.terze;
+    const pool = modeCfg.authors || AUTHORS;
+    const revealedAuthors = pool.filter(a => a.isSchedaRevealed);
 
     if(revealedAuthors.length === 0) {
         grid.innerHTML = '<p class="text-muted" style="grid-column: 1/-1;">In attesa della prima scheda... i professori le pubblicheranno a breve!</p>';
@@ -1118,14 +1209,16 @@ function populateSchede() {
 
         if (author.schedaHTML) {
             titleStyle = 'cursor:pointer; color:var(--primary-color); display:inline-block; border-bottom:1px solid currentColor; margin-bottom:5px;';
-            onclickAttr = `onclick="openAuthorSchedaModal('${author.id}')"`;
+            onclickAttr = `onclick="openAuthorSchedaModal('${author.id}', '${modeKey}')"`;
             content = `<div class="puntata-author"><button class="btn" style="padding: 4px 10px; font-size: 0.8rem; width: auto;" ${onclickAttr}><i class="fa-solid fa-eye"></i> Apri Scheda</button></div>`;
         } else {
             content = `<div class="puntata-author"><a href="schede/${author.id}.pdf" target="_blank" style="color:var(--primary-color); text-decoration:none;"><i class="fa-solid fa-file-pdf"></i> Vedi PDF</a></div>`;
         }
         
+        const isInternationalClass = author.isInternational ? 'card-international' : '';
+
         const card = `
-            <div class="puntata-card" style="align-items:flex-start; overflow:hidden;">
+            <div class="puntata-card ${isInternationalClass}" style="align-items:flex-start; overflow:hidden;">
                 <img src="${author.image}" alt="${author.name}" class="puntata-img" style="background:#fff; margin-top:5px; flex-shrink:0; ${author.schedaHTML ? 'cursor:pointer;' : ''}" ${onclickAttr}>
                 <div class="puntata-info" style="width:100%;">
                     <div class="puntata-title" style="${titleStyle}" ${onclickAttr}>${author.name}</div>
@@ -1145,6 +1238,13 @@ function populateSchede() {
 let currentUserEmail = null;
 
 function checkLoginSession() {
+    // Ripristina modalità se salvata
+    const savedMode = localStorage.getItem('fanta_active_mode');
+    if (savedMode) {
+        currentTeamMode = savedMode;
+        currentLeaderboardMode = savedMode;
+    }
+
     fanta_db.onAuthStateChanged(async (user) => {
         if (user) {
             const email = user.email.toLowerCase();
@@ -1339,6 +1439,16 @@ async function checkStudentConsent() {
         localStorage.setItem('fanta_active_team_code', codeInput);
         localStorage.setItem('fanta_active_team_id', team.id);
         
+        // Imposta automaticamente il campionato della squadra
+        if (team.mode) {
+            localStorage.setItem('fanta_active_mode', team.mode);
+            currentTeamMode = team.mode;
+            currentLeaderboardMode = team.mode;
+            // Se eravamo in un'altra vista, forziamo il refresh dei dati prima di navigare
+            if (typeof populateAuthorSelects === 'function') populateAuthorSelects(team.mode);
+            if (typeof populateSchede === 'function') populateSchede(team.mode);
+        }
+
         const now = new Date();
         const timestamp = now.toLocaleDateString('it-IT') + ' ' + now.toLocaleTimeString('it-IT');
         localStorage.setItem('fanta_student_consent', timestamp);
@@ -1387,15 +1497,41 @@ function eliminaAccountTotale() {
 }
 
 function azzeraTutteSpunte() {
-    if(!confirm("Vuoi davvero azzerare tutte le spunte e ricominciare il gioco?")) return;
-    AUTHORS.forEach(a => {
+    const mode = window.currentAdminMode || 'terze';
+    const modeCfg = GAME_MODES[mode] || GAME_MODES.terze;
+    
+    if(!confirm(`Vuoi davvero azzerare tutte le spunte della modalità ${modeCfg.label} e ricominciare il gioco?`)) return;
+    
+    const pool = modeCfg.authors || AUTHORS;
+    pool.forEach(a => {
         a.isPointsRevealed = false;
         a.isSchedaRevealed = false;
     });
-    saveGameState();
-    if (typeof window.renderAdminAutori === 'function') window.renderAdminAutori();
-    alert("Tutte le spunte sono state rimosse!");
+    
+    saveGameState(mode);
+    if (typeof window.renderAdminAutori === 'function') window.renderAdminAutori(mode);
+    alert(`Tutte le spunte della modalità ${modeCfg.label} sono state rimosse!`);
 }
+
+window.testConnessioneAdmin = async function() {
+    const feedback = document.createElement('div');
+    feedback.style = 'position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#3498db; color:white; padding:15px 30px; border-radius:12px; font-weight:bold; z-index:20000; box-shadow:0 10px 30px rgba(0,0,0,0.5); font-size:0.9rem;';
+    feedback.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifica connessione in corso...';
+    document.body.appendChild(feedback);
+
+    try {
+        // Tentiamo di leggere la configurazione globale come test
+        await fanta_db.getSettings('terze');
+        feedback.style.background = '#27ae60';
+        feedback.innerHTML = '<i class="fa-solid fa-circle-check"></i> Connessione Firebase OK!';
+        setTimeout(() => feedback.remove(), 3000);
+    } catch (e) {
+        console.error("Errore test connessione:", e);
+        feedback.style.background = '#e74c3c';
+        feedback.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Errore connessione: ' + e.message;
+        setTimeout(() => feedback.remove(), 5000);
+    }
+};
 
 async function logoutDocente() {
     await fanta_db.logout();
@@ -1623,8 +1759,12 @@ async function renderProfilo() {
     // Calcoliamo i punteggi globali per determinare le posizioni
     let calculatedLeaderboard = allTeams.map(t => {
         let authPoints = 0;
+        const teamMode = t.mode || 'terze';
+        const modeCfg = GAME_MODES[teamMode] || GAME_MODES.terze;
+        const pool = modeCfg.authors || AUTHORS;
+
         t.authors.forEach(aid => {
-            const author = AUTHORS.find(a => a.id === aid);
+            const author = pool.find(a => a.id === aid);
             if(author && author.isPointsRevealed) authPoints += (author.points || 0);
         });
         return {
@@ -1639,8 +1779,12 @@ async function renderProfilo() {
         squadreList.innerHTML = '<div class="glass" style="padding:20px; text-align:center;"><i>Nessuna squadra creata. Premi il tasto sopra per iniziare!</i></div>';
     } else {
         myTeams.forEach(team => {
+            const teamMode = team.mode || 'terze';
+            const modeCfg = GAME_MODES[teamMode] || GAME_MODES.terze;
+            const currentPool = modeCfg.authors || AUTHORS;
+
             let authorsNames = team.authors.map(aid => {
-                let a = AUTHORS.find(x => x.id === aid);
+                let a = currentPool.find(x => x.id === aid);
                 return a ? a.name : aid;
             }).join(', ');
 
@@ -1649,16 +1793,13 @@ async function renderProfilo() {
              
              let authPts = 0;
              team.authors.forEach(aid => {
-                 const a = AUTHORS.find(x => x.id === aid);
+                 const a = currentPool.find(x => x.id === aid);
                  if(a && a.isPointsRevealed) authPts += (a.points || 0);
              });
              let misPts = (team.missionsCompleted || 0) * 5;
 
              // Badge modalità
-             const modeInfo = team.mode ? GAME_MODES[team.mode] : null;
-             const modeBadgeHtml = modeInfo 
-                 ? `<span class="mode-badge ${modeInfo.colorClass}">${modeInfo.emoji} ${modeInfo.shortLabel}</span>` 
-                 : '';
+             const modeBadgeHtml = `<span class="mode-badge ${modeCfg.colorClass}">${modeCfg.emoji} ${modeCfg.shortLabel}</span>`;
 
              squadreList.innerHTML += `
                 <div class="card" style="margin-bottom:20px; flex-direction:column; align-items:flex-start;">
@@ -1990,8 +2131,12 @@ async function renderTornei() {
                 let tObj = allTeams.find(x => x.id === tid);
                 if(!tObj) return null;
                 let authPts = 0;
+                const teamMode = tObj.mode || 'terze';
+                const modeCfg = GAME_MODES[teamMode] || GAME_MODES.terze;
+                const pool = modeCfg.authors || AUTHORS;
+
                 tObj.authors.forEach(aid => {
-                    let a = AUTHORS.find(x => x.id === aid);
+                    let a = pool.find(x => x.id === aid);
                     if(a && a.isPointsRevealed) authPts += a.points;
                 });
                 return {

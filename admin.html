@@ -59,9 +59,12 @@
             </div>
 
             <section id="admin-view-autori" class="admin-view active">
-                <div style="display:flex; justify-content:space-between; align-items:center; padding: 0 15px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; padding: 0 15px; gap: 10px; flex-wrap: wrap;">
                     <h2><i class="fa-solid fa-pen-nib"></i> Convalida Autori</h2>
-                    <button type="button" class="btn" style="width:auto; padding:5px 15px; font-size:0.8rem; background:var(--danger-color);" onclick="azzeraTutteSpunte()"><i class="fa-solid fa-rotate-left"></i> Azzera tutto</button>
+                    <div style="display:flex; gap:10px;">
+                        <button type="button" class="btn" style="width:auto; padding:5px 15px; font-size:0.8rem; background:#3498db;" onclick="testConnessioneAdmin()"><i class="fa-solid fa-satellite-dish"></i> Test Connessione</button>
+                        <button type="button" class="btn" style="width:auto; padding:5px 15px; font-size:0.8rem; background:var(--danger-color);" onclick="azzeraTutteSpunte()"><i class="fa-solid fa-rotate-left"></i> Azzera tutto</button>
+                    </div>
                 </div>
                 <div class="glass" style="padding: 15px; margin: 0 15px 20px 15px;">
                     <p style="font-size:0.85rem; margin-bottom:10px; line-height:1.4;">Seleziona la spunta per validare i punti di un autore.</p>
