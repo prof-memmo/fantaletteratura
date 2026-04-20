@@ -95,7 +95,7 @@ const AUTHORS = [
             <li><strong>📚 CLASSICO 🏺 +5</strong> &rarr; INFLUENZE CLASSICHE VISIBILI NELLA RETORICA E NELLO STILE. IMITA GLI ANTICHI IN MODO RAFFINATO.</li>
             <li><strong>🔋 SOLITARIO 🏡 0</strong> &rarr; VITA SOCIALE INTENSA, NON ISOLATO.</li>
             <li><strong>🤬 SCANDALOSO 🧨 -10</strong> &rarr; SCANDALI, POLEMICHE, VITA PUBBLICA CONTROVERSA. AMORI, LUSSO E SCANDALI INFINITI.</li>
-            <li><strong>🌀 PESSIMISTA 🌫️ 0</strong> &rarr; VISIONE ESTETICA PIÙ EDONISTICA CHE CUPA.</li>
+            <li><strong>🌀 PESSIMISTA 🌫️ 0</strong> &rarr; VISIONE ESTETICA PIÙ EDONISTICA QUE CUPA.</li>
             <li><strong>🧠 INNOVATORE ⚡️ +10</strong> &rarr; SPERIMENTAZIONE STILISTICA E LINGUISTICA. REINVENTA LA LINGUA ITALIANA MODERNA.</li>
         </ul>`
     },
@@ -122,7 +122,7 @@ const AUTHORS = [
             <li><strong>🔋 SOLITARIO 🏡 0</strong> &rarr; VITA SOCIALE ATTIVA.</li>
             <li><strong>🤬 SCANDALOSO 🧨 -10</strong> &rarr; POLEMICHE E PROVOCAZIONI CONTINUE. DISTRUGGE MUSEI E REGOLE.</li>
             <li><strong>🌀 PESSIMISTA 🌫️ 0</strong> &rarr; VISIONE OTTIMISTICA PER LA MODERNITÀ E LA TECNOLOGIA.</li>
-            <li><strong>🧠 INNOVATORE ⚡️ +10</strong> &rarr; RIVOLUZIONARIO LINGUISTICO E STILISTICO. INVENTORE DELLA PAROLA IN LIBERTÀ.</li>
+            <li><strong>🧠 INNOVATORE ⚡️ +10</strong> &rarr; RIVOLUZIONARIO LINGUISTICO E STILISTICO. INVENTORE DELLE PAROLE IN LIBERTÀ.</li>
         </ul>`
     },
     { id: 'a10', name: 'Giuseppe Ungaretti',          cost: 4000, points: 20, isPointsRevealed: false, isSchedaRevealed: false, image: 'avatar_autori/Ungaretti.png',
@@ -233,7 +233,7 @@ const AUTHORS = [
         schedaHTML: `<p class="scheda-intro">L'analista spietato della borghesia e dei suoi disincanti, che con una prosa asciutta e diretta ha esplorato l'alienazione, il sesso e il potere, diventando uno dei testimoni più lucidi della società contemporanea.</p>
         <ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈️ +10</strong> &rarr; VIAGGI FREQUENTI IN EUROPA E AMERICA. CONOSCE IL MONDO E LO RACCONTA.</li>
-            <li><strong>🏛️ POLITICO 🗳️ +5</strong> &rarr; NON ATTIVO POLITICAMENTE. CRITICO VERSO LA SOCIETÀ BORGHESE.</li>
+            <li><strong>🏛️ POLITICO 🏟️ +5</strong> &rarr; NON ATTIVO POLITICAMENTE. CRITICO VERSO LA SOCIETÀ BORGHESE.</li>
             <li><strong>✍️ POLIEDRICO ✒️ +10</strong> &rarr; ROMANZI, SAGGI, REPORTAGE GIORNALISTICO, CINEMA.</li>
             <li><strong>📚 CLASSICO 🏺 0</strong> &rarr; RIFERIMENTI CLASSICI LIMITATI.</li>
             <li><strong>🔋 SOLITARIO 🏡 -5</strong> &rarr; VITA RIFLESSIVA E RISERVATA.</li>
@@ -290,52 +290,23 @@ const AUTHORS = [
             <li><strong>📚 CLASSICO 🏺 0</strong> &rarr; INFLUENZA CLASSICA MINIMA.</li>
             <li><strong>🔋 SOLITARIO 🏡 -5</strong> &rarr; VITA RIFLESSIVA E RISERVATA.</li>
             <li><strong>🤬 SCANDALOSO 🧨 0</strong> &rarr; NESSUNO SCANDALO PERSONALE.</li>
-            <li><strong>🌀 PESSIMISTA 🌫️ -5</strong> &rarr; VISIONE CRITICA DELLA SOCIETÀ E DELLA POLITICA.</li>
-            <li><strong>🧠 INNOVATORE ⚡️ +10</strong> &rarr; STILE INNOVATIVO NEL RACCONTO SOCIALE E POLITICO. GIALLO ETICO E CIVILE.</li>
-        </ul>`
-    },
-    { id: 'a23', name: 'Alda Merini',                 cost: 3000, points: 10, isPointsRevealed: false, isSchedaRevealed: false, image: 'avatar_autori/Alda Merini.png',
-        schedaHTML: `<p class="scheda-intro">La 'piccola ape furibonda' della poesia italiana, che ha trasformato il dolore del manicomio e dell'emarginazione in un canto d'amore e di libertà, celebrando la vita con una lingua visionaria e prepotente.</p>
-        <ul class="scheda-list">
-            <li><strong>🌍 VIAGGIATORE ✈️ 0</strong> &rarr; VITA PREVALENTEMENTE A MILANO, POCHI VIAGGI.</li>
-            <li><strong>🏛️ POLITICO 🗳️ 0</strong> &rarr; NON COINVOLTA POLITICAMENTE.</li>
-            <li><strong>✍️ POLIEDRICO ✒️ +10</strong> &rarr; POESIA, NARRATIVA, AUTOBIOGRAFIA, AFORISMI.</li>
-            <li><strong>📚 CLASSICO 🏺 0</strong> &rarr; INFLUENZA CLASSICA MINIMA.</li>
-            <li><strong>🔋 SOLITARIO 🏡 -5</strong> &rarr; VITA SEGNATA DA RICOVERI E ISOLAMENTO.</li>
-            <li><strong>🤬 SCANDALOSO 🧨 0</strong> &rarr; NESSUNO SCANDALO RILEVANTE.</li>
-            <li><strong>🌀 PESSIMISTA 🌫️ -5</strong> &rarr; VISIONE SPESSO DRAMMATICA E DOLOROSA. ANTICONFORMISTA.</li>
-            <li><strong>🧠 INNOVATORE ⚡️ +10</strong> &rarr; INNOVAZIONI STILISTICHE NELLA POESIA CONTEMPORANEA.</li>
-        </ul>`
-    },
-    { id: 'a24', name: 'Umberto Saba', cost: 3500, points: 10, isPointsRevealed: false, isSchedaRevealed: false, image: 'avatar_autori/Umberto Saba.png',
-        schedaHTML: `<p class="scheda-intro">L'antico e moderno poeta di Trieste, che con una 'onesta' semplicità ha cantato le strade della sua città, i dolori dell'anima e la 'nuova aurora' della vita, cercando sempre la verità nelle pieghe dell'esistenza.</p>
-        <ul class="scheda-list">
-            <li><strong>🌍 VIAGGIATORE ✈️ 0</strong> &rarr; VITA PREVALENTEMENTE A TRIESTE, QUALCHE VIAGGIO IN ITALIA.</li>
-            <li><strong>🏛️ POLITICO 🗳️ 0</strong> &rarr; NON IMPEGNATO POLITICAMENTE.</li>
-            <li><strong>✍️ POLIEDRICO ✒️ +10</strong> &rarr; POESIA, AUTOBIOGRAFIA IN VERSI, CRITICA.</li>
-            <li><strong>📚 CLASSICO 🏺 0</strong> &rarr; INFLUENZA CLASSICA LIMITATA.</li>
-            <li><strong>🔋 SOLITARIO 🏡 -5</strong> &rarr; VITA RITIRATA E RIFLESSIVA. VITA INTROSPETTIVA E DIFFICILE.</li>
-            <li><strong>🤬 SCANDALOSO 🧨 0</strong> &rarr; NESSUNO SCANDALO.</li>
-            <li><strong>🌀 PESSIMISTA 🌫️ -5</strong> &rarr; VISIONE MALINCONICA DELLA VITA.</li>
-            <li><strong>🧠 INNOVATORE ⚡️ +10</strong> &rarr; LINGUAGGIO POETICO SEMPLICE MA INTENSO, INNOVATIVO.</li>
+               <li><strong>🧠 INNOVATORE ⚡️ +10</strong> &rarr; INNOVAZIONI STILISTICHE NELLA POESIA CONTEMPORANEA.</li>
         </ul>`
     }
 ];
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // POOL AUTORI — ETÀ MODERNA
-// Aggiungi qui gli autori quando disponibili
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const AUTHORS_SECONDE = [
     {
         id: 'primi-documenti',
         name: 'I Primi Documenti in Volgare',
         role: 'Le Origini',
-        points: 30,
+        cost: 300,
         image: 'avatar_autori/primi_documenti.png',
         description: 'Dal Placito Capuano alle prime testimonianze scritte della lingua italiana.',
-        schedaHTML: `<p class="scheda-intro">Le fondamenta della nostra identità: frammenti di giuramenti e testimonianze che segnano il passaggio dal latino al volgare, rivelando la nascita di una nuova coscienza linguistica e sociale.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈ +10</strong> &rarr; Testi che nascono dal movimento di notai e religiosi in diverse aree.</li>
             <li><strong>🏛 POLITICO 🏟 +5</strong> &rarr; Documenti legati all'amministrazione della giustizia e delle terre.</li>
             <li><strong>📝 POLIEDRICO 🪶 +5</strong> &rarr; Getta le basi per diversi usi della scrittura.</li>
@@ -350,11 +321,10 @@ const AUTHORS_SECONDE = [
         id: 'scuola-siciliana',
         name: 'La Scuola Siciliana',
         role: 'Poeti di Corte',
-        points: 30,
+        cost: 300,
         image: 'avatar_autori/scuola_siciliana.png',
         description: 'La nascita della lirica d’amore alla corte di Federico II.',
-        schedaHTML: `<p class="scheda-intro">I raffinati poeti della corte di Federico II che, tra burocrazia e cortesia, hanno inventato il sonetto e trasformato il siciliano in una lingua d'arte, dando inizio alla tradizione lirica italiana.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈ +10</strong> &rarr; Mobilità dei poeti-funzionari nella Magna Curia.</li>
             <li><strong>🏛 POLITICO 🏟 +10</strong> &rarr; Al servizio dell'imperatore Federico II.</li>
             <li><strong>📝 POLIEDRICO 🪶 +5</strong> &rarr; Poeti che sono anche giuristi e burocrati.</li>
@@ -369,11 +339,10 @@ const AUTHORS_SECONDE = [
         id: 'francesco-assisi', 
         name: 'Francesco d’Assisi', 
         role: 'Poverello d’Assisi', 
-        points: 30, 
+        cost: 300,
         image: 'avatar_autori/francesco_assisi.png',
         description: 'Il Santo che parlava agli uccelli e scrisse il primo grande testo in volgare.',
-        schedaHTML: `<p class="scheda-intro">Il 'giullare di Dio' che ha rivoluzionato la spiritualità medievale, scrivendo il primo grande inno alla creazione in una lingua semplice e luminosa, capace di parlare al cuore di tutti.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈️ +10</strong> &rarr; PREDICA E VIAGGIA PER L’ITALIA DIFFONDENDO PACE E FRATERNITÀ.</li>
             <li><strong>🏛️ POLITICO 🏟️ +0</strong> &rarr; NON PARTECIPA ALLA VITA POLITICA.</li>
             <li><strong>📝 POLIEDRICO 🪶 +10</strong> &rarr; COMPONE PREGHIERE E POESIE IN VOLGARE (“CANTICO DELLE CREATURE”).</li>
@@ -388,11 +357,10 @@ const AUTHORS_SECONDE = [
         id: 'francesco-petrarca', 
         name: 'Francesco Petrarca', 
         role: 'Padre dell’Umanesimo', 
-        points: 30, 
+        cost: 300,
         image: 'avatar_autori/francesco_petrarca.png',
         description: 'Il poeta dell’interiorità, incoronato in Campidoglio.',
-        schedaHTML: `<p class="scheda-intro">Il poeta dell'interiorità e il primo grande umanista, che ha esplorato i labirinti del cuore umano e la gloria della letteratura, consegnando ai posteri un modello di perfezione lirica insuperato.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈️ +10</strong> &rarr; PASSA LA VITA IN MOVIMENTO TRA AVIGNONE, L’ITALIA E L’EUROPA.</li>
             <li><strong>🏛️ POLITICO 🏟️ +5</strong> &rarr; AMICO DEI POTENTI, SVOLGE MOLTE MISSIONI DIPLOMATICHE.</li>
             <li><strong>📝 POLIEDRICO 🪶 +5</strong> &rarr; POETA IN VOLGARE E GRANDE STUDIOSO IN LATINO.</li>
@@ -407,11 +375,10 @@ const AUTHORS_SECONDE = [
         id: 'lorenzo-medici', 
         name: 'Lorenzo de’ Medici', 
         role: 'L’Ago della Bilancia', 
-        points: 30, 
+        cost: 300,
         image: 'avatar_autori/lorenzo_medici.png',
         description: 'Signore di Firenze e mecenate dei più grandi artisti del Rinascimento.',
-        schedaHTML: `<p class="scheda-intro">Il signore poeta che ha incarnato l'ideale del Rinascimento, trasformando Firenze nella capitale della cultura e celebrando la bellezza fugace della giovinezza con i suoi celebri canti.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈ +0</strong> &rarr; RESTA QUASI SEMPRE A FIRENZE E NELLE SUE VILLE.</li>
             <li><strong>🏛 POLITICO 🏟 +15</strong> &rarr; IL PIÙ GRANDE POLITICO DEL SUO TEMPO.</li>
             <li><strong>📝 POLIEDRICO 🪶 +10</strong> &rarr; SIGNORE DI FIRENZE, POETA E GRANDE MECENATE.</li>
@@ -426,11 +393,10 @@ const AUTHORS_SECONDE = [
         id: 'cesare-beccaria', 
         name: 'Cesare Beccaria', 
         role: 'Contro la Pena di Morte', 
-        points: 30, 
+        cost: 300,
         image: 'avatar_autori/cesare_beccaria.png',
         description: 'L’Illuminista che cambiò la giustizia nel mondo.',
-        schedaHTML: `<p class="scheda-intro">L'illuminista coraggioso che con un solo, lucido trattato ha sfidato i secoli di barbarie legale, chiedendo giustizia e dignità per ogni uomo e ispirando l'abolizione della pena di morte in tutto il mondo.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈ -5</strong> &rarr; AMA POCO VIAGGIARE E RESTA QUASI SEMPRE A MILANO.</li>
             <li><strong>🏛 Politico 🏟 +10</strong> &rarr; LE SUE IDEE CAMBIANO LE LEGGI DI MOLTI STATI.</li>
             <li><strong>📝 POLIEDRICO 🪶 +5</strong> &rarr; GIURISTA, ECONOMISTA E LETTERATO.</li>
@@ -445,11 +411,10 @@ const AUTHORS_SECONDE = [
         id: 'dante-alighieri-sec', 
         name: 'Dante Alighieri', 
         role: 'Il Sommo Poeta', 
-        points: 25, 
+        cost: 250,
         image: 'avatar_autori/dante_modern.png',
         description: 'L’autore della Divina Commedia, il viaggio nell’oltretomba.',
-        schedaHTML: `<p class="scheda-intro">Il Sommo Poeta che ha racchiuso l'intero universo medievale in un viaggio ultraterreno senza precedenti, creando una lingua e un immaginario che sono ancora oggi la radice profonda della cultura italiana.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈ +10</strong> &rarr; PASSA MOLTI ANNI IN ESILIO GIRANDO PER L’ITALIA.</li>
             <li><strong>🏛 Politico 🏟 +10</strong> &rarr; IMPEGNATO NELLA POLITICA DI FIRENZE, PAGHERÀ CON L’ESILIO.</li>
             <li><strong>📝 POLIEDRICO 🪶 +10</strong> &rarr; SCRIVE DI AMORE, FILOSOFIA, POLITICA E RELIGIONE.</li>
@@ -464,12 +429,11 @@ const AUTHORS_SECONDE = [
         id: 'ludovico-ariosto', 
         name: 'Ludovico Ariosto', 
         role: 'Il Poeta del Furioso', 
-        points: 25, 
+        cost: 250,
         image: 'avatar_autori/ludovico_ariosto.png',
         description: 'L’autore dell’Orlando Furioso, tra magia, cavalieri e amore.',
-        schedaHTML: `<p class="scheda-intro">Il creatore di un mondo fantastico fatto di cavalieri, maghi e passioni travolgenti, che ha guardato alle follie dell'uomo con l'ironia e la saggezza di chi sa che la luna ospita tutto ciò che perdiamo in terra.</p>
-        <ul class="scheda-list">
-            <li><strong>🌍 VIAGGIATORE ✈ +10</strong> &rarr; VIAGGI MOLTO PER LAVORO AL SERVIZIO DEGLI ESTE.</li>
+        schedaHTML: `<ul class="scheda-list">
+            <li><strong>🌍 VIAGGIATORE ✈ +10</strong> &rarr; VIAGGIA MOLTO PER LAVORO AL SERVIZIO DEGLI ESTE.</li>
             <li><strong>🏛 POLITICO 🏟 +5</strong> &rarr; AMMINISTRA TERRE DIFFICILI COME LA GARFAGNANA.</li>
             <li><strong>📝 POLIEDRICO 🪶 +10</strong> &rarr; POETA, SCRITTORE DI TEATRO E DIPLOMATICO.</li>
             <li><strong>📚 CLASSICO 🏺 +10</strong> &rarr; RIPRENDE I MITI ANTICHI E I POEMI CAVALLERESCHI.</li>
@@ -483,12 +447,11 @@ const AUTHORS_SECONDE = [
         id: 'giovanni-boccaccio', 
         name: 'Giovanni Boccaccio', 
         role: 'Il Maestro del Racconto', 
-        points: 20, 
+        cost: 200,
         image: 'avatar_autori/giovanni_boccaccio.png',
         description: 'L’autore del Decameron, cento novelle su amore e astuzia.',
-        schedaHTML: `<p class="scheda-intro">Il maestro del racconto che ha celebrato l'intelligenza umana e la vitalità delle passioni, intrecciando storie di beffe, amori e fortuna per offrire conforto e intrattenimento in un mondo segnato dalla peste.</p>
-        <ul class="scheda-list">
-            <li><strong>🌍 VIAGGIATORE ✈ +5</strong> &rarr; VIAGGI TRA FIRENZE e NAPOLI PER AFFARI E CULTURA.</li>
+        schedaHTML: `<ul class="scheda-list">
+            <li><strong>🌍 VIAGGIATORE ✈ +5</strong> &rarr; VIAGGIA TRA FIRENZE e NAPOLI PER AFFARI E CULTURA.</li>
             <li><strong>🏛 POLITICO 🏟 +5</strong> &rarr; SVOLGE COMPITI DIPLOMATICI PER IL COMUNE DI FIRENZE.</li>
             <li><strong>📝 POLIEDRICO 🪶 +10</strong> &rarr; SCRIVE POESIE, ROMANZI E RACCONTI.</li>
             <li><strong>📚 CLASSICO 🏺 +5</strong> &rarr; RITROVA E STUDIA IMPORTANTI TESTI ANTICHI.</li>
@@ -502,14 +465,13 @@ const AUTHORS_SECONDE = [
         id: 'niccolo-machiavelli', 
         name: 'Niccolò Machiavelli', 
         role: 'Il Segretario Fiorentino', 
-        points: 20, 
+        cost: 200,
         image: 'avatar_autori/niccolo_machiavelli.png',
         description: 'L’autore del Principe, che spiegò come funziona il potere.',
-        schedaHTML: `<p class="scheda-intro">Lo scienziato della politica che ha analizzato la natura del potere con spietata onestà, insegnando che per governare gli uomini serve la forza del leone e l'astuzia della volpe.</p>
-        <ul class="scheda-list">
-            <li><strong>🌍 VIAGGIATORE ✈ +10</strong> &rarr; VIAGGI PER TUTTA EUROPA COME DIPLOMATICO.</li>
+        schedaHTML: `<ul class="scheda-list">
+            <li><strong>🌍 VIAGGIATORE ✈ +10</strong> &rarr; VIAGGIA PER TUTTA EUROPA COME DIPLOMATICO.</li>
             <li><strong>🏛 POLITICO 🏟 +15</strong> &rarr; DEDICA TUTTA LA VITA ALLA POLITICA E ALLO STATO.</li>
-            <li><strong>📝 POLIEDRICO 🪶 +10</strong> &rarr; POLITICO, STORICO e SCRITTORE DI TEATRO.</li>
+            <li><strong>📝 POLIEDRICO 🪶 +10</strong> &rarr; POLITICO, STORICO e SCRITTORE di TEATRO.</li>
             <li><strong>📚 CLASSICO 🏺 +10</strong> &rarr; STUDIA GLI ANTICHI ROMANI PER CAPIRE IL PRESENTE.</li>
             <li><strong>🪫 SOLITARIO 🏡 0</strong> &rarr; VIVE CIRCONDATO DA ARTISTI, STORICI E OSTERIE.</li>
             <li><strong>🤯 SCANDALOSO 🧨 +15</strong> &rarr; IL SUO PENSIERO VIENE CONSIDERATO “DIABOLICO” DALLA CHIESA.</li>
@@ -521,11 +483,10 @@ const AUTHORS_SECONDE = [
         id: 'galileo-galilei', 
         name: 'Galileo Galilei', 
         role: 'Eppur si muove', 
-        points: 20, 
+        cost: 200,
         image: 'avatar_autori/galileo_galilei.png',
         description: 'Il padre del metodo scientifico moderno e il primo a guardare la luna con il cannocchiale.',
-        schedaHTML: `<p class="scheda-intro">Il padre della scienza moderna che ha sfidato i dogmi del passato con la forza dell'osservazione e della ragione, aprendo gli occhi dell'umanità sull'universo infinito ed 'eppur muovendosi' verso la verità.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈️ +5</strong> &rarr; SI MUOVE TRA PISA, PADOVA E FIRENZE.</li>
             <li><strong>🏛️ POLITICO 🏟️ +5</strong> &rarr; AMICO DI PRINCIPI E CARDINALI, MA VITTIMA DEL POTERE.</li>
             <li><strong>📝 POLIEDRICO 🪶 +5</strong> &rarr; SCIENZIATO, SCRITTORE E MUSICISTA.</li>
@@ -540,11 +501,10 @@ const AUTHORS_SECONDE = [
         id: 'giuseppe-parini', 
         name: 'Giuseppe Parini', 
         role: 'Il Poeta Educatore', 
-        points: 20, 
+        cost: 200, 
         image: 'avatar_autori/giuseppe_parini.png',
         description: 'L’autore del Giorno, che criticò la nobiltà pigra del suo tempo.',
-        schedaHTML: `<p class="scheda-intro">L'autore del Giorno, che con ironia tagliente e impegno civile ha criticato la nobiltà pigra del suo tempo, cercando di educare la società ai valori della ragione e del bene comune.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈ 0</strong> &rarr; RESTA QUASI SEMPRE A MILANO, LA SUA CITTÀ.</li>
             <li><strong>🏛 POLITICO 🏟 +10</strong> &rarr; IMPEGNATO NELLE RIFORME DELLA SCUOLA E DELLO STATO.</li>
             <li><strong>📝 POLIEDRICO 🪶 +5</strong> &rarr; POETA E IMPORTANTE INSEGNANTE.</li>
@@ -559,11 +519,10 @@ const AUTHORS_SECONDE = [
         id: 'carlo-goldoni', 
         name: 'Carlo Goldoni', 
         role: 'Il Riformatore del Teatro', 
-        points: 20, 
+        cost: 200,
         image: 'avatar_autori/carlo_goldoni.png',
         description: 'L’autore che tolse le maschere agli attori e raccontò la vita vera.',
-        schedaHTML: `<p class="scheda-intro">Il genio che ha strappato le maschere alla Commedia dell'Arte per raccontare la vita operosa e verace della borghesia veneziana, creando un teatro moderno fatto di caratteri reali e umanità.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈ +10</strong> &rarr; GIRA L’ITALIA E PASSA GLI ULTIMI ANNI A PARIGI.</li>
             <li><strong>🏛 POLITICO 🏟 +0</strong> &rarr; SI OCCUPA SOLO DI TEATRO E SPETTACOLO.</li>
             <li><strong>📝 POLIEDRICO 🪶 +5</strong> &rarr; SCRIVE CENTINAIA DI COMMEDIE IN ITALIANO E VENEZIANO.</li>
@@ -578,11 +537,10 @@ const AUTHORS_SECONDE = [
         id: 'torquato-tasso', 
         name: 'Torquato Tasso', 
         role: 'Il Poeta Inquieto', 
-        points: 15, 
+        cost: 150,
         image: 'avatar_autori/torquato_tasso.png',
         description: 'L’autore della Gerusalemme Liberata, tra battaglie e tormenti religiosi.',
-        schedaHTML: `<p class="scheda-intro">Il poeta malinconico che ha vissuto in bilico tra la gloria delle corti e il tormento dell'anima, cercando di conciliare l'eroismo cavalleresco con la profonda inquietudine religiosa del suo tempo.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈ +10</strong> &rarr; VIAGGI SENZA PACE TRA LE CORTI DI TUTTA ITALIA.</li>
             <li><strong>🏛 POLITICO 🏟 +5</strong> &rarr; POETA DI CORTE, MA SEMPRE IN LOTTA CON I POTENTI.</li>
             <li><strong>📝 POLIEDRICO 🪶 +10</strong> &rarr; SCRIVE POEMI, POESIE E DIALOGHI FILOSOFICI.</li>
@@ -597,11 +555,10 @@ const AUTHORS_SECONDE = [
         id: 'cecco-angiolieri',
         name: 'Cecco Angiolieri',
         role: 'Il Poeta Maledetto',
-        points: 15,
+        cost: 150,
         image: 'avatar_autori/cecco_angiolieri.png',
         description: 'Il poeta del "S\'i\' fosse foco", ribelle e dissacrante.',
-        schedaHTML: `<p class="scheda-intro">Il poeta ribelle e 'maledetto' del Duecento, che con i suoi sonetti arrabbiati e dissacranti ha celebrato il gioco, le taverne e l'odio verso l'ipocrisia del suo tempo.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈ +5</strong> &rarr; Frequenti spostamenti, spesso per sfuggire a debiti o problemi.</li>
             <li><strong>🏛 POLITICO 🏟 -5</strong> &rarr; Atteggiamento anti-istituzionale e ribelle.</li>
             <li><strong>📝 POLIEDRICO 🪶 +5</strong> &rarr; Maestro della poesia comico-realistica.</li>
@@ -616,11 +573,10 @@ const AUTHORS_SECONDE = [
         id: 'iacopone-todi',
         name: 'Iacopone da Todi',
         role: 'Il Poeta del Fango e del Cielo',
-        points: 15,
+        cost: 150,
         image: 'avatar_autori/iacopone_todi.png',
         description: 'L’autore del "Pianto della Madonna", tra misticismo e ribellione.',
-        schedaHTML: `<p class="scheda-intro">Il cavaliere che si fece 'matto per Cristo' dopo un dolore immenso, portando nella poesia la cruda realtà del corpo e del fango intrecciata con la ricerca disperata dell'amore divino.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈ +5</strong> &rarr; Predicazione e vagabondaggio spirituale.</li>
             <li><strong>🏛 POLITICO 🏟 +10</strong> &rarr; Feroce oppositore di Bonifacio VIII per motivi religiosi.</li>
             <li><strong>📝 POLIEDRICO 🪶 +5</strong> &rarr; Le laudi incorporano elementi teatrali e popolari.</li>
@@ -635,21 +591,17 @@ const AUTHORS_SECONDE = [
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // POOL AUTORI — CONTEMPORANEA + STRANIERI
-// Per ora usa gli stessi autori italiani.
-// Aggiungi qui gli autori stranieri quando disponibili,
-// poi imposta available: true in GAME_MODES.avanzato
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const AUTHORS_INTERNAZIONALI = [
     {
         id: 'victor-hugo',
         name: 'Victor Hugo',
         role: 'Il Gigante del Romanticismo',
-        points: 30,
+        cost: 5000,
         image: 'avatar_autori/victor_hugo.png',
         description: 'L’autore de I Miserabili e il difensore dei diritti umani.',
         isInternational: true,
-        schedaHTML: `<p class="scheda-intro">Il gigante del Romanticismo francese, autore di opere monumentali che hanno dato voce agli oppressi e celebrato la forza indomabile dello spirito umano contro l'ingiustizia.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈ +10</strong> &rarr; VIVE IN ESILIO E VIAGGIA TRA FRANCIA E ISOLE DEL CANALE DOPO CONTRASTI POLITICI.</li>
             <li><strong>🏛 POLITICO 🏟 +10</strong> &rarr; IMPEGNATO NELLA POLITICA FRANCESE E NELLA DIFESA DEI DIRITTI CIVILI.</li>
             <li><strong>📝 POLIEDRICO 🪶 +10</strong> &rarr; POETA, ROMANZIERE E DRAMMATURGO.</li>
@@ -664,13 +616,12 @@ const AUTHORS_INTERNAZIONALI = [
         id: 'gabriel-garcia-marquez',
         name: 'G. García Márquez',
         role: 'Realismo Magico',
-        points: 30,
+        cost: 5000,
         image: 'avatar_autori/gabriel_garcia_marquez.png',
         description: 'L’autore di Cent’anni di solitudine, dove la magia incontra la realtà.',
         isInternational: true,
-        schedaHTML: `<p class="scheda-intro">Il tessitore del 'realismo magico' che ha trasformato la sua Colombia in un mito universale, raccontando la solitudine e le passioni di intere generazioni in una prosa incantata e senza tempo.</p>
-        <ul class="scheda-list">
-            <li><strong>🌍 VIAGGIATORE ✈ +10</strong> &rarr; VIAGGI E VIVE TRA COLOMBIA, MESSICO, EUROPA E CUBA.</li>
+        schedaHTML: `<ul class="scheda-list">
+            <li><strong>🌍 VIAGGIATORE ✈ +10</strong> &rarr; VIAGGIA E VIVE TRA COLOMBIA, MESSICO, EUROPA E CUBA.</li>
             <li><strong>🏛 POLITICO 🏟 +5</strong> &rarr; AMICO DI LEADER POLITICI E IMPEGNATO SOCIALMENTE.</li>
             <li><strong>📝 POLIEDRICO 🪶 +10</strong> &rarr; GIORNALISTA E SCRITTORE DI FAMA MONDIALE.</li>
             <li><strong>📚 CLASSICO 🏺 +5</strong> &rarr; CREA UN NUOVO CANONE LETTERARIO SUDAMERICANO.</li>
@@ -684,16 +635,15 @@ const AUTHORS_INTERNAZIONALI = [
         id: 'edgar-allan-poe',
         name: 'Edgar Allan Poe',
         role: 'Maestro del Brivido',
-        points: 30,
+        cost: 5000,
         image: 'avatar_autori/edgar_allan_poe.png',
         description: 'L’inventore del racconto poliziesco e maestro del genere horror.',
         isInternational: true,
-        schedaHTML: `<p class="scheda-intro">Il maestro del brivido e del mistero, che ha esplorato gli abissi più oscuri dell'animo umano, inventando il genere poliziesco e dando forma ai nostri incubi più profondi.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈ +5</strong> &rarr; SI SPOSTA TRA DIVERSE CITTÀ AMERICANE IN CERCA DI FORTUNA.</li>
             <li><strong>🏛 POLITICO 🏟 0</strong> &rarr; NON SI INTERESSA ALLA VITA POLITICA.</li>
             <li><strong>📝 POLIEDRICO 🪶 +5</strong> &rarr; POETA, CRITICO E SCRITTORE DI RACCONTI.</li>
-            <li><strong>📚 CLASSICO 🏺 +5</strong> &rarr; SI ISPIRA ALLA TRADIZIONE GOTICA EUROPEA.</li>
+            <li><strong>📚 CLASSICO 🏺 +5</strong> &rarr; SI ISPIRA AL TRADIZIONE GOTICA EUROPEA.</li>
             <li><strong>🪫 SOLITARIO 🏡 -10</strong> &rarr; VISSUTO IN POVERTÀ E SPESSO ISOLATO.</li>
             <li><strong>🤯 SCANDALOSO 🧨 +10</strong> &rarr; VITA TORMENTATA E POLEMICHE CON I CONTEMPORANEI.</li>
             <li><strong>🌀 PESSIMISTA 🌫 -15</strong> &rarr; LA SUA OPERA È IMMERSA NELL’OSCURITÀ E NELL’ANGOSCIA.</li>
@@ -704,12 +654,11 @@ const AUTHORS_INTERNAZIONALI = [
         id: 'fedor-dostoevskij',
         name: 'Fëdor Dostoevskij',
         role: 'L’Abisso dell’Anima',
-        points: 25,
+        cost: 4000,
         image: 'avatar_autori/fedor_dostoevskij.png',
         description: 'L’autore di Delitto e castigo, che esplorò i tormenti della coscienza.',
         isInternational: true,
-        schedaHTML: `<p class="scheda-intro">L'esploratore delle 'memorie del sottosuolo', che ha messo a nudo i conflitti morali e le inquietudini più estreme dell'uomo, cercando la luce della fede nel cuore delle tenebre.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈ +10</strong> &rarr; VIAGGIA IN EUROPA, MA SOPRATTUTTO L’ESILIO IN SIBERIA.</li>
             <li><strong>🏛 POLITICO 🏟 +5</strong> &rarr; IDEE CHE CAMBIANO NEL TEMPO, SEMPRE PROFONDO.</li>
             <li><strong>📝 POLIEDRICO 🪶 +5</strong> &rarr; ROMANZIERE E FILOSOFO DELL'ESISTENZA.</li>
@@ -724,12 +673,11 @@ const AUTHORS_INTERNAZIONALI = [
         id: 'lev-tolstoj',
         name: 'Lev Tolstoj',
         role: 'Guerra e Pace',
-        points: 25,
+        cost: 4000,
         image: 'avatar_autori/lev_tolstoj.png',
         description: 'Il grande narratore della storia e dell’animo russo.',
         isInternational: true,
-        schedaHTML: `<p class="scheda-intro">Il cronista epico dell'anima russa e della storia universale, che ha saputo intrecciare i grandi eventi del mondo con la ricerca incessante di una verità morale e spirituale.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈ +5</strong> &rarr; VIAGGIA IN EUROPA MA È LEGATISSIMO ALLA SUA TERRA.</li>
             <li><strong>🏛 POLITICO 🏟 +10</strong> &rarr; LE SUE IDEE SULLA NON-VIOLENZA ISPIRANO GANDHI.</li>
             <li><strong>📝 POLIEDRICO 🪶 +10</strong> &rarr; SCRITTORE, FILOSOFO E RIFORMATORE SOCIALE.</li>
@@ -744,12 +692,11 @@ const AUTHORS_INTERNAZIONALI = [
         id: 'george-orwell',
         name: 'George Orwell',
         role: '1984 e il Grande Fratello',
-        points: 25,
+        cost: 4000,
         image: 'avatar_autori/george_orwell.png',
         description: 'Il visionario che mise in guardia contro i totalitarismi.',
         isInternational: true,
-        schedaHTML: `<p class="scheda-intro">L'occhio vigile della coscienza civile e politica, che ha messo in guardia l'umanità contro i pericoli del totalitarismo e della manipolazione del linguaggio in visioni profetiche e agghiaccianti.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈ +10</strong> &rarr; VIVE IN INDIA, BIRMANIA, SPAGNA E FRANCIA.</li>
             <li><strong>🏛 POLITICO 🏟 +15</strong> &rarr; TUTTA LA SUA OPERA È UNA CRITICA AL POTERE.</li>
             <li><strong>📝 POLIEDRICO 🪶 +5</strong> &rarr; SAGGISTA E ROMANZIERE POLITICO.</li>
@@ -764,12 +711,11 @@ const AUTHORS_INTERNAZIONALI = [
         id: 'ernest-hemingway',
         name: 'Ernest Hemingway',
         role: 'Il Vecchio e il Mare',
-        points: 25,
+        cost: 4000,
         image: 'avatar_autori/ernest_hemingway.png',
         description: 'L’autore della Lost Generation, amante dell’avventura e della sintesi.',
         isInternational: true,
-        schedaHTML: `<p class="scheda-intro">L'uomo d'azione e lo scrittore del silenzio, che con una prosa essenziale e scolpita ha celebrato il coraggio di fronte alla sconfitta e la ricerca di un senso nel caos del mondo.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈ +15</strong> &rarr; VIAGGIA TRA EUROPA, AFRICA, CUBA E STATI UNITI.</li>
             <li><strong>🏛 POLITICO 🏟 +5</strong> &rarr; CORRISPONDENTE DI GUERRA IN MOLTI CONFLITTI.</li>
             <li><strong>📝 POLIEDRICO 🪶 +5</strong> &rarr; GIORNALISTA E ROMANZIERE.</li>
@@ -784,12 +730,11 @@ const AUTHORS_INTERNAZIONALI = [
         id: 'charles-dickens',
         name: 'Charles Dickens',
         role: 'La Londra degli Ultimi',
-        points: 25,
+        cost: 4000,
         image: 'avatar_autori/charles_dickens.png',
         description: 'Il grande narratore delle ingiustizie sociali dell’Inghilterra vittoriana.',
         isInternational: true,
-        schedaHTML: `<p class="scheda-intro">Il cuore palpitante della Londra vittoriana, che con i suoi indimenticabili personaggi ha denunciato le crudeltà sociali del suo tempo, offrendo speranza e dignità agli umili e agli indifesi.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈ +5</strong> &rarr; VIAGGIA IN AMERICA E EUROPA PER TOUR DI LETTURE.</li>
             <li><strong>🏛 POLITICO 🏟 +10</strong> &rarr; DENUNCIA COSTANTE DELLE CONDIZIONI DEI POVERI.</li>
             <li><strong>📝 POLIEDRICO 🪶 +5</strong> &rarr; ROMANZIERE E GIORNALISTA.</li>
@@ -804,12 +749,11 @@ const AUTHORS_INTERNAZIONALI = [
         id: 'herman-melville',
         name: 'Herman Melville',
         role: 'Moby Dick',
-        points: 25,
+        cost: 4000,
         image: 'avatar_autori/herman_melville.png',
         description: 'L’autore della balena bianca, il viaggio estremo tra mare e ossessione.',
         isInternational: true,
-        schedaHTML: `<p class="scheda-intro">L'esploratore del mare e dell'ignoto, che ha trasformato la caccia alla balena bianca in un'epopea filosofica sulla lotta eterna dell'uomo contro il destino e il male assoluto.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈ +15</strong> &rarr; NAVIGA PER ANNI NEI MARI DEL SUD.</li>
             <li><strong>🏛 POLITICO 🏟 0</strong> &rarr; NON PARTECIPA ALLA VITA POLITICA.</li>
             <li><strong>📝 POLIEDRICO 🪶 +5</strong> &rarr; SCRITTORE DI MARE E POETA.</li>
@@ -824,19 +768,18 @@ const AUTHORS_INTERNAZIONALI = [
         id: 'oscar-wilde',
         name: 'Oscar Wilde',
         role: 'L’Esteta Ribelle',
-        points: 25,
+        cost: 4000,
         image: 'avatar_autori/oscar_wilde.png',
         description: 'L’autore de Il ritratto di Dorian Gray e maestro dell’aforisma.',
         isInternational: true,
-        schedaHTML: `<p class="scheda-intro">L'esteta brillante e lo spirito ribelle che ha fatto dell'ironia un'arma e della bellezza una religione, sfidando l'ipocrisia della società con aforismi fulminanti e un destino tragico.</p>
-        <ul class="scheda-list">
-            <li><strong>🌍 VIAGGIATORE ✈ +10</strong> &rarr; VIAGGI IN EUROPA E TOUR DI CONFERENZE IN AMERICA.</li>
+        schedaHTML: `<ul class="scheda-list">
+            <li><strong>🌍 VIAGGIATORE ✈ +10</strong> &rarr; VIAGGIA IN EUROPA E TOUR DI CONFERENZE IN AMERICA.</li>
             <li><strong>🏛 POLITICO 🏟 0</strong> &rarr; RIFIUTA LA POLITICA TRADIZIONALE.</li>
             <li><strong>📝 POLIEDRICO 🪶 +10</strong> &rarr; POETA, DRAMMATURGO E SAGGISTA.</li>
             <li><strong>📚 CLASSICO 🏺 +5</strong> &rarr; SI ISPIRA AL BELLEZZA DELL’ANTICA GRECIA.</li>
             <li><strong>🪫 SOLITARIO 🏡 -10</strong> &rarr; IL CARCERE LO PORTA A UNA TRAGICA SOLITUDINE.</li>
             <li><strong>🤯 SCANDALOSO 🧨 +15</strong> &rarr; PROTAGONISTA DI UNO SCANDALO SOCIALE E GIUDIZIARIO.</li>
-            <li><strong>🌀 PESSIMISTA 🌫 -5</strong> &rarr; IRONIA CHE NASCONDE UNA TRAGICA VISIONE DELLA VITA.</li>
+            <li><strong>🌀 PESSIMISTA 🌫 -5</strong> &rarr; IRONIA QUE NASCONDE UNA TRAGICA VISIONE DELLA VITA.</li>
             <li><strong>🧠 INNOVATORE ⚡ +15</strong> &rarr; SIMBOLO DELL'ESTETISMO E DELLA LIBERTÀ INDIVIDUALE.</li>
         </ul>`
     },
@@ -844,12 +787,11 @@ const AUTHORS_INTERNAZIONALI = [
         id: 'emile-zola',
         name: 'Émile Zola',
         role: 'Il Naturalismo',
-        points: 20,
-        image: 'avatar_autori/avatar_placeholder.png',
+        cost: 3000,
+        image: 'avatar_autori/emile_zola.png',
         description: 'Il teorico del naturalismo e l’autore del celebre J’Accuse.',
         isInternational: true,
-        schedaHTML: `<p class="scheda-intro">Il padre del Naturalismo, che con occhio implacabile ha documentato la realtà sociale della Francia di fine Ottocento, denunciando le ingiustizie e i vizi del potere in un vasto affresco umano.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈ +5</strong> &rarr; ESILIATO IN INGHILTERRA PER LE SUE IDEE.</li>
             <li><strong>🏛 POLITICO 🏟 +15</strong> &rarr; DIFENSORE DELLA VERITÀ E DEI DIRITTI CIVILI (AFFARE DREYFUS).</li>
             <li><strong>📝 POLIEDRICO 🪶 +5</strong> &rarr; ROMANZIERE, CRITICO E GIORNALISTA.</li>
@@ -864,12 +806,11 @@ const AUTHORS_INTERNAZIONALI = [
         id: 'franz-kafka',
         name: 'Franz Kafka',
         role: 'Il Labirinto dell’Inquietudine',
-        points: 20,
+        cost: 3000,
         image: 'avatar_autori/franz_kafka.png',
         description: 'L’autore de La metamorfosi, che raccontò l’alienazione moderna.',
         isInternational: true,
-        schedaHTML: `<p class="scheda-intro">L'interprete dell'angoscia moderna e dell'assurdo, che ha descritto mondi labirintici e burocrazie spietate in cui l'uomo si ritrova smarrito, vittima di colpe misteriose e incomprensibili.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈ +5</strong> &rarr; SOGGIORNI IN DIVERSE CITTÀ EUROPEE PER MOTIVI DI SALUTE.</li>
             <li><strong>🏛 POLITICO 🏟 0</strong> &rarr; ESTRANEO ALLA POLITICA MILITANTE.</li>
             <li><strong>📝 POLIEDRICO 🪶 +5</strong> &rarr; SCRITTORE DI RACCONTI E ROMANZI INCOMPIUTI.</li>
@@ -884,12 +825,11 @@ const AUTHORS_INTERNAZIONALI = [
         id: 'virginia-woolf',
         name: 'Virginia Woolf',
         role: 'Il Flusso di Coscienza',
-        points: 20,
-        image: 'avatar_autori/avatar_placeholder.png',
+        cost: 3000,
+        image: 'avatar_autori/virginia_woolf.png',
         description: 'La pioniera della modernità e dell’analisi interiore femminile.',
         isInternational: true,
-        schedaHTML: `<p class="scheda-intro">La pioniera del 'flusso di coscienza', che ha esplorato l'interiorità più profonda delle donne e degli uomini, catturando l'essenza fugace del tempo e della percezione in una prosa lirica e innovativa.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈ +10</strong> &rarr; VIAGGI IN EUROPA E SPOSTAMENTI NELL'INGHILTERRA DEL GRUPPO DI BLOOMSBURY.</li>
             <li><strong>🏛 POLITICO 🏟 +10</strong> &rarr; ATTENTA ALLE QUESTIONI FEMMINISTE E SOCIALI DEL SUO TEMPO.</li>
             <li><strong>📝 POLIEDRICO 🪶 +10</strong> &rarr; ROMANZIERA, SAGGISTA E CRITICA LETTERARIA.</li>
@@ -904,19 +844,18 @@ const AUTHORS_INTERNAZIONALI = [
         id: 'james-joyce',
         name: 'James Joyce',
         role: 'L’Ulisse Moderno',
-        points: 20,
+        cost: 3000,
         image: 'avatar_autori/james_joyce.png',
         description: 'L’autore di Ulisse, che rivoluzionò il linguaggio del romanzo.',
         isInternational: true,
-        schedaHTML: `<p class="scheda-intro">L'architetto del linguaggio moderno, che con il suo 'Ulisse' ha rivoluzionato il romanzo del Novecento, racchiudendo l'intera esperienza umana nel giro di una singola, indimenticabile giornata.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈ +10</strong> &rarr; VIVE IN ESILIO VOLONTARIO A TRIESTE, PARIGI E ZURIGO.</li>
             <li><strong>🏛 POLITICO 🏟 0</strong> &rarr; DISTANTE DALLA POLITICA ATTIVA.</li>
             <li><strong>📝 POLIEDRICO 🪶 +5</strong> &rarr; POETA E ROMANZIERE SPERIMENTALE.</li>
             <li><strong>📚 CLASSICO 🏺 +10</strong> &rarr; RISCRIVE IL MITO DI OMERO NELLA MODERNITÀ.</li>
             <li><strong>🪫 SOLITARIO 🏡 -5</strong> &rarr; DEDIZIONE TOTALE ALLA SCRITTURA COMPLESSA.</li>
             <li><strong>🤯 SCANDALOSO 🧨 +15</strong> &rarr; IL SUO ULISSE VIENE CENSURATO PER ANNI PER OSCENITÀ.</li>
-            <li><strong>🌀 PESSIMISTA 🌫 0</strong> &rarr; IRONIA E COMPLESSITÀ CHE SUPERANO IL PESSIMISMO.</li>
+            <li><strong>🌀 PESSIMISTA 🌫 0</strong> &rarr; IRONIA E COMPLESSITÀ QUE SUPERANO IL PESSIMISMO.</li>
             <li><strong>🧠 INNOVATORE ⚡ +20</strong> &rarr; PORTA LA SPERIMENTAZIONE LINGUISTICA AL LIMITE.</li>
         </ul>`
     },
@@ -924,32 +863,30 @@ const AUTHORS_INTERNAZIONALI = [
         id: 'mark-twain',
         name: 'Mark Twain',
         role: 'L’Anima dell’America',
-        points: 20,
-        image: 'avatar_autori/avatar_placeholder.png',
+        cost: 3000,
+        image: 'avatar_autori/mark_twain.png',
         description: 'L’autore di Tom Sawyer e Huckleberry Finn, maestro dell’umorismo.',
         isInternational: true,
-        schedaHTML: `<p class="scheda-intro">La voce autentica e ironica dell'America, che ha raccontato con umorismo e acume la libertà del fiume Mississippi e le contraddizioni della società umana, diventando il padre della letteratura moderna del suo paese.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈ +10</strong> &rarr; VIAGGIA PER TUTTO IL MONDO COME CONFERENZIERE.</li>
             <li><strong>🏛 POLITICO 🏟 +5</strong> &rarr; CRITICO DELL'IMPERIALISMO E DEL RAZZISMO.</li>
             <li><strong>📝 POLIEDRICO 🪶 +5</strong> &rarr; GIORNALISTA, SCRITTORE E INVENTORE.</li>
             <li><strong>📚 CLASSICO 🏺 0</strong> &rarr; CREA UNA LETTERATURA AMERICANA AUTENTICA.</li>
             <li><strong>🪫 SOLITARIO 🏡 0</strong> &rarr; FIGURA PUBBLICA MOLTO AMATA.</li>
             <li><strong>🤯 SCANDALOSO 🧨 +5</strong> &rarr; I SUOI LIBRI SPESSO DISCUSSI PER IL LINGUAGGIO DIRETTO.</li>
-            <li><strong>🌀 PESSIMISTA 🌫 -5</strong> &rarr; UMORISMO CHE NASCONDE UNA VISIONE CINICA.</li>
+            <li><strong>🌀 PESSIMISTA 🌫 -5</strong> &rarr; UMORISMO QUE NASCONDE UNA VISIONE CINICA.</li>
             <li><strong>🧠 INNOVATORE ⚡ +10</strong> &rarr; PADRE DELLA LETTERATURA AMERICANA MODERNA.</li>
         </ul>`
     },
     {
         id: 'anton-cechov',
         name: 'Anton Čechov',
-        role: 'Maestro del Sottomono',
-        points: 20,
-        image: 'avatar_autori/avatar_placeholder.png',
+        role: 'Maestro del Sottotono',
+        cost: 3000,
+        image: 'avatar_autori/anton_cechov.png',
         description: 'Il medico scrittore che rivoluzionò il racconto e il dramma.',
         isInternational: true,
-        schedaHTML: `<p class="scheda-intro">Il medico dell'anima che con infinita delicatezza ha ritratto le speranze e le delusioni della vita quotidiana, insegnando che la vera grandezza si nasconde nei piccoli gesti e nei silenzi del cuore.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈ +10</strong> &rarr; VIAGGIA FINO ALL’ISOLA DI SAKHALIN PER STUDIARE I PRIGIONIERI.</li>
             <li><strong>🏛 POLITICO 🏟 +5</strong> &rarr; IMPEGNO SOCIALE COME MEDICO GRATUITO PER I POVERI.</li>
             <li><strong>📝 POLIEDRICO 🪶 +5</strong> &rarr; SCRITTORE DI RACCONTI E DRAMMATURGO.</li>
@@ -964,12 +901,11 @@ const AUTHORS_INTERNAZIONALI = [
         id: 'henrik-ibsen',
         name: 'Henrik Ibsen',
         role: 'Il Dramma Borghese',
-        points: 20,
-        image: 'avatar_autori/avatar_placeholder.png',
+        cost: 3000,
+        image: 'avatar_autori/henrik_ibsen.png',
         description: 'L’autore di Casa di bambola, che scosse le fondamenta della famiglia borghese.',
         isInternational: true,
-        schedaHTML: `<p class="scheda-intro">Il padre del dramma moderno, che ha infranto il silenzio delle stanze borghesi per gridare la verità, indagando con forza le ferite della società e la ricerca tormentata della libertà individuale.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈ +10</strong> &rarr; VIVE MOLTI ANNI IN ITALIA E GERMANIA IN ESILIO VOLONTARIO.</li>
             <li><strong>🏛 POLITICO 🏟 +5</strong> &rarr; LE SUE OPERE SONO UN ATTO POLITICO CONTRO L'IPOCRISIA.</li>
             <li><strong>📝 POLIEDRICO 🪶 +5</strong> &rarr; DRAMMATURGO e POETA.</li>
@@ -977,19 +913,18 @@ const AUTHORS_INTERNAZIONALI = [
             <li><strong>🪫 SOLITARIO 🏡 -5</strong> &rarr; CARATTERE DIFFICILE E SOLITARIO.</li>
             <li><strong>🤯 SCANDALOSO 🧨 +15</strong> &rarr; LE SUE OPERE SCATENANO DISORDINI E CENSURE.</li>
             <li><strong>🌀 PESSIMISTA 🌫 -5</strong> &rarr; SCOPRE I SEGRETI OSCURI DI OGNI FAMIGLIA.</li>
-            <li><strong>🧠 INNOVATORE ⚡ +15</strong> &rarr; PADRE DEL DRAMMA MODERNO BORGUESE.</li>
+            <li><strong>🧠 INNOVATORE ⚡ +15</strong> &rarr; PADRE DEL DRAMMA MODERNO BORGHESE.</li>
         </ul>`
     },
     {
         id: 'rainer-maria-rilke',
         name: 'Rainer Maria Rilke',
         role: 'Il Poeta degli Angeli',
-        points: 20,
-        image: 'avatar_autori/avatar_placeholder.png',
+        cost: 3000,
+        image: 'avatar_autori/rainer_maria_rilke.png',
         description: 'Il grande lirico delle Elegie duinesi e dei Sonetti a Orfeo.',
         isInternational: true,
-        schedaHTML: `<p class="scheda-intro">Il poeta delle 'cose' e dell'invisibile, che ha cercato il divino nella solitudine e nella bellezza, trasformando la parola in una preghiera laica che interroga il mistero dell'esistenza e dell'angelo.</p>
-        <ul class="scheda-list">
+        schedaHTML: `<ul class="scheda-list">
             <li><strong>🌍 VIAGGIATORE ✈ +10</strong> &rarr; VIAGGIA COSTANTEMENTE TRA RUSSIA, FRANCIA, ITALIA E SVIZZERA.</li>
             <li><strong>🏛 POLITICO 🏟 0</strong> &rarr; DISTANTE DALLA VITA PUBBLICA.</li>
             <li><strong>📝 POLIEDRICO 🪶 +5</strong> &rarr; POETA E SCRITTORE DI PROSA LIRICA.</li>
@@ -1033,7 +968,7 @@ const GAME_MODES = {
         colorDark:    '#7a3d08',
         colorClass:   'mode-orange',
         authors: AUTHORS_SECONDE,
-        budget: 500,
+        budget: 1000,
         currencyLabel: 'fiorini',
         available: true
     },
