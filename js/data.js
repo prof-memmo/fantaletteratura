@@ -1215,6 +1215,46 @@ const AUTHORS_INTERNAZIONALI = [
             <li><strong>🌀 PESSIMISTA 🌫 0</strong> &rarr; FIDUCIA NELLA LOGICA E NELLA GIUSTIZIA.</li>
             <li><strong>🧠 INNOVATORE ⚡ +10</strong> &rarr; RIVOLUZIONA LA STRUTTURA DEL ROMANZO POLIZIESCO.</li>
         </ul>`
+    },
+    {
+        id: 'jane-austen',
+        name: 'Jane Austen',
+        role: 'La Maestra dell’Ironia',
+        cost: 4000,
+        image: 'avatar_autori/jane_austen.png',
+        description: 'L’autrice di Orgoglio e pregiudizio, che ha raccontato con arguzia e precisione la società inglese del suo tempo.',
+        isInternational: true,
+        schedaHTML: `<p class="scheda-intro">Jane Austen osserva il mondo dalla finestra di un tranquillo cottage nella campagna inglese, ma vede tutto. Con un'ironia sottile e una precisione chirurgica, racconta le dinamiche sociali, i balli, i pettegolezzi e la ricerca dell'amore e dell'indipendenza delle donne della sua epoca. <em>Orgoglio e pregiudizio</em>, <em>Ragione e sentimento</em>, <em>Emma</em>: i suoi romanzi sono commedie umane perfette dove ogni dialogo è una lezione di intelligenza. Ha dimostrato che si può parlare dell'universo intero anche descrivendo "due pollici d'avorio".</p>
+        <ul class="scheda-list">
+            <li><strong>🌍 VIAGGIATORE ✈ 0</strong> &rarr; VITA TRASCORSA QUASI INTERAMENTE NELLA CAMPAGNA INGLESE.</li>
+            <li><strong>🏛 POLITICO 🏟 0</strong> &rarr; NON SI OCCUPA DI POLITICA, MA LE SUE OPERE SONO UN ATTO DI CRITICA SOCIALE.</li>
+            <li><strong>📝 POLIEDRICO 🪶 +5</strong> &rarr; SCRITTRICE DI ROMANZI E LETTERE BRILLANTI.</li>
+            <li><strong>📚 CLASSICO 🏺 +10</strong> &rarr; MASSIMO EREDE DELLA TRADIZIONE NARRATIVA SETTECENTESCA.</li>
+            <li><strong>🪫 SOLITARIO 🏡 -5</strong> &rarr; VITA FAMILIARE TRANQUILLA E SCHIVA.</li>
+            <li><strong>🤯 SCANDALOSO 🧨 0</strong> &rarr; PUBBLICA ANONIMAMENTE ("BY A LADY").</li>
+            <li><strong>🌀 PESSIMISTA 🌫 0</strong> &rarr; IRONIA CHE PORTA ALL'EQUILIBRIO E ALLA LIETO FINE.</li>
+            <li><strong>🧠 INNOVATORE ⚡ +15</strong> &rarr; INVENTA IL DISCORSO INDIRETTO LIBERO NEL ROMANZO.</li>
+        </ul>`
+    },
+    {
+        id: 'emily-dickinson',
+        name: 'Emily Dickinson',
+        role: 'La Poetessa del Silenzio',
+        cost: 3500,
+        image: 'avatar_autori/emily_dickinson.png',
+        description: 'Una delle più grandi voci della poesia mondiale, che ha racchiuso l’universo in poche, intense righe.',
+        isInternational: true,
+        schedaHTML: `<p class="scheda-intro">Emily Dickinson vive gran parte della sua vita nella casa paterna ad Amherst, nel Massachusetts, spesso vestita di bianco e rifiutando di vedere estranei. Ma nella sua stanza scrive quasi duemila poesie che sono esplosioni di pensiero. Parla di Dio, di morte, di natura e d'amore con un linguaggio rivoluzionario, fatto di trattini, maiuscole improvvise e immagini folgoranti. Quasi nulla è stato pubblicato mentre era in vita; la sua "lettera al mondo" è stata aperta solo dopo la sua morte, rivelando una delle voci più originali e potenti della letteratura di ogni tempo.</p>
+        <ul class="scheda-list">
+            <li><strong>🌍 VIAGGIATORE ✈ 0</strong> &rarr; "NON C'È UN VASCELLO CHE COME UN LIBRO POSSA PORTARCI IN TERRE LONTANE".</li>
+            <li><strong>🏛 POLITICO 🏟 0</strong> &rarr; COMPLETAMENTE ESTRANEA ALLA VITA PUBBLICA.</li>
+            <li><strong>📝 POLIEDRICO 🪶 +5</strong> &rarr; POETESSA E APPASSIONATA DI BOTANICA.</li>
+            <li><strong>📚 CLASSICO 🏺 +5</strong> &rarr; SI ISPIRA AI TESTI BIBLICI E A SHAKESPEARE.</li>
+            <li><strong>🪫 SOLITARIO 🏡 -20</strong> &rarr; SCELTA DI ISOLAMENTO QUASI TOTALE DAL MONDO.</li>
+            <li><strong>🤯 SCANDALOSO 🧨 +5</strong> &rarr; STILE TROPPO AVANZATO PER I SUOI CONTEMPORANEI.</li>
+            <li><strong>🌀 PESSIMISTA 🌫 -5</strong> &rarr; CONFRONTO DIRETTO E SENZA PAURA CON LA MORTE.</li>
+            <li><strong>🧠 INNOVATORE ⚡ +20</strong> &rarr; RIVOLUZIONA IL LINGUAGGIO POETICO MODERNO.</li>
+        </ul>`
     }
 ];
 
