@@ -1178,8 +1178,8 @@ window.openAuthorSchedaModal = function(authorId, modeKey = null) {
     if (!author || !author.schedaHTML) return;
     document.getElementById('scheda-autore-title').innerHTML = `Scheda di <strong>${author.name}</strong>`;
     document.getElementById('scheda-autore-content').innerHTML = `
-        <div style="text-align:center; margin-bottom:15px;">
-            <img src="${author.image}" style="width:80px; height:80px; border-radius:50%; object-fit:cover; background:#fff;">
+        <div style="text-align:center; margin-bottom:20px;">
+            <img src="${author.image}" style="width:200px; height:200px; max-width:100%; border-radius:15px; border:3px solid var(--accent-gold); object-fit:cover; background:#fff; box-shadow:0 8px 20px rgba(0,0,0,0.4);">
         </div>
         <div style="font-size:0.95rem; line-height:1.6; color:#e0e0e0; margin-bottom:10px;">${author.schedaHTML}</div>
     `;
