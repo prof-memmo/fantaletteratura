@@ -573,6 +573,25 @@ const AUTHORS_SECONDE = [
             <li><strong>🧠 INNOVATORE ⚡ +15</strong> &rarr; CREA IL TEATRO MODERNO BASATO SUI CARATTERI REALI.</li>
         </ul>`
     },
+    {
+        id: 'commedia-arte',
+        name: 'Commedia dell\'Arte',
+        role: 'Il Teatro delle Maschere',
+        cost: 150,
+        image: 'avatar_autori/avatar_placeholder.png',
+        description: 'La forma di teatro basata sull\'improvvisazione e sulle maschere.',
+        schedaHTML: `<p class="scheda-intro">La Commedia dell'Arte nasce nelle piazze italiane del Cinquecento. Non ci sono copioni scritti, ma "canovacci" su cui attori professionisti improvvisano. Nascono così le maschere che tutti conosciamo: Arlecchino servo imbroglione, Pantalone vecchio avaro, Balanzone dottore pedante. È il trionfo del corpo, della fisicità, della battuta pronta. Per due secoli dominerà l'Europa, prima che Goldoni le tolga la maschera per mostrare il vero volto della società.</p>
+        <ul class="scheda-list">
+            <li><strong>🌍 VIAGGIATORE ✈ +15</strong> &rarr; COMPAGNIE GIROVAGHE CHE PORTANO IL TEATRO IN TUTTA EUROPA.</li>
+            <li><strong>🏛 POLITICO 🏟 -5</strong> &rarr; SPESSO CENSURATI O CONTROLLATI DAL POTERE PER IRRIVERENZA.</li>
+            <li><strong>📝 POLIEDRICO 🪶 +10</strong> &rarr; ATTORI, ACROBATI, MUSICISTI E IMPROVVISATORI.</li>
+            <li><strong>📚 CLASSICO 🏺 -10</strong> &rarr; RIFIUTANO LE REGOLE DEL TEATRO COLTO.</li>
+            <li><strong>🪫 SOLITARIO 🏡 -10</strong> &rarr; LAVORANO SEMPRE IN GRUPPO.</li>
+            <li><strong>🤯 SCANDALOSO 🧨 +15</strong> &rarr; PRIMI A FAR RECITARE LE DONNE, SPESSO CONSIDERATI IMMORALI.</li>
+            <li><strong>🌀 PESSIMISTA 🌫 0</strong> &rarr; IL FINE È LA RISATA.</li>
+            <li><strong>🧠 INNOVATORE ⚡ +15</strong> &rarr; INVENTANO IL PROFESSIONISMO TEATRALE.</li>
+        </ul>`
+    },
     { 
         id: 'torquato-tasso', 
         name: 'Torquato Tasso', 
