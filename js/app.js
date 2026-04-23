@@ -1178,12 +1178,43 @@ window.openAuthorSchedaModal = function(authorId, modeKey = null) {
     if (!author || !author.schedaHTML) return;
     document.getElementById('scheda-autore-title').innerHTML = `Scheda di <strong>${author.name}</strong>`;
     document.getElementById('scheda-autore-content').innerHTML = `
-        <div style="text-align:center; margin-bottom:20px;">
-            <img src="${author.image}" style="width:200px; height:200px; max-width:100%; border-radius:15px; border:3px solid var(--accent-gold); object-fit:cover; background:#fff; box-shadow:0 8px 20px rgba(0,0,0,0.4);">
+        <div style="text-align:center; margin-bottom:15px;">
+            <img src="${author.image}" onclick="if(window.openImageModal) window.openImageModal('${author.image}')" style="width:80px; height:80px; border-radius:50%; object-fit:cover; background:#fff; cursor:pointer; border: 2px solid var(--accent-gold); box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Clicca per ingrandire">
         </div>
         <div style="font-size:0.95rem; line-height:1.6; color:#e0e0e0; margin-bottom:10px;">${author.schedaHTML}</div>
     `;
     document.getElementById('scheda-autore-modal').style.display = 'block';
+};
+
+window.openImageModal = function(src) {
+    const modal = document.createElement('div');
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.backgroundColor = 'rgba(0,0,0,0.85)';
+    modal.style.display = 'flex';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
+    modal.style.zIndex = '3000';
+    modal.style.cursor = 'zoom-out';
+    
+    const img = document.createElement('img');
+    img.src = src;
+    img.style.maxWidth = '90%';
+    img.style.maxHeight = '90%';
+    img.style.borderRadius = '15px';
+    img.style.boxShadow = '0 10px 30px rgba(0,0,0,0.8)';
+    img.style.objectFit = 'contain';
+    img.style.backgroundColor = '#fff';
+    
+    modal.appendChild(img);
+    document.body.appendChild(modal);
+    
+    modal.onclick = function() {
+        document.body.removeChild(modal);
+    };
 };
 
 function populateSchede(modeId = null) {
