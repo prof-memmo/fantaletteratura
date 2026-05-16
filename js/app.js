@@ -174,6 +174,28 @@ function setupNavigation() {
         menuOverlay.addEventListener('click', closeMenu);
     }
 
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    if (sidebarToggle) {
+        if (window.innerWidth >= 1024) sidebarToggle.style.display = 'block';
+        
+        // Restore state
+        if (localStorage.getItem('fanta_sidebar_collapsed') === 'true') {
+            sideMenu.classList.add('sidebar-collapsed');
+            sidebarToggle.innerHTML = '<i class="fa-solid fa-chevron-right"></i>';
+        }
+
+        sidebarToggle.addEventListener('click', () => {
+            sideMenu.classList.toggle('sidebar-collapsed');
+            if (sideMenu.classList.contains('sidebar-collapsed')) {
+                localStorage.setItem('fanta_sidebar_collapsed', 'true');
+                sidebarToggle.innerHTML = '<i class="fa-solid fa-chevron-right"></i>';
+            } else {
+                localStorage.setItem('fanta_sidebar_collapsed', 'false');
+                sidebarToggle.innerHTML = '<i class="fa-solid fa-chevron-left"></i>';
+            }
+        });
+    }
+
     // Handle menu links
     menuLinks.forEach(link => {
         link.addEventListener('click', (e) => {
@@ -199,16 +221,15 @@ function setupNavigation() {
 function navigateTo(viewId, pushHistory = true) {
     if (!viewId) return;
 
-    // STUDENT CODE GUARD
-    const isStudentProtected = ['view-classifiche', 'view-schede'].includes(viewId);
+    // ACCESSO E PROTEZIONE NAVIGAZIONE
+    const isPublicView = ['view-welcome', 'view-onboarding', 'view-iscrizione', 'view-regolamento', 'view-contatti'].includes(viewId);
     const hasStudentCode = localStorage.getItem('fanta_active_team_code');
     const isDocente = !!currentUserEmail;
 
-    if (isStudentProtected && !hasStudentCode && !isDocente) {
-        // Se non è loggato come docente e non ha un codice studente, 
-        // lo mandiamo alla sezione studenti per inserire il codice
-        alert("Per accedere a questa sezione devi inserire il codice fornito dal tuo docente.");
-        navigateTo('view-studenti', pushHistory);
+    if (!isPublicView && !hasStudentCode && !isDocente) {
+        // Blocco totale per utenti non loggati che provano ad accedere a sezioni riservate
+        alert("Devi prima effettuare l'accesso per visitare questa sezione.");
+        navigateTo('view-welcome', pushHistory);
         return;
     }
 
@@ -1688,6 +1709,10 @@ window.onclick = function(event) {
 
 function setLoggedIn(email) {
     currentUserEmail = email;
+    
+    const sideMenu = document.getElementById('side-menu');
+    if (sideMenu) sideMenu.classList.remove('hidden-pre-login');
+    
     const loginSec = document.getElementById('login-section');
     const loggedSec = document.getElementById('logged-in-section');
     if(loginSec) loginSec.style.display = 'none';
@@ -1715,6 +1740,10 @@ function setLoggedIn(email) {
 
 function setLoggedOut() {
     currentUserEmail = null;
+    
+    const sideMenu = document.getElementById('side-menu');
+    if (sideMenu) sideMenu.classList.add('hidden-pre-login');
+    
     const loginSec = document.getElementById('login-section');
     const loggedSec = document.getElementById('logged-in-section');
     if(loginSec) loginSec.style.display = 'block';

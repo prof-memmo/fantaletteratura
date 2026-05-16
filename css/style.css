@@ -297,6 +297,34 @@ h1, h2, h3, h4 {
     left: 0;
 }
 
+.side-menu.hidden-pre-login {
+    display: none !important;
+}
+
+.side-menu.sidebar-collapsed {
+    width: 80px;
+}
+
+.side-menu.sidebar-collapsed .menu-link span,
+.side-menu.sidebar-collapsed .sidebar-title,
+.side-menu.sidebar-collapsed .sidebar-subtitle {
+    display: none;
+}
+
+.side-menu.sidebar-collapsed .menu-header {
+    padding: 20px 10px;
+}
+
+.side-menu.sidebar-collapsed .menu-link {
+    justify-content: center;
+    padding: 15px 0;
+}
+
+.side-menu.sidebar-collapsed .menu-link i {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
 .menu-overlay {
     position: fixed;
     top: 0;
@@ -677,6 +705,21 @@ h1, h2, h3, h4 {
         margin-left: 280px;
         width: calc(100% - 280px) !important;
         max-width: none !important;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .sidebar-collapsed ~ .top-nav,
+    .sidebar-collapsed ~ main,
+    .sidebar-collapsed ~ .bottom-bar {
+        margin-left: 80px;
+        width: calc(100% - 80px) !important;
+    }
+
+    .hidden-pre-login ~ .top-nav,
+    .hidden-pre-login ~ main,
+    .hidden-pre-login ~ .bottom-bar {
+        margin-left: 0;
+        width: 100% !important;
     }
     
     .menu-btn {
