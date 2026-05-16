@@ -255,12 +255,15 @@ h1, h2, h3, h4 {
     gap: 5px;
     text-decoration: none;
     color: var(--text-muted);
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     transition: all 0.3s ease;
+    padding: 5px;
+    flex: 1;
+    min-width: 0;
 }
 
 .tab-item i {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
 }
 
 .tab-item.active {
@@ -703,42 +706,37 @@ h1, h2, h3, h4 {
 
 /* Responsive Desktop Layout */
 @media screen and (min-width: 1024px) {
-    .side-menu {
-        left: 0 !important;
-        box-shadow: none;
-        border-right: 1px solid var(--glass-border);
-    }
-    
-    .menu-overlay {
+    .side-menu, .menu-btn, .menu-overlay {
         display: none !important;
     }
     
-    .top-nav, main {
-        margin-left: 280px;
-        width: calc(100% - 280px) !important;
-        max-width: none !important;
+    main {
+        margin-left: 0 !important;
+        width: 100% !important;
+        max-width: 1200px;
+        margin: 0 auto;
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
     .bottom-bar {
-        display: none !important;
+        display: flex !important;
+        justify-content: center;
+        gap: 40px;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        left: 0;
+        padding: 0 20px;
+    }
+
+    .tab-item {
+        min-width: 80px;
     }
 
     #app-container {
-        padding-bottom: 0 !important;
+        padding-bottom: var(--bottom-bar-height) !important;
     }
-    
-    .sidebar-collapsed ~ .top-nav,
-    .sidebar-collapsed ~ main {
-        margin-left: 80px;
-        width: calc(100% - 80px) !important;
-    }
-
-    .hidden-pre-login ~ .top-nav,
-    .hidden-pre-login ~ main {
-        margin-left: 0;
-        width: 100% !important;
-    }
+}
     
     .menu-btn {
         display: none;

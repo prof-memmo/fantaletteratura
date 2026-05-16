@@ -11,30 +11,7 @@
 </head>
 <body>
     <div id="app-container">
-        <!-- Floating Menu Button (Mobile) -->
-        <button class="menu-btn hidden-pre-login" id="open-menu"><i class="fa-solid fa-bars"></i></button>
-
-        <!-- Side Drawer Menu -->
-        <div class="menu-overlay" id="menu-overlay"></div>
-        <nav class="side-menu hidden-pre-login" id="side-menu">
-            <div class="menu-header" style="display: flex; flex-direction: column; align-items: center; position: relative;">
-                <button id="sidebar-toggle" style="position: absolute; right: 10px; top: 10px; background: transparent; border: none; color: white; cursor: pointer; font-size: 1.2rem; display: none;"><i class="fa-solid fa-chevron-left"></i></button>
-                <h2 style="margin: 0; margin-top: 15px;" class="sidebar-title">Fantaletteratura</h2>
-                <p style="font-size: 0.8rem; margin:0;" class="sidebar-subtitle">La sfida tra capolavori</p>
-            </div>
-            <ul class="menu-items">
-                <li><a href="#" data-view="view-welcome" class="menu-link active"><i class="fa-solid fa-house fa-fw"></i> <span>Home</span></a></li>
-                <li><a href="#" data-view="view-regolamento" class="menu-link"><i class="fa-solid fa-scale-balanced fa-fw"></i> <span>Regolamento</span></a></li>
-                <li><a href="#" data-view="view-classifiche" class="menu-link"><i class="fa-solid fa-trophy fa-fw"></i> <span>Classifiche</span></a></li>
-                <li><a href="#" data-view="view-schede" class="menu-link"><i class="fa-solid fa-file-lines fa-fw"></i> <span>Schede</span></a></li>
-                <li><a href="#" data-view="view-contatti" class="menu-link"><i class="fa-solid fa-envelope fa-fw"></i> <span>Contatti</span></a></li>
-                <li><a href="#" data-view="view-profilo" class="menu-link hidden" id="menu-link-profilo"><i class="fa-solid fa-user fa-fw"></i> <span>Profilo Utente</span></a></li>
-                <li style="padding: 0 20px; margin-top: 15px;"><hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1);"></li>
-                <li><a href="#" class="menu-link" onclick="event.preventDefault(); openLegalModal('privacy')"><i class="fa-solid fa-user-lock fa-fw"></i> <span>Privacy Policy</span></a></li>
-                <li><a href="#" class="menu-link" onclick="event.preventDefault(); openLegalModal('termini')"><i class="fa-solid fa-file-invoice fa-fw"></i> <span>Termini e Condizioni</span></a></li>
-                <li id="menu-admin-item" style="margin-top: 15px; display:none;"><a href="admin.html" class="admin-link text-primary" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem;"><i class="fa-solid fa-lock fa-fw"></i> <span>Pannello Admin</span></a></li>
-            </ul>
-        </nav>
+        <!-- SIDEBAR REMOVED AS REQUESTED -->
 
         <!-- VIEWS -->
         <main id="main-content">
@@ -584,9 +561,17 @@
                 <i class="fa-solid fa-file-lines"></i>
                 <span>Schede</span>
             </a>
+            <a href="#" class="tab-item" data-view="view-contatti">
+                <i class="fa-solid fa-envelope"></i>
+                <span>Contatti</span>
+            </a>
             <a href="#" class="tab-item hidden" data-view="view-profilo" id="tab-item-profilo">
                 <i class="fa-solid fa-user"></i>
                 <span>Profilo</span>
+            </a>
+            <a href="admin.html" class="tab-item hidden" id="tab-item-admin">
+                <i class="fa-solid fa-lock"></i>
+                <span>Admin</span>
             </a>
         </nav>
     </div>

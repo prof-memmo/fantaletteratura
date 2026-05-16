@@ -150,70 +150,16 @@ function initApp() {
    NAVIGATION & VIEW ROUTING
 ========================================= */
 function setupNavigation() {
-    const menuBtn = document.getElementById('open-menu');
-    const sideMenu = document.getElementById('side-menu');
-    const menuOverlay = document.getElementById('menu-overlay');
-    const menuLinks = document.querySelectorAll('.menu-link');
     const tabItems = document.querySelectorAll('.tab-item');
 
-    // Open side menu
-    if (menuBtn) {
-        menuBtn.addEventListener('click', () => {
-            if (sideMenu) sideMenu.classList.add('active');
-            if (menuOverlay) menuOverlay.classList.add('active');
-        });
-    }
-
-    // Close side menu function
-    const closeMenu = () => {
-        if (sideMenu) sideMenu.classList.remove('active');
-        if (menuOverlay) menuOverlay.classList.remove('active');
-    };
-
-    if (menuOverlay) {
-        menuOverlay.addEventListener('click', closeMenu);
-    }
-
-    const sidebarToggle = document.getElementById('sidebar-toggle');
-    if (sidebarToggle) {
-        if (window.innerWidth >= 1024) sidebarToggle.style.display = 'block';
-        
-        // Restore state
-        if (localStorage.getItem('fanta_sidebar_collapsed') === 'true') {
-            sideMenu.classList.add('sidebar-collapsed');
-            sidebarToggle.innerHTML = '<i class="fa-solid fa-chevron-right"></i>';
-        }
-
-        sidebarToggle.addEventListener('click', () => {
-            sideMenu.classList.toggle('sidebar-collapsed');
-            if (sideMenu.classList.contains('sidebar-collapsed')) {
-                localStorage.setItem('fanta_sidebar_collapsed', 'true');
-                sidebarToggle.innerHTML = '<i class="fa-solid fa-chevron-right"></i>';
-            } else {
-                localStorage.setItem('fanta_sidebar_collapsed', 'false');
-                sidebarToggle.innerHTML = '<i class="fa-solid fa-chevron-left"></i>';
-            }
-        });
-    }
-
-    // Handle menu links
-    menuLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            const viewId = link.getAttribute('data-view');
-            if (viewId) {
-                e.preventDefault();
-                navigateTo(viewId);
-                closeMenu();
-            }
-        });
-    });
-
-    // Handle bottom tabs
+    // Handle bottom navigation
     tabItems.forEach(tab => {
         tab.addEventListener('click', (e) => {
-            e.preventDefault();
-            const viewId = tab.getAttribute('data-view');
-            navigateTo(viewId);
+            const targetView = tab.getAttribute('data-view');
+            if (targetView) {
+                e.preventDefault();
+                navigateTo(targetView);
+            }
         });
     });
 }
@@ -1725,10 +1671,7 @@ window.onclick = function(event) {
 function setLoggedIn(email) {
     currentUserEmail = email;
     
-    const sideMenu = document.getElementById('side-menu');
-    const menuBtn = document.getElementById('open-menu');
-    if (sideMenu) sideMenu.classList.remove('hidden-pre-login');
-    if (menuBtn) menuBtn.classList.remove('hidden-pre-login');
+    // Sidebar and menu-btn removed
     
     const loginSec = document.getElementById('login-section');
     const loggedSec = document.getElementById('logged-in-section');
@@ -1738,11 +1681,15 @@ function setLoggedIn(email) {
     const loggedWelc = document.getElementById('logged-in-welcome');
     if(loggedWelc) loggedWelc.textContent = "Bentornato, Prof!";
     
-    // Show Profile tabs/links
-    const pLink = document.getElementById('menu-link-profilo');
+    // Show Profile and Admin tabs
     const pTab = document.getElementById('tab-item-profilo');
-    if(pLink) pLink.classList.remove('hidden');
     if(pTab) pTab.classList.remove('hidden');
+
+    const adminTab = document.getElementById('tab-item-admin');
+    if (adminTab) {
+        if (email === 'prof.memmo@gmail.com') adminTab.classList.remove('hidden');
+        else adminTab.classList.add('hidden');
+    }
 
     const profEmail = document.getElementById('profilo-email');
     if(profEmail) profEmail.value = email;
@@ -1758,10 +1705,7 @@ function setLoggedIn(email) {
 function setLoggedOut() {
     currentUserEmail = null;
     
-    const sideMenu = document.getElementById('side-menu');
-    const menuBtn = document.getElementById('open-menu');
-    if (sideMenu) sideMenu.classList.add('hidden-pre-login');
-    if (menuBtn) menuBtn.classList.add('hidden-pre-login');
+    // Sidebar and menu-btn removed
     
     const loginSec = document.getElementById('login-section');
     const loggedSec = document.getElementById('logged-in-section');
