@@ -49,7 +49,7 @@
             <!-- Admin Navigation -->
             <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap; padding: 0 15px; margin-bottom: 20px;" id="admin-main-nav">
                 <button class="btn admin-tab-btn active" data-target="admin-view-autori" style="flex:1; padding: 10px 5px; font-size: 0.8rem;"><i class="fa-solid fa-feather"></i> Autori</button>
-                <button class="btn admin-tab-btn" data-target="admin-view-docenti" style="flex:1; padding: 10px 5px; font-size: 0.8rem;"><i class="fa-solid fa-chalkboard-user"></i> Docenti</button>
+                <button class="btn admin-tab-btn" data-target="admin-view-docenti" style="flex:1; padding: 10px 5px; font-size: 0.8rem;"><i class="fa-solid fa-users"></i> Iscritti</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-squadre" style="flex:1; padding: 10px 5px; font-size: 0.8rem;"><i class="fa-solid fa-users-rectangle"></i> Squadre</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-missioni" style="flex:1; padding: 10px 5px; font-size: 0.8rem;"><i class="fa-solid fa-scroll"></i> Missioni</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-tornei" style="flex:1; padding: 10px 5px; font-size: 0.8rem;"><i class="fa-solid fa-trophy"></i> Tornei</button>
@@ -81,13 +81,19 @@
                 </div>
             </section>
 
-            <!-- VIEW: Pannello Admin - Docenti -->
             <section id="admin-view-docenti" class="admin-view" style="display:none;">
-                <h2 style="padding: 0 15px;">Gestione Docenti</h2>
+                <h2 style="padding: 0 15px;">Gestione Iscritti</h2>
                 <div class="glass" style="padding: 15px; margin: 0 15px 20px 15px;">
+                    <!-- Filtri Iscritti -->
+                    <div class="admin-mode-filter" style="margin-bottom:15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="admin-mode-filter-btn" onclick="window.setAdminDocentiFilter('tutti')" id="filter-docenti-tutti" style="background: var(--primary-color); color: white; border: none; padding: 8px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; cursor: pointer;">👥 Tutti</button>
+                        <button class="admin-mode-filter-btn" onclick="window.setAdminDocentiFilter('teacher')" id="filter-docenti-docente" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; cursor: pointer;">👨‍🏫 Docenti</button>
+                        <button class="admin-mode-filter-btn" onclick="window.setAdminDocentiFilter('guest')" id="filter-docenti-guest" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; cursor: pointer;">👋 Fantamici</button>
+                    </div>
+
                     <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; border: 1px solid var(--glass-border);">
                         <i class="fa-solid fa-magnifying-glass" style="color: var(--primary-color);"></i>
-                        <input type="text" id="admin-docenti-search" placeholder="Cerca docente per email..." style="background: transparent; border: none; color: white; width: 100%; outline: none;" oninput="renderAdminDocenti(this.value)">
+                        <input type="text" id="admin-docenti-search" placeholder="Cerca iscritti per email o nome..." style="background: transparent; border: none; color: white; width: 100%; outline: none;" oninput="window.renderAdminDocenti(this.value)">
                     </div>
                     <div id="admin-docenti-list" style="display:flex; flex-direction:column; gap:10px;">
                         <!-- Inseriti da JS -->

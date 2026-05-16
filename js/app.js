@@ -756,25 +756,56 @@ async function setupAdminPanel() {
         }
     };
 
+    let currentAdminDocentiFilter = 'tutti';
+    window.setAdminDocentiFilter = function(f) {
+        currentAdminDocentiFilter = f;
+        // Reset search input
+        const searchInput = document.getElementById('admin-docenti-search');
+        if(searchInput) searchInput.value = '';
+        
+        // Update button styles
+        ['tutti', 'teacher', 'guest'].forEach(role => {
+            const btnId = role === 'tutti' ? 'filter-docenti-tutti' : (role === 'teacher' ? 'filter-docenti-docente' : 'filter-docenti-guest');
+            const btn = document.getElementById(btnId);
+            if(btn) {
+                if(role === f) {
+                    btn.style.background = 'var(--primary-color)';
+                    btn.style.borderColor = 'transparent';
+                } else {
+                    btn.style.background = 'rgba(255,255,255,0.1)';
+                    btn.style.borderColor = 'rgba(255,255,255,0.2)';
+                }
+            }
+        });
+        
+        window.renderAdminDocenti();
+    };
+
     window.renderAdminDocenti = async function(filterText = '') {
         const list = document.getElementById('admin-docenti-list');
         if (!list) return;
-        list.innerHTML = '<p class="text-center">Caricamento docenti...</p>';
+        list.innerHTML = '<p class="text-center">Caricamento iscritti...</p>';
         
-        const snapshot = await window.db.collection("users").where("role", "==", "teacher").get();
+        let query = window.db.collection("users");
+        if (currentAdminDocentiFilter !== 'tutti') {
+            query = query.where("role", "==", currentAdminDocentiFilter);
+        }
+        
+        const snapshot = await query.get();
         let users = snapshot.docs.map(doc => doc.data());
         
         list.innerHTML = '';
         let filteredUsers = users.filter(u => {
-            const query = filterText.toLowerCase();
-            return u.email.toLowerCase().includes(query) || u.name.toLowerCase().includes(query);
+            const q = filterText.toLowerCase();
+            return (u.email || '').toLowerCase().includes(q) || (u.name || '').toLowerCase().includes(q);
         });
 
-        if (filteredUsers.length === 0) list.innerHTML = '<i>Nessun docente trovato.</i>';
+        if (filteredUsers.length === 0) list.innerHTML = '<i>Nessun iscritto trovato.</i>';
         filteredUsers.forEach(u => {
+            let roleLabel = u.role === 'teacher' ? '<span style="color:#3498db; font-size:0.7rem; font-weight:800; text-transform:uppercase;">[Docente]</span>' : '<span style="color:#e67e22; font-size:0.7rem; font-weight:800; text-transform:uppercase;">[Fantamico]</span>';
             let log = u.approvedAt ? `<br><small class="text-muted">Approvato: ${u.approvedAt.toDate ? u.approvedAt.toDate().toLocaleString() : u.approvedAt}</small>` : '';
             list.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid rgba(255,255,255,0.05);">
-                <div><span>${u.email}</span> &mdash; <strong>${u.name}</strong>${log}</div>
+                <div>${roleLabel} <span>${u.email}</span> &mdash; <strong>${u.name}</strong>${log}</div>
                 <button class="btn btn-secondary text-danger" style="padding:4px 8px; font-size:0.75rem; width:auto; background:var(--bg-card); border-color:var(--danger-color);" onclick="eliminaDocente('${u.email}')"><i class="fa-solid fa-trash"></i></button>
             </div>`;
         });
