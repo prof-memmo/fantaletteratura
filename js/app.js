@@ -1336,9 +1336,7 @@ function checkLoginSession() {
                 } else {
                     // Nuovo utente o senza ruolo: mandiamo a onboarding
                     setLoggedIn(email);
-                    if (window.location.hash === '#view-welcome' || window.location.hash === '') {
-                        navigateTo('view-onboarding');
-                    }
+                    navigateTo('view-onboarding');
                 }
             } catch(e) {
                 console.error("Errore checkLoginSession Firestore:", e);
