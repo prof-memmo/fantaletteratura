@@ -713,23 +713,29 @@ h1, h2, h3, h4 {
         display: none !important;
     }
     
-    .top-nav, main, .bottom-bar {
+    .top-nav, main {
         margin-left: 280px;
         width: calc(100% - 280px) !important;
         max-width: none !important;
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
+    .bottom-bar {
+        display: none !important;
+    }
+
+    #app-container {
+        padding-bottom: 0 !important;
+    }
+    
     .sidebar-collapsed ~ .top-nav,
-    .sidebar-collapsed ~ main,
-    .sidebar-collapsed ~ .bottom-bar {
+    .sidebar-collapsed ~ main {
         margin-left: 80px;
         width: calc(100% - 80px) !important;
     }
 
     .hidden-pre-login ~ .top-nav,
-    .hidden-pre-login ~ main,
-    .hidden-pre-login ~ .bottom-bar {
+    .hidden-pre-login ~ main {
         margin-left: 0;
         width: 100% !important;
     }
