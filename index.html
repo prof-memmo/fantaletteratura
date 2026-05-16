@@ -62,8 +62,6 @@
                         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" height="18"> Entra / Registrati con Google
                     </button>
                     <p class="text-center mt-1" style="font-size: 0.75rem; color: #aaa;">Se è il tuo primo accesso, verrai guidato alla selezione del profilo.</p>
-                    <div style="text-align: center; margin: 15px 0; color: #ccc;">- oppure -</div>
-                    <button type="button" class="btn" style="background: #f1c40f !important; color: #000 !important; font-size: 1rem; font-weight: 800; border: 2px solid #000; box-shadow: 0 4px 15px rgba(241, 196, 15, 0.4); width: 100%;" onclick="openInviteModal()"><i class="fa-solid fa-paper-plane"></i> INVITA UN COLLEGA</button>
                 </div>
                 
                 <div class="glass" style="padding: 20px; margin-top: 30px; display: none;" id="logged-in-section">
@@ -116,8 +114,9 @@
                 <h2>Bentornato Prof!</h2>
                 <div class="glass" style="padding: 15px; font-size: 0.95rem;">
                     <p>Benvenuto nel tuo pannello di controllo. Da qui puoi gestire le tue classi, le squadre, e proporre le missioni.</p>
-                    <div style="margin-top:20px;">
+                    <div style="margin-top:20px; display:flex; flex-direction:column; gap:10px;">
                         <button class="btn" style="width:100%;" onclick="navigateTo('view-squadra')">Iscrivi una classe</button>
+                        <button type="button" class="btn btn-secondary" style="width:100%;" onclick="openInviteModal()"><i class="fa-solid fa-paper-plane"></i> INVITA UN COLLEGA</button>
                     </div>
                 </div>
             </section>
