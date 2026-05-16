@@ -1279,6 +1279,7 @@ function checkLoginSession() {
     fanta_db.onAuthStateChanged(async (user) => {
         if (user) {
             const email = user.email.toLowerCase();
+            currentUserEmail = email;
             
             // Protezione pannello admin
             if (window.location.pathname.includes('admin.html')) {
@@ -1307,36 +1308,43 @@ function checkLoginSession() {
                 const adminMenuItem = document.getElementById('menu-admin-item');
                 if (adminMenuItem) adminMenuItem.style.display = 'block';
                 
-                if (window.location.hash === '#view-welcome' && !window.location.pathname.includes('admin.html')) {
+                if (window.location.hash === '#view-welcome' || window.location.hash === '' && !window.location.pathname.includes('admin.html')) {
                     navigateTo('view-prof');
                 }
                 return;
             }
             
-            // Verifica approvazione su Firestore
+            // Verifica ruolo su Firestore
             try {
                 const doc = await window.db.collection("users").doc(email).get();
                 
-                if (doc.exists) {
-                    // Utente approvato
+                if (doc.exists && doc.data().role) {
+                    // Utente approvato e ha un ruolo
+                    const role = doc.data().role;
                     setLoggedIn(email);
-                    if (window.location.hash === '#view-welcome') {
-                        navigateTo('view-prof');
+                    if (window.location.hash === '#view-welcome' || window.location.hash === '') {
+                        if (role === 'docente' || role === 'teacher') {
+                            navigateTo('view-prof');
+                        } else if (role === 'studente') {
+                            navigateTo('view-studenti');
+                        } else if (role === 'fantamico') {
+                            navigateTo('view-fantamico');
+                        } else {
+                            navigateTo('view-onboarding');
+                        }
                     }
                 } else {
-                    // Utente non ancora approvato o nuovo:
-                    // NON leggiamo pending_requests (richiede permessi admin su Firestore)
-                    // Lo mandiamo al form di iscrizione — se ha già una richiesta, il form lo avviserà
-                    localStorage.setItem('fanta_temp_email', email);
-                    await fanta_db.logout(); // Slogghiamo prima
-                    navigateTo('view-iscrizione'); // Poi mostriamo il form
+                    // Nuovo utente o senza ruolo: mandiamo a onboarding
+                    setLoggedIn(email);
+                    if (window.location.hash === '#view-welcome' || window.location.hash === '') {
+                        navigateTo('view-onboarding');
+                    }
                 }
             } catch(e) {
                 console.error("Errore checkLoginSession Firestore:", e);
-                // In caso di errore (es: regole Firestore), mandiamo comunque al form
-                localStorage.setItem('fanta_temp_email', email);
-                await fanta_db.logout();
-                navigateTo('view-iscrizione');
+                // In caso di errore (es: regole Firestore), mandiamo comunque al form onboarding
+                setLoggedIn(email);
+                navigateTo('view-onboarding');
             }
         } else {
             setLoggedOut();
@@ -1365,6 +1373,40 @@ async function loginDocente(event) {
         alert("Accesso fallito. Verifica email e password o assicurati di essere stato approvato.");
     }
 }
+
+window.selectOnboardingRole = async function(role) {
+    const user = window.auth.currentUser;
+    if (!user) {
+        alert("Devi prima accedere con Google.");
+        navigateTo('view-welcome');
+        return;
+    }
+    const email = user.email.toLowerCase();
+    
+    if (role === 'docente' || role === 'teacher') {
+        // Ripristina flusso di iscrizione manuale per i docenti
+        localStorage.setItem('fanta_temp_email', email);
+        await fanta_db.logout();
+        navigateTo('view-iscrizione');
+    } else if (role === 'studente') {
+        navigateTo('view-studenti');
+    } else if (role === 'fantamico') {
+        try {
+            await window.db.collection("users").doc(email).set({
+                email: email,
+                role: role,
+                name: user.displayName || email.split('@')[0],
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+            
+            currentUserEmail = email;
+            navigateTo('view-fantamico');
+        } catch (e) {
+            console.error("Errore salvataggio ruolo:", e);
+            alert("Si è verificato un errore durante la configurazione del tuo account. Verifica la tua connessione.");
+        }
+    }
+};
 
 async function loginGoogle() {
     try {
@@ -1405,9 +1447,6 @@ async function inviaRichiestaIscrizione(event) {
     }
 
     try {
-        // 1. In un flusso solo Google, non creiamo l'account via email/password qui
-        // L'utente è già loggato in Firebase tramite Google se è arrivato con fanta_temp_email
-        
         const requests = await fanta_db.getTeacherRequests();
         if (requests.some(r => r.email.toLowerCase() === email)) {
             alert("Hai già inviato una richiesta di iscrizione con questa email. Attendi l'approvazione.");
@@ -1466,7 +1505,23 @@ async function checkStudentConsent() {
             return;
         }
 
-        // Salviamo il codice e lo stato dello studente
+        // Salviamo il ruolo per i futuri login, se l'utente è autenticato tramite Google
+        const user = window.auth.currentUser;
+        if (user) {
+            try {
+                await window.db.collection("users").doc(user.email.toLowerCase()).set({
+                    email: user.email.toLowerCase(),
+                    role: 'studente',
+                    teamId: team.id,
+                    teamCode: codeInput,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+            } catch (roleErr) {
+                console.error("Errore salvataggio ruolo studente:", roleErr);
+            }
+        }
+
+        // Salviamo il codice e lo stato dello studente localmente
         localStorage.setItem('fanta_active_team_code', codeInput);
         localStorage.setItem('fanta_active_team_id', team.id);
         
