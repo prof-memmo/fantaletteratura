@@ -759,40 +759,49 @@ async function setupAdminPanel() {
     let currentAdminDocentiFilter = 'tutti';
     window.setAdminDocentiFilter = function(f) {
         currentAdminDocentiFilter = f;
-        // Reset search input
         const searchInput = document.getElementById('admin-docenti-search');
         if(searchInput) searchInput.value = '';
-        
-        // Update button styles
-        ['tutti', 'teacher', 'guest'].forEach(role => {
-            const btnId = role === 'tutti' ? 'filter-docenti-tutti' : (role === 'teacher' ? 'filter-docenti-docente' : 'filter-docenti-guest');
-            const btn = document.getElementById(btnId);
-            if(btn) {
-                if(role === f) {
-                    btn.style.background = 'var(--primary-color)';
-                    btn.style.borderColor = 'transparent';
-                } else {
-                    btn.style.background = 'rgba(255,255,255,0.1)';
-                    btn.style.borderColor = 'rgba(255,255,255,0.2)';
-                }
-            }
-        });
-        
         window.renderAdminDocenti();
     };
 
     window.renderAdminDocenti = async function(filterText = '') {
         const list = document.getElementById('admin-docenti-list');
+        const statsContainer = document.getElementById('admin-docenti-stats');
         if (!list) return;
+        
+        // Fetch all users to get counts
+        const snapshotAll = await window.db.collection("users").get();
+        const allUsers = snapshotAll.docs.map(doc => doc.data());
+        
+        const counts = {
+            tutti: allUsers.length,
+            teacher: allUsers.filter(u => u.role === 'teacher').length,
+            guest: allUsers.filter(u => u.role === 'guest').length
+        };
+        
+        if (statsContainer) {
+            statsContainer.innerHTML = `
+                <div class="admin-stat-card ${currentAdminDocentiFilter === 'tutti' ? 'active' : ''}" onclick="window.setAdminDocentiFilter('tutti')">
+                    <div class="stat-value">${counts.tutti}</div>
+                    <div class="stat-label">TUTTI</div>
+                </div>
+                <div class="admin-stat-card ${currentAdminDocentiFilter === 'teacher' ? 'active' : ''}" onclick="window.setAdminDocentiFilter('teacher')">
+                    <div class="stat-value">${counts.teacher}</div>
+                    <div class="stat-label">DOCENTI</div>
+                </div>
+                <div class="admin-stat-card ${currentAdminDocentiFilter === 'guest' ? 'active' : ''}" onclick="window.setAdminDocentiFilter('guest')">
+                    <div class="stat-value">${counts.guest}</div>
+                    <div class="stat-label">FANTAMICI</div>
+                </div>
+            `;
+        }
+
         list.innerHTML = '<p class="text-center">Caricamento iscritti...</p>';
         
-        let query = window.db.collection("users");
+        let users = allUsers;
         if (currentAdminDocentiFilter !== 'tutti') {
-            query = query.where("role", "==", currentAdminDocentiFilter);
+            users = allUsers.filter(u => u.role === currentAdminDocentiFilter);
         }
-        
-        const snapshot = await query.get();
-        let users = snapshot.docs.map(doc => doc.data());
         
         list.innerHTML = '';
         let filteredUsers = users.filter(u => {

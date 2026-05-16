@@ -84,11 +84,9 @@
             <section id="admin-view-docenti" class="admin-view" style="display:none;">
                 <h2 style="padding: 0 15px;">Gestione Iscritti</h2>
                 <div class="glass" style="padding: 15px; margin: 0 15px 20px 15px;">
-                    <!-- Filtri Iscritti -->
-                    <div class="admin-mode-filter" style="margin-bottom:15px; display: flex; gap: 10px; flex-wrap: wrap;">
-                        <button class="admin-mode-filter-btn" onclick="window.setAdminDocentiFilter('tutti')" id="filter-docenti-tutti" style="background: var(--primary-color); color: white; border: none; padding: 8px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; cursor: pointer;">👥 Tutti</button>
-                        <button class="admin-mode-filter-btn" onclick="window.setAdminDocentiFilter('teacher')" id="filter-docenti-docente" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; cursor: pointer;">👨‍🏫 Docenti</button>
-                        <button class="admin-mode-filter-btn" onclick="window.setAdminDocentiFilter('guest')" id="filter-docenti-guest" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; cursor: pointer;">👋 Fantamici</button>
+                    <!-- New Interactive Stat Cards -->
+                    <div id="admin-docenti-stats" class="admin-stats-grid">
+                        <!-- Rendered by JS -->
                     </div>
 
                     <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; border: 1px solid var(--glass-border);">

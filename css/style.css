@@ -1197,6 +1197,55 @@ h1, h2, h3, h4 {
 .admin-mode-filter-btn.f-gold   { border-color: #c9a227;  color: #d4af37; background: rgba(201,162,39,0.1); }
 .admin-mode-filter-btn.f-all    { border-color: rgba(255,255,255,0.3); color: var(--text-main); background: rgba(255,255,255,0.05); }
 
+/* Admin Stat Cards (Dashboard Style) */
+.admin-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.admin-stat-card {
+    background: white;
+    padding: 1.2rem;
+    border-radius: 20px;
+    text-align: center;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+.admin-stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+.admin-stat-card.active {
+    border-color: var(--primary-color);
+    background: rgba(144, 161, 79, 0.05);
+}
+
+.admin-stat-card .stat-value {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--primary-color);
+    line-height: 1;
+    margin-bottom: 5px;
+}
+
+.admin-stat-card .stat-label {
+    font-size: 0.7rem;
+    color: #888;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.admin-stat-card.active .stat-label {
+    color: var(--primary-color);
+}
+
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    AUTHOR SLOT with REMOVE BUTTON
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
