@@ -270,6 +270,130 @@ h1, h2, h3, h4 {
     color: var(--primary-color);
 }
 
+/* Tooltips (Desktop only) */
+@media screen and (min-width: 1024px) {
+    .tab-item {
+        position: relative;
+    }
+
+    .tab-item::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 110%;
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+        background: var(--primary-color);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 10px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        pointer-events: none;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+        z-index: 2000;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .tab-item:hover::after {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    .tab-item:hover i {
+        transform: translateY(-5px);
+        color: var(--primary-color);
+    }
+
+    .tab-item i {
+        transition: transform 0.3s ease, color 0.3s ease;
+    }
+}
+
+/* Side Menu */
+.side-menu {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 280px;
+    height: 100%;
+    background: var(--bg-dark);
+    z-index: 2000;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-right: 1px solid var(--glass-border);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.side-menu.active {
+    left: 0;
+}
+
+.side-menu.hidden-pre-login {
+    display: none !important;
+}
+
+.side-menu.sidebar-collapsed {
+    width: 80px;
+}
+
+.side-menu.sidebar-collapsed .menu-link span,
+.side-menu.sidebar-collapsed .sidebar-title,
+.side-menu.sidebar-collapsed .sidebar-subtitle {
+    display: none;
+}
+
+.side-menu.sidebar-collapsed .menu-header {
+    padding: 20px 10px;
+}
+
+.side-menu.sidebar-collapsed .menu-link {
+    justify-content: center;
+    padding: 15px 0;
+}
+
+.side-menu.sidebar-collapsed .menu-link i {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: none;
+    z-index: 1999;
+    backdrop-filter: blur(5px);
+}
+
+.menu-overlay.active {
+    display: block;
+}
+
+.menu-link {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 25px;
+    text-decoration: none;
+    color: var(--text-main);
+    font-size: 1.1rem;
+    font-family: var(--font-body);
+    transition: all 0.3s ease;
+}
+
+.menu-link:hover, .menu-link.active {
+    background: rgba(141, 160, 63, 0.1);
+    color: var(--primary-color);
+}
+
 /* Side Menu */
 .side-menu {
     position: fixed;
@@ -706,35 +830,83 @@ h1, h2, h3, h4 {
 
 /* Responsive Desktop Layout */
 @media screen and (min-width: 1024px) {
-    .side-menu, .menu-btn, .menu-overlay {
+    /* DEFAULT LAYOUT (Sidebar visible) - e.g. Admin */
+    .side-menu {
+        left: 0 !important;
+        box-shadow: none;
+        border-right: 1px solid var(--glass-border);
+    }
+    
+    .menu-overlay {
         display: none !important;
     }
     
-    main {
-        margin-left: 0 !important;
-        width: 100% !important;
-        max-width: 1200px;
-        margin: 0 auto;
+    .top-nav, main, .bottom-bar {
+        margin-left: 280px;
+        width: calc(100% - 280px) !important;
+        max-width: none !important;
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
+
+    .sidebar-collapsed ~ .top-nav,
+    .sidebar-collapsed ~ main,
+    .sidebar-collapsed ~ .bottom-bar {
+        margin-left: 80px;
+        width: calc(100% - 80px) !important;
+    }
+
+    /* APP-SPECIFIC LAYOUT (No Sidebar, Bottom Bar only) - index.html */
+    body.no-sidebar .side-menu, 
+    body.no-sidebar .menu-btn, 
+    body.no-sidebar .menu-overlay {
+        display: none !important;
+    }
     
-    .bottom-bar {
+    body.no-sidebar main {
+        margin-left: 0 !important;
+        width: 100% !important;
+        max-width: none !important; /* Flush design */
+        margin: 0;
+    }
+    
+    body.no-sidebar .bottom-bar {
         display: flex !important;
         justify-content: center;
-        gap: 40px;
+        gap: 15px;
         position: fixed;
-        bottom: 0;
-        width: 100%;
-        left: 0;
-        padding: 0 20px;
+        bottom: 20px; /* Floating from bottom */
+        left: 50%;
+        transform: translateX(-50%);
+        width: auto !important;
+        min-width: 500px;
+        max-width: 90vw;
+        height: 70px;
+        padding: 0 30px;
+        border-radius: 40px; /* Rounded Dock */
+        background: rgba(15, 17, 8, 0.85);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid var(--glass-border);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        margin-left: 0 !important;
+        z-index: 1500;
     }
 
-    .tab-item {
-        min-width: 80px;
+    body.no-sidebar .tab-item {
+        min-width: 70px;
+        padding: 10px;
     }
 
-    #app-container {
-        padding-bottom: var(--bottom-bar-height) !important;
+    body.no-sidebar .tab-item span {
+        display: none; /* Hide labels on Dock to look more premium, using Tooltips instead */
+    }
+
+    body.no-sidebar .tab-item i {
+        font-size: 1.5rem; /* Larger icons on Dock */
+    }
+
+    body.no-sidebar #app-container {
+        padding-bottom: 100px !important;
     }
 }
     

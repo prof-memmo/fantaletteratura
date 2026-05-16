@@ -9,7 +9,7 @@
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="no-sidebar">
     <div id="app-container">
         <!-- SIDEBAR REMOVED AS REQUESTED -->
 
@@ -543,33 +543,33 @@
             <p>&copy; 2026 Fantaletteratura - A cura di Guglielmo Piersanti</p>
         </footer>
 
-        <!-- Bottom Navigation Tabs -->
+        <!-- Bottom Navigation Tabs (Floating Dock on PC) -->
         <nav class="bottom-bar">
-            <a href="#" class="tab-item active" data-view="view-welcome">
+            <a href="#" class="tab-item active" data-view="view-welcome" data-tooltip="Torna alla Home">
                 <i class="fa-solid fa-house"></i>
                 <span>Home</span>
             </a>
-            <a href="#" class="tab-item" data-view="view-regolamento">
+            <a href="#" class="tab-item" data-view="view-regolamento" data-tooltip="Leggi il Regolamento">
                 <i class="fa-solid fa-scale-balanced"></i>
                 <span>Regolamento</span>
             </a>
-            <a href="#" class="tab-item" data-view="view-classifiche">
+            <a href="#" class="tab-item" data-view="view-classifiche" data-tooltip="Guarda le Classifiche">
                 <i class="fa-solid fa-trophy"></i>
                 <span>Classifiche</span>
             </a>
-            <a href="#" class="tab-item" data-view="view-schede">
+            <a href="#" class="tab-item" data-view="view-schede" data-tooltip="Esplora le Schede Autore">
                 <i class="fa-solid fa-file-lines"></i>
                 <span>Schede</span>
             </a>
-            <a href="#" class="tab-item" data-view="view-contatti">
+            <a href="#" class="tab-item" data-view="view-contatti" data-tooltip="Inviaci un Messaggio">
                 <i class="fa-solid fa-envelope"></i>
                 <span>Contatti</span>
             </a>
-            <a href="#" class="tab-item hidden" data-view="view-profilo" id="tab-item-profilo">
+            <a href="#" class="tab-item hidden" data-view="view-profilo" id="tab-item-profilo" data-tooltip="Mio Profilo e Squadre">
                 <i class="fa-solid fa-user"></i>
                 <span>Profilo</span>
             </a>
-            <a href="admin.html" class="tab-item hidden" id="tab-item-admin">
+            <a href="admin.html" class="tab-item hidden" id="tab-item-admin" data-tooltip="Pannello Gestione Admin">
                 <i class="fa-solid fa-lock"></i>
                 <span>Admin</span>
             </a>
