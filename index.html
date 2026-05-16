@@ -53,6 +53,19 @@
                 <div class="glass" style="padding: 20px; margin-top: 30px;" id="login-section">
                     <p class="text-center" style="font-size: 0.9rem; color: #fff; margin-bottom: 15px;">Accedi o registrati per iniziare a giocare.</p>
                     
+                    <div class="consent-group mb-2">
+                        <label class="checkbox-container mb-1">
+                            <input type="checkbox" id="welcome-check-age">
+                            <span class="checkmark"></span>
+                            Ho almeno 16 anni o supervisione di un adulto
+                        </label>
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="welcome-check-privacy">
+                            <span class="checkmark"></span>
+                            Accetto <a href="#" onclick="event.preventDefault(); openLegalModal('privacy')" style="color:var(--primary-color);">Privacy</a> e <a href="#" onclick="event.preventDefault(); openLegalModal('termini')" style="color:var(--primary-color);">Termini</a>
+                        </label>
+                    </div>
+
                     <button type="button" class="btn" style="background: #fff; color: #444; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 12px; font-weight: bold;" onclick="loginGoogle()">
                         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" height="20"> Entra con Google
                     </button>

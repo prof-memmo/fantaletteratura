@@ -1377,6 +1377,14 @@ function checkLoginSession() {
 
 async function loginDocente(event) {
     if(event) event.preventDefault();
+    
+    const checkAge = document.getElementById('welcome-check-age')?.checked;
+    const checkPrivacy = document.getElementById('welcome-check-privacy')?.checked;
+    if (!checkAge || !checkPrivacy) {
+        alert("Devi confermare l'età e accettare Privacy Policy e Termini per continuare.");
+        return;
+    }
+
     const emailInput = document.getElementById('docente-email-input').value.trim().toLowerCase();
     const passwordInput = document.getElementById('docente-password-input').value.trim();
 
@@ -1428,6 +1436,13 @@ window.selectOnboardingRole = async function(role) {
 };
 
 async function loginGoogle() {
+    const checkAge = document.getElementById('welcome-check-age')?.checked;
+    const checkPrivacy = document.getElementById('welcome-check-privacy')?.checked;
+    if (!checkAge || !checkPrivacy) {
+        alert("Devi confermare l'età e accettare Privacy Policy e Termini per continuare.");
+        return;
+    }
+
     try {
         const result = await fanta_db.loginWithGoogle();
         const user = result.user;
