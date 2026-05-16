@@ -11,12 +11,8 @@
 </head>
 <body>
     <div id="app-container">
-        <!-- Top Navigation -->
-        <header class="top-nav glass">
-            <button class="menu-btn" id="open-menu"><i class="fa-solid fa-bars"></i></button>
-            <div class="page-title" id="page-title"></div>
-            <div style="width: 24px;"></div> <!-- Spacer for flexbox -->
-        </header>
+        <!-- Floating Menu Button (Mobile) -->
+        <button class="menu-btn hidden-pre-login" id="open-menu"><i class="fa-solid fa-bars"></i></button>
 
         <!-- Side Drawer Menu -->
         <div class="menu-overlay" id="menu-overlay"></div>
@@ -380,6 +376,7 @@
                     <p style="font-style: italic; font-size: 0.9rem;">"La cosa importante è non smettere mai di domandare. La curiosità ha il suo motivo di esistere. Non si può fare altro che restare stupiti quando si contemplano i misteri dell'eternità, della vita, della struttura meravigliosa della realtà. È sufficiente se si cerca di comprendere soltanto un poco di questo mistero tutti i giorni. Non perdere mai una sacra curiosità."</p>
                     <h4 class="text-primary mt-2">Albert Einstein</h4>
                 </div>
+                <h2 class="text-center mb-2">Classifiche</h2>
                 <h3 class="text-center mb-2">Scegli la modalità</h3>
                 <div class="leaderboard-mode-tabs" style="margin-bottom:20px;">
                     <button class="lb-mode-tab" id="lb-tab-terze" onclick="selectLeaderboardMode('terze')">📘 Contemporanea: Autori Italiani</button>
@@ -400,6 +397,7 @@
                 <button class="btn-secondary" style="padding: 5px 15px; border-radius:20px; margin-bottom: 15px; border:none;" onclick="navigateTo('view-classifiche')">
                     <i class="fa-solid fa-arrow-left"></i> Indietro
                 </button>
+                <h2 class="mb-2">Dettaglio Classifica</h2>
                 <h2 id="leaderboard-title">Classifica</h2>
                 <div class="input-group mt-2">
                     <input type="text" class="input-control" placeholder="Cerca squadra..." id="search-leaderboard">

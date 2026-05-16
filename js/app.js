@@ -1726,7 +1726,9 @@ function setLoggedIn(email) {
     currentUserEmail = email;
     
     const sideMenu = document.getElementById('side-menu');
+    const menuBtn = document.getElementById('open-menu');
     if (sideMenu) sideMenu.classList.remove('hidden-pre-login');
+    if (menuBtn) menuBtn.classList.remove('hidden-pre-login');
     
     const loginSec = document.getElementById('login-section');
     const loggedSec = document.getElementById('logged-in-section');
@@ -1757,7 +1759,9 @@ function setLoggedOut() {
     currentUserEmail = null;
     
     const sideMenu = document.getElementById('side-menu');
+    const menuBtn = document.getElementById('open-menu');
     if (sideMenu) sideMenu.classList.add('hidden-pre-login');
+    if (menuBtn) menuBtn.classList.add('hidden-pre-login');
     
     const loginSec = document.getElementById('login-section');
     const loggedSec = document.getElementById('logged-in-section');
