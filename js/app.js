@@ -1445,8 +1445,8 @@ function populateSchede(modeId = null) {
                 </div>
             </div>
         `;
-        // Put the newest ones at the top/bottom depending on preference, we'll append.
-        grid.insertAdjacentHTML('afterbegin', card); 
+        // Conserva l'ordine cronologico (dal primo autore studiato all'ultimo)
+        grid.insertAdjacentHTML('beforeend', card); 
     });
 
     // Segna tutte le schede caricate in questa modalità come viste quando l'utente le visita
