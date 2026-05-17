@@ -1169,23 +1169,24 @@ async function setupAdminPanel() {
         }
     };
 
-    window.renderAdminMissioni = function() {
+    window.renderAdminMissioni = async function() {
         const list = document.getElementById('admin-missioni-list');
         if(!list) return;
         list.innerHTML = '';
-        getAllTeams().filter(t => (t.missionsCompleted || 0) > 0).forEach(team => {
+        const allTeams = await getAllTeams();
+        allTeams.filter(t => (t.missionsCompleted || 0) > 0).forEach(team => {
             list.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid rgba(255,255,255,0.05);">
                 <span>${team.name}</span><span style="font-weight:bold; color:var(--primary-color);">+${team.missionsCompleted * 5} pt</span>
             </div>`;
         });
     };
 
-    window.renderAdminClassifica = function(modeFilter) {
+    window.renderAdminClassifica = async function(modeFilter) {
         const list = document.getElementById('admin-classifica-list');
         if (!list) return;
         list.innerHTML = '';
 
-        let teams = getAllTeams();
+        let teams = await getAllTeams();
         if (modeFilter && modeFilter !== 'all') {
             teams = teams.filter(t => (t.mode || 'terze') === modeFilter);
         }
