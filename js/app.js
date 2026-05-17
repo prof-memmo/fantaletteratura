@@ -369,7 +369,7 @@ function populateAuthorSelects(modeId) {
             <div class="author-image-wrapper">
                 <img src="${author.image}" alt="${author.name}">
             </div>
-            <div style="font-family: var(--font-heading); font-weight:bold; font-size:1.1rem; color:var(--accent-gold);">${author.name}</div>
+            <div class="author-name" style="font-family: var(--font-heading); font-weight:bold; font-size:1.1rem; color:var(--accent-gold);">${author.name}</div>
             <div class="text-primary" style="font-size:0.9rem; font-weight:600;">${author.cost || author.points} ${currency}</div>
         `;
         card.addEventListener('click', () => {
@@ -399,7 +399,8 @@ function populateAuthorSelects(modeId) {
         newInput.addEventListener('input', () => {
             const q = newInput.value.toLowerCase();
             document.querySelectorAll('.author-card').forEach(card => {
-                const name = card.querySelector('div')?.textContent?.toLowerCase() || '';
+                const nameDiv = card.querySelector('.author-name');
+                const name = nameDiv ? nameDiv.textContent.toLowerCase() : '';
                 card.style.display = name.includes(q) ? '' : 'none';
             });
         });
@@ -539,6 +540,23 @@ function calculateBudget() {
         } else {
             budgetBar.classList.remove('over');
             budgetBar.style.background = 'var(--primary-color)';
+        }
+    }
+
+    // Update Save Team Button
+    const saveBtn = document.getElementById('btn-save-team');
+    if (saveBtn) {
+        let allSlotsFilled = true;
+        for (let i = 1; i <= 5; i++) {
+            if (!teamSelection[i]) {
+                allSlotsFilled = false;
+                break;
+            }
+        }
+        if (allSlotsFilled && remaining >= 0) {
+            saveBtn.disabled = false;
+        } else {
+            saveBtn.disabled = true;
         }
     }
 }
@@ -1601,21 +1619,8 @@ async function inviaRichiestaIscrizione(event) {
     const school = document.querySelector('#view-iscrizione input[placeholder="Nome scuola"]').value.trim();
     const city = document.querySelector('#view-iscrizione input[placeholder="Citta"]').value.trim();
 
-    const isDocente = document.getElementById('teacher-check-docente').checked;
-    const acceptedPrivacy = document.getElementById('teacher-check-privacy').checked;
-
     if (!name || !school || !city || !email) {
         alert("Completa tutti i campi (e inserisci l'email nella home se necessario).");
-        return;
-    }
-
-    if (!hasReadPrivacy || !hasReadTermini) {
-        alert("Per proseguire è necessario aprire e leggere la Privacy Policy e i Termini e Condizioni cliccando sui rispettivi link.");
-        return;
-    }
-
-    if (!isDocente || !acceptedPrivacy) {
-        alert("Devi dichiarare di essere docente e accettare la Privacy Policy per iscriverti.");
         return;
     }
 
