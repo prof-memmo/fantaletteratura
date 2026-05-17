@@ -2158,24 +2158,38 @@ async function renderProfilo() {
 
         // Sezione codice (solo per squadre proprie)
         const codiceSection = !isCollaborated ? `
-            <div style="width:100%; margin-bottom:10px; padding:6px 10px; border-radius:8px; background:rgba(141, 160, 63, 0.04); border:1px dashed rgba(141, 160, 63, 0.3); display:flex; justify-content:space-between; align-items:center;">
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <span style="font-size:0.65rem; text-transform:uppercase; color:var(--text-muted);">Codice Studenti:</span>
-                    <span class="join-code-badge" style="margin:0; font-size:0.85rem; padding:2px 6px;">${team.joinCode || '---'}</span>
+            <div style="width:100%; margin-bottom:8px; padding:8px 10px; border-radius:8px; background:rgba(141, 160, 63, 0.04); border:1px dashed rgba(141, 160, 63, 0.3); display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                <div style="display:flex; flex-direction:column; gap:4px; flex-grow:1;">
+                    <span style="font-size:0.68rem; text-transform:uppercase; color:var(--text-muted); font-weight:600; letter-spacing:0.5px;">Codice Studenti</span>
+                    <span class="join-code-badge" style="margin:0; font-size:1rem; padding:3px 8px; width:fit-content; text-align:center; font-weight:bold;">${team.joinCode || '---'}</span>
                 </div>
-                <button class="btn" style="width:auto; padding:4px 10px; font-size:0.7rem; border-radius:12px;" onclick="shareInvite({type:'student', code:'${team.joinCode}', teamName:'${team.name}'})">
+                <button class="btn" style="width:auto; padding:6px 12px; font-size:0.75rem; border-radius:12px; height:fit-content;" onclick="shareInvite({type:'student', code:'${team.joinCode}', teamName:'${team.name}'})">
                     <i class="fa-solid fa-share-nodes"></i> Condividi
+                </button>
+            </div>` : '';
+
+        // Sezione Azioni (Modifica / Elimina)
+        const azioniSection = !isCollaborated ? `
+            <div style="display:flex; gap:8px; width:100%; margin-top:4px; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px;">
+                <button class="btn btn-secondary" style="flex:1; padding:5px 8px; font-size:0.72rem; border-radius:8px; background:rgba(255,255,255,0.03);" 
+                    onclick="docenteModificaSquadra('${team.id}', '${team.name.replace(/'/g, "\\'")}', '${(team.classe || '').replace(/'/g, "\\'")}')">
+                    <i class="fa-solid fa-pen-to-square"></i> Modifica
+                </button>
+                <button class="btn btn-danger" style="flex:1; padding:5px 8px; font-size:0.72rem; border-radius:8px; background:rgba(230, 57, 70, 0.1); border:1px solid rgba(230, 57, 70, 0.2); color:#e63946;" 
+                    onclick="docenteEliminaSquadra('${team.id}', '${team.name.replace(/'/g, "\\'")}')">
+                    <i class="fa-solid fa-trash-can"></i> Elimina
                 </button>
             </div>` : '';
 
         return `
             <div class="card" style="margin:0; padding:12px; flex-direction:column; align-items:flex-start; gap:8px; width:100%;">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; width:100%; gap:10px;">
-                    <div>
-                        <div style="font-family: var(--font-heading); font-weight:bold; color:#f5c53c; font-size:1.35rem; line-height:1.2; text-shadow: 0 1px 4px rgba(0,0,0,0.4);">${team.name}${collabBadge}</div>
-                        <div style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;"><i class="fa-solid fa-users"></i> Classe: ${team.classe || 'N/A'}</div>
+                <div style="width:100%;">
+                    <div style="font-family: var(--font-heading); font-weight:bold; color:#f5c53c; font-size:1.35rem; line-height:1.2; text-shadow: 0 1px 4px rgba(0,0,0,0.4); width:100%;">${team.name}${collabBadge}</div>
+                    <div style="font-size:0.75rem; color:var(--text-muted); display:flex; gap:8px; align-items:center; width:100%; margin-top:4px; margin-bottom:4px;">
+                        <span><i class="fa-solid fa-trophy" style="color:#f5c53c; font-size:0.7rem;"></i> ${modeCfg.emoji} ${modeCfg.shortLabel}</span>
+                        <span style="opacity:0.3;">|</span>
+                        <span><i class="fa-solid fa-users" style="font-size:0.7rem;"></i> Classe: <strong>${team.classe || 'N/A'}</strong></span>
                     </div>
-                    ${modeBadgeHtml}
                 </div>
                 
                 <div style="display:flex; justify-content:space-between; align-items:center; width:100%; background:rgba(255, 255, 255, 0.02); border:1px solid rgba(255, 255, 255, 0.05); padding:6px 10px; border-radius:8px; margin-bottom:4px; font-size:0.8rem;">
@@ -2199,6 +2213,7 @@ async function renderProfilo() {
 
                 ${studentiSection}
                 ${codiceSection}
+                ${azioniSection}
             </div>`;
     }
 
@@ -2213,6 +2228,39 @@ async function renderProfilo() {
     renderNotifiche();
     renderTornei();
 }
+
+window.docenteModificaSquadra = async function(teamId, currentName, currentClasse) {
+    const newName = prompt("Modifica il nome della squadra:", currentName);
+    if (newName === null) return;
+    if (!newName.trim()) { alert("Il nome della squadra non può essere vuoto."); return; }
+    
+    const newClasse = prompt("Modifica la classe (es: 3D):", currentClasse);
+    if (newClasse === null) return;
+    
+    try {
+        await fanta_db.updateTeam(teamId, {
+            name: newName.trim(),
+            classe: newClasse.trim()
+        });
+        alert("Squadra modificata con successo!");
+        renderProfilo();
+    } catch (e) {
+        console.error(e);
+        alert("Errore durante la modifica della squadra: " + e.message);
+    }
+};
+
+window.docenteEliminaSquadra = async function(teamId, teamName) {
+    if (!confirm(`Sei sicuro di voler eliminare definitivamente la squadra "${teamName}"? Questa azione non può essere annullata.`)) return;
+    try {
+        await fanta_db.deleteTeam(teamId);
+        alert("Squadra eliminata con successo!");
+        renderProfilo();
+    } catch (e) {
+        console.error(e);
+        alert("Errore durante l'eliminazione della squadra: " + e.message);
+    }
+};
 
 // Sposta studente da pagina profilo docente (usa stessa modal dell'admin se disponibile)
 window.profiloSpostaStudente = async function(studentEmail, currentTeamId, currentTeamName) {
