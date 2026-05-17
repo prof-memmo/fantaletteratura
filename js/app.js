@@ -109,7 +109,10 @@ function initApp() {
     const _c = document.getElementById('app-container');
     if (_c && !isLoginPage) _c.style.display = 'block';
 
-    loadGameState();
+    // Sottoscrivi real-time a tutti i campionati per raccogliere notifiche e schede in tempo reale
+    loadGameState('terze');
+    loadGameState('seconde');
+    loadGameState('avanzato');
 
     // 1. Navigation setup
     setupNavigation();
@@ -908,10 +911,54 @@ async function setupAdminPanel() {
         teams.forEach(t => {
             const modeInfo = t.mode ? GAME_MODES[t.mode] : null;
             const badge = modeInfo ? `<span class="mode-badge ${modeInfo.colorClass}">${modeInfo.emoji} ${modeInfo.shortLabel}</span>` : '';
+            const pool = (modeInfo && modeInfo.authors && modeInfo.authors.length > 0) ? modeInfo.authors : AUTHORS;
             const collaboratori = (t.collaboratori || []);
             const collBadge = collaboratori.length > 0
                 ? `<span style="font-size:0.7rem; color:var(--accent-gold);"><i class="fa-solid fa-users-gear"></i> ${collaboratori.length} collaboratore/i</span>`
                 : '';
+
+            // Autori in questa squadra
+            let autoriSection = '';
+            if (t.authors && t.authors.length > 0) {
+                const autoriRows = t.authors.map(aid => {
+                    const author = pool.find(x => x.id === aid);
+                    if (!author) return '';
+                    
+                    const ptsLabel = author.isPointsRevealed 
+                        ? `<span style="font-weight:bold; color:var(--primary-color);">${author.points} pt</span>`
+                        : `<span style="font-size:0.75rem; color:var(--text-muted);"><i class="fa-solid fa-eye-slash" title="Punti non ancora rivelati"></i> ? pt</span>`;
+                    
+                    return `
+                        <div style="display:flex; align-items:center; justify-content:space-between; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.03); font-size:0.8rem;">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <img src="${author.image}" alt="${author.name}" style="width:24px; height:24px; border-radius:50%; object-fit:cover; border:1px solid var(--primary-color); background:#fff;">
+                                <span style="font-weight:500; color:var(--text-main);">${author.name}</span>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <span style="font-size:0.7rem; color:var(--text-muted);">${author.cost || author.points || 0} €</span>
+                                ${ptsLabel}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                autoriSection = `
+                    <details style="margin-top:8px; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px; width:100%;">
+                        <summary style="font-size:0.78rem; cursor:pointer; color:var(--primary-color); font-weight:600; user-select:none; margin-bottom:4px;">
+                            <i class="fa-solid fa-feather-pointed"></i> Autori Schierati (${t.authors.length}/5)
+                        </summary>
+                        <div style="padding-left:4px; max-height:200px; overflow-y:auto;">
+                            ${autoriRows}
+                        </div>
+                    </details>
+                `;
+            } else {
+                autoriSection = `
+                    <div style="font-size:0.75rem; color:var(--text-muted); padding-top:8px; border-top:1px solid rgba(255,255,255,0.05); width:100%;">
+                        <i>Nessun autore schierato</i>
+                    </div>
+                `;
+            }
 
             // Studenti iscritti a questa squadra
             const studentiDiQuesta = allStudents.filter(s => s.teamId === t.id);
@@ -947,6 +994,7 @@ async function setupAdminPanel() {
                             </button>
                         </div>
                     </div>
+                    ${autoriSection}
                     <details style="margin-top:4px;">
                         <summary style="font-size:0.8rem; cursor:pointer; color:var(--text-muted); user-select:none;">
                             <i class="fa-solid fa-users"></i> Studenti (${studentiDiQuesta.length})
@@ -1232,6 +1280,50 @@ window.renderAdminProfilo = async function() {
                 if(a && a.isPointsRevealed) authPts += (a.points || 0);
             });
             let misPts = (t.missionsCompleted || 0) * 5;
+
+            // Autori in questa squadra
+            let autoriSection = '';
+            if (t.authors && t.authors.length > 0) {
+                const autoriRows = t.authors.map(aid => {
+                    const author = pool.find(x => x.id === aid);
+                    if (!author) return '';
+                    
+                    const ptsLabel = author.isPointsRevealed 
+                        ? `<span style="font-weight:bold; color:var(--primary-color);">${author.points} pt</span>`
+                        : `<span style="font-size:0.75rem; color:var(--text-muted);"><i class="fa-solid fa-eye-slash" title="Punti non ancora rivelati"></i> ? pt</span>`;
+                    
+                    return `
+                        <div style="display:flex; align-items:center; justify-content:space-between; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.03); font-size:0.8rem;">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <img src="${author.image}" alt="${author.name}" style="width:24px; height:24px; border-radius:50%; object-fit:cover; border:1px solid var(--primary-color); background:#fff;">
+                                <span style="font-weight:500; color:var(--text-main);">${author.name}</span>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <span style="font-size:0.7rem; color:var(--text-muted);">${author.cost || author.points || 0} €</span>
+                                ${ptsLabel}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                autoriSection = `
+                    <details style="margin-top:8px; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px; width:100%;">
+                        <summary style="font-size:0.78rem; cursor:pointer; color:var(--primary-color); font-weight:600; user-select:none; margin-bottom:4px;">
+                            <i class="fa-solid fa-feather-pointed"></i> Autori Schierati (${t.authors.length}/5)
+                        </summary>
+                        <div style="padding-left:4px; max-height:200px; overflow-y:auto;">
+                            ${autoriRows}
+                        </div>
+                    </details>
+                `;
+            } else {
+                autoriSection = `
+                    <div style="font-size:0.75rem; color:var(--text-muted); padding-top:8px; border-top:1px solid rgba(255,255,255,0.05); width:100%;">
+                        <i>Nessun autore schierato</i>
+                    </div>
+                `;
+            }
+
             sqList.innerHTML += `<div class="glass" style="padding:15px; margin-bottom:15px; border-left:4px solid var(--primary-color);">
                 <div style="font-weight:bold; font-size:1.1rem; margin-bottom:10px;">${t.name}</div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:0.85rem;">
@@ -1241,6 +1333,7 @@ window.renderAdminProfilo = async function() {
                         Totale: <span style="color:var(--primary-hover)">${authPts + misPts} pt</span>
                     </div>
                 </div>
+                ${autoriSection}
             </div>`;
         });
     }
