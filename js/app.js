@@ -878,18 +878,64 @@ async function setupAdminPanel() {
             teams = teams.filter(t => (t.mode || 'terze') === modeFilter);
         }
         
+        // Carica tutti gli studenti una volta sola per efficienza
+        const allUsersSnap = await window.db.collection("users").where("role", "==", "studente").get();
+        const allStudents = allUsersSnap.docs.map(d => d.data());
+
         list.innerHTML = '';
         if (teams.length === 0) list.innerHTML = '<i>Nessuna squadra trovata.</i>';
+        
         teams.forEach(t => {
             const modeInfo = t.mode ? GAME_MODES[t.mode] : null;
             const badge = modeInfo ? `<span class="mode-badge ${modeInfo.colorClass}">${modeInfo.emoji} ${modeInfo.shortLabel}</span>` : '';
-            list.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid rgba(255,255,255,0.05);">
-                <div>
-                    <strong>${t.name}</strong> ${badge}<br>
-                    <small>${t.ownerEmail || 'Globale'} &mdash; ${t.classe || ''}</small>
-                </div>
-                <button class="btn btn-secondary text-danger" style="padding:4px 8px; font-size:0.75rem; width:auto; background:transparent;" onclick="eliminaSquadra('${t.id}')"><i class="fa-solid fa-trash"></i></button>
-            </div>`;
+            const collaboratori = (t.collaboratori || []);
+            const collBadge = collaboratori.length > 0
+                ? `<span style="font-size:0.7rem; color:var(--accent-gold);"><i class="fa-solid fa-users-gear"></i> ${collaboratori.length} collaboratore/i</span>`
+                : '';
+
+            // Studenti iscritti a questa squadra
+            const studentiDiQuesta = allStudents.filter(s => s.teamId === t.id);
+            let studentiHtml = '';
+            if (studentiDiQuesta.length === 0) {
+                studentiHtml = '<i style="font-size:0.8rem; color:var(--text-muted);">Nessuno studente iscritto</i>';
+            } else {
+                studentiHtml = studentiDiQuesta.map(s => `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.04);">
+                        <span style="font-size:0.82rem;">${s.email}</span>
+                        <button class="btn btn-secondary" style="padding:3px 8px; font-size:0.72rem; width:auto; border-radius:12px;"
+                            onclick="apriSpostaStudente('${s.email}', '${t.id}', '${t.name}')">
+                            <i class="fa-solid fa-right-left"></i> Sposta
+                        </button>
+                    </div>`).join('');
+            }
+
+            list.innerHTML += `
+                <div class="glass" style="padding:12px; margin-bottom:8px; border-radius:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                        <div>
+                            <strong>${t.name}</strong> ${badge}<br>
+                            <small style="color:var(--text-muted);">${t.ownerEmail || 'N/D'} &mdash; ${t.classe || ''}</small><br>
+                            ${collBadge}
+                        </div>
+                        <div style="display:flex; gap:6px; flex-shrink:0;">
+                            <button class="btn btn-secondary" title="Gestisci Collaboratori" style="padding:4px 8px; font-size:0.75rem; width:auto; background:rgba(141,160,63,0.15); border-color:var(--primary-color);"
+                                onclick="apriCollaboratori('${t.id}', '${t.name}', ${JSON.stringify(collaboratori).replace(/"/g, '&quot;')})">
+                                <i class="fa-solid fa-user-plus"></i>
+                            </button>
+                            <button class="btn btn-secondary text-danger" style="padding:4px 8px; font-size:0.75rem; width:auto; background:transparent;" onclick="eliminaSquadra('${t.id}')">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <details style="margin-top:4px;">
+                        <summary style="font-size:0.8rem; cursor:pointer; color:var(--text-muted); user-select:none;">
+                            <i class="fa-solid fa-users"></i> Studenti (${studentiDiQuesta.length})
+                        </summary>
+                        <div style="margin-top:8px; padding-left:4px;">
+                            ${studentiHtml}
+                        </div>
+                    </details>
+                </div>`;
         });
     };
 
@@ -901,6 +947,108 @@ async function setupAdminPanel() {
         } catch (e) {
             console.error(e);
             alert("Errore durante l'eliminazione della squadra.");
+        }
+    };
+
+    // ── SPOSTAMENTO STUDENTI ────────────────────────────────────
+    window.apriSpostaStudente = async function(studentEmail, currentTeamId, currentTeamName) {
+        const modal = document.getElementById('modal-sposta-studente');
+        if (!modal) return;
+
+        document.getElementById('sposta-studente-email').value = studentEmail;
+        document.getElementById('sposta-studente-nome').textContent =
+            `Studente: ${studentEmail} — attualmente in: ${currentTeamName}`;
+
+        // Popola select con tutte le altre squadre
+        const allTeams = await getAllTeams();
+        const select = document.getElementById('sposta-studente-select');
+        select.innerHTML = allTeams
+            .filter(t => t.id !== currentTeamId)
+            .map(t => `<option value="${t.id}" data-code="${t.joinCode || ''}">${t.name} (${t.classe || ''})</option>`)
+            .join('');
+
+        modal.style.display = 'flex';
+    };
+
+    window.confermaSposta = async function() {
+        const email = document.getElementById('sposta-studente-email').value;
+        const select = document.getElementById('sposta-studente-select');
+        const newTeamId = select.value;
+        const newTeamCode = select.selectedOptions[0]?.dataset.code || '';
+        if (!newTeamId) { alert('Seleziona una squadra di destinazione.'); return; }
+
+        try {
+            await fanta_db.moveStudent(email, newTeamId, newTeamCode);
+            document.getElementById('modal-sposta-studente').style.display = 'none';
+            alert('Studente spostato con successo!');
+            window.renderAdminSquadre();
+        } catch (e) {
+            console.error(e);
+            alert('Errore durante lo spostamento: ' + e.message);
+        }
+    };
+
+    // ── COLLABORATORI DOCENTI ───────────────────────────────────
+    window.apriCollaboratori = function(teamId, teamName, collaboratori) {
+        const modal = document.getElementById('modal-collaboratori');
+        if (!modal) return;
+        document.getElementById('collaboratori-team-id').value = teamId;
+        document.getElementById('collaboratori-team-nome').textContent = `Squadra: ${teamName}`;
+        document.getElementById('collaboratori-new-email').value = '';
+        window._renderCollaboratoriLista(teamId, collaboratori);
+        modal.style.display = 'flex';
+    };
+
+    window._renderCollaboratoriLista = function(teamId, collaboratori) {
+        const lista = document.getElementById('collaboratori-lista');
+        if (!lista) return;
+        if (!collaboratori || collaboratori.length === 0) {
+            lista.innerHTML = '<i style="font-size:0.85rem; color:var(--text-muted);">Nessun collaboratore aggiunto.</i>';
+            return;
+        }
+        lista.innerHTML = collaboratori.map(email => `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
+                <span style="font-size:0.85rem;">${email}</span>
+                <button class="btn btn-secondary text-danger" style="padding:3px 8px; font-size:0.72rem; width:auto;"
+                    onclick="rimuoviCollaboratore('${teamId}', '${email}')">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>`).join('');
+    };
+
+    window.aggiungiCollaboratore = async function() {
+        const teamId = document.getElementById('collaboratori-team-id').value;
+        const email = document.getElementById('collaboratori-new-email').value.trim().toLowerCase();
+        if (!email) { alert('Inserisci un\'email valida.'); return; }
+
+        try {
+            // Verifica che l'email sia un docente approvato
+            const userDoc = await window.db.collection('users').doc(email).get();
+            if (!userDoc.exists || (userDoc.data().role !== 'teacher' && userDoc.data().role !== 'docente')) {
+                alert('Email non trovata o non corrisponde a un docente approvato.');
+                return;
+            }
+            await fanta_db.addCollaboratore(teamId, email);
+            document.getElementById('collaboratori-new-email').value = '';
+            alert('Collaboratore aggiunto!');
+            // Aggiorna la lista
+            const teamDoc = await window.db.collection('teams').doc(teamId).get();
+            window._renderCollaboratoriLista(teamId, teamDoc.data()?.collaboratori || []);
+        } catch (e) {
+            console.error(e);
+            alert('Errore: ' + e.message);
+        }
+    };
+
+    window.rimuoviCollaboratore = async function(teamId, email) {
+        if (!confirm(`Rimuovere ${email} dai collaboratori?`)) return;
+        try {
+            await fanta_db.removeCollaboratore(teamId, email);
+            const teamDoc = await window.db.collection('teams').doc(teamId).get();
+            window._renderCollaboratoriLista(teamId, teamDoc.data()?.collaboratori || []);
+        } catch (e) {
+            console.error(e);
+            alert('Errore: ' + e.message);
         }
     };
 
@@ -1930,8 +2078,21 @@ async function renderProfilo() {
     const allTeams = await getAllTeams();
     const myTeams = allTeams.filter(t => t.ownerEmail === currentUserEmail);
     
+    // Carica anche i team dove il docente è collaboratore
+    let collabTeams = [];
+    try {
+        collabTeams = await fanta_db.getCollaboratedTeams(currentUserEmail);
+    } catch(e) { /* Query non disponibile se non ci sono indici, ignora silenziosamente */ }
+
     const squadreList = document.getElementById('profilo-squadre-list');
     if(!squadreList) return;
+
+    // Carica tutti gli studenti una volta sola
+    let allStudentsMap = {};
+    try {
+        const snap = await window.db.collection("users").where("role", "==", "studente").get();
+        snap.docs.forEach(d => { allStudentsMap[d.data().teamId] = allStudentsMap[d.data().teamId] || []; allStudentsMap[d.data().teamId].push(d.data()); });
+    } catch(e) { /* ignora */ }
 
     // Calcoliamo i punteggi globali per determinare le posizioni
     let calculatedLeaderboard = allTeams.map(t => {
@@ -1951,80 +2112,129 @@ async function renderProfilo() {
     });
     calculatedLeaderboard.sort((a, b) => b.points - a.points);
 
-    squadreList.innerHTML = ''; // Reset prima di popolare
-    if(myTeams.length === 0) {
+    // Helper: renderizza una singola card squadra
+    function renderTeamCard(team, isCollaborated) {
+        const teamMode = team.mode || 'terze';
+        const modeCfg = GAME_MODES[teamMode] || GAME_MODES.terze;
+        const currentPool = modeCfg.authors || AUTHORS;
+
+        let rank = calculatedLeaderboard.findIndex(s => s.id === team.id) + 1;
+        let authPts = 0;
+        team.authors.forEach(aid => {
+            const a = currentPool.find(x => x.id === aid);
+            if(a && a.isPointsRevealed) authPts += (a.points || 0);
+        });
+        let misPts = (team.missionsCompleted || 0) * 5;
+        const modeBadgeHtml = `<span class="mode-badge ${modeCfg.colorClass}">${modeCfg.emoji} ${modeCfg.shortLabel}</span>`;
+        const collabBadge = isCollaborated
+            ? `<span style="font-size:0.72rem; background:rgba(141,160,63,0.2); color:var(--primary-color); border-radius:8px; padding:2px 8px; margin-left:4px;"><i class="fa-solid fa-users-gear"></i> Collaboratore</span>`
+            : '';
+
+        // Studenti iscritti a questa squadra
+        const studentiArr = allStudentsMap[team.id] || [];
+        let studentiSection = '';
+        if (studentiArr.length > 0) {
+            const studentiRows = studentiArr.map(s => `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.04);">
+                    <span style="font-size:0.82rem;">${s.email}</span>
+                    <button class="btn btn-secondary" style="padding:3px 8px; font-size:0.72rem; width:auto; border-radius:12px;"
+                        onclick="profiloSpostaStudente('${s.email}', '${team.id}', '${team.name}')">
+                        <i class="fa-solid fa-right-left"></i> Sposta
+                    </button>
+                </div>`).join('');
+            studentiSection = `
+                <details style="margin-top:8px; margin-bottom:4px;">
+                    <summary style="font-size:0.8rem; cursor:pointer; color:var(--text-muted); user-select:none; margin-bottom:6px;">
+                        <i class="fa-solid fa-users"></i> Studenti iscritti (${studentiArr.length})
+                    </summary>
+                    <div style="padding-left:4px;">${studentiRows}</div>
+                </details>`;
+        }
+
+        // Sezione codice (solo per squadre proprie)
+        const codiceSection = !isCollaborated ? `
+            <div style="width:100%; margin-bottom:15px; padding:10px; border-radius:12px; background:rgba(141, 160, 63, 0.05); border:1px dashed var(--primary-color); display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <span style="font-size:0.7rem; text-transform:uppercase; color:var(--text-muted); display:block;">Codice Studenti</span>
+                    <span class="join-code-badge" style="margin:0;">${team.joinCode || '---'}</span>
+                </div>
+                <button class="btn" style="width:auto; padding:6px 12px; font-size:0.75rem; border-radius:20px;" onclick="shareInvite({type:'student', code:'${team.joinCode}', teamName:'${team.name}'})">
+                    <i class="fa-solid fa-share-nodes"></i> Condividi
+                </button>
+            </div>` : '';
+
+        return `
+            <div class="card" style="margin-bottom:20px; flex-direction:column; align-items:flex-start;">
+                <div style="display:flex; justify-content:space-between; align-items:center; width:100%; border-bottom:1px solid rgba(75, 93, 22, 0.2); padding-bottom:8px; margin-bottom:10px;">
+                    <div style="font-family: var(--font-heading); font-weight:bold; color:var(--accent-gold); font-size:1.4rem;">${team.name}${collabBadge}</div>
+                    ${modeBadgeHtml}
+                </div>
+                <div style="font-size:0.9rem; color:var(--text-muted); margin-bottom:12px;"><i class="fa-solid fa-users"></i> Classe: ${team.classe || 'N/A'}</div>
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; width:100%; margin-bottom:15px; font-size:0.85rem; padding: 0 5px;">
+                    <div style="background:rgba(255,255,255,0.03); padding:8px; border-radius:8px;">
+                        <span style="color:var(--text-muted); display:block; font-size:0.7rem; text-transform:uppercase;">Punti Autori</span>
+                        <span style="font-weight:bold; color:var(--primary-color); font-size:1.1rem;">${authPts} pt</span>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.03); padding:8px; border-radius:8px;">
+                        <span style="color:var(--text-muted); display:block; font-size:0.7rem; text-transform:uppercase;">Punti Missioni</span>
+                        <span style="font-weight:bold; color:var(--primary-color); font-size:1.1rem;">${misPts} pt</span>
+                    </div>
+                </div>
+
+                ${studentiSection}
+                ${codiceSection}
+
+                <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(75, 93, 22, 0.05); padding:12px; border-radius:12px; width:100%; border:1px solid rgba(75, 93, 22, 0.1);">
+                    <div>
+                        <div style="font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); letter-spacing:1px;">Totale Globale</div>
+                        <div style="font-weight:bold; font-size:1.4rem; color:var(--primary-color);">${authPts + misPts} pt</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); letter-spacing:1px;">Posizione</div>
+                        <div style="font-weight:bold; font-size:1.4rem; color:var(--accent-gold);">#${rank}</div>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    squadreList.innerHTML = '';
+    if(myTeams.length === 0 && collabTeams.length === 0) {
         squadreList.innerHTML = '<div class="glass" style="padding:20px; text-align:center;"><i>Nessuna squadra creata. Premi il tasto sopra per iniziare!</i></div>';
     } else {
-        myTeams.forEach(team => {
-            const teamMode = team.mode || 'terze';
-            const modeCfg = GAME_MODES[teamMode] || GAME_MODES.terze;
-            const currentPool = modeCfg.authors || AUTHORS;
-
-            let authorsNames = team.authors.map(aid => {
-                let a = currentPool.find(x => x.id === aid);
-                return a ? a.name : aid;
-            }).join(', ');
-
-             // Troviamo posizione e punteggio per QUESTA squadra
-             let rank = calculatedLeaderboard.findIndex(s => s.id === team.id) + 1;
-             
-             let authPts = 0;
-             team.authors.forEach(aid => {
-                 const a = currentPool.find(x => x.id === aid);
-                 if(a && a.isPointsRevealed) authPts += (a.points || 0);
-             });
-             let misPts = (team.missionsCompleted || 0) * 5;
-
-             // Badge modalità
-             const modeBadgeHtml = `<span class="mode-badge ${modeCfg.colorClass}">${modeCfg.emoji} ${modeCfg.shortLabel}</span>`;
-
-             squadreList.innerHTML += `
-                <div class="card" style="margin-bottom:20px; flex-direction:column; align-items:flex-start;">
-                     <div style="display:flex; justify-content:space-between; align-items:center; width:100%; border-bottom:1px solid rgba(75, 93, 22, 0.2); padding-bottom:8px; margin-bottom:10px;">
-                         <div style="font-family: var(--font-heading); font-weight:bold; color:var(--accent-gold); font-size:1.4rem;">${team.name}</div>
-                         ${modeBadgeHtml}
-                     </div>
-                     <div style="font-size:0.9rem; color:var(--text-muted); margin-bottom:12px;"><i class="fa-solid fa-users"></i> Classe: ${team.classe || 'N/A'}</div>
-                     
-                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; width:100%; margin-bottom:15px; font-size:0.85rem; padding: 0 5px;">
-                        <div style="background:rgba(255,255,255,0.03); padding:8px; border-radius:8px;">
-                            <span style="color:var(--text-muted); display:block; font-size:0.7rem; text-transform:uppercase;">Punti Autori</span>
-                            <span style="font-weight:bold; color:var(--primary-color); font-size:1.1rem;">${authPts} pt</span>
-                        </div>
-                        <div style="background:rgba(255,255,255,0.03); padding:8px; border-radius:8px;">
-                            <span style="color:var(--text-muted); display:block; font-size:0.7rem; text-transform:uppercase;">Punti Missioni</span>
-                            <span style="font-weight:bold; color:var(--primary-color); font-size:1.1rem;">${misPts} pt</span>
-                        </div>
-                     </div>
-
-                     <div style="width:100%; margin-bottom:15px; padding:10px; border-radius:12px; background:rgba(141, 160, 63, 0.05); border:1px dashed var(--primary-color); display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <span style="font-size:0.7rem; text-transform:uppercase; color:var(--text-muted); display:block;">Codice Studenti</span>
-                            <span class="join-code-badge" style="margin:0;">${team.joinCode || '---'}</span>
-                        </div>
-                        <button class="btn" style="width:auto; padding:6px 12px; font-size:0.75rem; border-radius:20px;" onclick="shareInvite({type:'student', code:'${team.joinCode}', teamName:'${team.name}'})">
-                            <i class="fa-solid fa-share-nodes"></i> Condividi
-                        </button>
-                     </div>
-
-                     <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(75, 93, 22, 0.05); padding:12px; border-radius:12px; width:100%; border:1px solid rgba(75, 93, 22, 0.1);">
-                         <div>
-                             <div style="font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); letter-spacing:1px;">Totale Globale</div>
-                             <div style="font-weight:bold; font-size:1.4rem; color:var(--primary-color);">${authPts + misPts} pt</div>
-                         </div>
-                         <div style="text-align:right;">
-                             <div style="font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); letter-spacing:1px;">Posizione</div>
-                             <div style="font-weight:bold; font-size:1.4rem; color:var(--accent-gold);">#${rank}</div>
-                         </div>
-                     </div>
-                </div>
-             `;
-        });
+        myTeams.forEach(team => { squadreList.innerHTML += renderTeamCard(team, false); });
+        collabTeams.forEach(team => { squadreList.innerHTML += renderTeamCard(team, true); });
     }
 
     renderNotifiche();
     renderTornei();
 }
+
+// Sposta studente da pagina profilo docente (usa stessa modal dell'admin se disponibile)
+window.profiloSpostaStudente = async function(studentEmail, currentTeamId, currentTeamName) {
+    // Se siamo in admin.html usa la modal admin, altrimenti usa prompt
+    const modal = document.getElementById('modal-sposta-studente');
+    if (modal) {
+        window.apriSpostaStudente(studentEmail, currentTeamId, currentTeamName);
+        return;
+    }
+    // Fallback semplice per index.html (senza modal dedicata)
+    const allTeams = await getAllTeams();
+    const altre = allTeams.filter(t => t.id !== currentTeamId);
+    if (altre.length === 0) { alert('Nessun\'altra squadra disponibile.'); return; }
+    const opzioni = altre.map((t, i) => `${i + 1}. ${t.name} (${t.classe || ''})`).join('\n');
+    const scelta = prompt(`Sposta ${studentEmail} da "${currentTeamName}" a quale squadra?\n\n${opzioni}\n\nInserisci il numero:`);
+    const idx = parseInt(scelta) - 1;
+    if (isNaN(idx) || idx < 0 || idx >= altre.length) { alert('Scelta non valida.'); return; }
+    const dest = altre[idx];
+    try {
+        await fanta_db.moveStudent(studentEmail, dest.id, dest.joinCode || '');
+        alert(`Studente spostato in "${dest.name}"!`);
+        renderProfilo();
+    } catch (e) {
+        alert('Errore: ' + e.message);
+    }
+};
 
 async function renderNotifiche() {
     const list = document.getElementById('profilo-notifiche-list');

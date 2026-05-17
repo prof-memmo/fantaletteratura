@@ -295,6 +295,45 @@
         </div>
     </div>
 
+    <!-- Modal Spostamento Studente (Admin) -->
+    <div id="modal-sposta-studente" class="modal-wip" style="z-index:3500;" onclick="if(event.target===this)document.getElementById('modal-sposta-studente').style.display='none'">
+        <div class="modal-wip-content" style="max-width:420px;">
+            <div style="font-family:var(--font-heading); font-size:1.3rem; color:var(--primary-color); margin-bottom:5px;">
+                <i class="fa-solid fa-right-left"></i> Sposta Partecipante
+            </div>
+            <p id="sposta-studente-nome" style="font-size:0.9rem; color:var(--text-muted); margin-bottom:15px;"></p>
+            <div class="input-group">
+                <label style="font-size:0.8rem; color:var(--text-muted);">Squadra di destinazione</label>
+                <select id="sposta-studente-select" class="input-control"></select>
+            </div>
+            <input type="hidden" id="sposta-studente-email">
+            <div style="display:flex; gap:10px; margin-top:15px;">
+                <button class="btn" style="flex:1;" onclick="confermaSposta()"><i class="fa-solid fa-check"></i> Conferma</button>
+                <button class="btn btn-secondary" style="flex:1;" onclick="document.getElementById('modal-sposta-studente').style.display='none'">Annulla</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Collaboratori Docente (Admin) -->
+    <div id="modal-collaboratori" class="modal-wip" style="z-index:3500;" onclick="if(event.target===this)document.getElementById('modal-collaboratori').style.display='none'">
+        <div class="modal-wip-content" style="max-width:420px;">
+            <div style="font-family:var(--font-heading); font-size:1.3rem; color:var(--primary-color); margin-bottom:5px;">
+                <i class="fa-solid fa-user-plus"></i> Docenti Collaboratori
+            </div>
+            <p id="collaboratori-team-nome" style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;"></p>
+            <div id="collaboratori-lista" style="margin-bottom:15px; min-height:40px;"></div>
+            <div class="input-group" style="margin-bottom:10px;">
+                <label style="font-size:0.8rem;">Aggiungi collaboratore (email docente approvato)</label>
+                <input type="email" id="collaboratori-new-email" class="input-control" placeholder="email@scuola.it">
+            </div>
+            <input type="hidden" id="collaboratori-team-id">
+            <div style="display:flex; gap:10px;">
+                <button class="btn" style="flex:1;" onclick="aggiungiCollaboratore()"><i class="fa-solid fa-plus"></i> Aggiungi</button>
+                <button class="btn btn-secondary" style="flex:1;" onclick="document.getElementById('modal-collaboratori').style.display='none'">Chiudi</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase SDK (Compat Version) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>

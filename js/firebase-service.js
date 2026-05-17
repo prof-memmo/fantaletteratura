@@ -131,5 +131,40 @@ window.fanta_db = {
     },
     deleteInvite: async (inviteId) => {
         await window.db.collection("invites").doc(inviteId).delete();
+    },
+
+    // --- COLLABORATORI DOCENTI ---
+    addCollaboratore: async (teamId, email) => {
+        await window.db.collection("teams").doc(teamId).update({
+            collaboratori: firebase.firestore.FieldValue.arrayUnion(email.toLowerCase())
+        });
+    },
+    removeCollaboratore: async (teamId, email) => {
+        await window.db.collection("teams").doc(teamId).update({
+            collaboratori: firebase.firestore.FieldValue.arrayRemove(email.toLowerCase())
+        });
+    },
+    getCollaboratedTeams: async (email) => {
+        const snapshot = await window.db.collection("teams")
+            .where("collaboratori", "array-contains", email.toLowerCase()).get();
+        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    },
+
+    // --- STUDENTI IN SQUADRA ---
+    getStudentsInTeam: async (teamId) => {
+        const snapshot = await window.db.collection("users")
+            .where("teamId", "==", teamId)
+            .where("role", "==", "studente").get();
+        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    },
+    moveStudent: async (studentEmail, newTeamId, newTeamCode) => {
+        await window.db.collection("users").doc(studentEmail.toLowerCase()).update({
+            teamId: newTeamId,
+            teamCode: newTeamCode,
+            movedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+    },
+    updateTeam: async (teamId, data) => {
+        await window.db.collection("teams").doc(teamId).update(data);
     }
 };
