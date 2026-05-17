@@ -63,6 +63,7 @@ function processState(state, mode) {
         
         if (typeof populateSchede === 'function') populateSchede(mode);
         if (typeof renderAdminAutori === 'function') renderAdminAutori(mode);
+        if (typeof renderNotifiche === 'function') renderNotifiche();
     }
 }
 
@@ -1413,30 +1414,34 @@ function populateSchede(modeId = null) {
     const revealedAuthors = pool.filter(a => a.isSchedaRevealed);
 
     if(revealedAuthors.length === 0) {
-        grid.innerHTML = '<p class="text-muted" style="grid-column: 1/-1;">In attesa della prima scheda... i professori le pubblicheranno a breve!</p>';
+        grid.innerHTML = '<p class="text-muted" style="grid-column: 1/-1; text-align: center; padding: 20px 0;">In attesa della prima scheda... i professori le pubblicheranno a breve!</p>';
         return;
     }
 
     revealedAuthors.forEach(author => {
         let content = '';
-        let titleStyle = '';
         let onclickAttr = '';
 
         if (author.schedaHTML) {
-            titleStyle = 'cursor:pointer; color:var(--primary-color); display:inline-block; border-bottom:1px solid currentColor; margin-bottom:5px;';
             onclickAttr = `onclick="openAuthorSchedaModal('${author.id}', '${modeKey}')"`;
-            content = `<div class="puntata-author"><button class="btn" style="padding: 4px 10px; font-size: 0.8rem; width: auto;" ${onclickAttr}><i class="fa-solid fa-eye"></i> Apri Scheda</button></div>`;
+            content = `<button class="btn btn-secondary" style="padding: 5px 12px; font-size: 0.72rem; width: 100%; border-radius: 12px; margin: 0; pointer-events: none;"><i class="fa-solid fa-eye"></i> Apri Scheda</button>`;
         } else {
-            content = `<div class="puntata-author"><a href="schede/${author.id}.pdf" target="_blank" style="color:var(--primary-color); text-decoration:none;"><i class="fa-solid fa-file-pdf"></i> Vedi PDF</a></div>`;
+            onclickAttr = `onclick="window.open('schede/${author.id}.pdf', '_blank')"`;
+            content = `<button class="btn" style="padding: 5px 12px; font-size: 0.72rem; width: 100%; border-radius: 12px; margin: 0; background: var(--primary-color); color: var(--bg-dark); font-weight: bold; pointer-events: none;"><i class="fa-solid fa-file-pdf"></i> Vedi PDF</button>`;
         }
         
         const isInternationalClass = author.isInternational ? 'card-international' : '';
 
         const card = `
-            <div class="puntata-card ${isInternationalClass}" style="align-items:flex-start; overflow:hidden;">
-                <img src="${author.image}" alt="${author.name}" class="puntata-img" style="background:#fff; margin-top:5px; flex-shrink:0; ${author.schedaHTML ? 'cursor:pointer;' : ''}" ${onclickAttr}>
-                <div class="puntata-info" style="width:100%;">
-                    <div class="puntata-title" style="${titleStyle}" ${onclickAttr}>${author.name}</div>
+            <div class="author-card glass ${isInternationalClass}" style="cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:space-between; padding: 12px !important; min-height: 200px; text-align: center;" ${onclickAttr}>
+                <div class="author-image-wrapper" style="margin-bottom: 8px; width: 80px; height: 80px; aspect-ratio: 1; border-radius: 50%; overflow: hidden; border: 2px solid var(--primary-color); background: #fff; flex-shrink: 0;">
+                    <img src="${author.image}" alt="${author.name}" style="width:100%; height:100%; object-fit:cover;">
+                </div>
+                <div style="flex-grow:1; display:flex; flex-direction:column; justify-content:center; width:100%; margin-bottom: 8px;">
+                    <div style="font-family: var(--font-heading); font-weight:bold; font-size:0.95rem; color:#f5c53c; line-height:1.2; text-shadow:0 1px 3px rgba(0,0,0,0.3);">${author.name}</div>
+                    <div style="font-size:0.65rem; color:var(--text-muted); text-transform:uppercase; font-weight:600; margin-top:2px;">${author.isInternational ? 'Internazionale' : 'Classico'}</div>
+                </div>
+                <div style="width:100%;">
                     ${content}
                 </div>
             </div>
@@ -1444,6 +1449,30 @@ function populateSchede(modeId = null) {
         // Put the newest ones at the top/bottom depending on preference, we'll append.
         grid.insertAdjacentHTML('afterbegin', card); 
     });
+
+    // Segna tutte le schede caricate in questa modalità come viste quando l'utente le visita
+    const seenSchedeStr = localStorage.getItem('fanta_seen_schede') || '[]';
+    let seenSchede = [];
+    try {
+        seenSchede = JSON.parse(seenSchedeStr);
+    } catch(e) {
+        seenSchede = [];
+    }
+    
+    let updated = false;
+    revealedAuthors.forEach(a => {
+        if (!seenSchede.includes(a.id)) {
+            seenSchede.push(a.id);
+            updated = true;
+        }
+    });
+    
+    if (updated) {
+        localStorage.setItem('fanta_seen_schede', JSON.stringify(seenSchede));
+        setTimeout(() => {
+            if (typeof renderNotifiche === 'function') renderNotifiche();
+        }, 100);
+    }
 }
 
 /* =========================================
@@ -2326,10 +2355,46 @@ async function renderNotifiche() {
         const myPending = await fanta_db.getInvites(currentUserEmail);
         const pendingInvites = myPending.filter(i => i.status === 'pending');
         
+        // Rileva le nuove schede autore non lette
+        const unseenSchede = [];
+        const seenSchedeStr = localStorage.getItem('fanta_seen_schede') || '[]';
+        let seenSchede = [];
+        try {
+            seenSchede = JSON.parse(seenSchedeStr);
+        } catch(e) {
+            seenSchede = [];
+        }
+        
+        // Raccogli tutte le schede revealed in tutte le modalità attive
+        if (typeof GAME_MODES !== 'undefined') {
+            Object.keys(GAME_MODES).forEach(modeKey => {
+                const modeCfg = GAME_MODES[modeKey];
+                if (modeCfg && modeCfg.authors) {
+                    modeCfg.authors.forEach(author => {
+                        if (author.isSchedaRevealed && !seenSchede.includes(author.id)) {
+                            // Evita duplicati se lo stesso autore è in più modalità
+                            if (!unseenSchede.find(x => x.id === author.id)) {
+                                unseenSchede.push({
+                                    id: author.id,
+                                    name: author.name,
+                                    modeLabel: modeCfg.label,
+                                    modeKey: modeKey,
+                                    image: author.image,
+                                    schedaHTML: !!author.schedaHTML
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        }
+        
+        const totalNotifications = pendingInvites.length + unseenSchede.length;
+        
         // Aggiorna Badge Campanella
         if(badge) {
-            if(pendingInvites.length > 0) {
-                badge.textContent = pendingInvites.length;
+            if(totalNotifications > 0) {
+                badge.textContent = totalNotifications;
                 badge.style.display = 'flex';
             } else {
                 badge.style.display = 'none';
@@ -2338,23 +2403,50 @@ async function renderNotifiche() {
         
         if(list) {
             list.innerHTML = '';
-            if(pendingInvites.length === 0) {
+            if(totalNotifications === 0) {
                 list.innerHTML = '<i style="display:block; text-align:center; padding:15px 0;">Nessuna nuova notifica.</i>';
                 return;
             }
             
-            const tourneys = await fanta_db.getTournaments();
+            // 1. Mostra gli inviti ai tornei
+            if (pendingInvites.length > 0) {
+                const tourneys = await fanta_db.getTournaments();
+                pendingInvites.forEach(inv => {
+                    let t = tourneys.find(x => x.id === inv.tournamentId);
+                    let tName = t ? t.name : "Torneo Sconosciuto";
+                    
+                    list.innerHTML += `
+                        <div style="background:rgba(255,193,7,0.1); padding:12px; border-radius:8px; border-left:3px solid #ffc107; font-size:0.85rem; margin-bottom:10px;">
+                            <p style="margin:0 0 10px 0;"><b>${inv.fromEmail}</b> ti ha invitato al torneo <b>${tName}</b>.</p>
+                            <div style="display:flex; gap:10px;">
+                                <button class="btn" style="padding:5px 12px; font-size:0.75rem; width:auto; background:var(--primary-color);" onclick="document.getElementById('notifiche-modal').style.display='none'; openJoinTorneoModal('${inv.tournamentId}', '${inv.id}')">Accetta e Iscrivi Squadre</button>
+                                <button class="btn btn-secondary" style="padding:5px 12px; font-size:0.75rem; width:auto;" onclick="rifiutaInvito('${inv.id}')">Rifiuta</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
             
-            pendingInvites.forEach(inv => {
-                let t = tourneys.find(x => x.id === inv.tournamentId);
-                let tName = t ? t.name : "Torneo Sconosciuto";
+            // 2. Mostra le nuove schede autore pubblicate
+            unseenSchede.forEach(item => {
+                let actionAttr = '';
+                let actionBtn = '';
+                if (item.schedaHTML) {
+                    actionAttr = `onclick="document.getElementById('notifiche-modal').style.display='none'; segnaSchedaComeVisto('${item.id}'); openAuthorSchedaModal('${item.id}', '${item.modeKey}')"`;
+                    actionBtn = `<button class="btn" style="padding:5px 12px; font-size:0.75rem; width:auto; background:var(--primary-color);">Apri Scheda</button>`;
+                } else {
+                    actionAttr = `onclick="document.getElementById('notifiche-modal').style.display='none'; segnaSchedaComeVisto('${item.id}'); window.open('schede/${item.id}.pdf', '_blank')"`;
+                    actionBtn = `<button class="btn" style="padding:5px 12px; font-size:0.75rem; width:auto; background:var(--primary-color);"><i class="fa-solid fa-file-pdf"></i> Apri PDF</button>`;
+                }
                 
                 list.innerHTML += `
-                    <div style="background:rgba(255,193,7,0.1); padding:12px; border-radius:8px; border-left:3px solid #ffc107; font-size:0.85rem; margin-bottom:10px;">
-                        <p style="margin:0 0 10px 0;"><b>${inv.fromEmail}</b> ti ha invitato al torneo <b>${tName}</b>.</p>
-                        <div style="display:flex; gap:10px;">
-                            <button class="btn" style="padding:5px 12px; font-size:0.75rem; width:auto; background:var(--primary-color);" onclick="document.getElementById('notifiche-modal').style.display='none'; openJoinTorneoModal('${inv.tournamentId}', '${inv.id}')">Accetta e Iscrivi Squadre</button>
-                            <button class="btn btn-secondary" style="padding:5px 12px; font-size:0.75rem; width:auto;" onclick="rifiutaInvito('${inv.id}')">Rifiuta</button>
+                    <div style="background:rgba(141, 160, 63, 0.1); padding:12px; border-radius:8px; border-left:3px solid var(--primary-color); font-size:0.85rem; margin-bottom:10px;">
+                        <p style="margin:0 0 10px 0;">🔔 <b>Nuova Scheda!</b> È stata pubblicata la scheda di <b>${item.name}</b> in <i>${item.modeLabel}</i>.</p>
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <div ${actionAttr} style="display:inline-block;">
+                                ${actionBtn}
+                            </div>
+                            <button class="btn btn-secondary" style="padding:5px 12px; font-size:0.75rem; width:auto;" onclick="segnaSchedaComeVisto('${item.id}')"><i class="fa-solid fa-check"></i> Letta</button>
                         </div>
                     </div>
                 `;
@@ -2365,6 +2457,22 @@ async function renderNotifiche() {
         if(list) list.innerHTML = '<i>Errore nel caricamento delle notifiche.</i>';
     }
 }
+
+window.segnaSchedaComeVisto = function(authorId) {
+    const seenSchedeStr = localStorage.getItem('fanta_seen_schede') || '[]';
+    let seenSchede = [];
+    try {
+        seenSchede = JSON.parse(seenSchedeStr);
+    } catch(e) {
+        seenSchede = [];
+    }
+    if(!seenSchede.includes(authorId)) {
+        seenSchede.push(authorId);
+        localStorage.setItem('fanta_seen_schede', JSON.stringify(seenSchede));
+    }
+    renderNotifiche();
+    if(typeof populateSchede === 'function') populateSchede();
+};
 
 window.apriNotificheModal = function() {
     const modal = document.getElementById('notifiche-modal');
