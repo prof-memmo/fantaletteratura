@@ -921,7 +921,17 @@ async function setupAdminPanel() {
             let autoriSection = '';
             if (t.authors && t.authors.length > 0) {
                 const autoriRows = t.authors.map(aid => {
-                    const author = pool.find(x => x.id === aid);
+                    let author = pool.find(x => x.id === aid);
+                    if (!author) {
+                        Object.values(GAME_MODES).forEach(modeCfg => {
+                            if (!author && modeCfg.authors) {
+                                author = modeCfg.authors.find(x => x.id === aid);
+                            }
+                        });
+                    }
+                    if (!author) {
+                        author = AUTHORS.find(x => x.id === aid);
+                    }
                     if (!author) return '';
                     
                     const ptsLabel = author.isPointsRevealed 
@@ -1276,7 +1286,17 @@ window.renderAdminProfilo = async function() {
             const pool = modeCfg.authors || AUTHORS;
             
             t.authors.forEach(aid => {
-                const a = pool.find(x => x.id === aid);
+                let a = pool.find(x => x.id === aid);
+                if (!a) {
+                    Object.values(GAME_MODES).forEach(modeCfg => {
+                        if (!a && modeCfg.authors) {
+                            a = modeCfg.authors.find(x => x.id === aid);
+                        }
+                    });
+                }
+                if (!a) {
+                    a = AUTHORS.find(x => x.id === aid);
+                }
                 if(a && a.isPointsRevealed) authPts += (a.points || 0);
             });
             let misPts = (t.missionsCompleted || 0) * 5;
@@ -1285,7 +1305,17 @@ window.renderAdminProfilo = async function() {
             let autoriSection = '';
             if (t.authors && t.authors.length > 0) {
                 const autoriRows = t.authors.map(aid => {
-                    const author = pool.find(x => x.id === aid);
+                    let author = pool.find(x => x.id === aid);
+                    if (!author) {
+                        Object.values(GAME_MODES).forEach(modeCfg => {
+                            if (!author && modeCfg.authors) {
+                                author = modeCfg.authors.find(x => x.id === aid);
+                            }
+                        });
+                    }
+                    if (!author) {
+                        author = AUTHORS.find(x => x.id === aid);
+                    }
                     if (!author) return '';
                     
                     const ptsLabel = author.isPointsRevealed 
@@ -2256,7 +2286,17 @@ async function renderProfilo() {
         const pool = modeCfg.authors || AUTHORS;
 
         t.authors.forEach(aid => {
-            const author = pool.find(a => a.id === aid);
+            let author = pool.find(a => a.id === aid);
+            if (!author) {
+                Object.values(GAME_MODES).forEach(modeCfg => {
+                    if (!author && modeCfg.authors) {
+                        author = modeCfg.authors.find(x => x.id === aid);
+                    }
+                });
+            }
+            if (!author) {
+                author = AUTHORS.find(x => x.id === aid);
+            }
             if(author && author.isPointsRevealed) authPoints += (author.points || 0);
         });
         return {
@@ -2275,7 +2315,17 @@ async function renderProfilo() {
         let rank = calculatedLeaderboard.findIndex(s => s.id === team.id) + 1;
         let authPts = 0;
         team.authors.forEach(aid => {
-            const a = currentPool.find(x => x.id === aid);
+            let a = currentPool.find(x => x.id === aid);
+            if (!a) {
+                Object.values(GAME_MODES).forEach(modeCfg => {
+                    if (!a && modeCfg.authors) {
+                        a = modeCfg.authors.find(x => x.id === aid);
+                    }
+                });
+            }
+            if (!a) {
+                a = AUTHORS.find(x => x.id === aid);
+            }
             if(a && a.isPointsRevealed) authPts += (a.points || 0);
         });
         let misPts = (team.missionsCompleted || 0) * 5;
@@ -2288,7 +2338,17 @@ async function renderProfilo() {
         let autoriSection = '';
         if (team.authors && team.authors.length > 0) {
             const autoriRows = team.authors.map(aid => {
-                const author = currentPool.find(x => x.id === aid);
+                let author = currentPool.find(x => x.id === aid);
+                if (!author) {
+                    Object.values(GAME_MODES).forEach(modeCfg => {
+                        if (!author && modeCfg.authors) {
+                            author = modeCfg.authors.find(x => x.id === aid);
+                        }
+                    });
+                }
+                if (!author) {
+                    author = AUTHORS.find(x => x.id === aid);
+                }
                 if (!author) return '';
                 
                 const ptsLabel = author.isPointsRevealed 
@@ -2606,6 +2666,13 @@ window.segnaSchedaComeVisto = function(authorId) {
         seenSchede.push(authorId);
         localStorage.setItem('fanta_seen_schede', JSON.stringify(seenSchede));
     }
+    renderNotifiche();
+    if(typeof populateSchede === 'function') populateSchede();
+};
+
+window.resetNotificheLette = function() {
+    localStorage.removeItem('fanta_seen_schede');
+    alert("Notifiche resettate con successo! Ora le schede pubblicate verranno mostrate di nuovo come non lette.");
     renderNotifiche();
     if(typeof populateSchede === 'function') populateSchede();
 };
