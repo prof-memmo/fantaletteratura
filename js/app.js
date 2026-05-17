@@ -2169,7 +2169,7 @@ async function renderProfilo() {
             </div>` : '';
 
         return `
-            <div class="card" style="margin-bottom:15px; padding:12px; flex-direction:column; align-items:flex-start; gap:8px; width:100%;">
+            <div class="card" style="margin:0; padding:12px; flex-direction:column; align-items:flex-start; gap:8px; width:100%;">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start; width:100%; gap:10px;">
                     <div>
                         <div style="font-family: var(--font-heading); font-weight:bold; color:#f5c53c; font-size:1.35rem; line-height:1.2; text-shadow: 0 1px 4px rgba(0,0,0,0.4);">${team.name}${collabBadge}</div>
@@ -2204,7 +2204,7 @@ async function renderProfilo() {
 
     squadreList.innerHTML = '';
     if(myTeams.length === 0 && collabTeams.length === 0) {
-        squadreList.innerHTML = '<div class="glass" style="padding:20px; text-align:center;"><i>Nessuna squadra creata. Premi il tasto sopra per iniziare!</i></div>';
+        squadreList.innerHTML = '<div class="glass" style="padding:20px; text-align:center; grid-column: 1 / -1; width: 100%;"><i>Nessuna squadra creata. Premi il tasto sopra per iniziare!</i></div>';
     } else {
         myTeams.forEach(team => { squadreList.innerHTML += renderTeamCard(team, false); });
         collabTeams.forEach(team => { squadreList.innerHTML += renderTeamCard(team, true); });
