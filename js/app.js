@@ -1412,7 +1412,8 @@ window.approvaMissione = async function(mid, tid) {
         const team = allTeams.find(t => t.id === tid);
         if(team) {
             const newCount = parseInt(team.missionsCompleted || 0, 10) + 1;
-            await window.db.collection("teams").doc(tid).update({ missionsCompleted: newCount });
+            const ref = await window.fanta_db.getTeamDocRef(tid);
+            await ref.update({ missionsCompleted: newCount });
         }
         await fanta_db.approveMission(mid);
         if(typeof window.renderAdminMissioni === 'function') await window.renderAdminMissioni();
@@ -1460,9 +1461,10 @@ window.approvaTutteMissioni = async function() {
         const promises = [];
         
         // 1. Aggiorna i conteggi dei team esistenti
-        Object.keys(teamUpdates).forEach(tid => {
-            promises.push(window.db.collection("teams").doc(tid).update({ missionsCompleted: teamUpdates[tid] }));
-        });
+        for (const tid of Object.keys(teamUpdates)) {
+            const ref = await window.fanta_db.getTeamDocRef(tid);
+            promises.push(ref.update({ missionsCompleted: teamUpdates[tid] }));
+        }
         
         // 2. Approva tutte le missioni
         pending.forEach(m => {
@@ -1695,7 +1697,8 @@ window.selfHealMissionsCount = async function() {
             
             if (actualCount !== expectedCount) {
                 console.log(`Self-Healing: Correzione missionsCompleted per il team ${team.name} (ID: ${team.id}) da ${expectedCount} a ${actualCount}`);
-                await window.db.collection("teams").doc(team.id).update({ missionsCompleted: actualCount });
+                const ref = await window.fanta_db.getTeamDocRef(team.id);
+                await ref.update({ missionsCompleted: actualCount });
                 hasChanges = true;
             }
         }

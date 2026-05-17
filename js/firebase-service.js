@@ -13,6 +13,27 @@ window.fanta_db = {
     onAuthStateChanged: (cb) => window.auth.onAuthStateChanged(cb),
 
     // --- TEAMS ---
+    mapTeamDoc: (doc) => {
+        const data = doc.data();
+        return {
+            ...data,
+            docId: doc.id,
+            id: data.id || doc.id
+        };
+    },
+    getTeamDocRef: async (teamId) => {
+        // 1. Cerca per ID del documento diretto (se coincide con teamId)
+        const docRef = window.db.collection("teams").doc(teamId);
+        const docSnap = await docRef.get();
+        if (docSnap.exists) return docRef;
+        
+        // 2. Altrimenti, cerca un documento dove il campo "id" è uguale a teamId
+        const querySnap = await window.db.collection("teams").where("id", "==", teamId).get();
+        if (!querySnap.empty) {
+            return querySnap.docs[0].ref;
+        }
+        return docRef;
+    },
     saveTeam: async (teamData) => {
         // Genera un codice univoco di 6 caratteri (es: FL-A1B2)
         const generateCode = () => {
@@ -35,16 +56,16 @@ window.fanta_db = {
         let query = window.db.collection("teams");
         if (mode !== 'all') query = query.where("mode", "==", mode);
         const snapshot = await query.get();
-        return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+        return snapshot.docs.map(doc => window.fanta_db.mapTeamDoc(doc));
     },
     getTeamByCode: async (code) => {
         const snapshot = await window.db.collection("teams").where("joinCode", "==", code.toUpperCase()).get();
         if (snapshot.empty) return null;
-        return { ...snapshot.docs[0].data(), id: snapshot.docs[0].id };
+        return window.fanta_db.mapTeamDoc(snapshot.docs[0]);
     },
     getUserTeams: async (email) => {
         const snapshot = await window.db.collection("teams").where("ownerEmail", "==", email).get();
-        return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+        return snapshot.docs.map(doc => window.fanta_db.mapTeamDoc(doc));
     },
 
     // --- MISSIONS ---
@@ -95,7 +116,8 @@ window.fanta_db = {
         await window.db.collection("users").doc(email).delete();
     },
     deleteTeam: async (teamId) => {
-        await window.db.collection("teams").doc(teamId).delete();
+        const ref = await window.fanta_db.getTeamDocRef(teamId);
+        await ref.delete();
     },
 
     // --- TOURNAMENTS ---
@@ -135,19 +157,21 @@ window.fanta_db = {
 
     // --- COLLABORATORI DOCENTI ---
     addCollaboratore: async (teamId, email) => {
-        await window.db.collection("teams").doc(teamId).update({
+        const ref = await window.fanta_db.getTeamDocRef(teamId);
+        await ref.update({
             collaboratori: firebase.firestore.FieldValue.arrayUnion(email.toLowerCase())
         });
     },
     removeCollaboratore: async (teamId, email) => {
-        await window.db.collection("teams").doc(teamId).update({
+        const ref = await window.fanta_db.getTeamDocRef(teamId);
+        await ref.update({
             collaboratori: firebase.firestore.FieldValue.arrayRemove(email.toLowerCase())
         });
     },
     getCollaboratedTeams: async (email) => {
         const snapshot = await window.db.collection("teams")
             .where("collaboratori", "array-contains", email.toLowerCase()).get();
-        return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+        return snapshot.docs.map(doc => window.fanta_db.mapTeamDoc(doc));
     },
 
     // --- STUDENTI IN SQUADRA ---
@@ -165,6 +189,7 @@ window.fanta_db = {
         });
     },
     updateTeam: async (teamId, data) => {
-        await window.db.collection("teams").doc(teamId).update(data);
+        const ref = await window.fanta_db.getTeamDocRef(teamId);
+        await ref.update(data);
     }
 };
