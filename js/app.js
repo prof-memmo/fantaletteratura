@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 const STORAGE_KEY = 'fanta_state_v1';
+let pendingInitialView = null;
 
 // ── GAME MODE STATE ──────────────────────────────────────────
 let currentTeamMode = 'terze';        // modalità scelta nel form "Crea Squadra"
@@ -127,7 +128,7 @@ function initApp() {
     if (window.location.hash) {
         const viewId = window.location.hash.substring(1);
         if (document.getElementById(viewId)) {
-            navigateTo(viewId, false);
+            pendingInitialView = viewId;
         }
     }
     
@@ -1493,8 +1494,14 @@ function checkLoginSession() {
                 const adminMenuItem = document.getElementById('menu-admin-item');
                 if (adminMenuItem) adminMenuItem.style.display = 'block';
                 
-                if (window.location.hash === '#view-welcome' || window.location.hash === '' && !window.location.pathname.includes('admin.html')) {
-                    navigateTo('view-welcome');
+                if (!window.location.pathname.includes('admin.html')) {
+                    if (pendingInitialView) {
+                        const target = pendingInitialView;
+                        pendingInitialView = null;
+                        navigateTo(target, false);
+                    } else if (window.location.hash === '#view-welcome' || window.location.hash === '') {
+                        navigateTo('view-welcome');
+                    }
                 }
                 return;
             }
@@ -1508,25 +1515,46 @@ function checkLoginSession() {
                     const role = doc.data().role;
                     currentUserRole = role;
                     setLoggedIn(email, role);
-                    if (window.location.hash === '#view-welcome' || window.location.hash === '') {
+                    
+                    if (pendingInitialView) {
+                        const target = pendingInitialView;
+                        pendingInitialView = null;
+                        navigateTo(target, false);
+                    } else if (window.location.hash === '#view-welcome' || window.location.hash === '') {
                         navigateTo('view-welcome');
                     }
                 } else {
                     // Nuovo utente o senza ruolo: mandiamo a onboarding
                     setLoggedIn(email);
-                    navigateTo('view-onboarding');
+                    if (pendingInitialView) {
+                        const target = pendingInitialView;
+                        pendingInitialView = null;
+                        navigateTo(target, false);
+                    } else {
+                        navigateTo('view-onboarding');
+                    }
                 }
             } catch(e) {
                 console.error("Errore checkLoginSession Firestore:", e);
                 // In caso di errore (es: regole Firestore), mandiamo comunque al form onboarding
                 setLoggedIn(email);
-                navigateTo('view-onboarding');
+                if (pendingInitialView) {
+                    const target = pendingInitialView;
+                    pendingInitialView = null;
+                    navigateTo(target, false);
+                } else {
+                    navigateTo('view-onboarding');
+                }
             }
         } else {
             setLoggedOut();
             if (window.location.pathname.includes('admin.html')) {
                 alert("Devi effettuare l'accesso per visualizzare il pannello admin.");
                 window.location.href = 'index.html';
+            } else if (pendingInitialView) {
+                const target = pendingInitialView;
+                pendingInitialView = null;
+                navigateTo(target, false);
             }
         }
     });
