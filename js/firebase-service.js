@@ -35,16 +35,16 @@ window.fanta_db = {
         let query = window.db.collection("teams");
         if (mode !== 'all') query = query.where("mode", "==", mode);
         const snapshot = await query.get();
-        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
     },
     getTeamByCode: async (code) => {
         const snapshot = await window.db.collection("teams").where("joinCode", "==", code.toUpperCase()).get();
         if (snapshot.empty) return null;
-        return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
+        return { ...snapshot.docs[0].data(), id: snapshot.docs[0].id };
     },
     getUserTeams: async (email) => {
         const snapshot = await window.db.collection("teams").where("ownerEmail", "==", email).get();
-        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
     },
 
     // --- MISSIONS ---
@@ -58,7 +58,7 @@ window.fanta_db = {
     },
     getPendingMissions: async () => {
         const snapshot = await window.db.collection("missions").where("status", "==", "pending").get();
-        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
     },
     approveMission: async (missionId) => {
         await window.db.collection("missions").doc(missionId).update({ status: 'approved' });
@@ -87,7 +87,7 @@ window.fanta_db = {
     },
     getTeacherRequests: async () => {
         const snapshot = await window.db.collection("pending_requests").get();
-        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
     },
 
     // --- ADMIN / CLEANUP ---
@@ -108,7 +108,7 @@ window.fanta_db = {
     },
     getTournaments: async () => {
         const snapshot = await window.db.collection("tournaments").get();
-        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
     },
     deleteTournament: async (tournamentId) => {
         await window.db.collection("tournaments").doc(tournamentId).delete();
@@ -124,7 +124,7 @@ window.fanta_db = {
     },
     getInvites: async (email) => {
         const snapshot = await window.db.collection("invites").where("toEmail", "==", email).get();
-        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
     },
     updateInviteStatus: async (inviteId, status) => {
         await window.db.collection("invites").doc(inviteId).update({ status });
@@ -147,7 +147,7 @@ window.fanta_db = {
     getCollaboratedTeams: async (email) => {
         const snapshot = await window.db.collection("teams")
             .where("collaboratori", "array-contains", email.toLowerCase()).get();
-        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
     },
 
     // --- STUDENTI IN SQUADRA ---
@@ -155,7 +155,7 @@ window.fanta_db = {
         const snapshot = await window.db.collection("users")
             .where("teamId", "==", teamId)
             .where("role", "==", "studente").get();
-        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
     },
     moveStudent: async (studentEmail, newTeamId, newTeamCode) => {
         await window.db.collection("users").doc(studentEmail.toLowerCase()).update({

@@ -1659,6 +1659,58 @@ function populateSchede(modeId = null) {
 let currentUserEmail = null;
 let currentUserRole = null;
 
+window.selfHealMissionsCount = async function() {
+    try {
+        if (!currentUserEmail) return;
+        
+        // 1. Recupera tutte le missioni approvate
+        const missionsSnap = await window.db.collection("missions").where("status", "==", "approved").get();
+        const approvedMissions = missionsSnap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+        
+        // 2. Recupera i team in base al ruolo dell'utente
+        let teams = [];
+        if (currentUserEmail === "prof.memmo@gmail.com") {
+            // Admin vede tutto e corregge tutto
+            teams = await fanta_db.getTeams();
+        } else {
+            // Docente/studente vede e corregge solo le proprie squadre
+            teams = await fanta_db.getUserTeams(currentUserEmail);
+            // Più quelle in collaborazione
+            const collTeams = await fanta_db.getCollaboratedTeams(currentUserEmail);
+            teams = [...teams, ...collTeams];
+            // Rimuovi eventuali duplicati
+            const ids = new Set();
+            teams = teams.filter(t => {
+                if (ids.has(t.id)) return false;
+                ids.add(t.id);
+                return true;
+            });
+        }
+        
+        // 3. Verifica per ciascuna squadra se il conteggio coincide con le missioni approvate realmente presenti
+        let hasChanges = false;
+        for (const team of teams) {
+            const actualCount = approvedMissions.filter(m => m.teamId === team.id).length;
+            const expectedCount = parseInt(team.missionsCompleted || 0, 10);
+            
+            if (actualCount !== expectedCount) {
+                console.log(`Self-Healing: Correzione missionsCompleted per il team ${team.name} (ID: ${team.id}) da ${expectedCount} a ${actualCount}`);
+                await window.db.collection("teams").doc(team.id).update({ missionsCompleted: actualCount });
+                hasChanges = true;
+            }
+        }
+        
+        // Se ci sono stati aggiornamenti, ricarica la visualizzazione profilo o classifiche
+        if (hasChanges) {
+            if (typeof window.renderProfilo === 'function') window.renderProfilo();
+            if (typeof window.renderAdminSquadre === 'function') window.renderAdminSquadre();
+            if (typeof window.renderAdminMissioni === 'function') await window.renderAdminMissioni();
+        }
+    } catch (e) {
+        console.error("Errore durante il self-healing dei conteggi missioni:", e);
+    }
+};
+
 function checkLoginSession() {
     // Ripristina modalità se salvata
     const savedMode = localStorage.getItem('fanta_active_mode');
@@ -1710,6 +1762,9 @@ function checkLoginSession() {
                         navigateTo('view-welcome');
                     }
                 }
+                
+                // Esegui allineamento punteggi a caldo
+                window.selfHealMissionsCount();
                 return;
             }
             
@@ -1730,6 +1785,9 @@ function checkLoginSession() {
                     } else if (window.location.hash === '#view-welcome' || window.location.hash === '') {
                         navigateTo('view-welcome');
                     }
+                    
+                    // Esegui allineamento punteggi a caldo
+                    window.selfHealMissionsCount();
                 } else {
                     // Nuovo utente o senza ruolo: mandiamo a onboarding
                     setLoggedIn(email);
