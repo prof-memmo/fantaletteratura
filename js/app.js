@@ -1615,9 +1615,9 @@ async function loginGoogle() {
 async function inviaRichiestaIscrizione(event) {
     if(event) event.preventDefault();
     const email = (localStorage.getItem('fanta_temp_email') || document.querySelector('#docente-email-input')?.value || "").toLowerCase();
-    const name = document.querySelector('#view-iscrizione input[placeholder="Nome docente"]').value.trim();
-    const school = document.querySelector('#view-iscrizione input[placeholder="Nome scuola"]').value.trim();
-    const city = document.querySelector('#view-iscrizione input[placeholder="Citta"]').value.trim();
+    const name = (document.getElementById('iscrizione-nome')?.value || "").trim();
+    const school = (document.getElementById('iscrizione-scuola')?.value || "").trim();
+    const city = (document.getElementById('iscrizione-citta')?.value || "").trim();
 
     if (!name || !school || !city || !email) {
         alert("Completa tutti i campi (e inserisci l'email nella home se necessario).");
