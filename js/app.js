@@ -1411,9 +1411,51 @@ window.rifiutaMissione = async function(mid) {
 
 window.approvaTutteMissioni = async function() {
     if(!confirm('Approvare tutte le missioni in attesa?')) return;
-    const pending = await fanta_db.getPendingMissions();
-    for (const m of pending) {
-        await window.approvaMissione(m.id, m.teamId);
+    
+    // Mostra un caricamento per feedback immediato
+    const list = document.getElementById('admin-missioni-pending-list');
+    if(list) list.innerHTML = '<p class="text-center">Approvazione di tutte le missioni in corso...</p>';
+    
+    try {
+        const pending = await fanta_db.getPendingMissions();
+        if(pending.length === 0) return;
+        
+        const allTeams = await fanta_db.getTeams();
+        
+        // Calcola i nuovi conteggi cumulati delle missioni per squadra
+        const teamUpdates = {};
+        pending.forEach(m => {
+            const team = allTeams.find(t => t.id === m.teamId);
+            if(team) {
+                const currentCount = teamUpdates[m.teamId] !== undefined ? teamUpdates[m.teamId] : (team.missionsCompleted || 0);
+                teamUpdates[m.teamId] = currentCount + 1;
+            }
+        });
+        
+        // Esegui tutte le scritture in parallelo
+        const promises = [];
+        
+        // 1. Aggiorna i conteggi dei team
+        Object.keys(teamUpdates).forEach(tid => {
+            promises.push(window.db.collection("teams").doc(tid).update({ missionsCompleted: teamUpdates[tid] }));
+        });
+        
+        // 2. Approva tutte le missioni
+        pending.forEach(m => {
+            promises.push(fanta_db.approveMission(m.id));
+        });
+        
+        // Attendi il completamento di tutte le operazioni
+        await Promise.all(promises);
+        
+        alert("Tutte le missioni sono state approvate con successo!");
+    } catch (e) {
+        console.error("Errore approvazione totale missioni:", e);
+        alert("Si è verificato un errore durante l'approvazione di tutte le missioni.");
+    } finally {
+        // Refresh delle view esattamente una volta
+        if(typeof window.renderAdminMissioni === 'function') await window.renderAdminMissioni();
+        if(typeof window.renderAdminMissioniPending === 'function') await window.renderAdminMissioniPending();
     }
 };
 
