@@ -2870,6 +2870,55 @@ window.segnaMissioneNotificaVisto = function(mid) {
     if(typeof renderProfilo === 'function') renderProfilo();
 };
 
+window.segnaTutteNotificheComeLette = async function() {
+    // 1. Segna tutti gli autori rivelati come letti
+    if (typeof window.segnaTuttiAutoriRivelatiComeVisti === 'function') {
+        window.segnaTuttiAutoriRivelatiComeVisti();
+    }
+
+    // 2. Segna tutte le missioni convalidate/rifiutate come lette
+    if (currentUserEmail && currentUserEmail !== 'prof.memmo@gmail.com') {
+        try {
+            const allTeams = await fanta_db.getTeams();
+            const myTeams = allTeams.filter(t => t.ownerEmail === currentUserEmail);
+            const myTeamIds = myTeams.map(t => t.id);
+            let collabTeams = [];
+            try {
+                collabTeams = await fanta_db.getCollaboratedTeams(currentUserEmail);
+            } catch(e) {}
+            const allMyTeamIds = [...myTeamIds, ...collabTeams.map(t => t.id)];
+
+            if (allMyTeamIds.length > 0) {
+                const snap = await window.db.collection("missions")
+                    .where("teamId", "in", allMyTeamIds.slice(0, 30))
+                    .get();
+                const myMissions = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+                    .filter(m => m.status === 'approved' || m.status === 'rejected');
+                
+                const seenMissionsStr = localStorage.getItem('fanta_seen_missions') || '[]';
+                let seenMissions = [];
+                try {
+                    seenMissions = JSON.parse(seenMissionsStr);
+                } catch(e) {
+                    seenMissions = [];
+                }
+                
+                myMissions.forEach(m => {
+                    if (!seenMissions.includes(m.id)) {
+                        seenMissions.push(m.id);
+                    }
+                });
+                localStorage.setItem('fanta_seen_missions', JSON.stringify(seenMissions));
+            }
+        } catch (e) {
+            console.error("Errore segna tutte come lette:", e);
+        }
+    }
+
+    renderNotifiche();
+    if(typeof renderProfilo === 'function') renderProfilo();
+};
+
 window.apriNotificheModal = function() {
     const modal = document.getElementById('notifiche-modal');
     if (modal) {

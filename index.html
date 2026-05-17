@@ -704,7 +704,12 @@
         <div class="glass" style="max-width: 480px; width: 100%; padding: 20px; border-radius: 16px; position: relative; box-shadow: 0 15px 35px rgba(0,0,0,0.6); border: 1px solid var(--glass-border);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px;">
                 <h3 style="margin: 0; display: flex; align-items: center; gap: 8px; color: var(--primary-color);"><i class="fa-solid fa-bell"></i> Le tue Notifiche</h3>
-                <button class="btn-secondary" onclick="document.getElementById('notifiche-modal').style.display='none'" style="padding: 5px 15px; width:auto; border-radius:20px; border:none; cursor: pointer; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-xmark"></i></button>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button class="btn" style="padding: 5px 12px; font-size: 0.72rem; font-weight: 600; width: auto; background: var(--primary-color); color: var(--bg-dark); border-radius: 20px; border: none; cursor: pointer; display: flex; align-items: center; gap: 4px; margin: 0;" onclick="window.segnaTutteNotificheComeLette()">
+                        <i class="fa-solid fa-check-double"></i> <span>Leggi tutte</span>
+                    </button>
+                    <button class="btn-secondary" onclick="document.getElementById('notifiche-modal').style.display='none'" style="padding: 5px 15px; width:auto; border-radius:20px; border:none; cursor: pointer; display: flex; align-items: center; justify-content: center; margin: 0;"><i class="fa-solid fa-xmark"></i></button>
+                </div>
             </div>
             <div id="profilo-notifiche-list" style="display:flex; flex-direction:column; gap:10px; max-height: 350px; overflow-y: auto; padding-right: 5px;">
                 <i>Nessuna nuova notifica.</i>
