@@ -2541,6 +2541,15 @@ async function renderNotifiche() {
         } catch (err) {
             console.warn("getInvites failed or permission denied: ", err);
         }
+
+        let pendingMissions = [];
+        if (currentUserEmail === 'prof.memmo@gmail.com') {
+            try {
+                pendingMissions = await fanta_db.getPendingMissions();
+            } catch (err) {
+                console.warn("getPendingMissions failed: ", err);
+            }
+        }
         
         // Rileva le nuove schede autore non lette
         const unseenSchede = [];
@@ -2576,7 +2585,7 @@ async function renderNotifiche() {
             });
         }
         
-        const totalNotifications = pendingInvites.length + unseenSchede.length;
+        const totalNotifications = pendingInvites.length + unseenSchede.length + pendingMissions.length;
         
         // Aggiorna Badge Campanella
         if(badge) {
@@ -2638,6 +2647,24 @@ async function renderNotifiche() {
                     </div>
                 `;
             });
+
+            // 3. Mostra le missioni in attesa per l'admin
+            if (currentUserEmail === 'prof.memmo@gmail.com' && pendingMissions.length > 0) {
+                const allTeams = await fanta_db.getTeams();
+                pendingMissions.forEach(m => {
+                    const t = allTeams.find(x => x.id === m.teamId);
+                    const teamName = t ? t.name : 'Squadra Sconosciuta';
+                    list.innerHTML += `
+                        <div style="background:rgba(245, 197, 60, 0.1); padding:12px; border-radius:8px; border-left:3px solid var(--accent-gold); font-size:0.85rem; margin-bottom:10px;">
+                            <p style="margin:0 0 10px 0;">🚀 <b>Nuova Missione!</b> La squadra <b>${teamName}</b> ha caricato la missione: "<i>${m.titolo}</i>"</p>
+                            <div style="display:flex; gap:10px;">
+                                <button class="btn" style="padding:5px 12px; font-size:0.75rem; width:auto; background:var(--accent-gold); color:var(--bg-dark);" onclick="document.getElementById('notifiche-modal').style.display='none'; window.approvaMissioneDaNotifica('${m.id}', '${m.teamId}')">Approva</button>
+                                <button class="btn btn-secondary" style="padding:5px 12px; font-size:0.75rem; width:auto;" onclick="document.getElementById('notifiche-modal').style.display='none'; window.rifiutaMissioneDaNotifica('${m.id}')">Rifiuta</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
         }
     } catch (e) {
         console.error("Errore caricamento notifiche:", e);
@@ -2695,6 +2722,20 @@ window.segnaTuttiAutoriRivelatiComeVisti = function() {
     if (updated) {
         localStorage.setItem('fanta_seen_schede', JSON.stringify(seenSchede));
         renderNotifiche();
+    }
+};
+
+window.approvaMissioneDaNotifica = async function(mid, tid) {
+    if(typeof window.approvaMissione === 'function') {
+        await window.approvaMissione(mid, tid);
+        if (typeof renderNotifiche === 'function') renderNotifiche();
+    }
+};
+
+window.rifiutaMissioneDaNotifica = async function(mid) {
+    if(typeof window.rifiutaMissione === 'function') {
+        await window.rifiutaMissione(mid);
+        if (typeof renderNotifiche === 'function') renderNotifiche();
     }
 };
 
