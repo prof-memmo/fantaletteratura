@@ -616,7 +616,7 @@ async function setupAdminPanel() {
             return;
         }
 
-        [...pool].sort((a,b) => a.name.localeCompare(b.name)).forEach(author => {
+        pool.forEach(author => {
             const currentMode = author.activeMode;
             const modeCfg = GAME_MODES[currentMode] || GAME_MODES.terze;
             const isRevealed = author.isPointsRevealed;
@@ -1439,7 +1439,7 @@ function populateSchede(modeId = null) {
                 </div>
                 <div style="flex-grow:1; display:flex; flex-direction:column; justify-content:center; width:100%; margin-bottom: 8px;">
                     <div style="font-family: var(--font-heading); font-weight:bold; font-size:0.95rem; color:#f5c53c; line-height:1.2; text-shadow:0 1px 3px rgba(0,0,0,0.3);">${author.name}</div>
-                    <div style="font-size:0.65rem; color:var(--text-muted); text-transform:uppercase; font-weight:600; margin-top:2px;">${author.isInternational ? 'Internazionale' : 'Classico'}</div>
+                    <div style="font-size:0.65rem; color:var(--text-muted); text-transform:uppercase; font-weight:600; margin-top:2px;">${author.isInternational ? 'Internazionale' : 'Italiano'}</div>
                 </div>
                 <div style="width:100%;">
                     ${content}
