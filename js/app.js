@@ -2191,6 +2191,49 @@ async function renderProfilo() {
             ? `<span style="font-size:0.72rem; background:rgba(141,160,63,0.2); color:var(--primary-color); border-radius:8px; padding:2px 8px; margin-left:4px;"><i class="fa-solid fa-users-gear"></i> Collaboratore</span>`
             : '';
 
+        // Autori in questa squadra
+        let autoriSection = '';
+        if (team.authors && team.authors.length > 0) {
+            const autoriRows = team.authors.map(aid => {
+                const author = currentPool.find(x => x.id === aid);
+                if (!author) return '';
+                
+                const ptsLabel = author.isPointsRevealed 
+                    ? `<span style="font-weight:bold; color:var(--primary-color);">${author.points} pt</span>`
+                    : `<span style="font-size:0.75rem; color:var(--text-muted);"><i class="fa-solid fa-eye-slash" title="Punti non ancora rivelati"></i> ? pt</span>`;
+                
+                return `
+                    <div style="display:flex; align-items:center; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.03);">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <img src="${author.image}" alt="${author.name}" style="width:28px; height:28px; border-radius:50%; object-fit:cover; border:1px solid var(--primary-color); background:#fff;">
+                            <span style="font-size:0.8rem; font-weight:500; color:var(--text-main);">${author.name}</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span style="font-size:0.7rem; color:var(--text-muted);">${author.cost || author.points || 0} €</span>
+                            ${ptsLabel}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            autoriSection = `
+                <details style="margin-top:6px; margin-bottom:6px; width:100%; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px;">
+                    <summary style="font-size:0.78rem; cursor:pointer; color:var(--primary-color); font-weight:600; user-select:none; margin-bottom:6px; display:flex; align-items:center; gap:5px;">
+                        <i class="fa-solid fa-feather-pointed"></i> Autori Schierati (${team.authors.length}/5)
+                    </summary>
+                    <div style="padding-left:4px; max-height: 250px; overflow-y: auto;">
+                        ${autoriRows}
+                    </div>
+                </details>
+            `;
+        } else {
+            autoriSection = `
+                <div style="font-size:0.75rem; color:var(--text-muted); padding:8px 0; border-top:1px solid rgba(255,255,255,0.05); width:100%;">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Nessun autore ancora schierato in questa squadra.
+                </div>
+            `;
+        }
+
         // Studenti iscritti a questa squadra
         const studentiArr = allStudentsMap[team.id] || [];
         let studentiSection = '';
@@ -2266,6 +2309,7 @@ async function renderProfilo() {
                     </div>
                 </div>
 
+                ${autoriSection}
                 ${studentiSection}
                 ${codiceSection}
                 ${azioniSection}
