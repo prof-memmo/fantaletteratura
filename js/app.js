@@ -2032,7 +2032,7 @@ function setupTeamSave() {
 
         // Salvataggio su Firebase
         fanta_db.saveTeam(newTeam).then(() => {
-            alert("Squadra creata con successo! Caricamento in corso...");
+            alert("Squadra creata con successo!");
             // Reset form
             document.querySelector('#view-squadra input[placeholder="Es: I Promessi Sposi"]').value = "";
             document.getElementById('team-classe-input').value = "";
