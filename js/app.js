@@ -2317,40 +2317,62 @@ window.profiloSpostaStudente = async function(studentEmail, currentTeamId, curre
 
 async function renderNotifiche() {
     const list = document.getElementById('profilo-notifiche-list');
-    if(!list || !currentUserEmail) return;
+    const badge = document.getElementById('notification-badge');
+    if(!currentUserEmail) return;
     
-    list.innerHTML = '<p class="text-center">Caricamento notifiche...</p>';
+    if(list) list.innerHTML = '<p class="text-center">Caricamento notifiche...</p>';
     
     try {
         const myPending = await fanta_db.getInvites(currentUserEmail);
-        list.innerHTML = '';
+        const pendingInvites = myPending.filter(i => i.status === 'pending');
         
-        if(myPending.length === 0) {
-            list.innerHTML = '<i>Nessuna nuova notifica.</i>';
-            return;
+        // Aggiorna Badge Campanella
+        if(badge) {
+            if(pendingInvites.length > 0) {
+                badge.textContent = pendingInvites.length;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
         }
         
-        const tourneys = await fanta_db.getTournaments();
-        
-        myPending.filter(i => i.status === 'pending').forEach(inv => {
-            let t = tourneys.find(x => x.id === inv.tournamentId);
-            let tName = t ? t.name : "Torneo Sconosciuto";
+        if(list) {
+            list.innerHTML = '';
+            if(pendingInvites.length === 0) {
+                list.innerHTML = '<i style="display:block; text-align:center; padding:15px 0;">Nessuna nuova notifica.</i>';
+                return;
+            }
             
-            list.innerHTML += `
-                <div style="background:rgba(255,193,7,0.1); padding:10px; border-radius:8px; border-left:3px solid #ffc107; font-size:0.9rem; margin-bottom:10px;">
-                    <p style="margin:0 0 10px 0;"><b>${inv.fromEmail}</b> ti ha invitato al torneo <b>${tName}</b>.</p>
-                    <div style="display:flex; gap:10px;">
-                        <button class="btn" style="padding:4px 10px; font-size:0.75rem; width:auto; background:var(--primary-color);" onclick="openJoinTorneoModal('${inv.tournamentId}', '${inv.id}')">Accetta e Iscrivi Squadre</button>
-                        <button class="btn btn-secondary" style="padding:4px 10px; font-size:0.75rem; width:auto;" onclick="rifiutaInvito('${inv.id}')">Rifiuta</button>
+            const tourneys = await fanta_db.getTournaments();
+            
+            pendingInvites.forEach(inv => {
+                let t = tourneys.find(x => x.id === inv.tournamentId);
+                let tName = t ? t.name : "Torneo Sconosciuto";
+                
+                list.innerHTML += `
+                    <div style="background:rgba(255,193,7,0.1); padding:12px; border-radius:8px; border-left:3px solid #ffc107; font-size:0.85rem; margin-bottom:10px;">
+                        <p style="margin:0 0 10px 0;"><b>${inv.fromEmail}</b> ti ha invitato al torneo <b>${tName}</b>.</p>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn" style="padding:5px 12px; font-size:0.75rem; width:auto; background:var(--primary-color);" onclick="document.getElementById('notifiche-modal').style.display='none'; openJoinTorneoModal('${inv.tournamentId}', '${inv.id}')">Accetta e Iscrivi Squadre</button>
+                            <button class="btn btn-secondary" style="padding:5px 12px; font-size:0.75rem; width:auto;" onclick="rifiutaInvito('${inv.id}')">Rifiuta</button>
+                        </div>
                     </div>
-                </div>
-            `;
-        });
+                `;
+            });
+        }
     } catch (e) {
         console.error("Errore caricamento notifiche:", e);
-        list.innerHTML = '<i>Errore nel caricamento delle notifiche.</i>';
+        if(list) list.innerHTML = '<i>Errore nel caricamento delle notifiche.</i>';
     }
 }
+
+window.apriNotificheModal = function() {
+    const modal = document.getElementById('notifiche-modal');
+    if (modal) {
+        modal.style.display = 'flex';
+        renderNotifiche();
+    }
+};
 
 async function openTorneoModal() {
     const modal = document.getElementById('torneo-modal');

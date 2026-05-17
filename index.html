@@ -433,36 +433,42 @@
              <!-- VIEW: Profilo -->
              <section id="view-profilo" class="view">
 
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                     <h2>Profilo Utente</h2>
-                     <button class="btn btn-secondary" style="width: auto; padding: 8px 15px; border-radius:20px; font-size:0.8rem;" onclick="logoutDocente()"><i class="fa-solid fa-right-from-bracket"></i> Esci</button>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; flex-wrap: wrap;">
+                      <h2>Profilo Utente</h2>
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                          <!-- Invita un collega -->
+                          <button class="btn" style="width: auto; padding: 8px 14px; border-radius: 20px; font-size: 0.8rem; background: var(--accent-gold); color: var(--bg-dark); font-weight: 600; margin: 0; display: flex; align-items: center; gap: 6px;" onclick="openInviteModal()">
+                              <i class="fa-solid fa-paper-plane"></i> <span class="hide-mobile">Invita Collega</span>
+                          </button>
+                          
+                          <!-- Campanella Notifiche con Badge -->
+                          <button class="btn btn-secondary" style="width: 36px; height: 36px; padding: 0; border-radius: 50%; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; position: relative; margin: 0; cursor: pointer;" onclick="apriNotificheModal()">
+                              <i class="fa-solid fa-bell"></i>
+                              <span id="notification-badge" style="display: none; position: absolute; top: -3px; right: -3px; background: #e63946; color: white; font-size: 0.6rem; font-weight: bold; width: 16px; height: 16px; border-radius: 50%; align-items: center; justify-content: center; border: 1.5px solid var(--bg-dark);">0</span>
+                          </button>
+                          
+                          <!-- Pulsante Esci -->
+                          <button class="btn btn-secondary" style="width: auto; padding: 8px 15px; border-radius: 20px; font-size: 0.8rem; margin: 0; display: flex; align-items: center; gap: 6px;" onclick="logoutDocente()">
+                              <i class="fa-solid fa-right-from-bracket"></i> <span class="hide-mobile">Esci</span>
+                          </button>
+                      </div>
+                  </div>
+                 <div class="glass mb-2" style="padding: 15px;">
+                     <input type="text" id="profilo-email" class="input-control mb-1" value="" readonly style="background: rgba(255,255,255,0.05); color: #aaa;">
+                     
+                     <button type="button" class="btn mb-2" onclick="navigateTo('view-missioni'); openNuovaMissioneModal();"><i class="fa-solid fa-list-check"></i> Carica una Missione</button>
+                     <button type="button" class="btn mb-2" onclick="navigateTo('view-squadra')"><i class="fa-solid fa-plus-circle"></i> Carica una nuova squadra</button>
+                     
+                     <h3 class="mt-2 text-primary">Le tue squadre</h3>
+                     <div id="profilo-squadre-list" style="padding: 10px 0; color: var(--text-muted); font-size: 0.9rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px;">
+                         <div class="glass" style="padding:20px; text-align:center; grid-column: 1 / -1; width: 100%;"><i>Nessuna squadra creata. Premi il tasto sopra per iniziare!</i></div>
+                     </div>
+ 
+                     <h3 class="mt-2 text-primary">Missioni Convalidate</h3>
+                     <div id="profilo-missioni-list" style="padding: 10px 0; color: var(--text-muted); font-size: 0.9rem;">
+                         <i>Ancora nessuna missione per le tue squadre.</i>
+                     </div>
                  </div>
-                <div class="glass mb-2" style="padding: 15px;">
-                    <input type="text" id="profilo-email" class="input-control mb-1" value="" readonly style="background: rgba(255,255,255,0.05); color: #aaa;">
-                    
-                    <button type="button" class="btn mb-2" onclick="navigateTo('view-missioni'); openNuovaMissioneModal();"><i class="fa-solid fa-list-check"></i> Carica una Missione</button>
-                    <button type="button" class="btn mb-2" onclick="navigateTo('view-squadra')"><i class="fa-solid fa-plus-circle"></i> Carica una nuova squadra</button>
-                    <button type="button" class="btn mb-2" style="background: var(--accent-gold);" onclick="openInviteModal()"><i class="fa-solid fa-paper-plane"></i> Invita un Collega</button>
-                    
-                    <h3 class="mt-2 text-primary">Le tue squadre</h3>
-                    <div id="profilo-squadre-list" style="padding: 10px 0; color: var(--text-muted); font-size: 0.9rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px;">
-                        <div class="glass" style="padding:20px; text-align:center; grid-column: 1 / -1; width: 100%;"><i>Nessuna squadra creata. Premi il tasto sopra per iniziare!</i></div>
-                    </div>
-
-                    <h3 class="mt-2 text-primary">Missioni Convalidate</h3>
-                    <div id="profilo-missioni-list" style="padding: 10px 0; color: var(--text-muted); font-size: 0.9rem;">
-                        <i>Ancora nessuna missione per le tue squadre.</i>
-                    </div>
-                </div>
-
-                <div class="glass mb-2" style="padding: 15px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <h3 style="margin:0;"><i class="fa-solid fa-bell text-primary"></i> Le tue Notifiche</h3>
-                    </div>
-                    <div id="profilo-notifiche-list" style="display:flex; flex-direction:column; gap:10px;">
-                        <i>Nessuna nuova notifica.</i>
-                    </div>
-                </div>
 
                 <div class="glass mb-2" style="padding: 15px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
@@ -691,6 +697,19 @@
             </div>
             <div class="modal-legal-footer">
                 <button type="button" class="btn" onclick="closeLegalModal('termini')">Ho capito</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL NOTIFICHE -->
+    <div id="notifiche-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:3000; overflow-y:auto; backdrop-filter: blur(10px); align-items: center; justify-content: center; padding: 15px;" onclick="if(event.target===this) document.getElementById('notifiche-modal').style.display='none'">
+        <div class="glass" style="max-width: 480px; width: 100%; padding: 20px; border-radius: 16px; position: relative; box-shadow: 0 15px 35px rgba(0,0,0,0.6); border: 1px solid var(--glass-border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px;">
+                <h3 style="margin: 0; display: flex; align-items: center; gap: 8px; color: var(--primary-color);"><i class="fa-solid fa-bell"></i> Le tue Notifiche</h3>
+                <button class="btn-secondary" onclick="document.getElementById('notifiche-modal').style.display='none'" style="padding: 5px 15px; width:auto; border-radius:20px; border:none; cursor: pointer; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="profilo-notifiche-list" style="display:flex; flex-direction:column; gap:10px; max-height: 350px; overflow-y: auto; padding-right: 5px;">
+                <i>Nessuna nuova notifica.</i>
             </div>
         </div>
     </div>

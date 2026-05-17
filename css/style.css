@@ -1445,3 +1445,9 @@ h1, h2, h3, h4 {
     font-weight: 700;
     margin-right: 5px;
 }
+
+@media screen and (max-width: 600px) {
+    .hide-mobile {
+        display: none !important;
+    }
+}
