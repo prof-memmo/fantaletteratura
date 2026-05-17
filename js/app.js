@@ -1418,7 +1418,7 @@ window.selectOnboardingRole = async function(role) {
             }, { merge: true });
             
             currentUserEmail = email;
-            navigateTo('view-fantamico');
+            navigateTo('view-welcome');
         } catch (e) {
             console.error("Errore salvataggio ruolo:", e);
             alert("Si è verificato un errore durante la configurazione del tuo account. Verifica la tua connessione.");
