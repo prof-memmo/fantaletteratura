@@ -214,6 +214,11 @@ function navigateTo(viewId, pushHistory = true) {
     if(viewId === 'view-profilo') {
         renderProfilo();
     }
+    if(viewId === 'view-schede') {
+        if(typeof window.segnaTuttiAutoriRivelatiComeVisti === 'function') {
+            window.segnaTuttiAutoriRivelatiComeVisti();
+        }
+    }
 
     // Hightlight side-menu active link
     document.querySelectorAll('.menu-link').forEach(link => {
@@ -1571,30 +1576,6 @@ function populateSchede(modeId = null) {
         // Conserva l'ordine cronologico (dal primo autore studiato all'ultimo)
         grid.insertAdjacentHTML('beforeend', card); 
     });
-
-    // Segna tutte le schede caricate in questa modalità come viste quando l'utente le visita
-    const seenSchedeStr = localStorage.getItem('fanta_seen_schede') || '[]';
-    let seenSchede = [];
-    try {
-        seenSchede = JSON.parse(seenSchedeStr);
-    } catch(e) {
-        seenSchede = [];
-    }
-    
-    let updated = false;
-    revealedAuthors.forEach(a => {
-        if (!seenSchede.includes(a.id)) {
-            seenSchede.push(a.id);
-            updated = true;
-        }
-    });
-    
-    if (updated) {
-        localStorage.setItem('fanta_seen_schede', JSON.stringify(seenSchede));
-        setTimeout(() => {
-            if (typeof renderNotifiche === 'function') renderNotifiche();
-        }, 100);
-    }
 }
 
 /* =========================================
@@ -1639,6 +1620,7 @@ function checkLoginSession() {
                     // Se siamo in admin, rendiamo certi ricaricamenti forzati
                     if(typeof window.renderAdminAutori === 'function') window.renderAdminAutori();
                     if(typeof window.renderAdminRichieste === 'function') window.renderAdminRichieste();
+                    if(typeof renderNotifiche === 'function') renderNotifiche();
                 }
 
                 // Mostra il link al pannello admin nel menù
@@ -2131,6 +2113,10 @@ function setLoggedIn(email, role = '') {
     if (!isStudent) {
         renderProfilo();
     }
+    
+    if (typeof renderNotifiche === 'function') {
+        renderNotifiche();
+    }
 }
 
 function setLoggedOut() {
@@ -2548,8 +2534,13 @@ async function renderNotifiche() {
     if(list) list.innerHTML = '<p class="text-center">Caricamento notifiche...</p>';
     
     try {
-        const myPending = await fanta_db.getInvites(currentUserEmail);
-        const pendingInvites = myPending.filter(i => i.status === 'pending');
+        let pendingInvites = [];
+        try {
+            const myPending = await fanta_db.getInvites(currentUserEmail);
+            pendingInvites = myPending.filter(i => i.status === 'pending');
+        } catch (err) {
+            console.warn("getInvites failed or permission denied: ", err);
+        }
         
         // Rileva le nuove schede autore non lette
         const unseenSchede = [];
@@ -2675,6 +2666,36 @@ window.resetNotificheLette = function() {
     alert("Notifiche resettate con successo! Ora le schede pubblicate verranno mostrate di nuovo come non lette.");
     renderNotifiche();
     if(typeof populateSchede === 'function') populateSchede();
+};
+
+window.segnaTuttiAutoriRivelatiComeVisti = function() {
+    const seenSchedeStr = localStorage.getItem('fanta_seen_schede') || '[]';
+    let seenSchede = [];
+    try {
+        seenSchede = JSON.parse(seenSchedeStr);
+    } catch(e) {
+        seenSchede = [];
+    }
+    
+    let updated = false;
+    if (typeof GAME_MODES !== 'undefined') {
+        Object.keys(GAME_MODES).forEach(modeKey => {
+            const modeCfg = GAME_MODES[modeKey];
+            if (modeCfg && modeCfg.authors) {
+                modeCfg.authors.forEach(a => {
+                    if (a.isSchedaRevealed && !seenSchede.includes(a.id)) {
+                        seenSchede.push(a.id);
+                        updated = true;
+                    }
+                });
+            }
+        });
+    }
+    
+    if (updated) {
+        localStorage.setItem('fanta_seen_schede', JSON.stringify(seenSchede));
+        renderNotifiche();
+    }
 };
 
 window.apriNotificheModal = function() {
