@@ -1,0 +1,87 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Funzione helper per verificare se l'utente è autenticato
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Funzione helper per ottenere l'email dell'utente corrente (in minuscolo)
+    function currentUserEmail() {
+      return request.auth.token.email.toLowerCase();
+    }
+    
+    // Funzione helper per verificare se l'utente è il Game Master (Prof. Memmo)
+    function isGameMaster() {
+      return isAuthenticated() && currentUserEmail() == 'prof.memmo@gmail.com';
+    }
+
+    // 1. Collezione: settings (Stato di gioco globale, schede e punteggi sbloccati)
+    match /settings/{docId} {
+      // Chiunque può leggere le impostazioni correnti di gioco
+      allow read: if true;
+      // Solo il Game Master (Prof. Memmo) può modificare le impostazioni globali
+      allow write: if isGameMaster();
+    }
+
+    // 2. Collezione: users (Profili di docenti, studenti e fantamici)
+    match /users/{email} {
+      // Qualsiasi utente autenticato può leggere le informazioni dei profili
+      allow read: if isAuthenticated();
+      // Un utente può creare o aggiornare solo il proprio profilo (o il Game Master può gestire tutto)
+      allow write: if isGameMaster() || (isAuthenticated() && currentUserEmail() == email.toLowerCase());
+    }
+
+    // 3. Collezione: pending_requests (Richieste di approvazione dei docenti)
+    match /pending_requests/{reqId} {
+      // Qualsiasi utente autenticato può leggere le richieste
+      allow read: if isAuthenticated();
+      // Chiunque può creare una nuova richiesta (durante la registrazione iniziale)
+      allow create: if true;
+      // Solo il proprietario della richiesta o il Game Master può modificarla o cancellarla
+      allow update, delete: if isGameMaster() || (isAuthenticated() && resource.data.email.toLowerCase() == currentUserEmail());
+    }
+
+    // 4. Collezione: teams (Fanta-squadre create dagli utenti)
+    match /teams/{teamId} {
+      // Chiunque può leggere le squadre (necessario per visualizzare classifiche e tornei)
+      allow read: if true;
+      // Un utente autenticato può creare una squadra solo a proprio nome
+      allow create: if isAuthenticated() && request.resource.data.ownerEmail.toLowerCase() == currentUserEmail();
+      // Solo il proprietario della squadra o il Game Master può modificarla o eliminarla
+      allow update, delete: if isGameMaster() || (isAuthenticated() && resource.data.ownerEmail.toLowerCase() == currentUserEmail());
+    }
+
+    // 5. Collezione: missions (Missioni inviate dagli studenti/docenti)
+    match /missions/{missionId} {
+      // Chiunque può leggere le missioni inviate
+      allow read: if true;
+      // Un utente autenticato può inviare/creare una missione a proprio nome
+      allow create: if isAuthenticated() && request.resource.data.ownerEmail.toLowerCase() == currentUserEmail();
+      // Solo l'autore della missione o il Game Master può modificarla o eliminarla
+      allow update, delete: if isGameMaster() || (isAuthenticated() && resource.data.ownerEmail.toLowerCase() == currentUserEmail());
+    }
+
+    // 6. Collezione: tournaments (Tornei interni creati dai docenti)
+    match /tournaments/{tournamentId} {
+      // Chiunque può leggere i tornei esistenti
+      allow read: if true;
+      // Un utente autenticato (docente) può creare un torneo a proprio nome
+      allow create: if isAuthenticated() && request.resource.data.ownerEmail.toLowerCase() == currentUserEmail();
+      // Solo l'owner del torneo o il Game Master può modificarlo o eliminarlo
+      allow update, delete: if isGameMaster() || (isAuthenticated() && resource.data.ownerEmail.toLowerCase() == currentUserEmail());
+    }
+
+    // 7. Collezione: invites (Inviti di collaborazione tra colleghi docenti)
+    match /invites/{inviteId} {
+      // L'utente può leggere l'invito solo se è il mittente o il destinatario
+      allow read: if isAuthenticated() && (resource.data.fromEmail.toLowerCase() == currentUserEmail() || resource.data.toEmail.toLowerCase() == currentUserEmail());
+      // Chiunque sia autenticato può inviare/creare un invito se impostato come mittente
+      allow create: if isAuthenticated() && request.resource.data.fromEmail.toLowerCase() == currentUserEmail();
+      // Il mittente, il destinatario o il Game Master possono aggiornare o cancellare l'invito
+      allow update, delete: if isGameMaster() || (isAuthenticated() && (resource.data.fromEmail.toLowerCase() == currentUserEmail() || resource.data.toEmail.toLowerCase() == currentUserEmail()));
+    }
+  }
+}
