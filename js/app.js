@@ -1172,13 +1172,35 @@ async function setupAdminPanel() {
     window.renderAdminMissioni = async function() {
         const list = document.getElementById('admin-missioni-list');
         if(!list) return;
-        list.innerHTML = '';
-        const allTeams = await getAllTeams();
-        allTeams.filter(t => (t.missionsCompleted || 0) > 0).forEach(team => {
-            list.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid rgba(255,255,255,0.05);">
-                <span>${team.name}</span><span style="font-weight:bold; color:var(--primary-color);">+${team.missionsCompleted * 5} pt</span>
-            </div>`;
-        });
+        list.innerHTML = '<p class="text-center">Caricamento storico...</p>';
+        
+        try {
+            const allTeams = await getAllTeams();
+            const snap = await window.db.collection("missions").where("status", "==", "approved").get();
+            const approvedMissions = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            
+            list.innerHTML = '';
+            if (approvedMissions.length === 0) {
+                list.innerHTML = '<i>Nessuna missione convalidata.</i>';
+            } else {
+                approvedMissions.forEach(m => {
+                    const team = allTeams.find(t => t.id === m.teamId);
+                    const teamName = team ? team.name : 'Squadra Sconosciuta (Eliminata)';
+                    list.innerHTML += `
+                        <div class="glass" style="padding: 10px; border-left: 3px solid var(--primary-color); display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <div>
+                                <span style="font-weight: bold; color: var(--text-main);">${m.titolo}</span><br>
+                                <small style="color: var(--text-muted);"><i class="fa-solid fa-users"></i> ${teamName}</small>
+                            </div>
+                            <span style="font-weight: bold; color: var(--primary-color);">+5 pt</span>
+                        </div>
+                    `;
+                });
+            }
+        } catch(e) {
+            console.error("Errore storico missioni:", e);
+            list.innerHTML = '<i>Errore nel caricamento dello storico.</i>';
+        }
     };
 
     window.renderAdminClassifica = async function(modeFilter) {
@@ -1389,14 +1411,15 @@ window.approvaMissione = async function(mid, tid) {
         const allTeams = await fanta_db.getTeams();
         const team = allTeams.find(t => t.id === tid);
         if(team) {
-            const newCount = (team.missionsCompleted || 0) + 1;
+            const newCount = parseInt(team.missionsCompleted || 0, 10) + 1;
             await window.db.collection("teams").doc(tid).update({ missionsCompleted: newCount });
         }
         await fanta_db.approveMission(mid);
-        if(typeof window.renderAdminMissioni === 'function') window.renderAdminMissioni();
-        if(typeof window.renderAdminMissioniPending === 'function') window.renderAdminMissioniPending();
+        if(typeof window.renderAdminMissioni === 'function') await window.renderAdminMissioni();
+        if(typeof window.renderAdminMissioniPending === 'function') await window.renderAdminMissioniPending();
     } catch (e) {
         console.error("Errore approvazione missione:", e);
+        alert("Errore durante l'approvazione: " + e.message);
     }
 };
 
@@ -1406,6 +1429,7 @@ window.rifiutaMissione = async function(mid) {
         if(typeof window.renderAdminMissioniPending === 'function') window.renderAdminMissioniPending();
     } catch (e) {
         console.error("Errore rifiuto missione:", e);
+        alert("Errore durante il rifiuto: " + e.message);
     }
 };
 
@@ -1427,7 +1451,7 @@ window.approvaTutteMissioni = async function() {
         pending.forEach(m => {
             const team = allTeams.find(t => t.id === m.teamId);
             if(team) {
-                const currentCount = teamUpdates[m.teamId] !== undefined ? teamUpdates[m.teamId] : (team.missionsCompleted || 0);
+                const currentCount = teamUpdates[m.teamId] !== undefined ? teamUpdates[m.teamId] : parseInt(team.missionsCompleted || 0, 10);
                 teamUpdates[m.teamId] = currentCount + 1;
             }
         });
@@ -1435,7 +1459,7 @@ window.approvaTutteMissioni = async function() {
         // Esegui tutte le scritture in parallelo
         const promises = [];
         
-        // 1. Aggiorna i conteggi dei team
+        // 1. Aggiorna i conteggi dei team esistenti
         Object.keys(teamUpdates).forEach(tid => {
             promises.push(window.db.collection("teams").doc(tid).update({ missionsCompleted: teamUpdates[tid] }));
         });
@@ -1451,7 +1475,7 @@ window.approvaTutteMissioni = async function() {
         alert("Tutte le missioni sono state approvate con successo!");
     } catch (e) {
         console.error("Errore approvazione totale missioni:", e);
-        alert("Si è verificato un errore durante l'approvazione di tutte le missioni.");
+        alert("Errore durante l'approvazione di tutte le missioni: " + e.message);
     } finally {
         // Refresh delle view esattamente una volta
         if(typeof window.renderAdminMissioni === 'function') await window.renderAdminMissioni();
