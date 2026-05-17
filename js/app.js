@@ -369,7 +369,7 @@ function populateAuthorSelects(modeId) {
             <div class="author-image-wrapper">
                 <img src="${author.image}" alt="${author.name}">
             </div>
-            <div class="author-name" style="font-family: var(--font-heading); font-weight:bold; font-size:1.1rem; color:var(--accent-gold);">${author.name}</div>
+            <div class="author-name" style="font-family: var(--font-heading); font-weight:bold; font-size:1.1rem; color:#f5c53c;">${author.name}</div>
             <div class="text-primary" style="font-size:0.9rem; font-weight:600;">${author.cost || author.points} ${currency}</div>
         `;
         card.addEventListener('click', () => {
@@ -2140,16 +2140,16 @@ async function renderProfilo() {
         let studentiSection = '';
         if (studentiArr.length > 0) {
             const studentiRows = studentiArr.map(s => `
-                <div style="display:flex; justify-content:space-between; align-items:center; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.04);">
-                    <span style="font-size:0.82rem;">${s.email}</span>
-                    <button class="btn btn-secondary" style="padding:3px 8px; font-size:0.72rem; width:auto; border-radius:12px;"
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.04);">
+                    <span style="font-size:0.8rem;">${s.email}</span>
+                    <button class="btn btn-secondary" style="padding:2px 6px; font-size:0.7rem; width:auto; border-radius:10px;"
                         onclick="profiloSpostaStudente('${s.email}', '${team.id}', '${team.name}')">
                         <i class="fa-solid fa-right-left"></i> Sposta
                     </button>
                 </div>`).join('');
             studentiSection = `
-                <details style="margin-top:8px; margin-bottom:4px;">
-                    <summary style="font-size:0.8rem; cursor:pointer; color:var(--text-muted); user-select:none; margin-bottom:6px;">
+                <details style="margin-top:4px; margin-bottom:6px; width:100%;">
+                    <summary style="font-size:0.78rem; cursor:pointer; color:var(--text-muted); user-select:none; margin-bottom:4px;">
                         <i class="fa-solid fa-users"></i> Studenti iscritti (${studentiArr.length})
                     </summary>
                     <div style="padding-left:4px;">${studentiRows}</div>
@@ -2158,48 +2158,47 @@ async function renderProfilo() {
 
         // Sezione codice (solo per squadre proprie)
         const codiceSection = !isCollaborated ? `
-            <div style="width:100%; margin-bottom:15px; padding:10px; border-radius:12px; background:rgba(141, 160, 63, 0.05); border:1px dashed var(--primary-color); display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                    <span style="font-size:0.7rem; text-transform:uppercase; color:var(--text-muted); display:block;">Codice Studenti</span>
-                    <span class="join-code-badge" style="margin:0;">${team.joinCode || '---'}</span>
+            <div style="width:100%; margin-bottom:10px; padding:6px 10px; border-radius:8px; background:rgba(141, 160, 63, 0.04); border:1px dashed rgba(141, 160, 63, 0.3); display:flex; justify-content:space-between; align-items:center;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:0.65rem; text-transform:uppercase; color:var(--text-muted);">Codice Studenti:</span>
+                    <span class="join-code-badge" style="margin:0; font-size:0.85rem; padding:2px 6px;">${team.joinCode || '---'}</span>
                 </div>
-                <button class="btn" style="width:auto; padding:6px 12px; font-size:0.75rem; border-radius:20px;" onclick="shareInvite({type:'student', code:'${team.joinCode}', teamName:'${team.name}'})">
+                <button class="btn" style="width:auto; padding:4px 10px; font-size:0.7rem; border-radius:12px;" onclick="shareInvite({type:'student', code:'${team.joinCode}', teamName:'${team.name}'})">
                     <i class="fa-solid fa-share-nodes"></i> Condividi
                 </button>
             </div>` : '';
 
         return `
-            <div class="card" style="margin-bottom:20px; flex-direction:column; align-items:flex-start;">
-                <div style="display:flex; justify-content:space-between; align-items:center; width:100%; border-bottom:1px solid rgba(75, 93, 22, 0.2); padding-bottom:8px; margin-bottom:10px;">
-                    <div style="font-family: var(--font-heading); font-weight:bold; color:var(--accent-gold); font-size:1.4rem;">${team.name}${collabBadge}</div>
+            <div class="card" style="margin-bottom:15px; padding:12px; flex-direction:column; align-items:flex-start; gap:8px; width:100%;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; width:100%; gap:10px;">
+                    <div>
+                        <div style="font-family: var(--font-heading); font-weight:bold; color:#f5c53c; font-size:1.35rem; line-height:1.2; text-shadow: 0 1px 4px rgba(0,0,0,0.4);">${team.name}${collabBadge}</div>
+                        <div style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;"><i class="fa-solid fa-users"></i> Classe: ${team.classe || 'N/A'}</div>
+                    </div>
                     ${modeBadgeHtml}
                 </div>
-                <div style="font-size:0.9rem; color:var(--text-muted); margin-bottom:12px;"><i class="fa-solid fa-users"></i> Classe: ${team.classe || 'N/A'}</div>
                 
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; width:100%; margin-bottom:15px; font-size:0.85rem; padding: 0 5px;">
-                    <div style="background:rgba(255,255,255,0.03); padding:8px; border-radius:8px;">
-                        <span style="color:var(--text-muted); display:block; font-size:0.7rem; text-transform:uppercase;">Punti Autori</span>
-                        <span style="font-weight:bold; color:var(--primary-color); font-size:1.1rem;">${authPts} pt</span>
+                <div style="display:flex; justify-content:space-between; align-items:center; width:100%; background:rgba(255, 255, 255, 0.02); border:1px solid rgba(255, 255, 255, 0.05); padding:6px 10px; border-radius:8px; margin-bottom:4px; font-size:0.8rem;">
+                    <div style="text-align:left; flex:1;">
+                        <span style="color:var(--text-muted); display:block; font-size:0.6rem; text-transform:uppercase; letter-spacing:0.5px;">Autori</span>
+                        <span style="font-weight:bold; color:var(--text-main); font-size:0.95rem;">${authPts} pt</span>
                     </div>
-                    <div style="background:rgba(255,255,255,0.03); padding:8px; border-radius:8px;">
-                        <span style="color:var(--text-muted); display:block; font-size:0.7rem; text-transform:uppercase;">Punti Missioni</span>
-                        <span style="font-weight:bold; color:var(--primary-color); font-size:1.1rem;">${misPts} pt</span>
+                    <div style="text-align:left; flex:1; border-left:1px solid rgba(255,255,255,0.08); padding-left:10px;">
+                        <span style="color:var(--text-muted); display:block; font-size:0.6rem; text-transform:uppercase; letter-spacing:0.5px;">Missioni</span>
+                        <span style="font-weight:bold; color:var(--text-main); font-size:0.95rem;">${misPts} pt</span>
+                    </div>
+                    <div style="text-align:left; flex:1.2; border-left:1px solid rgba(255,255,255,0.08); padding-left:10px;">
+                        <span style="color:var(--text-muted); display:block; font-size:0.6rem; text-transform:uppercase; letter-spacing:0.5px;">Totale</span>
+                        <span style="font-weight:bold; color:var(--primary-color); font-size:0.95rem;">${authPts + misPts} pt</span>
+                    </div>
+                    <div style="text-align:right; flex:1; border-left:1px solid rgba(255,255,255,0.08); padding-left:10px;">
+                        <span style="color:var(--text-muted); display:block; font-size:0.6rem; text-transform:uppercase; letter-spacing:0.5px;">Posizione</span>
+                        <span style="font-weight:bold; color:#f5c53c; font-size:0.95rem;">#${rank}</span>
                     </div>
                 </div>
 
                 ${studentiSection}
                 ${codiceSection}
-
-                <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(75, 93, 22, 0.05); padding:12px; border-radius:12px; width:100%; border:1px solid rgba(75, 93, 22, 0.1);">
-                    <div>
-                        <div style="font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); letter-spacing:1px;">Totale Globale</div>
-                        <div style="font-weight:bold; font-size:1.4rem; color:var(--primary-color);">${authPts + misPts} pt</div>
-                    </div>
-                    <div style="text-align:right;">
-                        <div style="font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); letter-spacing:1px;">Posizione</div>
-                        <div style="font-weight:bold; font-size:1.4rem; color:var(--accent-gold);">#${rank}</div>
-                    </div>
-                </div>
             </div>`;
     }
 
@@ -2596,13 +2595,13 @@ async function renderMissioniUtente() {
                 let teamObj = myTeams.find(t => t.id === m.teamId);
                 let teamName = teamObj ? teamObj.name : "Squadra Sconosciuta";
                 list.innerHTML += `
-                    <div class="glass" style="padding:15px; margin-bottom:10px; border-left:4px solid var(--accent-gold); display:flex; justify-content:space-between; align-items:center;">
+                    <div class="glass" style="padding:15px; margin-bottom:10px; border-left:4px solid #f5c53c; display:flex; justify-content:space-between; align-items:center;">
                         <div>
                             <div style="font-weight:bold; font-size:1rem; margin-bottom:2px;">${m.titolo}</div>
                             <div style="font-size:0.8rem; color:var(--text-muted);"><i class="fa-solid fa-users"></i> ${teamName}</div>
                         </div>
                         <div style="text-align:right;">
-                            <div style="font-size:0.65rem; color:var(--accent-gold); font-weight:800; text-transform:uppercase; background:rgba(212, 175, 55, 0.1); padding:4px 8px; border-radius:10px; border:1px solid rgba(212, 175, 55, 0.2);">
+                            <div style="font-size:0.65rem; color:#f5c53c; font-weight:800; text-transform:uppercase; background:rgba(212, 175, 55, 0.1); padding:4px 8px; border-radius:10px; border:1px solid rgba(212, 175, 55, 0.2);">
                                 <i class="fa-solid fa-clock"></i> In attesa
                             </div>
                         </div>
