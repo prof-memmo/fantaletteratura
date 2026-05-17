@@ -1394,7 +1394,7 @@ window.approvaMissione = async function(mid, tid) {
 
 window.rifiutaMissione = async function(mid) {
     try {
-        await window.db.collection("missions").doc(mid).delete();
+        await window.db.collection("missions").doc(mid).update({ status: 'rejected' });
         if(typeof window.renderAdminMissioniPending === 'function') window.renderAdminMissioniPending();
     } catch (e) {
         console.error("Errore rifiuto missione:", e);
@@ -2463,6 +2463,43 @@ async function renderProfilo() {
         collabTeams.forEach(team => { squadreList.innerHTML += renderTeamCard(team, true); });
     }
 
+    // Aggiorna le missioni convalidate del profilo docente
+    const profMisList = document.getElementById('profilo-missioni-list');
+    if(profMisList) {
+        profMisList.innerHTML = '<i>Caricamento missioni convalidate...</i>';
+        try {
+            // Ottieni tutte le missioni convalidate
+            const snap = await window.db.collection("missions").where("status", "==", "approved").get();
+            const approvedMissions = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            
+            // Filtra solo quelle delle squadre dell'utente (proprietario o collaboratore)
+            const myTeamIds = [...myTeams, ...collabTeams].map(t => t.id);
+            const myApproved = approvedMissions.filter(m => myTeamIds.includes(m.teamId));
+            
+            if(myApproved.length === 0) {
+                profMisList.innerHTML = '<i>Nessuna missione convalidata.</i>';
+            } else {
+                profMisList.innerHTML = '';
+                myApproved.forEach(m => {
+                    const t = [...myTeams, ...collabTeams].find(x => x.id === m.teamId);
+                    const teamName = t ? t.name : 'Squadra Sconosciuta';
+                    profMisList.innerHTML += `
+                        <div class="glass" style="padding:10px; margin-bottom:8px; border-left:3px solid var(--primary-color); display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <div style="font-weight:bold; font-size:0.9rem;">${m.titolo}</div>
+                                <small style="color:var(--text-muted);"><i class="fa-solid fa-users"></i> ${teamName}</small>
+                            </div>
+                            <div style="font-size:0.75rem; color:var(--primary-color); font-weight:bold;"><i class="fa-solid fa-circle-check"></i> Convalidata (+5 pt)</div>
+                        </div>
+                    `;
+                });
+            }
+        } catch(e) {
+            console.error("Errore nel caricamento delle missioni convalidate:", e);
+            profMisList.innerHTML = '<i>Errore nel caricamento delle missioni.</i>';
+        }
+    }
+
     renderNotifiche();
     renderTornei();
 }
@@ -2534,6 +2571,8 @@ async function renderNotifiche() {
     if(list) list.innerHTML = '<p class="text-center">Caricamento notifiche...</p>';
     
     try {
+        const allTeams = await fanta_db.getTeams();
+        
         let pendingInvites = [];
         try {
             const myPending = await fanta_db.getInvites(currentUserEmail);
@@ -2548,6 +2587,44 @@ async function renderNotifiche() {
                 pendingMissions = await fanta_db.getPendingMissions();
             } catch (err) {
                 console.warn("getPendingMissions failed: ", err);
+            }
+        }
+
+        // Rileva le notifiche di convalida/rifiuto missioni per i docenti/fantamici
+        let unseenMissions = [];
+        if (currentUserEmail !== 'prof.memmo@gmail.com') {
+            const myTeams = allTeams.filter(t => t.ownerEmail === currentUserEmail);
+            const myTeamIds = myTeams.map(t => t.id);
+            let collabTeams = [];
+            try {
+                collabTeams = await fanta_db.getCollaboratedTeams(currentUserEmail);
+            } catch(e) {}
+            const allMyTeamIds = [...myTeamIds, ...collabTeams.map(t => t.id)];
+
+            if (allMyTeamIds.length > 0) {
+                try {
+                    const snap = await window.db.collection("missions")
+                        .where("teamId", "in", allMyTeamIds.slice(0, 30))
+                        .get();
+                    const myMissions = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+                        .filter(m => m.status === 'approved' || m.status === 'rejected');
+                    
+                    const seenMissionsStr = localStorage.getItem('fanta_seen_missions') || '[]';
+                    let seenMissions = [];
+                    try {
+                        seenMissions = JSON.parse(seenMissionsStr);
+                    } catch(e) {
+                        seenMissions = [];
+                    }
+                    
+                    myMissions.forEach(m => {
+                        if (!seenMissions.includes(m.id)) {
+                            unseenMissions.push(m);
+                        }
+                    });
+                } catch (err) {
+                    console.warn("getMissions for notifications failed: ", err);
+                }
             }
         }
         
@@ -2585,7 +2662,7 @@ async function renderNotifiche() {
             });
         }
         
-        const totalNotifications = pendingInvites.length + unseenSchede.length + pendingMissions.length;
+        const totalNotifications = pendingInvites.length + unseenSchede.length + pendingMissions.length + unseenMissions.length;
         
         // Aggiorna Badge Campanella
         if(badge) {
@@ -2594,6 +2671,16 @@ async function renderNotifiche() {
                 badge.style.display = 'flex';
             } else {
                 badge.style.display = 'none';
+            }
+        }
+
+        // Aggiorna Badge Tab Profilo
+        const tabBadge = document.getElementById('tab-notification-badge');
+        if(tabBadge) {
+            if(totalNotifications > 0) {
+                tabBadge.style.display = 'block';
+            } else {
+                tabBadge.style.display = 'none';
             }
         }
         
@@ -2661,6 +2748,27 @@ async function renderNotifiche() {
                                 <button class="btn" style="padding:5px 12px; font-size:0.75rem; width:auto; background:var(--accent-gold); color:var(--bg-dark);" onclick="document.getElementById('notifiche-modal').style.display='none'; window.approvaMissioneDaNotifica('${m.id}', '${m.teamId}')">Approva</button>
                                 <button class="btn btn-secondary" style="padding:5px 12px; font-size:0.75rem; width:auto;" onclick="document.getElementById('notifiche-modal').style.display='none'; window.rifiutaMissioneDaNotifica('${m.id}')">Rifiuta</button>
                             </div>
+                        </div>
+                    `;
+                });
+            }
+
+            // 4. Mostra le notifiche di convalida/rifiuto missioni per il docente/fantamico
+            if (currentUserEmail !== 'prof.memmo@gmail.com' && unseenMissions.length > 0) {
+                unseenMissions.forEach(m => {
+                    const t = allTeams.find(x => x.id === m.teamId);
+                    const teamName = t ? t.name : 'Squadra Sconosciuta';
+                    const isApproved = m.status === 'approved';
+                    const bg = isApproved ? 'rgba(141, 160, 63, 0.1)' : 'rgba(230, 57, 70, 0.1)';
+                    const border = isApproved ? 'var(--primary-color)' : '#e63946';
+                    const titleText = isApproved 
+                        ? `✅ <b>Missione Convalidata!</b> La missione "<i>${m.titolo}</i>" per la squadra <b>${teamName}</b> è stata approvata! (+5 punti)` 
+                        : `❌ <b>Missione Respinta!</b> La missione "<i>${m.titolo}</i>" per la squadra <b>${teamName}</b> non è stata approvata.`;
+                    
+                    list.innerHTML += `
+                        <div style="background:${bg}; padding:12px; border-radius:8px; border-left:3px solid ${border}; font-size:0.85rem; margin-bottom:10px;">
+                            <p style="margin:0 0 10px 0;">${titleText}</p>
+                            <button class="btn btn-secondary" style="padding:5px 12px; font-size:0.75rem; width:auto;" onclick="window.segnaMissioneNotificaVisto('${m.id}')"><i class="fa-solid fa-check"></i> Ho capito</button>
                         </div>
                     `;
                 });
@@ -2737,6 +2845,22 @@ window.rifiutaMissioneDaNotifica = async function(mid) {
         await window.rifiutaMissione(mid);
         if (typeof renderNotifiche === 'function') renderNotifiche();
     }
+};
+
+window.segnaMissioneNotificaVisto = function(mid) {
+    const seenMissionsStr = localStorage.getItem('fanta_seen_missions') || '[]';
+    let seenMissions = [];
+    try {
+        seenMissions = JSON.parse(seenMissionsStr);
+    } catch(e) {
+        seenMissions = [];
+    }
+    if(!seenMissions.includes(mid)) {
+        seenMissions.push(mid);
+        localStorage.setItem('fanta_seen_missions', JSON.stringify(seenMissions));
+    }
+    renderNotifiche();
+    if(typeof renderProfilo === 'function') renderProfilo();
 };
 
 window.apriNotificheModal = function() {
