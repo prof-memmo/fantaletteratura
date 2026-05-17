@@ -172,6 +172,16 @@ function navigateTo(viewId, pushHistory = true) {
     const hasStudentCode = localStorage.getItem('fanta_active_team_code');
     const isDocente = !!currentUserEmail;
 
+    // Restrizioni per Studenti
+    const isRestrictedForStudents = ['view-profilo', 'view-squadra', 'view-missioni'].includes(viewId);
+    const userRole = (typeof currentUserRole !== 'undefined' ? currentUserRole : '') || localStorage.getItem('fanta_user_role') || (hasStudentCode && !isDocente ? 'studente' : '');
+
+    if (isRestrictedForStudents && (userRole === 'studente' || (hasStudentCode && !isDocente))) {
+        alert("Questa sezione è riservata ai docenti e fantamici.");
+        navigateTo('view-welcome', pushHistory);
+        return;
+    }
+
     if (!isPublicView && !hasStudentCode && !isDocente) {
         // Blocco totale per utenti non loggati che provano ad accedere a sezioni riservate
         alert("Devi prima effettuare l'accesso per visitare questa sezione.");
@@ -1274,6 +1284,7 @@ function populateSchede(modeId = null) {
 ========================================= */
 
 let currentUserEmail = null;
+let currentUserRole = null;
 
 function checkLoginSession() {
     // Ripristina modalità se salvata
@@ -1299,7 +1310,8 @@ function checkLoginSession() {
 
             // Prof Memmo ha accesso diretto
             if (email === "prof.memmo@gmail.com") {
-                setLoggedIn(email);
+                currentUserRole = 'docente';
+                setLoggedIn(email, 'docente');
                 
                 // Forza visualizzazione container nel pannello admin dopo la verifica
                 if (window.location.pathname.includes('admin.html')) {
@@ -1316,7 +1328,7 @@ function checkLoginSession() {
                 if (adminMenuItem) adminMenuItem.style.display = 'block';
                 
                 if (window.location.hash === '#view-welcome' || window.location.hash === '' && !window.location.pathname.includes('admin.html')) {
-                    navigateTo('view-prof');
+                    navigateTo('view-welcome');
                 }
                 return;
             }
@@ -1328,17 +1340,10 @@ function checkLoginSession() {
                 if (doc.exists && doc.data().role) {
                     // Utente approvato e ha un ruolo
                     const role = doc.data().role;
-                    setLoggedIn(email);
+                    currentUserRole = role;
+                    setLoggedIn(email, role);
                     if (window.location.hash === '#view-welcome' || window.location.hash === '') {
-                        if (role === 'docente' || role === 'teacher') {
-                            navigateTo('view-prof');
-                        } else if (role === 'studente') {
-                            navigateTo('view-studenti');
-                        } else if (role === 'fantamico') {
-                            navigateTo('view-fantamico');
-                        } else {
-                            navigateTo('view-onboarding');
-                        }
+                        navigateTo('view-welcome');
                     }
                 } else {
                     // Nuovo utente o senza ruolo: mandiamo a onboarding
@@ -1708,8 +1713,14 @@ window.onclick = function(event) {
     if (event.target.id === 'invite-torneo-modal') event.target.style.display = 'none';
 }
 
-function setLoggedIn(email) {
+function setLoggedIn(email, role = '') {
     currentUserEmail = email;
+    if (role) {
+        localStorage.setItem('fanta_user_role', role);
+        currentUserRole = role;
+    } else {
+        currentUserRole = localStorage.getItem('fanta_user_role') || '';
+    }
     
     // Sidebar and menu-btn removed
     
@@ -1719,11 +1730,57 @@ function setLoggedIn(email) {
     if(loggedSec) loggedSec.style.display = 'block';
     
     const loggedWelc = document.getElementById('logged-in-welcome');
-    if(loggedWelc) loggedWelc.textContent = "Bentornato, Prof!";
+    const loggedInNormalContent = document.getElementById('logged-in-normal-content');
     
-    // Show Profile and Admin tabs
+    const isTeacher = currentUserRole === 'docente' || currentUserRole === 'teacher' || email === 'prof.memmo@gmail.com';
+    const isFantamico = currentUserRole === 'fantamico' || currentUserRole === 'guest';
+    const isStudent = currentUserRole === 'studente';
+    
+    if (loggedWelc) {
+        if (isTeacher) loggedWelc.textContent = "Bentornato, Prof!";
+        else if (isFantamico) loggedWelc.textContent = "Ciao, Fantamico!";
+        else if (isStudent) loggedWelc.textContent = "Ciao, Studente!";
+        else loggedWelc.textContent = "Benvenuto!";
+    }
+    
+    if (loggedInNormalContent) {
+        if (isStudent) {
+            const teamCode = localStorage.getItem('fanta_active_team_code') || '';
+            loggedInNormalContent.innerHTML = `
+                <h3 class="text-center mb-1 text-primary">Area Studente</h3>
+                <p class="text-center" style="font-size: 0.9rem; margin-bottom:20px;">Hai effettuato l'accesso come studente.${teamCode ? `<br>Codice Squadra attivo: <b>${teamCode}</b>` : ''}</p>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <button class="btn" style="width:100%;" onclick="navigateTo('view-classifiche')">Vedi le Classifiche</button>
+                    <button class="btn btn-secondary" style="width:100%; border-width:2px;" onclick="navigateTo('view-schede')">Esplora le Schede Autore</button>
+                </div>
+            `;
+        } else if (isFantamico) {
+            loggedInNormalContent.innerHTML = `
+                <h3 class="text-center mb-1 text-primary">Ciao, Fantamico!</h3>
+                <p class="text-center" style="font-size: 0.9rem; margin-bottom:20px;">Hai effettuato l'accesso all'area personale Fantamico.</p>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <button class="btn" style="width:100%;" onclick="navigateTo('view-profilo')">Vai al tuo Profilo / Squadre</button>
+                    <button class="btn btn-secondary" style="width:100%; border-width:2px;" onclick="navigateTo('view-squadra')">Crea una Nuova Squadra</button>
+                </div>
+            `;
+        } else {
+            loggedInNormalContent.innerHTML = `
+                <h3 class="text-center mb-1 text-primary">Bentornato, Prof!</h3>
+                <p class="text-center" style="font-size: 0.9rem; margin-bottom:20px;">Hai effettuato l'accesso all'area personale.</p>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <button class="btn" style="width:100%;" onclick="navigateTo('view-profilo')">Vai alle tue Squadre / Profilo</button>
+                    <button class="btn btn-secondary" style="width:100%; border-width:2px;" onclick="navigateTo('view-squadra')">Iscrivi una Nuova Classe</button>
+                </div>
+            `;
+        }
+    }
+    
+    // Show Profile and Admin tabs only if not a student
     const pTab = document.getElementById('tab-item-profilo');
-    if(pTab) pTab.classList.remove('hidden');
+    if(pTab) {
+        if (isStudent) pTab.classList.add('hidden');
+        else pTab.classList.remove('hidden');
+    }
 
     const adminTab = document.getElementById('tab-item-admin');
     if (adminTab) {
@@ -1739,11 +1796,15 @@ function setLoggedIn(email) {
     const appContainer = document.getElementById('app-container');
     if(appContainer) appContainer.style.display = 'block';
 
-    renderProfilo();
+    if (!isStudent) {
+        renderProfilo();
+    }
 }
 
 function setLoggedOut() {
     currentUserEmail = null;
+    currentUserRole = null;
+    localStorage.removeItem('fanta_user_role');
     
     // Sidebar and menu-btn removed
     
