@@ -109,6 +109,13 @@ function initApp() {
     const _c = document.getElementById('app-container');
     if (_c && !isLoginPage) _c.style.display = 'block';
 
+    // Migrazione unica per pulire fanta_seen_schede inquinato dal vecchio bug di auto-lettura in background
+    if (!localStorage.getItem('fanta_seen_schede_migrated_v3')) {
+        localStorage.removeItem('fanta_seen_schede');
+        localStorage.setItem('fanta_seen_schede_migrated_v3', 'true');
+        console.log("Migration: cleared old fanta_seen_schede auto-read pollution.");
+    }
+
     // Sottoscrivi real-time a tutti i campionati per raccogliere notifiche e schede in tempo reale
     loadGameState('terze');
     loadGameState('seconde');
