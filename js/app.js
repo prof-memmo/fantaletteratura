@@ -2213,10 +2213,9 @@ async function renderProfilo() {
             <div class="card" style="margin:0; padding:12px; flex-direction:column; align-items:flex-start; gap:8px; width:100%;">
                 <div style="width:100%;">
                     <div style="font-family: var(--font-heading); font-weight:bold; color:#f5c53c; font-size:1.35rem; line-height:1.2; text-shadow: 0 1px 4px rgba(0,0,0,0.4); width:100%;">${team.name}${collabBadge}</div>
-                    <div style="font-size:0.75rem; color:var(--text-muted); display:flex; gap:8px; align-items:center; width:100%; margin-top:4px; margin-bottom:4px;">
-                        <span><i class="fa-solid fa-trophy" style="color:#f5c53c; font-size:0.7rem;"></i> ${modeCfg.emoji} ${modeCfg.shortLabel}</span>
-                        <span style="opacity:0.3;">|</span>
-                        <span><i class="fa-solid fa-users" style="font-size:0.7rem;"></i> Classe: <strong>${team.classe || 'N/A'}</strong></span>
+                    <div style="font-size:0.75rem; color:var(--text-muted); margin-top:4px; line-height:1.35;">
+                        <div style="color:var(--text-main); font-weight:500;"><i class="fa-solid fa-users" style="font-size:0.68rem; margin-right:4px;"></i> Classe: <strong>${team.classe || 'N/A'}</strong></div>
+                        <div style="font-size:0.7rem; color:var(--text-muted); margin-top:2px;">Campionato: ${modeCfg.emoji} ${modeCfg.shortLabel}</div>
                     </div>
                 </div>
                 
