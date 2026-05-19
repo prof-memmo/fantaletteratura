@@ -18,6 +18,15 @@ service cloud.firestore {
       return isAuthenticated() && currentUserEmail() == 'prof.memmo@gmail.com';
     }
 
+    // Funzione helper per verificare se l'utente è un docente autorizzato per una determinata squadra (owner o collaboratore)
+    function isAuthorizedTeacherForTeam(teamId) {
+      let team = get(/databases/$(database)/documents/teams/$(teamId));
+      return team != null && (
+        team.data.ownerEmail.toLowerCase() == currentUserEmail() ||
+        ('collaboratori' in team.data && team.data.collaboratori != null && currentUserEmail() in team.data.collaboratori)
+      );
+    }
+
     // 1. Collezione: settings (Stato di gioco globale, schede e punteggi sbloccati)
     match /settings/{docId} {
       // Chiunque può leggere le impostazioni correnti di gioco
@@ -30,8 +39,17 @@ service cloud.firestore {
     match /users/{email} {
       // Qualsiasi utente autenticato può leggere le informazioni dei profili
       allow read: if isAuthenticated();
-      // Un utente può creare o aggiornare solo il proprio profilo (o il Game Master può gestire tutto)
-      allow write: if isGameMaster() || (isAuthenticated() && currentUserEmail() == email.toLowerCase());
+      // Un utente può creare o cancellare solo il proprio profilo (o il Game Master)
+      allow create, delete: if isGameMaster() || (isAuthenticated() && currentUserEmail() == email.toLowerCase());
+      // Un utente può aggiornare il proprio profilo, oppure un docente autorizzato può aggiornare la squadra dello studente
+      allow update: if isGameMaster() || (isAuthenticated() && (
+        currentUserEmail() == email.toLowerCase() ||
+        (resource.data.role == 'studente' &&
+         'teamId' in resource.data && resource.data.teamId != null &&
+         isAuthorizedTeacherForTeam(resource.data.teamId) &&
+         'teamId' in request.resource.data && request.resource.data.teamId != null &&
+         isAuthorizedTeacherForTeam(request.resource.data.teamId))
+      ));
     }
 
     // 3. Collezione: pending_requests (Richieste di approvazione dei docenti)
@@ -50,8 +68,11 @@ service cloud.firestore {
       allow read: if true;
       // Un utente autenticato può creare una squadra solo a proprio nome
       allow create: if isAuthenticated() && request.resource.data.ownerEmail.toLowerCase() == currentUserEmail();
-      // Solo il proprietario della squadra o il Game Master può modificarla o eliminarla
-      allow update, delete: if isGameMaster() || (isAuthenticated() && resource.data.ownerEmail.toLowerCase() == currentUserEmail());
+      // Solo il proprietario della squadra, un collaboratore o il Game Master può modificarla o eliminarla
+      allow update, delete: if isGameMaster() || (isAuthenticated() && (
+        resource.data.ownerEmail.toLowerCase() == currentUserEmail() ||
+        ('collaboratori' in resource.data && resource.data.collaboratori != null && currentUserEmail() in resource.data.collaboratori)
+      ));
     }
 
     // 5. Collezione: missions (Missioni inviate dagli studenti/docenti)
