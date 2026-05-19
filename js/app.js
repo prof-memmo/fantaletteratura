@@ -1008,7 +1008,7 @@ async function setupAdminPanel() {
                         </div>
                         <div style="display:flex; gap:6px; flex-shrink:0;">
                             <button class="btn btn-secondary" title="Gestisci Collaboratori" style="padding:4px 8px; font-size:0.75rem; width:auto; background:rgba(141,160,63,0.15); border-color:var(--primary-color);"
-                                onclick="apriCollaboratori('${t.id}', '${t.name}', ${JSON.stringify(collaboratori).replace(/"/g, '&quot;')})">
+                                onclick="window.apriCollaboratori('${t.id}', '${t.name.replace(/'/g, "\\'")}')">
                                 <i class="fa-solid fa-user-plus"></i>
                             </button>
                             <button class="btn btn-secondary text-danger" style="padding:4px 8px; font-size:0.75rem; width:auto; background:transparent;" onclick="eliminaSquadra('${t.id}')">
@@ -1083,14 +1083,30 @@ async function setupAdminPanel() {
     };
 
     // ── COLLABORATORI DOCENTI ───────────────────────────────────
-    window.apriCollaboratori = function(teamId, teamName, collaboratori) {
+    window.apriCollaboratori = async function(teamId, teamName) {
         const modal = document.getElementById('modal-collaboratori');
         if (!modal) return;
         document.getElementById('collaboratori-team-id').value = teamId;
         document.getElementById('collaboratori-team-nome').textContent = `Squadra: ${teamName}`;
         document.getElementById('collaboratori-new-email').value = '';
-        window._renderCollaboratoriLista(teamId, collaboratori);
         modal.style.display = 'flex';
+
+        // Renderizza uno stato di caricamento provvisorio
+        const lista = document.getElementById('collaboratori-lista');
+        if (lista) {
+            lista.innerHTML = '<i style="font-size:0.85rem; color:var(--text-muted);">Caricamento collaboratori...</i>';
+        }
+
+        try {
+            const teamDoc = await window.db.collection('teams').doc(teamId).get();
+            const colList = teamDoc.data()?.collaboratori || [];
+            window._renderCollaboratoriLista(teamId, colList);
+        } catch (e) {
+            console.error(e);
+            if (lista) {
+                lista.innerHTML = '<i style="font-size:0.85rem; color:var(--danger-color);">Errore caricamento.</i>';
+            }
+        }
     };
 
     window._renderCollaboratoriLista = function(teamId, collaboratori) {
@@ -2612,16 +2628,16 @@ async function renderProfilo() {
 
         // Sezione Azioni (Modifica / Collaboratori / Elimina)
         const azioniSection = `
-            <div style="display:flex; gap:8px; width:100%; margin-top:4px; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px;">
-                <button class="btn btn-secondary" style="flex:1; padding:5px 8px; font-size:0.72rem; border-radius:8px; background:rgba(255,255,255,0.03);" 
+            <div style="display:flex; flex-wrap:wrap; gap:8px; width:100%; margin-top:4px; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px;">
+                <button class="btn btn-secondary" style="flex:1; min-width:80px; padding:5px 8px; font-size:0.72rem; border-radius:8px; background:rgba(255,255,255,0.03);" 
                     onclick="docenteModificaSquadra('${team.id}', '${team.name.replace(/'/g, "\\'")}', '${(team.classe || '').replace(/'/g, "\\'")}')">
                     <i class="fa-solid fa-pen-to-square"></i> Modifica
                 </button>
-                <button class="btn btn-secondary" style="flex:1; padding:5px 8px; font-size:0.72rem; border-radius:8px; background:rgba(141,160,63,0.15); border-color:var(--primary-color);"
-                    onclick="apriCollaboratori('${team.id}', '${team.name.replace(/'/g, "\\'")}', ${JSON.stringify(team.collaboratori || []).replace(/"/g, '&quot;')})">
+                <button class="btn btn-secondary" style="flex:1.2; min-width:110px; padding:5px 8px; font-size:0.72rem; border-radius:8px; background:rgba(141,160,63,0.15); border-color:var(--primary-color);"
+                    onclick="window.apriCollaboratori('${team.id}', '${team.name.replace(/'/g, "\\'")}')">
                     <i class="fa-solid fa-user-plus"></i> Collaboratori
                 </button>
-                <button class="btn btn-danger" style="flex:1; padding:5px 8px; font-size:0.72rem; border-radius:8px; background:rgba(230, 57, 70, 0.1); border:1px solid rgba(230, 57, 70, 0.2); color:#e63946;" 
+                <button class="btn btn-danger" style="flex:1; min-width:80px; padding:5px 8px; font-size:0.72rem; border-radius:8px; background:rgba(230, 57, 70, 0.1); border:1px solid rgba(230, 57, 70, 0.2); color:#e63946;" 
                     onclick="docenteEliminaSquadra('${team.id}', '${team.name.replace(/'/g, "\\'")}')">
                     <i class="fa-solid fa-trash-can"></i> Elimina
                 </button>
