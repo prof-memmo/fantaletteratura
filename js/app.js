@@ -1207,10 +1207,10 @@ async function setupAdminPanel() {
             await fanta_db.moveStudent(email, newTeamId, newTeamCode);
             document.getElementById('modal-sposta-studente').style.display = 'none';
             alert('Studente spostato con successo!');
-            if (typeof window.renderAdminSquadre === 'function') {
-                window.renderAdminSquadre();
-            } else if (typeof renderProfilo === 'function') {
-                renderProfilo();
+            if (window.location.pathname.includes('admin.html')) {
+                if (typeof window.renderAdminSquadre === 'function') window.renderAdminSquadre();
+            } else {
+                if (typeof renderProfilo === 'function') renderProfilo();
             }
         } catch (e) {
             console.error(e);
@@ -1280,10 +1280,10 @@ async function setupAdminPanel() {
             // Aggiorna la lista
             const teamDoc = await window.db.collection('teams').doc(teamId).get();
             window._renderCollaboratoriLista(teamId, teamDoc.data()?.collaboratori || []);
-            if (typeof window.renderAdminSquadre === 'function') {
-                window.renderAdminSquadre();
-            } else if (typeof renderProfilo === 'function') {
-                renderProfilo();
+            if (window.location.pathname.includes('admin.html')) {
+                if (typeof window.renderAdminSquadre === 'function') window.renderAdminSquadre();
+            } else {
+                if (typeof renderProfilo === 'function') renderProfilo();
             }
         } catch (e) {
             console.error(e);
@@ -1297,10 +1297,10 @@ async function setupAdminPanel() {
             await fanta_db.removeCollaboratore(teamId, email);
             const teamDoc = await window.db.collection('teams').doc(teamId).get();
             window._renderCollaboratoriLista(teamId, teamDoc.data()?.collaboratori || []);
-            if (typeof window.renderAdminSquadre === 'function') {
-                window.renderAdminSquadre();
-            } else if (typeof renderProfilo === 'function') {
-                renderProfilo();
+            if (window.location.pathname.includes('admin.html')) {
+                if (typeof window.renderAdminSquadre === 'function') window.renderAdminSquadre();
+            } else {
+                if (typeof renderProfilo === 'function') renderProfilo();
             }
         } catch (e) {
             console.error(e);
