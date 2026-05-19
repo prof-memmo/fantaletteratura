@@ -1306,28 +1306,68 @@ async function setupAdminPanel() {
 
     window.renderAdminMissioniPending = async function() {
         const list = document.getElementById('admin-missioni-pending-list');
+        const statsContainer = document.getElementById('admin-missioni-stats');
         if(!list) return;
         list.innerHTML = '<p class="text-center">Caricamento missioni...</p>';
         
-        const pending = await fanta_db.getPendingMissions();
-        const allTeams = await fanta_db.getTeams();
-        
-        list.innerHTML = '';
-        if(pending.length === 0) {
-            list.innerHTML = '<i>Nessuna missione in attesa.</i>';
-            if(document.getElementById('btn-approva-tutte')) document.getElementById('btn-approva-tutte').disabled = true;
-        } else {
-            if(document.getElementById('btn-approva-tutte')) document.getElementById('btn-approva-tutte').disabled = false;
-            pending.forEach(m => {
-                let t = allTeams.find(x => x.id === m.teamId);
-                list.innerHTML += `<div class="glass" style="padding:10px; margin-bottom:10px; border-left:3px solid var(--accent-gold);">
-                    <div style="font-weight:bold;">${m.titolo}</div><small>${t?t.name:'Squadra Sconosciuta'}</small>
-                    <div style="display:flex; gap:10px; margin-top:8px;">
-                        <button class="btn" style="padding:4px; font-size:0.75rem; width:auto;" onclick="approvaMissione('${m.id}', '${m.teamId}')">Ok</button>
-                        <button class="btn btn-secondary" style="padding:4px; font-size:0.75rem; width:auto;" onclick="rifiutaMissione('${m.id}')">No</button>
+        try {
+            const pending = await fanta_db.getPendingMissions();
+            const allTeams = await fanta_db.getTeams();
+            
+            // Per il conteggio delle statistiche
+            const approvedSnap = await window.db.collection("missions").where("status", "==", "approved").get();
+            const approvedCount = approvedSnap.size;
+            
+            const rejectedSnap = await window.db.collection("missions").where("status", "==", "rejected").get();
+            const rejectedCount = rejectedSnap.size;
+            
+            const pendingCount = pending.length;
+            const totalCount = pendingCount + approvedCount + rejectedCount;
+            
+            if (statsContainer) {
+                statsContainer.innerHTML = `
+                    <div class="admin-stat-card">
+                        <div class="stat-value" style="color: var(--primary-color);">${totalCount}</div>
+                        <div class="stat-label">TOTALE MISSIONI</div>
                     </div>
-                </div>`;
-            });
+                    <div class="admin-stat-card">
+                        <div class="stat-value" style="color: var(--accent-gold);">${pendingCount}</div>
+                        <div class="stat-label">DA CONVALIDARE</div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <div class="stat-value" style="color: #2ecc71;">${approvedCount}</div>
+                        <div class="stat-label">CONVALIDATE</div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <div class="stat-value" style="color: #e74c3c;">${rejectedCount}</div>
+                        <div class="stat-label">RESPINTE</div>
+                    </div>
+                `;
+            }
+            
+            list.innerHTML = '';
+            if(pending.length === 0) {
+                list.innerHTML = '<i>Nessuna missione in attesa.</i>';
+                if(document.getElementById('btn-approva-tutte')) document.getElementById('btn-approva-tutte').disabled = true;
+            } else {
+                if(document.getElementById('btn-approva-tutte')) document.getElementById('btn-approva-tutte').disabled = false;
+                pending.forEach(m => {
+                    let t = allTeams.find(x => x.id === m.teamId);
+                    list.innerHTML += `<div class="glass" style="padding:10px; margin-bottom:10px; border-left:3px solid var(--accent-gold);">
+                        <div style="font-weight:bold;">${m.titolo}</div><small>${t?t.name:'Squadra Sconosciuta'}</small>
+                        <div style="display:flex; gap:10px; margin-top:8px;">
+                            <button class="btn" style="padding:4px; font-size:0.75rem; width:auto;" onclick="approvaMissione('${m.id}', '${m.teamId}')">Ok</button>
+                            <button class="btn btn-secondary" style="padding:4px; font-size:0.75rem; width:auto;" onclick="rifiutaMissione('${m.id}')">No</button>
+                        </div>
+                    </div>`;
+                });
+            }
+        } catch (e) {
+            console.error("Errore pending missioni:", e);
+            list.innerHTML = `<i>Errore nel caricamento delle missioni in attesa: ${e.message}</i>`;
+            if (statsContainer) {
+                statsContainer.innerHTML = `<div style="color:var(--danger-color); padding:10px; font-size:0.85rem;">Errore caricamento statistiche: ${e.message}</div>`;
+            }
         }
     };
 
@@ -1361,7 +1401,7 @@ async function setupAdminPanel() {
             }
         } catch(e) {
             console.error("Errore storico missioni:", e);
-            list.innerHTML = '<i>Errore nel caricamento dello storico.</i>';
+            list.innerHTML = `<i>Errore nel caricamento dello storico: ${e.message}</i>`;
         }
     };
 
@@ -1401,10 +1441,104 @@ async function setupAdminPanel() {
         });
     };
 
-    window.renderAdminTornei = function() {
+    window.renderAdminTornei = async function() {
         const list = document.getElementById('admin-tornei-admin-list');
+        const statsContainer = document.getElementById('admin-tornei-stats');
         if(!list) return;
-        list.innerHTML = '<i>Nessun torneo globale attivo.</i>';
+        
+        list.innerHTML = '<p class="text-center">Caricamento tornei...</p>';
+        
+        try {
+            const tourneys = await fanta_db.getTournaments();
+            const allTeams = await fanta_db.getTeams();
+            
+            const totalTourneys = tourneys.length;
+            let totalTeamsInTourneys = 0;
+            tourneys.forEach(t => {
+                totalTeamsInTourneys += (t.teams || []).length;
+            });
+            
+            if (statsContainer) {
+                statsContainer.innerHTML = `
+                    <div class="admin-stat-card">
+                        <div class="stat-value" style="color: var(--primary-color);">${totalTourneys}</div>
+                        <div class="stat-label">TOTALE TORNEI</div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <div class="stat-value" style="color: var(--accent-gold);">${totalTeamsInTourneys}</div>
+                        <div class="stat-label">ISCRIZIONI SQUADRE</div>
+                    </div>
+                `;
+            }
+            
+            list.innerHTML = '';
+            if (tourneys.length === 0) {
+                list.innerHTML = '<i>Nessun torneo globale attivo.</i>';
+                return;
+            }
+            
+            tourneys.forEach(tour => {
+                let calculated = (tour.teams || []).map(tid => {
+                    let tObj = allTeams.find(x => x.id === tid);
+                    if(!tObj) return null;
+                    let authPts = 0;
+                    const teamMode = tObj.mode || 'terze';
+                    const modeCfg = GAME_MODES[teamMode] || GAME_MODES.terze;
+                    const pool = modeCfg.authors || AUTHORS;
+                    
+                    tObj.authors.forEach(aid => {
+                        let a = pool.find(x => x.id === aid);
+                        if(a && a.isPointsRevealed) authPts += a.points;
+                    });
+                    return {
+                        team: tObj.name,
+                        totale: authPts + ((tObj.missionsCompleted || 0) * 5)
+                    };
+                }).filter(x => x !== null);
+                
+                calculated.sort((a,b) => b.totale - a.totale);
+                
+                let rankHtml = calculated.map((item, idx) => `
+                    <div style="display:flex; justify-content:space-between; font-size:0.9rem; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                        <span>${idx+1}. ${item.team}</span>
+                        <span class="text-primary" style="font-weight:bold">${item.totale} pt</span>
+                    </div>
+                `).join('');
+                
+                list.innerHTML += `
+                    <div class="glass" style="padding:15px; border-left:3px solid var(--primary-color); margin-bottom:15px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                            <div style="font-weight:bold; font-size:1.1rem; color:var(--primary-color);"> <i class="fa-solid fa-trophy"></i> ${tour.name}</div>
+                            <button class="btn btn-secondary text-danger" style="padding:4px 8px; font-size:0.75rem; width:auto; background:transparent;" onclick="window.eliminaTorneo('${tour.id}')">
+                                <i class="fa-solid fa-trash"></i> Elimina
+                            </button>
+                        </div>
+                        <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">
+                            Creato da: <strong>${tour.ownerEmail || 'N/D'}</strong>
+                        </div>
+                        ${rankHtml || '<i>Nessuna squadra iscritta.</i>'}
+                    </div>
+                `;
+            });
+        } catch (e) {
+            console.error("Errore caricamento tornei admin:", e);
+            list.innerHTML = `<i>Errore nel caricamento dei tornei: ${e.message}</i>`;
+            if (statsContainer) {
+                statsContainer.innerHTML = `<div style="color:var(--danger-color); padding:10px; font-size:0.85rem;">Errore: ${e.message}</div>`;
+            }
+        }
+    };
+
+    window.eliminaTorneo = async function(tourId) {
+        if(!confirm("Sei sicuro di voler eliminare questo torneo?")) return;
+        try {
+            await fanta_db.deleteTournament(tourId);
+            alert("Torneo eliminato con successo!");
+            window.renderAdminTornei();
+        } catch (e) {
+            console.error("Errore eliminazione torneo:", e);
+            alert("Errore durante l'eliminazione: " + e.message);
+        }
     };
 
     // --- NAVIGATION LOGIC ---

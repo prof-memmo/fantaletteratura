@@ -23,7 +23,7 @@ service cloud.firestore {
       let team = get(/databases/$(database)/documents/teams/$(teamId));
       return team != null && (
         team.data.ownerEmail.toLowerCase() == currentUserEmail() ||
-        ('collaboratori' in team.data && team.data.collaboratori != null && currentUserEmail() in team.data.collaboratori)
+        ('collaboratori' in team.data && team.data.collaboratori != null && team.data.collaboratori.hasAny([currentUserEmail()]))
       );
     }
 
@@ -72,7 +72,7 @@ service cloud.firestore {
       // Inoltre, un docente autenticato può aggiungere se stesso ai collaboratori conoscendo il joinCode della squadra.
       allow update: if isGameMaster() || (isAuthenticated() && (
         resource.data.ownerEmail.toLowerCase() == currentUserEmail() ||
-        ('collaboratori' in resource.data && resource.data.collaboratori != null && currentUserEmail() in resource.data.collaboratori) ||
+        ('collaboratori' in resource.data && resource.data.collaboratori != null && resource.data.collaboratori.hasAny([currentUserEmail()])) ||
         (
           request.resource.data.joinCode == resource.data.joinCode &&
           request.resource.data.ownerEmail == resource.data.ownerEmail &&
@@ -82,7 +82,7 @@ service cloud.firestore {
       ));
       allow delete: if isGameMaster() || (isAuthenticated() && (
         resource.data.ownerEmail.toLowerCase() == currentUserEmail() ||
-        ('collaboratori' in resource.data && resource.data.collaboratori != null && currentUserEmail() in resource.data.collaboratori)
+        ('collaboratori' in resource.data && resource.data.collaboratori != null && resource.data.collaboratori.hasAny([currentUserEmail()]))
       ));
     }
 
