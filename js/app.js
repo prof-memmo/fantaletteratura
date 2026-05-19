@@ -948,10 +948,14 @@ async function setupAdminPanel() {
         // 1. Calcolo Statistiche (basato su tutte le squadre, non filtrate)
         const counts = {
             tutti: allTeams.length,
-            partecipanti: allTeams.filter(t => {
-                const u = userMap[(t.ownerEmail || '').toLowerCase()];
-                return u && u.role === 'teacher';
-            }).length,
+            partecipanti: new Set(
+                allTeams
+                    .filter(t => {
+                        const u = userMap[(t.ownerEmail || '').toLowerCase()];
+                        return u && u.role === 'teacher';
+                    })
+                    .map(t => (t.ownerEmail || '').toLowerCase())
+            ).size,
             scuole: new Set(
                 allTeams
                     .filter(t => {
@@ -974,7 +978,7 @@ async function setupAdminPanel() {
             statsContainer.innerHTML = `
                 <div class="admin-stat-card ${window.currentAdminTeamsCategoryFilter === 'all' ? 'active' : ''}" onclick="window.setAdminTeamsCategoryFilter('all')">
                     <div class="stat-value" style="color: var(--primary-color);">${counts.tutti}</div>
-                    <div class="stat-label">TUTTE</div>
+                    <div class="stat-label">SQUADRE</div>
                 </div>
                 <div class="admin-stat-card ${window.currentAdminTeamsCategoryFilter === 'partecipanti' ? 'active' : ''}" onclick="window.setAdminTeamsCategoryFilter('partecipanti')">
                     <div class="stat-value" style="color: #3498db;">${counts.partecipanti}</div>
