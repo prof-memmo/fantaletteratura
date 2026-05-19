@@ -2762,6 +2762,56 @@ window.docenteEliminaSquadra = async function(teamId, teamName) {
     }
 };
 
+// Associazione collaboratore via codice squadra (es. ALFA24)
+window.uniscitiComeCollaboratore = async function() {
+    const input = document.getElementById('unisciti-squadra-codice');
+    if (!input) return;
+    const code = input.value.trim().toUpperCase();
+    if (!code) {
+        alert("Per favore, inserisci un codice squadra.");
+        return;
+    }
+
+    if (!currentUserEmail) {
+        alert("Devi essere autenticato come docente per eseguire questa azione.");
+        return;
+    }
+
+    try {
+        const snap = await window.db.collection('teams').where('joinCode', '==', code).get();
+        if (snap.empty) {
+            alert("Nessuna squadra trovata con il codice specificato.");
+            return;
+        }
+
+        const teamDoc = snap.docs[0];
+        const teamData = teamDoc.data();
+        
+        if (teamData.ownerEmail && teamData.ownerEmail.toLowerCase() === currentUserEmail.toLowerCase()) {
+            alert("Sei già il proprietario di questa squadra!");
+            return;
+        }
+
+        const collaboratori = teamData.collaboratori || [];
+        if (collaboratori.map(e => e.toLowerCase()).includes(currentUserEmail.toLowerCase())) {
+            alert("Fai già parte dei collaboratori di questa squadra!");
+            return;
+        }
+
+        await window.db.collection('teams').doc(teamDoc.id).update({
+            collaboratori: firebase.firestore.FieldValue.arrayUnion(currentUserEmail)
+        });
+
+        alert(`Sei stato aggiunto come collaboratore alla squadra "${teamData.name}"!`);
+        input.value = '';
+        
+        renderProfilo();
+    } catch (e) {
+        console.error(e);
+        alert("Errore durante l'associazione: " + e.message);
+    }
+};
+
 // Sposta studente da pagina profilo docente (usa stessa modal dell'admin se disponibile)
 window.profiloSpostaStudente = async function(studentEmail, currentTeamId, currentTeamName) {
     // Se siamo in admin.html usa la modal admin, altrimenti usa prompt

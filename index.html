@@ -456,6 +456,14 @@
                      <button type="button" class="btn mb-2" onclick="navigateTo('view-missioni'); openNuovaMissioneModal();"><i class="fa-solid fa-list-check"></i> Carica una Missione</button>
                      <button type="button" class="btn mb-2" onclick="navigateTo('view-squadra')"><i class="fa-solid fa-plus-circle"></i> Carica una nuova squadra</button>
                      
+                     <!-- Associazione collaboratore via codice squadra -->
+                     <div style="display: flex; gap: 8px; margin-bottom: 20px; width: 100%;">
+                         <input type="text" id="unisciti-squadra-codice" placeholder="Unisciti a una squadra come collaboratore con il Codice (es. ALFA24)" class="input-control" style="margin: 0; padding: 8px 12px; font-size: 0.8rem; border-radius: 12px; flex: 1;">
+                         <button type="button" class="btn" style="width: auto; padding: 8px 15px; font-size: 0.8rem; border-radius: 12px; margin: 0; white-space: nowrap; background:rgba(141,160,63,0.15); border-color:var(--primary-color);" onclick="window.uniscitiComeCollaboratore()">
+                             <i class="fa-solid fa-user-plus"></i> Unisciti
+                         </button>
+                     </div>
+                     
                      <h3 class="mt-2 text-primary">Le tue squadre</h3>
                      <div id="profilo-squadre-list" style="padding: 10px 0; color: var(--text-muted); font-size: 0.9rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px;">
                          <div class="glass" style="padding:20px; text-align:center; grid-column: 1 / -1; width: 100%;"><i>Nessuna squadra creata. Premi il tasto sopra per iniziare!</i></div>

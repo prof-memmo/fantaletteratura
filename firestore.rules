@@ -68,8 +68,19 @@ service cloud.firestore {
       allow read: if true;
       // Un utente autenticato può creare una squadra solo a proprio nome
       allow create: if isAuthenticated() && request.resource.data.ownerEmail.toLowerCase() == currentUserEmail();
-      // Solo il proprietario della squadra, un collaboratore o il Game Master può modificarla o eliminarla
-      allow update, delete: if isGameMaster() || (isAuthenticated() && (
+      // Solo il proprietario della squadra, un collaboratore o il Game Master può modificarla o eliminarla.
+      // Inoltre, un docente autenticato può aggiungere se stesso ai collaboratori conoscendo il joinCode della squadra.
+      allow update: if isGameMaster() || (isAuthenticated() && (
+        resource.data.ownerEmail.toLowerCase() == currentUserEmail() ||
+        ('collaboratori' in resource.data && resource.data.collaboratori != null && currentUserEmail() in resource.data.collaboratori) ||
+        (
+          request.resource.data.joinCode == resource.data.joinCode &&
+          request.resource.data.ownerEmail == resource.data.ownerEmail &&
+          request.resource.data.name == resource.data.name &&
+          request.resource.data.collaboratori.hasAll([currentUserEmail()])
+        )
+      ));
+      allow delete: if isGameMaster() || (isAuthenticated() && (
         resource.data.ownerEmail.toLowerCase() == currentUserEmail() ||
         ('collaboratori' in resource.data && resource.data.collaboratori != null && currentUserEmail() in resource.data.collaboratori)
       ));
