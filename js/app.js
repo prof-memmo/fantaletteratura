@@ -903,23 +903,141 @@ async function setupAdminPanel() {
         }
     };
 
+    window.currentAdminTeamsCategoryFilter = 'all';
+    window.currentAdminTeamsModeFilter = 'all';
+    
+    window.setAdminTeamsCategoryFilter = function(filter) {
+        window.currentAdminTeamsCategoryFilter = filter;
+        window.renderAdminSquadre();
+    };
+
     window.renderAdminSquadre = async function(modeFilter) {
         const list = document.getElementById('admin-squadre-list');
+        const statsContainer = document.getElementById('admin-squadre-stats');
         if (!list) return;
+
+        if (modeFilter !== undefined) {
+            window.currentAdminTeamsModeFilter = modeFilter;
+        }
+        const activeMode = window.currentAdminTeamsModeFilter || 'all';
+
+        // Aggiorna stile bottoni filtro modalità
+        const squadreSection = document.getElementById('admin-view-squadre');
+        if (squadreSection) {
+            squadreSection.querySelectorAll('.admin-mode-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            const activeBtn = squadreSection.querySelector(`.admin-mode-filter-btn[onclick*="'${activeMode}'"]`);
+            if (activeBtn) activeBtn.classList.add('active');
+        }
+
         list.innerHTML = '<p class="text-center">Caricamento squadre...</p>';
         
-        let teams = await getAllTeams();
-        if (modeFilter && modeFilter !== 'all') {
-            teams = teams.filter(t => (t.mode || 'terze') === modeFilter);
-        }
+        let allTeams = await getAllTeams();
         
+        // Carica tutti gli utenti per associare ruoli e scuole
+        const snapshotAllUsers = await window.db.collection("users").get();
+        const allUsers = snapshotAllUsers.docs.map(doc => doc.data());
+        const userMap = {};
+        allUsers.forEach(u => {
+            if (u.email) {
+                userMap[u.email.toLowerCase()] = u;
+            }
+        });
+
+        // 1. Calcolo Statistiche (basato su tutte le squadre, non filtrate)
+        const counts = {
+            tutti: allTeams.length,
+            partecipanti: allTeams.filter(t => {
+                const u = userMap[(t.ownerEmail || '').toLowerCase()];
+                return u && u.role === 'teacher';
+            }).length,
+            scuole: new Set(
+                allTeams
+                    .filter(t => {
+                        const u = userMap[(t.ownerEmail || '').toLowerCase()];
+                        return u && u.role === 'teacher';
+                    })
+                    .map(t => {
+                        const u = userMap[t.ownerEmail.toLowerCase()];
+                        return u ? (u.school || '').trim() : '';
+                    })
+                    .filter(s => s !== '')
+            ).size,
+            fantamici: allTeams.filter(t => {
+                const u = userMap[(t.ownerEmail || '').toLowerCase()];
+                return !u || u.role === 'guest';
+            }).length
+        };
+
+        if (statsContainer) {
+            statsContainer.innerHTML = `
+                <div class="admin-stat-card ${window.currentAdminTeamsCategoryFilter === 'all' ? 'active' : ''}" onclick="window.setAdminTeamsCategoryFilter('all')">
+                    <div class="stat-value" style="color: var(--primary-color);">${counts.tutti}</div>
+                    <div class="stat-label">TUTTE</div>
+                </div>
+                <div class="admin-stat-card ${window.currentAdminTeamsCategoryFilter === 'partecipanti' ? 'active' : ''}" onclick="window.setAdminTeamsCategoryFilter('partecipanti')">
+                    <div class="stat-value" style="color: #3498db;">${counts.partecipanti}</div>
+                    <div class="stat-label">PARTECIPANTI (DOCENTI)</div>
+                </div>
+                <div class="admin-stat-card ${window.currentAdminTeamsCategoryFilter === 'scuole' ? 'active' : ''}" onclick="window.setAdminTeamsCategoryFilter('scuole')">
+                    <div class="stat-value" style="color: var(--accent-gold);">${counts.scuole}</div>
+                    <div class="stat-label">SCUOLE COINVOLTE</div>
+                </div>
+                <div class="admin-stat-card ${window.currentAdminTeamsCategoryFilter === 'fantamici' ? 'active' : ''}" onclick="window.setAdminTeamsCategoryFilter('fantamici')">
+                    <div class="stat-value" style="color: #e67e22;">${counts.fantamici}</div>
+                    <div class="stat-label">FANTAMICI</div>
+                </div>
+            `;
+        }
+
+        // Applicazione filtri
+        let teams = allTeams;
+        
+        // A. Filtro modalità
+        if (activeMode !== 'all') {
+            teams = teams.filter(t => (t.mode || 'terze') === activeMode);
+        }
+
+        // B. Filtro categoria
+        if (window.currentAdminTeamsCategoryFilter === 'partecipanti') {
+            teams = teams.filter(t => {
+                const u = userMap[(t.ownerEmail || '').toLowerCase()];
+                return u && u.role === 'teacher';
+            });
+        } else if (window.currentAdminTeamsCategoryFilter === 'fantamici') {
+            teams = teams.filter(t => {
+                const u = userMap[(t.ownerEmail || '').toLowerCase()];
+                return !u || u.role === 'guest';
+            });
+        } else if (window.currentAdminTeamsCategoryFilter === 'scuole') {
+            teams = teams.filter(t => {
+                const u = userMap[(t.ownerEmail || '').toLowerCase()];
+                return u && u.role === 'teacher' && (u.school || '').trim() !== '';
+            });
+        }
+
+        // C. Filtro di ricerca testuale
+        const query = (document.getElementById('admin-squadre-search')?.value || '').toLowerCase().trim();
+        if (query) {
+            teams = teams.filter(t => {
+                const nameMatch = (t.name || '').toLowerCase().includes(query);
+                const emailMatch = (t.ownerEmail || '').toLowerCase().includes(query);
+                const collMatch = (t.collaboratori || []).some(email => email.toLowerCase().includes(query));
+                return nameMatch || emailMatch || collMatch;
+            });
+        }
+
         // Carica tutti gli studenti una volta sola per efficienza
         const allUsersSnap = await window.db.collection("users").where("role", "==", "studente").get();
         const allStudents = allUsersSnap.docs.map(d => d.data());
 
         list.innerHTML = '';
-        if (teams.length === 0) list.innerHTML = '<i>Nessuna squadra trovata.</i>';
-        
+        if (teams.length === 0) {
+            list.innerHTML = '<i>Nessuna squadra trovata con i filtri correnti.</i>';
+            return;
+        }
+
         teams.forEach(t => {
             const modeInfo = t.mode ? GAME_MODES[t.mode] : null;
             const badge = modeInfo ? `<span class="mode-badge ${modeInfo.colorClass}">${modeInfo.emoji} ${modeInfo.shortLabel}</span>` : '';
@@ -929,10 +1047,14 @@ async function setupAdminPanel() {
                 ? `<span style="font-size:0.7rem; color:var(--accent-gold);"><i class="fa-solid fa-users-gear"></i> ${collaboratori.length} collaboratore/i</span>`
                 : '';
 
+            const ownerUser = userMap[(t.ownerEmail || '').toLowerCase()];
+            const schoolName = ownerUser ? (ownerUser.school || '') : '';
+            const schoolLabel = schoolName ? ` &bull; <i class="fa-solid fa-school"></i> ${schoolName}` : '';
+
             // Autori in questa squadra
-            let autoriSection = '';
+            let autoriRows = '';
             if (t.authors && t.authors.length > 0) {
-                const autoriRows = t.authors.map(aid => {
+                autoriRows = t.authors.map(aid => {
                     let author = pool.find(x => x.id === aid);
                     if (!author) {
                         Object.values(GAME_MODES).forEach(modeCfg => {
@@ -963,23 +1085,6 @@ async function setupAdminPanel() {
                         </div>
                     `;
                 }).join('');
-
-                autoriSection = `
-                    <details style="margin-top:8px; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px; width:100%;">
-                        <summary style="font-size:0.78rem; cursor:pointer; color:var(--primary-color); font-weight:600; user-select:none; margin-bottom:4px;">
-                            <i class="fa-solid fa-feather-pointed"></i> Autori Schierati (${t.authors.length}/5)
-                        </summary>
-                        <div style="padding-left:4px; max-height:200px; overflow-y:auto;">
-                            ${autoriRows}
-                        </div>
-                    </details>
-                `;
-            } else {
-                autoriSection = `
-                    <div style="font-size:0.75rem; color:var(--text-muted); padding-top:8px; border-top:1px solid rgba(255,255,255,0.05); width:100%;">
-                        <i>Nessun autore schierato</i>
-                    </div>
-                `;
             }
 
             // Studenti iscritti a questa squadra
@@ -999,32 +1104,59 @@ async function setupAdminPanel() {
             }
 
             list.innerHTML += `
-                <div class="glass" style="padding:12px; margin-bottom:8px; border-radius:12px;">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
-                        <div>
-                            <strong>${t.name}</strong> ${badge}<br>
-                            <small style="color:var(--text-muted);">${t.ownerEmail || 'N/D'} &mdash; ${t.classe || ''}</small><br>
-                            ${collBadge}
+                <div class="glass" style="padding: 8px 12px; margin-bottom: 6px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 200px;">
+                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <strong style="font-size: 0.9rem; color: var(--text-main);">${t.name}</strong>
+                                ${badge}
+                                ${collBadge ? `<span style="font-size: 0.75rem; color: var(--accent-gold);" title="Ha collaboratori"><i class="fa-solid fa-users-gear"></i></span>` : ''}
+                            </div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">
+                                <i class="fa-solid fa-graduation-cap"></i> ${t.classe || 'N/D'}${schoolLabel} &bull; 
+                                <i class="fa-solid fa-user-tie"></i> ${t.ownerEmail || 'N/D'}
+                            </div>
                         </div>
-                        <div style="display:flex; gap:6px; flex-shrink:0;">
-                            <button class="btn btn-secondary" title="Gestisci Collaboratori" style="padding:4px 8px; font-size:0.75rem; width:auto; background:rgba(141,160,63,0.15); border-color:var(--primary-color);"
-                                onclick="window.apriCollaboratori('${t.id}', '${t.name.replace(/'/g, "\\'")}')">
-                                <i class="fa-solid fa-user-plus"></i>
-                            </button>
-                            <button class="btn btn-secondary text-danger" style="padding:4px 8px; font-size:0.75rem; width:auto; background:transparent;" onclick="eliminaSquadra('${t.id}')">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
+                        <div style="display: flex; align-items: center; gap: 15px; flex-shrink: 0;">
+                            <div style="font-size: 0.8rem; text-align: center; min-width: 45px;">
+                                <div style="font-weight: bold; color: var(--primary-color);">${t.authors ? t.authors.length : 0}/5</div>
+                                <div style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase;">Autori</div>
+                            </div>
+                            <div style="font-size: 0.8rem; text-align: center; min-width: 45px;">
+                                <div style="font-weight: bold; color: var(--accent-gold);">${studentiDiQuesta.length}</div>
+                                <div style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase;">Studenti</div>
+                            </div>
+                            <div style="display: flex; gap: 4px;">
+                                <button class="btn btn-secondary" title="Dettagli Autori/Studenti" style="padding: 4px 8px; font-size: 0.75rem; width: auto;" onclick="const panel = this.closest('.glass').querySelector('.details-panel'); panel.style.display = panel.style.display === 'none' ? 'block' : 'none'; this.querySelector('i').classList.toggle('fa-chevron-down'); this.querySelector('i').classList.toggle('fa-chevron-up');">
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </button>
+                                <button class="btn btn-secondary" title="Gestisci Collaboratori" style="padding: 4px 8px; font-size: 0.75rem; width: auto; background: rgba(141,160,63,0.15); border-color: var(--primary-color);"
+                                    onclick="window.apriCollaboratori('${t.id}', '${t.name.replace(/'/g, "\\'")}')">
+                                    <i class="fa-solid fa-user-plus"></i>
+                                </button>
+                                <button class="btn btn-secondary text-danger" style="padding: 4px 8px; font-size: 0.75rem; width: auto; background: transparent; border-color: transparent;" onclick="eliminaSquadra('${t.id}')">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    ${autoriSection}
-                    <details style="margin-top:4px;">
-                        <summary style="font-size:0.8rem; cursor:pointer; color:var(--text-muted); user-select:none;">
-                            <i class="fa-solid fa-users"></i> Studenti (${studentiDiQuesta.length})
-                        </summary>
-                        <div style="margin-top:8px; padding-left:4px;">
-                            ${studentiHtml}
+                    
+                    <div class="details-panel" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.05);">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px;">
+                            <div>
+                                <h4 style="font-size: 0.8rem; color: var(--primary-color); margin-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 3px;">
+                                    <i class="fa-solid fa-feather-pointed"></i> Autori Schierati (${t.authors ? t.authors.length : 0}/5)
+                                </h4>
+                                ${autoriRows || '<i>Nessun autore schierato</i>'}
+                            </div>
+                            <div>
+                                <h4 style="font-size: 0.8rem; color: var(--accent-gold); margin-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 3px;">
+                                    <i class="fa-solid fa-users"></i> Studenti Iscritti (${studentiDiQuesta.length})
+                                </h4>
+                                ${studentiHtml}
+                            </div>
                         </div>
-                    </details>
+                    </div>
                 </div>`;
         });
     };

@@ -118,6 +118,11 @@
             <section id="admin-view-squadre" class="admin-view" style="display:none;">
                 <h2 style="padding: 0 15px;">Riepilogo Squadre</h2>
                 <div class="glass" style="padding: 15px; margin: 0 15px 20px 15px;">
+                    <!-- Interactive Squadre Stat Cards -->
+                    <div id="admin-squadre-stats" class="admin-stats-grid" style="margin-bottom: 20px;">
+                        <!-- Rendered by JS -->
+                    </div>
+
                     <!-- Filtro modalità -->
                     <div class="admin-mode-filter" style="margin-bottom:15px;">
                         <button class="admin-mode-filter-btn f-all" onclick="window.renderAdminSquadre('all')">Tutte le modalità</button>
@@ -125,6 +130,13 @@
                         <button class="admin-mode-filter-btn f-orange" onclick="window.renderAdminSquadre('seconde')">📙 Età Moderna</button>
                         <button class="admin-mode-filter-btn f-gold" onclick="window.renderAdminSquadre('avanzato')">📒 Contemporanea: Autori Italiani e Internazionali</button>
                     </div>
+
+                    <!-- Barra di ricerca squadre -->
+                    <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; border: 1px solid var(--glass-border);">
+                        <i class="fa-solid fa-magnifying-glass" style="color: var(--primary-color);"></i>
+                        <input type="text" id="admin-squadre-search" placeholder="Cerca squadre per nome, email proprietario o collaboratore..." style="background: transparent; border: none; color: white; width: 100%; outline: none;" oninput="window.renderAdminSquadre()">
+                    </div>
+
                     <div id="admin-squadre-list" style="display:flex; flex-direction:column; gap:10px;">
                         <!-- Inseriti da JS -->
                     </div>
