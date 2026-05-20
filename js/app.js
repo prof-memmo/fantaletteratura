@@ -3876,9 +3876,22 @@ window.aggiornaCampiPresentazione = async function() {
         autoriContainer.innerHTML = '';
         
         if (selectedCamps.length > 0) {
-            selectedCamps.forEach(camp => {
+            for (const camp of selectedCamps) {
                 const modeCfg = GAME_MODES[camp] || GAME_MODES.terze;
                 const pool = modeCfg.authors || AUTHORS;
+                
+                // Recuperiamo le squadre di questo girone/campionato per trovare gli autori "matchati"
+                let matchedAuthorIds = new Set();
+                try {
+                    const teams = await window.fanta_db.getTeams(camp);
+                    teams.forEach(t => {
+                        if (t.authors && Array.isArray(t.authors)) {
+                            t.authors.forEach(aid => matchedAuthorIds.add(aid));
+                        }
+                    });
+                } catch (err) {
+                    console.error(`Errore nel recupero delle squadre per il campionato ${camp}:`, err);
+                }
                 
                 // Intestazione gruppo campionato
                 const header = document.createElement('div');
@@ -3893,32 +3906,45 @@ window.aggiornaCampiPresentazione = async function() {
                 header.textContent = (modeCfg.label || modeCfg.shortLabel || camp).toUpperCase();
                 autoriContainer.appendChild(header);
                 
-                pool.forEach(a => {
-                    const label = document.createElement('label');
-                    label.className = 'checkbox-container';
-                    label.style.paddingLeft = '30px';
-                    label.style.marginBottom = '8px';
-                    label.style.fontSize = '0.85rem';
-                    
-                    const input = document.createElement('input');
-                    input.type = 'checkbox';
-                    input.name = 'pres-autori';
-                    input.value = `${camp}:${a.id}`;
-                    // Spuntato se la scheda è già uscita nel campionato
-                    input.checked = !!a.isSchedaRevealed;
-                    
-                    const span = document.createElement('span');
-                    span.className = 'checkmark';
-                    span.style.top = '1px';
-                    span.style.height = '18px';
-                    span.style.width = '18px';
-                    
-                    label.appendChild(input);
-                    label.appendChild(document.createTextNode(a.name));
-                    label.appendChild(span);
-                    autoriContainer.appendChild(label);
-                });
-            });
+                // Mostriamo solo gli autori effettivamente in squadra (scelti da almeno una squadra)
+                const filteredPool = pool.filter(a => matchedAuthorIds.has(a.id));
+                
+                if (filteredPool.length === 0) {
+                    const noAutori = document.createElement('div');
+                    noAutori.style.gridColumn = '1 / -1';
+                    noAutori.style.color = 'var(--text-muted)';
+                    noAutori.style.fontSize = '0.85rem';
+                    noAutori.style.padding = '5px';
+                    noAutori.textContent = 'Nessun autore selezionato dalle squadre di questo girone.';
+                    autoriContainer.appendChild(noAutori);
+                } else {
+                    filteredPool.forEach(a => {
+                        const label = document.createElement('label');
+                        label.className = 'checkbox-container';
+                        label.style.paddingLeft = '30px';
+                        label.style.marginBottom = '8px';
+                        label.style.fontSize = '0.85rem';
+                        
+                        const input = document.createElement('input');
+                        input.type = 'checkbox';
+                        input.name = 'pres-autori';
+                        input.value = `${camp}:${a.id}`;
+                        // Spuntato se la scheda è già uscita nel campionato
+                        input.checked = !!a.isSchedaRevealed;
+                        
+                        const span = document.createElement('span');
+                        span.className = 'checkmark';
+                        span.style.top = '1px';
+                        span.style.height = '18px';
+                        span.style.width = '18px';
+                        
+                        label.appendChild(input);
+                        label.appendChild(document.createTextNode(a.name));
+                        label.appendChild(span);
+                        autoriContainer.appendChild(label);
+                    });
+                }
+            }
         } else {
             autoriContainer.innerHTML = '<div style="color: var(--text-muted); font-size:0.85rem; padding: 5px;">Seleziona almeno un campionato per visualizzare gli autori.</div>';
         }
@@ -4129,7 +4155,7 @@ window.avviaPresentazioneLIM = async function() {
                 presSlides.push({
                     type: 'suspense',
                     subtitle: `ED ORA...`,
-                    text: `SCOPRIAMO LA CLASSIFICA GLOBALE:<br>${modeCfg.title.toUpperCase()}`
+                    text: `SCOPRIAMO LA CLASSIFICA GLOBALE:<br>${(modeCfg.label || modeCfg.shortLabel || camp).toUpperCase()}`
                 });
                 presSlides.push({
                     type: 'leaderboard-list',
