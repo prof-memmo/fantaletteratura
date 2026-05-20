@@ -3890,7 +3890,7 @@ window.aggiornaCampiPresentazione = async function() {
                 header.style.fontSize = '0.9rem';
                 header.style.borderBottom = '1px solid rgba(141, 160, 63, 0.25)';
                 header.style.paddingBottom = '3px';
-                header.textContent = modeCfg.title.toUpperCase();
+                header.textContent = (modeCfg.label || modeCfg.shortLabel || camp).toUpperCase();
                 autoriContainer.appendChild(header);
                 
                 pool.forEach(a => {
@@ -4014,7 +4014,7 @@ window.avviaPresentazioneLIM = async function() {
             presSlides.push({
                 type: 'suspense',
                 subtitle: `GIRONE`.toUpperCase(),
-                text: modeCfg.title.toUpperCase()
+                text: (modeCfg.label || modeCfg.shortLabel || camp).toUpperCase()
             });
             
             // Aggiungi gli autori selezionati per questo girone (in ordine cronologico)
@@ -4078,12 +4078,12 @@ window.avviaPresentazioneLIM = async function() {
             if (selectedClassifiche.includes('autori')) {
                 const sorted = [...calculatedTeams].sort((a,b) => a.authPoints - b.authPoints);
                 const teamsForRank = sorted.map(t => ({ id: t.id, name: t.name, points: t.authPoints }));
-                const torneoName = `CLASSIFICA AUTORI - ${modeCfg.title.toUpperCase()}`;
+                const torneoName = `CLASSIFICA AUTORI - ${(modeCfg.label || modeCfg.shortLabel || camp).toUpperCase()}`;
                 
                 presSlides.push({
                     type: 'suspense',
                     subtitle: `ED ORA...`,
-                    text: `SCOPRIAMO LA CLASSIFICA AUTORI:<br>${modeCfg.title.toUpperCase()}`
+                    text: `SCOPRIAMO LA CLASSIFICA AUTORI:<br>${(modeCfg.label || modeCfg.shortLabel || camp).toUpperCase()}`
                 });
                 presSlides.push({
                     type: 'leaderboard-list',
@@ -4101,12 +4101,12 @@ window.avviaPresentazioneLIM = async function() {
             if (selectedClassifiche.includes('missioni')) {
                 const sorted = [...calculatedTeams].sort((a,b) => a.missPoints - b.missPoints);
                 const teamsForRank = sorted.map(t => ({ id: t.id, name: t.name, points: t.missPoints }));
-                const torneoName = `CLASSIFICA MISSIONI - ${modeCfg.title.toUpperCase()}`;
+                const torneoName = `CLASSIFICA MISSIONI - ${(modeCfg.label || modeCfg.shortLabel || camp).toUpperCase()}`;
                 
                 presSlides.push({
                     type: 'suspense',
                     subtitle: `ED ORA...`,
-                    text: `SCOPRIAMO LA CLASSIFICA MISSIONI:<br>${modeCfg.title.toUpperCase()}`
+                    text: `SCOPRIAMO LA CLASSIFICA MISSIONI:<br>${(modeCfg.label || modeCfg.shortLabel || camp).toUpperCase()}`
                 });
                 presSlides.push({
                     type: 'leaderboard-list',
@@ -4124,7 +4124,7 @@ window.avviaPresentazioneLIM = async function() {
             if (selectedClassifiche.includes('globale')) {
                 const sorted = [...calculatedTeams].sort((a,b) => a.totPoints - b.totPoints);
                 const teamsForRank = sorted.map(t => ({ id: t.id, name: t.name, points: t.totPoints }));
-                const torneoName = `CLASSIFICA GLOBALE - ${modeCfg.title.toUpperCase()}`;
+                const torneoName = `CLASSIFICA GLOBALE - ${(modeCfg.label || modeCfg.shortLabel || camp).toUpperCase()}`;
                 
                 presSlides.push({
                     type: 'suspense',
