@@ -299,14 +299,26 @@
                         Configura e avvia una presentazione animata a schermo intero da proiettare in classe. I dati delle classifiche e degli autori verranno caricati in tempo reale.
                     </p>
                     
-                    <!-- Campionato -->
+                    <!-- Campionati -->
                     <div class="input-group">
-                        <label><i class="fa-solid fa-trophy"></i> Seleziona Campionato (Modalità)</label>
-                        <select id="pres-campionato" class="input-control" onchange="window.aggiornaAutoriPresentazione()">
-                            <option value="terze">📘 Contemporanea: Autori Italiani</option>
-                            <option value="seconde">📙 Età Moderna</option>
-                            <option value="avanzato">📒 Contemporanea: Autori Italiani e Internazionali</option>
-                        </select>
+                        <label><i class="fa-solid fa-trophy"></i> Seleziona Campionati / Gironi da includere</label>
+                        <div id="pres-campionati-container" style="display: flex; flex-direction: column; gap: 8px; padding: 10px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 8px;">
+                            <label class="checkbox-container" style="padding-left: 30px; font-size: 0.9rem; margin-bottom: 0;">
+                                <input type="checkbox" name="pres-campionati" value="terze" checked onchange="window.aggiornaCampiPresentazione()">
+                                📘 CONTEMPORANEA: AUTORI ITALIANI (TERZE)
+                                <span class="checkmark" style="top: 1px; height: 18px; width: 18px;"></span>
+                            </label>
+                            <label class="checkbox-container" style="padding-left: 30px; font-size: 0.9rem; margin-bottom: 0;">
+                                <input type="checkbox" name="pres-campionati" value="seconde" checked onchange="window.aggiornaCampiPresentazione()">
+                                📙 ETÀ MODERNA (SECONDE)
+                                <span class="checkmark" style="top: 1px; height: 18px; width: 18px;"></span>
+                            </label>
+                            <label class="checkbox-container" style="padding-left: 30px; font-size: 0.9rem; margin-bottom: 0;">
+                                <input type="checkbox" name="pres-campionati" value="avanzato" checked onchange="window.aggiornaCampiPresentazione()">
+                                📒 CONTEMPORANEA: AUTORI INTERNAZIONALI (AVANZATO)
+                                <span class="checkmark" style="top: 1px; height: 18px; width: 18px;"></span>
+                            </label>
+                        </div>
                     </div>
 
                     <!-- Torneo -->
