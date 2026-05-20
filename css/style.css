@@ -1451,3 +1451,483 @@ h1, h2, h3, h4 {
         display: none !important;
     }
 }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   CINEMATIC PRESENTATION SYSTEM (LIM)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+#presentation-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #050603; /* Extra dark green-black */
+    z-index: 4000;
+    font-family: var(--font-body);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    color: var(--text-main);
+    user-select: none;
+}
+
+#pres-bg-video, #pres-bg-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+    opacity: 0.20; /* Very low opacity for contrast */
+    pointer-events: none;
+}
+
+#presentation-overlay::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 50% 50%, transparent 20%, rgba(5, 6, 3, 0.85) 90%);
+    z-index: 2;
+    pointer-events: none;
+}
+
+.pres-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+    z-index: 10;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%);
+}
+
+.pres-title {
+    font-family: var(--font-heading);
+    font-size: 1.6rem;
+    color: var(--primary-color);
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.9);
+}
+
+.pres-close-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    cursor: pointer;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pres-close-btn:hover {
+    color: var(--danger-color);
+    background: rgba(230, 57, 70, 0.15);
+    border-color: rgba(230, 57, 70, 0.3);
+    transform: rotate(90deg);
+}
+
+#pres-content-wrapper {
+    position: relative;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 90px 40px 80px 40px;
+    z-index: 5;
+}
+
+#pres-content {
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 50vh;
+}
+
+.pres-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+    z-index: 10;
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.pres-slide-num {
+    background: rgba(141, 160, 63, 0.15);
+    border: 1px solid var(--glass-border);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+    color: var(--primary-hover);
+    letter-spacing: 1px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.pres-nav-tip {
+    text-shadow: 0 1px 4px rgba(0,0,0,0.9);
+}
+
+.pres-nav-tip strong {
+    color: var(--primary-color);
+}
+
+/* Slide elements styling */
+.pres-slide-text {
+    font-family: var(--font-heading);
+    font-size: 2.3rem;
+    text-align: center;
+    line-height: 1.5;
+    text-shadow: 0 4px 15px rgba(0,0,0,0.9);
+    max-width: 850px;
+    color: var(--text-main);
+    animation: inkReveal 0.8s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+}
+
+.pres-slide-subtitle {
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 20px;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.9);
+    text-align: center;
+}
+
+.pres-slide-card {
+    background: rgba(20, 24, 15, 0.85);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 30px;
+    width: 100%;
+    max-width: 800px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+    backdrop-filter: var(--glass-blur);
+    animation: inkReveal 0.6s ease-out;
+}
+
+/* Author Reveal Slide */
+.pres-slide-author {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+    width: 100%;
+    max-width: 900px;
+    animation: inkReveal 0.6s ease-out;
+}
+
+.pres-author-left {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    min-width: 250px;
+}
+
+.pres-author-avatar {
+    width: 230px;
+    height: 230px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--primary-color);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+    background: #fff;
+}
+
+.pres-author-name {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-hover);
+    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+}
+
+.pres-author-role {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    font-style: italic;
+    margin-top: -10px;
+}
+
+.pres-author-points-badge {
+    background: linear-gradient(135deg, #f1c40f, #d35400);
+    color: #000;
+    font-weight: 800;
+    font-size: 1.6rem;
+    padding: 8px 24px;
+    border-radius: 30px;
+    box-shadow: 0 8px 20px rgba(241, 196, 15, 0.4);
+    letter-spacing: 1px;
+    margin-top: 10px;
+    animation: pulseGlow 2s infinite;
+}
+
+.pres-author-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.pres-author-intro {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    line-height: 1.5;
+    font-style: italic;
+    color: var(--text-main);
+    border-left: 4px solid var(--primary-color);
+    padding-left: 15px;
+    margin-bottom: 10px;
+}
+
+.pres-bonus-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(141, 160, 63, 0.15);
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 1rem;
+    opacity: 0;
+    transform: translateX(20px);
+    transition: all 0.4s ease-out;
+}
+
+.pres-bonus-item.revealed {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.pres-bonus-item.positive {
+    border-left: 4px solid #2ecc71;
+}
+
+.pres-bonus-item.negative {
+    border-left: 4px solid #e74c3c;
+}
+
+.pres-bonus-item.neutral {
+    border-left: 4px solid #7f8c8d;
+}
+
+/* Leaderboard Podium */
+.pres-podium-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 25px;
+    height: 380px;
+    width: 100%;
+    max-width: 800px;
+    margin-top: 30px;
+}
+
+.pres-podium-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    flex: 1;
+    max-width: 200px;
+}
+
+.pres-podium-team-name {
+    text-align: center;
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    text-shadow: 0 3px 6px rgba(0,0,0,0.9);
+    color: #fff;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pres-podium-step {
+    width: 100%;
+    border-radius: 15px 15px 0 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    font-family: var(--font-heading);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+    text-align: center;
+}
+
+.pres-podium-col.p1 .pres-podium-step {
+    height: 220px;
+    background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%);
+    border: 3px solid #fff;
+    color: #000;
+}
+
+.pres-podium-col.p2 .pres-podium-step {
+    height: 165px;
+    background: linear-gradient(135deg, #bdc3c7 0%, #95a5a6 100%);
+    border: 1px solid rgba(255,255,255,0.6);
+    color: #000;
+}
+
+.pres-podium-col.p3 .pres-podium-step {
+    height: 120px;
+    background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #000;
+}
+
+.pres-podium-num {
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.pres-podium-pts {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-top: 5px;
+    letter-spacing: 0.5px;
+}
+
+.pres-podium-col.p1 .pres-podium-pts { color: #5c4308; }
+.pres-podium-col.p2 .pres-podium-pts { color: #2c3e50; }
+.pres-podium-col.p3 .pres-podium-pts { color: #5e2700; }
+
+/* Leaderboard List Rows */
+.pres-leaderboard-list {
+    width: 100%;
+    max-width: 650px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.pres-leaderboard-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-size: 1.15rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(141, 160, 63, 0.15);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    opacity: 0;
+    transform: translateY(20px);
+    animation: slideUpReveal 0.6s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+}
+
+.pres-leaderboard-row.highlight {
+    background: rgba(141, 160, 63, 0.15);
+    border-color: var(--primary-color);
+}
+
+.pres-row-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.pres-row-rank {
+    font-family: var(--font-heading);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    width: 30px;
+}
+
+.pres-row-name {
+    font-weight: 600;
+}
+
+.pres-row-points {
+    font-weight: 700;
+    color: var(--primary-hover);
+}
+
+/* Animations */
+@keyframes slideUpReveal {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulseGlow {
+    0% {
+        box-shadow: 0 8px 20px rgba(241, 196, 15, 0.4);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 8px 30px rgba(241, 196, 15, 0.7);
+        transform: scale(1.03);
+    }
+    100% {
+        box-shadow: 0 8px 20px rgba(241, 196, 15, 0.4);
+        transform: scale(1);
+    }
+}
+
+/* Adapting presentation styles on tablet/mobile if projected from smaller screens */
+@media screen and (max-width: 768px) {
+    .pres-slide-author {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .pres-author-left {
+        min-width: unset;
+    }
+    
+    .pres-author-avatar {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .pres-slide-text {
+        font-size: 1.6rem;
+    }
+    
+    .pres-podium-container {
+        height: 300px;
+        gap: 10px;
+    }
+    
+    .pres-podium-team-name {
+        font-size: 0.95rem;
+    }
+    
+    .pres-podium-num {
+        font-size: 1.8rem;
+    }
+}
+

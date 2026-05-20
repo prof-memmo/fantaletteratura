@@ -1579,6 +1579,7 @@ async function setupAdminPanel() {
             if (targetId === 'admin-view-classifica') window.renderAdminClassifica();
             if (targetId === 'admin-view-tornei') window.renderAdminTornei();
             if (targetId === 'admin-view-profilo') window.renderAdminProfilo();
+            if (targetId === 'admin-view-presentazioni') window.initPresentazioniTab();
 
             // Mobile menu close
             const sideMenu = document.getElementById('side-menu');
@@ -1598,6 +1599,7 @@ async function setupAdminPanel() {
         await window.renderAdminRichieste();
         await window.renderAdminTornei();
         await window.renderAdminProfilo();
+        await window.initPresentazioniTab();
     }
 }
 
@@ -3839,4 +3841,459 @@ async function inviaMissione(event) {
         alert("Errore durante l'invio della missione.");
     }
 }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   CINEMATIC PRESENTATION SYSTEM (LIM)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+let presSlides = [];
+let presCurrentIndex = 0;
+let presLeaderboardRevealIndex = 0;
+let presLeaderboardTeams = [];
+let presAuthorBonusIndex = 0;
+
+window.initPresentazioniTab = async function() {
+    const torneoSelect = document.getElementById('pres-torneo');
+    if (!torneoSelect) return;
+    
+    torneoSelect.innerHTML = '<option value="all">🏆 Classifica Globale (Nessun filtro torneo)</option>';
+    
+    try {
+        const tourneys = await window.fanta_db.getTournaments();
+        tourneys.forEach(tour => {
+            const opt = document.createElement('option');
+            opt.value = tour.id;
+            opt.textContent = `🛡️ ${tour.name}`;
+            torneoSelect.appendChild(opt);
+        });
+    } catch (e) {
+        console.error("Errore nel caricamento dei tornei in Presentazioni:", e);
+    }
+    
+    window.aggiornaAutoriPresentazione();
+};
+
+window.aggiornaAutoriPresentazione = function() {
+    const container = document.getElementById('pres-autori-container');
+    if (!container) return;
+    
+    const campVal = document.getElementById('pres-campionato').value;
+    
+    const modeCfg = GAME_MODES[campVal] || GAME_MODES.terze;
+    const pool = modeCfg.authors || AUTHORS;
+    
+    container.innerHTML = '';
+    
+    pool.forEach(a => {
+        const id = a.id;
+        const name = a.name;
+        
+        const label = document.createElement('label');
+        label.className = 'checkbox-container';
+        label.style.paddingLeft = '30px';
+        label.style.marginBottom = '8px';
+        label.style.fontSize = '0.85rem';
+        
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.name = 'pres-autori';
+        input.value = id;
+        input.checked = false;
+        
+        const span = document.createElement('span');
+        span.className = 'checkmark';
+        span.style.top = '1px';
+        span.style.height = '18px';
+        span.style.width = '18px';
+        
+        label.appendChild(input);
+        label.appendChild(document.createTextNode(name));
+        label.appendChild(span);
+        
+        container.appendChild(label);
+    });
+};
+
+window.gestisciAugurioCustom = function(val) {
+    const customInput = document.getElementById('pres-augurio-custom');
+    if (!customInput) return;
+    if (val === 'custom') {
+        customInput.style.display = 'block';
+    } else {
+        customInput.style.display = 'none';
+    }
+};
+
+window.avviaPresentazioneLIM = async function() {
+    const campionato = document.getElementById('pres-campionato').value;
+    const torneoId = document.getElementById('pres-torneo').value;
+    const customGreetingSelect = document.getElementById('pres-augurio-select').value;
+    
+    let augurioVal = customGreetingSelect;
+    if (customGreetingSelect === 'custom') {
+        augurioVal = document.getElementById('pres-augurio-custom').value.trim() || "Buon anno scolastico!";
+    }
+    
+    document.body.style.overflow = 'hidden';
+    
+    const overlay = document.getElementById('presentation-overlay');
+    if (overlay) {
+        overlay.style.display = 'flex';
+    }
+    
+    const bgVideo = document.getElementById('pres-bg-video');
+    const bgImage = document.getElementById('pres-bg-image');
+    if (bgVideo) {
+        bgVideo.src = 'Sfondi e animazioni/Video 1.mp4';
+        bgVideo.style.display = 'block';
+        bgVideo.play().catch(e => {
+            console.log("Autoplay video bloccato, uso immagine statica:", e);
+            bgVideo.style.display = 'none';
+            if (bgImage) {
+                bgImage.style.backgroundImage = "url('Sfondi e animazioni/sfondo 1.png')";
+                bgImage.style.display = 'block';
+            }
+        });
+    }
+    
+    presSlides = [];
+    presCurrentIndex = 0;
+    
+    try {
+        let allTeams = await window.fanta_db.getTeams(campionato);
+        if (torneoId !== 'all') {
+            const tourneys = await window.fanta_db.getTournaments();
+            const activeTourney = tourneys.find(t => t.id === torneoId);
+            if (activeTourney) {
+                const teamIds = activeTourney.teams || [];
+                allTeams = allTeams.filter(t => teamIds.includes(t.id));
+            }
+        }
+        
+        const modeCfg = GAME_MODES[campionato] || GAME_MODES.terze;
+        const pool = modeCfg.authors || AUTHORS;
+        
+        const calculatedTeams = allTeams.map(t => {
+            let authPts = 0;
+            t.authors.forEach(aid => {
+                let a = pool.find(x => x.id === aid);
+                if (a && a.isPointsRevealed) authPts += a.points;
+            });
+            return {
+                id: t.id,
+                name: t.name,
+                points: authPts + ((t.missionsCompleted || 0) * 5)
+            };
+        });
+        
+        calculatedTeams.sort((a,b) => a.points - b.points); 
+        presLeaderboardTeams = calculatedTeams;
+        
+        presSlides.push({
+            type: 'intro',
+            subtitle: `Fantaletteratura • ${modeCfg.title}`,
+            text: `Benvenuti alla presentazione dei risultati di oggi!<br>Analizzeremo gli autori selezionati e scopriremo come si muovono le classifiche.`
+        });
+        
+        presSlides.push({
+            type: 'rules',
+            subtitle: `Breve remainder sulle regole del gioco`,
+            text: `Ogni squadra ha scelto 5 autori con un budget di 2500 lire.<br>L'obiettivo è totalizzare più punti possibile tramite i bonus degli autori e le missioni svolte in classe (+5 punti per ciascuna convalidata).`
+        });
+        
+        presSlides.push({
+            type: 'premi',
+            subtitle: `I Premi di Fine Anno`,
+            text: `Ci saranno gloria eterna, attestati di merito scolastico e premi speciali per i primi tre classificati di ogni girone!`
+        });
+        
+        const checkedAutori = Array.from(document.querySelectorAll('input[name="pres-autori"]:checked')).map(el => el.value);
+        checkedAutori.forEach(aid => {
+            const author = pool.find(x => x.id === aid);
+            if (author) {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = author.schedaHTML;
+                
+                const introText = tempDiv.querySelector('.scheda-intro') ? tempDiv.querySelector('.scheda-intro').innerText : '';
+                const listItems = tempDiv.querySelectorAll('li');
+                
+                const bonuses = Array.from(listItems).map(li => {
+                    const strong = li.querySelector('strong');
+                    const strongText = strong ? strong.innerText : '';
+                    let desc = li.innerHTML;
+                    if (strong) {
+                        desc = desc.replace(strong.outerHTML, '').replace(/&rarr;/g, '→').replace(/->/g, '→').trim();
+                    }
+                    desc = desc.replace(/^→/, '').trim();
+                    
+                    let type = 'neutral';
+                    if (strongText.includes('+')) type = 'positive';
+                    else if (strongText.includes('-')) type = 'negative';
+                    
+                    return { title: strongText, desc: desc, type: type };
+                });
+                
+                presSlides.push({
+                    type: 'author',
+                    author: author,
+                    intro: introText,
+                    bonuses: bonuses,
+                    totalPts: author.isPointsRevealed ? author.points : 0
+                });
+            }
+        });
+        
+        presSlides.push({
+            type: 'suspense',
+            subtitle: `Ed ora...`,
+            text: `Scopriamo la classifica del girone!<br>Mettetevi comodi e preparatevi alla suspense...`
+        });
+        
+        presSlides.push({
+            type: 'leaderboard-list'
+        });
+        
+        presSlides.push({
+            type: 'podium'
+        });
+        
+        presSlides.push({
+            type: 'outro',
+            text: augurioVal
+        });
+        
+        window.renderPresentationSlide();
+        
+        document.addEventListener('keydown', window.presKeydownHandler);
+        overlay.addEventListener('click', window.presClickHandler);
+        
+    } catch (e) {
+        console.error("Errore nell'avvio della presentazione:", e);
+        alert("Errore durante l'elaborazione dei dati per la presentazione.");
+        window.chiudiPresentazioneLIM();
+    }
+};
+
+window.renderPresentationSlide = function() {
+    const container = document.getElementById('pres-content');
+    const slideNum = document.getElementById('pres-slide-num');
+    if (!container || !slideNum) return;
+    
+    const slide = presSlides[presCurrentIndex];
+    if (!slide) return;
+    
+    slideNum.innerText = `Slide ${presCurrentIndex + 1}/${presSlides.length}`;
+    container.innerHTML = '';
+    
+    if (slide.type === 'intro' || slide.type === 'rules' || slide.type === 'premi' || slide.type === 'suspense') {
+        container.innerHTML = `
+            <div class="pres-slide-subtitle">${slide.subtitle}</div>
+            <div class="pres-slide-text">${slide.text}</div>
+        `;
+    } else if (slide.type === 'author') {
+        presAuthorBonusIndex = 0;
+        
+        const bonusesHtml = slide.bonuses.map((b, idx) => `
+            <div class="pres-bonus-item ${b.type}" id="pres-bonus-${idx}" style="display: none;">
+                <strong>${b.title}</strong>
+                <span>${b.desc}</span>
+            </div>
+        `).join('');
+        
+        container.innerHTML = `
+            <div class="pres-slide-author">
+                <div class="pres-author-left">
+                    <img src="${slide.author.image}" class="pres-author-avatar" onerror="this.src='avatar_autori/default.png'">
+                    <div class="pres-author-name">${slide.author.name}</div>
+                    <div class="pres-author-role">${slide.author.role || ''}</div>
+                    <div class="pres-author-points-badge" id="pres-author-pts-badge" style="visibility: hidden;">
+                        ${slide.totalPts} Lire
+                    </div>
+                </div>
+                <div class="pres-author-right">
+                    <div class="pres-author-intro">${slide.intro}</div>
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                        ${bonusesHtml}
+                    </div>
+                </div>
+            </div>
+        `;
+    } else if (slide.type === 'leaderboard-list') {
+        const listTeams = presLeaderboardTeams.slice(0, Math.max(0, presLeaderboardTeams.length - 3));
+        presLeaderboardRevealIndex = 0;
+        
+        if (listTeams.length === 0) {
+            setTimeout(() => window.avanzaPresentazione(), 50);
+            return;
+        }
+        
+        const rowsHtml = listTeams.map((t, idx) => {
+            const rank = presLeaderboardTeams.length - idx;
+            return `
+                <div class="pres-leaderboard-row" id="pres-row-${idx}" style="display: none;">
+                    <div class="pres-row-left">
+                        <span class="pres-row-rank">#${rank}</span>
+                        <span class="pres-row-name">${t.name}</span>
+                    </div>
+                    <span class="pres-row-points">${t.points} pt</span>
+                </div>
+            `;
+        }).join('');
+        
+        container.innerHTML = `
+            <div class="pres-slide-subtitle">La Classifica Generica</div>
+            <h2 style="font-family: var(--font-heading); font-size: 2.2rem; margin-bottom: 20px; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">Dalle retrovie verso il podio...</h2>
+            <div class="pres-leaderboard-list">
+                ${rowsHtml}
+            </div>
+        `;
+    } else if (slide.type === 'podium') {
+        presLeaderboardRevealIndex = 0;
+        
+        const len = presLeaderboardTeams.length;
+        const p3 = len >= 3 ? presLeaderboardTeams[len - 3] : { name: "Non assegnato", points: 0 };
+        const p2 = len >= 2 ? presLeaderboardTeams[len - 2] : { name: "Non assegnato", points: 0 };
+        const p1 = len >= 1 ? presLeaderboardTeams[len - 1] : { name: "Non assegnato", points: 0 };
+        
+        container.innerHTML = `
+            <div class="pres-slide-subtitle">🏆 Il Podio Finale 🏆</div>
+            <div class="pres-podium-container">
+                <div class="pres-podium-col p2" id="podium-p2" style="visibility: hidden;">
+                    <div class="pres-podium-team-name">${p2.name}</div>
+                    <div class="pres-podium-step">
+                        <div class="pres-podium-num">2</div>
+                        <div class="pres-podium-pts">${p2.points} pt</div>
+                    </div>
+                </div>
+                
+                <div class="pres-podium-col p1" id="podium-p1" style="visibility: hidden;">
+                    <div class="pres-podium-team-name">${p1.name}</div>
+                    <div class="pres-podium-step">
+                        <div class="pres-podium-num">1</div>
+                        <div class="pres-podium-pts">${p1.points} pt</div>
+                    </div>
+                </div>
+                
+                <div class="pres-podium-col p3" id="podium-p3" style="visibility: hidden;">
+                    <div class="pres-podium-team-name">${p3.name}</div>
+                    <div class="pres-podium-step">
+                        <div class="pres-podium-num">3</div>
+                        <div class="pres-podium-pts">${p3.points} pt</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    } else if (slide.type === 'outro') {
+        container.innerHTML = `
+            <div class="pres-slide-subtitle">Fantaletteratura</div>
+            <div class="pres-slide-text" style="font-size: 2.8rem; color: var(--primary-color);">${slide.text}</div>
+            <button class="btn" style="width: auto; margin-top: 40px; background: var(--primary-color) !important;" onclick="window.chiudiPresentazioneLIM()">Chiudi Presentazione</button>
+        `;
+    }
+};
+
+window.avanzaPresentazione = function() {
+    const slide = presSlides[presCurrentIndex];
+    if (!slide) return;
+    
+    if (slide.type === 'author') {
+        const bonusItems = document.querySelectorAll('.pres-bonus-item');
+        if (presAuthorBonusIndex < bonusItems.length) {
+            const item = document.getElementById(`pres-bonus-${presAuthorBonusIndex}`);
+            if (item) {
+                item.style.display = 'flex';
+                setTimeout(() => item.classList.add('revealed'), 20);
+            }
+            presAuthorBonusIndex++;
+            return; 
+        } else if (presAuthorBonusIndex === bonusItems.length) {
+            const badge = document.getElementById('pres-author-pts-badge');
+            if (badge) {
+                badge.style.visibility = 'visible';
+                badge.style.animation = 'pulseGlow 1.5s infinite';
+            }
+            presAuthorBonusIndex++;
+            return;
+        }
+    }
+    
+    if (slide.type === 'leaderboard-list') {
+        const listTeamsCount = Math.max(0, presLeaderboardTeams.length - 3);
+        if (presLeaderboardRevealIndex < listTeamsCount) {
+            const row = document.getElementById(`pres-row-${presLeaderboardRevealIndex}`);
+            if (row) {
+                row.style.display = 'flex';
+            }
+            presLeaderboardRevealIndex++;
+            return; 
+        }
+    }
+    
+    if (slide.type === 'podium') {
+        if (presLeaderboardRevealIndex === 0) {
+            const p3Col = document.getElementById('podium-p3');
+            if (p3Col) p3Col.style.visibility = 'visible';
+            presLeaderboardRevealIndex++;
+            return;
+        } else if (presLeaderboardRevealIndex === 1) {
+            const p2Col = document.getElementById('podium-p2');
+            if (p2Col) p2Col.style.visibility = 'visible';
+            presLeaderboardRevealIndex++;
+            return;
+        } else if (presLeaderboardRevealIndex === 2) {
+            const p1Col = document.getElementById('podium-p1');
+            if (p1Col) p1Col.style.visibility = 'visible';
+            
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 150,
+                    spread: 80,
+                    origin: { y: 0.6 }
+                });
+            }
+            presLeaderboardRevealIndex++;
+            return;
+        }
+    }
+    
+    if (presCurrentIndex < presSlides.length - 1) {
+        presCurrentIndex++;
+        window.renderPresentationSlide();
+    } else {
+        window.chiudiPresentazioneLIM();
+    }
+};
+
+window.chiudiPresentazioneLIM = function() {
+    document.body.style.overflow = '';
+    
+    const overlay = document.getElementById('presentation-overlay');
+    if (overlay) {
+        overlay.style.display = 'none';
+    }
+    
+    const bgVideo = document.getElementById('pres-bg-video');
+    if (bgVideo) {
+        bgVideo.pause();
+        bgVideo.src = '';
+    }
+    
+    document.removeEventListener('keydown', window.presKeydownHandler);
+    if (overlay) {
+        overlay.removeEventListener('click', window.presClickHandler);
+    }
+};
+
+window.presKeydownHandler = function(e) {
+    if (e.code === 'Space' || e.code === 'ArrowRight') {
+        e.preventDefault();
+        window.avanzaPresentazione();
+    } else if (e.code === 'Escape') {
+        window.chiudiPresentazioneLIM();
+    }
+};
+
+window.presClickHandler = function(e) {
+    if (e.target.closest('.pres-close-btn') || e.target.closest('button')) return;
+    window.avanzaPresentazione();
+};
 

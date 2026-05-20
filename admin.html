@@ -43,6 +43,7 @@
                 <li><a href="index.html" class="admin-link text-primary" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem;"><i class="fa-solid fa-house fa-fw"></i> Torna alla Home</a></li>
                 <li style="margin-top: 15px;"><a href="#" class="admin-tab-btn active" data-target="admin-view-autori" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-lock fa-fw"></i> Pagina Admin - gestionale</a></li>
                 <li><a href="#" class="admin-tab-btn" data-target="admin-view-profilo" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-user-gear fa-fw"></i> Mio Profilo Docente</a></li>
+                <li><a href="#" class="admin-tab-btn" data-target="admin-view-presentazioni" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-desktop fa-fw"></i> Presentazioni LIM</a></li>
                 
                 <div style="padding: 10px 20px; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-top: 15px; letter-spacing: 1px;">Aree Nascoste</div>
                 <li><a href="#" class="admin-tab-btn" data-target="admin-preview-prof" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-chalkboard-user fa-fw"></i> Buongiorno Prof</a></li>
@@ -69,7 +70,8 @@
                 <button class="btn admin-tab-btn" data-target="admin-view-tornei" style="flex:1; padding: 10px 5px; font-size: 0.8rem;"><i class="fa-solid fa-trophy"></i> Tornei</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-requests" style="flex:1; padding: 10px 5px; font-size: 0.8rem; background: #f1c40f !important; color: #000 !important; font-weight: 800; border: 2px solid #000; box-shadow: 0 4px 10px rgba(241, 196, 15, 0.3); opacity: 1;"><i class="fa-solid fa-envelope-open-text"></i> RICHIESTE</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-profilo" style="flex:1; padding: 10px 5px; font-size: 0.8rem;"><i class="fa-solid fa-user-gear"></i> Profilo</button>
-                <button class="btn admin-tab-btn" data-target="admin-view-classifica" style="width:100%; padding: 10px 5px; font-size: 0.8rem;"><i class="fa-solid fa-ranking-star"></i> Classifica Globale</button>
+                <button class="btn admin-tab-btn" data-target="admin-view-classifica" style="width:100%; padding: 10px 5px; font-size: 0.8rem; margin-bottom: 5px;"><i class="fa-solid fa-ranking-star"></i> Classifica Globale</button>
+                <button class="btn admin-tab-btn" data-target="admin-view-presentazioni" style="width:100%; padding: 10px 5px; font-size: 0.8rem; background: #2ecc71 !important; color: #000 !important; font-weight: 800; border: 2px solid #000; box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);"><i class="fa-solid fa-desktop"></i> Presentazioni LIM</button>
             </div>
 
             <section id="admin-view-autori" class="admin-view active">
@@ -289,6 +291,61 @@
                 </div>
             </section>
 
+            <!-- VIEW: Presentazioni LIM -->
+            <section id="admin-view-presentazioni" class="admin-view" style="display:none;">
+                <h2 style="padding: 0 15px;"><i class="fa-solid fa-desktop"></i> Presentazioni LIM</h2>
+                <div class="glass" style="padding: 20px; margin: 0 15px 20px 15px;">
+                    <p style="font-size:0.9rem; margin-bottom: 20px; line-height: 1.4; color: var(--text-muted);">
+                        Configura e avvia una presentazione animata a schermo intero da proiettare in classe. I dati delle classifiche e degli autori verranno caricati in tempo reale.
+                    </p>
+                    
+                    <!-- Campionato -->
+                    <div class="input-group">
+                        <label><i class="fa-solid fa-trophy"></i> Seleziona Campionato (Modalità)</label>
+                        <select id="pres-campionato" class="input-control" onchange="window.aggiornaAutoriPresentazione()">
+                            <option value="terze">📘 Contemporanea: Autori Italiani</option>
+                            <option value="seconde">📙 Età Moderna</option>
+                            <option value="avanzato">📒 Contemporanea: Autori Italiani e Internazionali</option>
+                        </select>
+                    </div>
+
+                    <!-- Torneo -->
+                    <div class="input-group">
+                        <label><i class="fa-solid fa-sitemap"></i> Seleziona Torneo (Opzionale)</label>
+                        <select id="pres-torneo" class="input-control">
+                            <option value="all">🏆 Classifica Globale (Nessun filtro torneo)</option>
+                            <!-- Inseriti da JS -->
+                        </select>
+                    </div>
+
+                    <!-- Autori in Evidenza -->
+                    <div class="input-group" style="margin-bottom: 25px;">
+                        <label><i class="fa-solid fa-feather-pointed"></i> Autori da Illustrare nella Scena 6 (Seleziona quelli studiati)</label>
+                        <div id="pres-autori-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; max-height: 200px; overflow-y: auto; padding: 10px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 8px;">
+                            <!-- Inseriti da JS in base alla modalità -->
+                        </div>
+                    </div>
+
+                    <!-- Augurio Finale -->
+                    <div class="input-group">
+                        <label><i class="fa-solid fa-wand-magic-sparkles"></i> Saluto / Augurio Finale</label>
+                        <select id="pres-augurio-select" class="input-control" onchange="window.gestisciAugurioCustom(this.value)">
+                            <option value="Buono studio e buone vacanze invernali! ❄️">Vacanze Invernali ❄️</option>
+                            <option value="Buono studio e buone vacanze pasquali! 🕊️">Vacanze Pasquali 🕊️</option>
+                            <option value="Buono studio e buone vacanze estive! ☀️">Vacanze Estive ☀️</option>
+                            <option value="Buono studio e buon fine settimana! 🕶️">Fine Settimana 🕶️</option>
+                            <option value="Buono studio e in bocca al lupo per le prossime sfide! 🚀">In bocca al lupo 🚀</option>
+                            <option value="custom">✍️ Testo Personalizzato...</option>
+                        </select>
+                        <input type="text" id="pres-augurio-custom" class="input-control mt-1" placeholder="Scrivi il tuo augurio personalizzato qui..." style="display: none;">
+                    </div>
+
+                    <button type="button" class="btn" style="margin-top: 15px; background: #2ecc71 !important; color: #000 !important; font-weight: 800; font-size: 1.1rem; border-radius: 30px; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);" onclick="window.avviaPresentazioneLIM()">
+                        <i class="fa-solid fa-play"></i> Avvia Presentazione a Schermo Intero
+                    </button>
+                </div>
+            </section>
+
         </main>
     </div>
 
@@ -389,10 +446,39 @@
         </div>
     </div>
 
+    <!-- OVERLAY PRESENTAZIONE A SCHERMO INTERO -->
+    <div id="presentation-overlay" style="display: none;">
+        <!-- Sfondo Video o Immagine -->
+        <video id="pres-bg-video" autoplay loop muted playsinline style="display: none;"></video>
+        <div id="pres-bg-image" style="display: none;"></div>
+        
+        <!-- Header di Controllo -->
+        <div class="pres-header">
+            <span class="pres-title"><i class="fa-solid fa-desktop"></i> Fantaletteratura LIM</span>
+            <button class="pres-close-btn" onclick="window.chiudiPresentazioneLIM()" title="Esci dalla presentazione (Esc)"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <!-- Contenuto della Slide -->
+        <div id="pres-content-wrapper">
+            <div id="pres-content">
+                <!-- Generato da JS -->
+            </div>
+        </div>
+
+        <!-- Control Navigation Instructions -->
+        <div class="pres-footer">
+            <span class="pres-slide-num" id="pres-slide-num">Slide 1/9</span>
+            <span class="pres-nav-tip"><i class="fa-solid fa-keyboard"></i> Premi <strong>Spazio</strong> / <strong>Freccia Destra</strong> o <strong>Click</strong> per avanzare. <strong>Esc</strong> per uscire.</span>
+        </div>
+    </div>
+
     <!-- Firebase SDK (Compat Version) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Libreria Coriandoli -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <!-- Configurazione & Service Layer -->
     <script src="js/firebase-config.js"></script>
