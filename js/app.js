@@ -3848,22 +3848,63 @@ async function inviaMissione(event) {
 let presSlides = [];
 let presCurrentIndex = 0;
 let presLeaderboardRevealIndex = 0;
-let presLeaderboardTeams = [];
 let presAuthorBonusIndex = 0;
 
 window.initPresentazioniTab = async function() {
-    const torneoSelect = document.getElementById('pres-torneo');
-    if (!torneoSelect) return;
+    const container = document.getElementById('pres-tornei-container');
+    if (!container) return;
     
-    torneoSelect.innerHTML = '<option value="all">🏆 Classifica Globale (Nessun filtro torneo)</option>';
+    container.innerHTML = '';
+    
+    // Checkbox per Classifica Globale
+    const globalLabel = document.createElement('label');
+    globalLabel.className = 'checkbox-container';
+    globalLabel.style.paddingLeft = '30px';
+    globalLabel.style.marginBottom = '8px';
+    globalLabel.style.fontSize = '0.85rem';
+    
+    const globalInput = document.createElement('input');
+    globalInput.type = 'checkbox';
+    globalInput.name = 'pres-tornei';
+    globalInput.value = 'all';
+    globalInput.checked = true; // Selezionata di default
+    
+    const globalSpan = document.createElement('span');
+    globalSpan.className = 'checkmark';
+    globalSpan.style.top = '1px';
+    globalSpan.style.height = '18px';
+    globalSpan.style.width = '18px';
+    
+    globalLabel.appendChild(globalInput);
+    globalLabel.appendChild(document.createTextNode('🏆 Classifica Globale (Tutte le squadre)'));
+    globalLabel.appendChild(globalSpan);
+    container.appendChild(globalLabel);
     
     try {
         const tourneys = await window.fanta_db.getTournaments();
         tourneys.forEach(tour => {
-            const opt = document.createElement('option');
-            opt.value = tour.id;
-            opt.textContent = `🛡️ ${tour.name}`;
-            torneoSelect.appendChild(opt);
+            const label = document.createElement('label');
+            label.className = 'checkbox-container';
+            label.style.paddingLeft = '30px';
+            label.style.marginBottom = '8px';
+            label.style.fontSize = '0.85rem';
+            
+            const input = document.createElement('input');
+            input.type = 'checkbox';
+            input.name = 'pres-tornei';
+            input.value = tour.id;
+            input.checked = false;
+            
+            const span = document.createElement('span');
+            span.className = 'checkmark';
+            span.style.top = '1px';
+            span.style.height = '18px';
+            span.style.width = '18px';
+            
+            label.appendChild(input);
+            label.appendChild(document.createTextNode(`🛡️ ${tour.name}`));
+            label.appendChild(span);
+            container.appendChild(label);
         });
     } catch (e) {
         console.error("Errore nel caricamento dei tornei in Presentazioni:", e);
@@ -3897,7 +3938,8 @@ window.aggiornaAutoriPresentazione = function() {
         input.type = 'checkbox';
         input.name = 'pres-autori';
         input.value = id;
-        input.checked = false;
+        // Gli autori di cui sono già uscite le schede per quel campionato sono spuntati per default
+        input.checked = !!a.isSchedaRevealed;
         
         const span = document.createElement('span');
         span.className = 'checkmark';
@@ -3925,13 +3967,19 @@ window.gestisciAugurioCustom = function(val) {
 
 window.avviaPresentazioneLIM = async function() {
     const campionato = document.getElementById('pres-campionato').value;
-    const torneoId = document.getElementById('pres-torneo').value;
+    const selectedTorneoIds = Array.from(document.querySelectorAll('input[name="pres-tornei"]:checked')).map(el => el.value);
     const customGreetingSelect = document.getElementById('pres-augurio-select').value;
+    
+    if (selectedTorneoIds.length === 0) {
+        alert("Seleziona almeno una classifica/torneo da mostrare nella presentazione!");
+        return;
+    }
     
     let augurioVal = customGreetingSelect;
     if (customGreetingSelect === 'custom') {
         augurioVal = document.getElementById('pres-augurio-custom').value.trim() || "Buon anno scolastico!";
     }
+    augurioVal = augurioVal.toUpperCase(); // Ingrandito e in maiuscolo
     
     document.body.style.overflow = 'hidden';
     
@@ -3959,57 +4007,34 @@ window.avviaPresentazioneLIM = async function() {
     presCurrentIndex = 0;
     
     try {
-        let allTeams = await window.fanta_db.getTeams(campionato);
-        if (torneoId !== 'all') {
-            const tourneys = await window.fanta_db.getTournaments();
-            const activeTourney = tourneys.find(t => t.id === torneoId);
-            if (activeTourney) {
-                const teamIds = activeTourney.teams || [];
-                allTeams = allTeams.filter(t => teamIds.includes(t.id));
-            }
-        }
-        
+        const allTeamsGlobal = await window.fanta_db.getTeams(campionato);
+        const tourneys = await window.fanta_db.getTournaments();
         const modeCfg = GAME_MODES[campionato] || GAME_MODES.terze;
         const pool = modeCfg.authors || AUTHORS;
         
-        const calculatedTeams = allTeams.map(t => {
-            let authPts = 0;
-            t.authors.forEach(aid => {
-                let a = pool.find(x => x.id === aid);
-                if (a && a.isPointsRevealed) authPts += a.points;
-            });
-            return {
-                id: t.id,
-                name: t.name,
-                points: authPts + ((t.missionsCompleted || 0) * 5)
-            };
-        });
-        
-        calculatedTeams.sort((a,b) => a.points - b.points); 
-        presLeaderboardTeams = calculatedTeams;
-        
         presSlides.push({
             type: 'intro',
-            subtitle: `Fantaletteratura • ${modeCfg.title}`,
-            text: `Benvenuti alla presentazione dei risultati di oggi!<br>Analizzeremo gli autori selezionati e scopriremo come si muovono le classifiche.`
+            subtitle: `Fantaletteratura • ${modeCfg.title}`.toUpperCase(),
+            text: `Benvenuti alla presentazione dei risultati di oggi!<br>Scopriamo l'andamento del campionato.`
         });
         
         presSlides.push({
             type: 'rules',
-            subtitle: `Breve remainder sulle regole del gioco`,
-            text: `Ogni squadra ha scelto 5 autori con un budget di 2500 lire.<br>L'obiettivo è totalizzare più punti possibile tramite i bonus degli autori e le missioni svolte in classe (+5 punti per ciascuna convalidata).`
+            subtitle: `Remainder regole`.toUpperCase(),
+            text: `Ogni squadra ha scelto 5 autori con un budget di 2500 lire.<br>L'obiettivo è totalizzare più punti possibile con bonus degli autori e missioni in classe (+5 punti per ciascuna convalidata).`
         });
         
         presSlides.push({
             type: 'premi',
-            subtitle: `I Premi di Fine Anno`,
-            text: `Ci saranno gloria eterna, attestati di merito scolastico e premi speciali per i primi tre classificati di ogni girone!`
+            subtitle: `I Premi finali`.toUpperCase(),
+            text: `Ci saranno gloria eterna, attestati di merito scolastico e premi speciali per i primi tre classificati di ciascun girone!`
         });
         
         const checkedAutori = Array.from(document.querySelectorAll('input[name="pres-autori"]:checked')).map(el => el.value);
-        checkedAutori.forEach(aid => {
-            const author = pool.find(x => x.id === aid);
-            if (author) {
+        
+        // L'ordine di visualizzazione degli autori deve essere rigorosamente quello cronologico di pool
+        pool.forEach(author => {
+            if (checkedAutori.includes(author.id)) {
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = author.schedaHTML;
                 
@@ -4042,18 +4067,57 @@ window.avviaPresentazioneLIM = async function() {
             }
         });
         
-        presSlides.push({
-            type: 'suspense',
-            subtitle: `Ed ora...`,
-            text: `Scopriamo la classifica del girone!<br>Mettetevi comodi e preparatevi alla suspense...`
-        });
-        
-        presSlides.push({
-            type: 'leaderboard-list'
-        });
-        
-        presSlides.push({
-            type: 'podium'
+        // Aggiungi le slide di classifica per ciascuna delle classifiche/tornei selezionati
+        selectedTorneoIds.forEach(torneoId => {
+            let torneoName = "";
+            let filteredTeams = [];
+            
+            if (torneoId === 'all') {
+                torneoName = "CLASSIFICA GLOBALE";
+                filteredTeams = [...allTeamsGlobal];
+            } else {
+                const activeTourney = tourneys.find(t => t.id === torneoId);
+                if (activeTourney) {
+                    torneoName = activeTourney.name.toUpperCase();
+                    const teamIds = activeTourney.teams || [];
+                    filteredTeams = allTeamsGlobal.filter(t => teamIds.includes(t.id));
+                } else {
+                    return; // Skip se torneo inesistente
+                }
+            }
+            
+            const calculatedTeams = filteredTeams.map(t => {
+                let authPts = 0;
+                t.authors.forEach(aid => {
+                    let a = pool.find(x => x.id === aid);
+                    if (a && a.isPointsRevealed) authPts += a.points;
+                });
+                return {
+                    id: t.id,
+                    name: t.name,
+                    points: authPts + ((t.missionsCompleted || 0) * 5)
+                };
+            });
+            
+            calculatedTeams.sort((a,b) => a.points - b.points); // Ordina in modo crescente per reveal
+            
+            presSlides.push({
+                type: 'suspense',
+                subtitle: `Ed ora...`.toUpperCase(),
+                text: `SCOPRIAMO LA CLASSIFICA:<br>${torneoName}`
+            });
+            
+            presSlides.push({
+                type: 'leaderboard-list',
+                torneoName: torneoName,
+                teams: calculatedTeams
+            });
+            
+            presSlides.push({
+                type: 'podium',
+                torneoName: torneoName,
+                teams: calculatedTeams
+            });
         });
         
         presSlides.push({
@@ -4081,7 +4145,7 @@ window.renderPresentationSlide = function() {
     const slide = presSlides[presCurrentIndex];
     if (!slide) return;
     
-    slideNum.innerText = `Slide ${presCurrentIndex + 1}/${presSlides.length}`;
+    slideNum.innerText = `SLIDE ${presCurrentIndex + 1}/${presSlides.length}`;
     container.innerHTML = '';
     
     if (slide.type === 'intro' || slide.type === 'rules' || slide.type === 'premi' || slide.type === 'suspense') {
@@ -4106,7 +4170,7 @@ window.renderPresentationSlide = function() {
                     <div class="pres-author-name">${slide.author.name}</div>
                     <div class="pres-author-role">${slide.author.role || ''}</div>
                     <div class="pres-author-points-badge" id="pres-author-pts-badge" style="visibility: hidden;">
-                        ${slide.totalPts} Lire
+                        ${slide.totalPts} PUNTI
                     </div>
                 </div>
                 <div class="pres-author-right">
@@ -4118,7 +4182,8 @@ window.renderPresentationSlide = function() {
             </div>
         `;
     } else if (slide.type === 'leaderboard-list') {
-        const listTeams = presLeaderboardTeams.slice(0, Math.max(0, presLeaderboardTeams.length - 3));
+        const teams = slide.teams || [];
+        const listTeams = teams.slice(0, Math.max(0, teams.length - 3));
         presLeaderboardRevealIndex = 0;
         
         if (listTeams.length === 0) {
@@ -4127,21 +4192,21 @@ window.renderPresentationSlide = function() {
         }
         
         const rowsHtml = listTeams.map((t, idx) => {
-            const rank = presLeaderboardTeams.length - idx;
+            const rank = teams.length - idx;
             return `
                 <div class="pres-leaderboard-row" id="pres-row-${idx}" style="display: none;">
                     <div class="pres-row-left">
                         <span class="pres-row-rank">#${rank}</span>
                         <span class="pres-row-name">${t.name}</span>
                     </div>
-                    <span class="pres-row-points">${t.points} pt</span>
+                    <span class="pres-row-points">${t.points} PT</span>
                 </div>
             `;
         }).join('');
         
         container.innerHTML = `
-            <div class="pres-slide-subtitle">La Classifica Generica</div>
-            <h2 style="font-family: var(--font-heading); font-size: 2.2rem; margin-bottom: 20px; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">Dalle retrovie verso il podio...</h2>
+            <div class="pres-slide-subtitle">CLASSIFICA: ${slide.torneoName}</div>
+            <h2 style="font-family: var(--font-heading); font-size: 2.2rem; margin-bottom: 20px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); text-transform: uppercase;">Dalle retrovie verso il podio...</h2>
             <div class="pres-leaderboard-list">
                 ${rowsHtml}
             </div>
@@ -4149,19 +4214,20 @@ window.renderPresentationSlide = function() {
     } else if (slide.type === 'podium') {
         presLeaderboardRevealIndex = 0;
         
-        const len = presLeaderboardTeams.length;
-        const p3 = len >= 3 ? presLeaderboardTeams[len - 3] : { name: "Non assegnato", points: 0 };
-        const p2 = len >= 2 ? presLeaderboardTeams[len - 2] : { name: "Non assegnato", points: 0 };
-        const p1 = len >= 1 ? presLeaderboardTeams[len - 1] : { name: "Non assegnato", points: 0 };
+        const teams = slide.teams || [];
+        const len = teams.length;
+        const p3 = len >= 3 ? teams[len - 3] : { name: "Non assegnato", points: 0 };
+        const p2 = len >= 2 ? teams[len - 2] : { name: "Non assegnato", points: 0 };
+        const p1 = len >= 1 ? teams[len - 1] : { name: "Non assegnato", points: 0 };
         
         container.innerHTML = `
-            <div class="pres-slide-subtitle">🏆 Il Podio Finale 🏆</div>
+            <div class="pres-slide-subtitle">🏆 IL PODIO FINALE: ${slide.torneoName} 🏆</div>
             <div class="pres-podium-container">
                 <div class="pres-podium-col p2" id="podium-p2" style="visibility: hidden;">
                     <div class="pres-podium-team-name">${p2.name}</div>
                     <div class="pres-podium-step">
                         <div class="pres-podium-num">2</div>
-                        <div class="pres-podium-pts">${p2.points} pt</div>
+                        <div class="pres-podium-pts">${p2.points} PT</div>
                     </div>
                 </div>
                 
@@ -4169,7 +4235,7 @@ window.renderPresentationSlide = function() {
                     <div class="pres-podium-team-name">${p1.name}</div>
                     <div class="pres-podium-step">
                         <div class="pres-podium-num">1</div>
-                        <div class="pres-podium-pts">${p1.points} pt</div>
+                        <div class="pres-podium-pts">${p1.points} PT</div>
                     </div>
                 </div>
                 
@@ -4177,16 +4243,16 @@ window.renderPresentationSlide = function() {
                     <div class="pres-podium-team-name">${p3.name}</div>
                     <div class="pres-podium-step">
                         <div class="pres-podium-num">3</div>
-                        <div class="pres-podium-pts">${p3.points} pt</div>
+                        <div class="pres-podium-pts">${p3.points} PT</div>
                     </div>
                 </div>
             </div>
         `;
     } else if (slide.type === 'outro') {
         container.innerHTML = `
-            <div class="pres-slide-subtitle">Fantaletteratura</div>
-            <div class="pres-slide-text" style="font-size: 2.8rem; color: var(--primary-color);">${slide.text}</div>
-            <button class="btn" style="width: auto; margin-top: 40px; background: var(--primary-color) !important;" onclick="window.chiudiPresentazioneLIM()">Chiudi Presentazione</button>
+            <div class="pres-slide-subtitle">FANTALETTERATURA</div>
+            <div class="pres-slide-text" style="font-size: 3.5rem; color: var(--primary-color);">${slide.text}</div>
+            <button class="btn" style="width: auto; margin-top: 40px; background: var(--primary-color) !important; color:#000 !important; font-weight:800;" onclick="window.chiudiPresentazioneLIM()">Chiudi Presentazione</button>
         `;
     }
 };
@@ -4217,7 +4283,8 @@ window.avanzaPresentazione = function() {
     }
     
     if (slide.type === 'leaderboard-list') {
-        const listTeamsCount = Math.max(0, presLeaderboardTeams.length - 3);
+        const teams = slide.teams || [];
+        const listTeamsCount = Math.max(0, teams.length - 3);
         if (presLeaderboardRevealIndex < listTeamsCount) {
             const row = document.getElementById(`pres-row-${presLeaderboardRevealIndex}`);
             if (row) {

@@ -1598,24 +1598,27 @@ h1, h2, h3, h4 {
 /* Slide elements styling */
 .pres-slide-text {
     font-family: var(--font-heading);
-    font-size: 2.3rem;
+    font-size: 3.5rem; /* Ingrandito da 2.3rem */
     text-align: center;
-    line-height: 1.5;
+    line-height: 1.4;
     text-shadow: 0 4px 15px rgba(0,0,0,0.9);
-    max-width: 850px;
+    max-width: 950px;
     color: var(--text-main);
+    text-transform: uppercase; /* In maiuscolo */
+    font-weight: 800;
     animation: inkReveal 0.8s cubic-bezier(0.19, 1, 0.22, 1) forwards;
 }
 
 .pres-slide-subtitle {
     font-family: var(--font-body);
-    font-size: 1.1rem;
+    font-size: 1.8rem; /* Ingrandito da 1.1rem */
     color: var(--primary-color);
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    margin-bottom: 20px;
+    text-transform: uppercase; /* In maiuscolo */
+    letter-spacing: 4px;
+    margin-bottom: 25px;
     text-shadow: 0 2px 5px rgba(0,0,0,0.9);
     text-align: center;
+    font-weight: 800;
 }
 
 .pres-slide-card {
@@ -1661,29 +1664,32 @@ h1, h2, h3, h4 {
 
 .pres-author-name {
     font-family: var(--font-heading);
-    font-size: 2rem;
-    font-weight: 700;
+    font-size: 2.8rem; /* Ingrandito da 2rem */
+    font-weight: 800;
     color: var(--primary-hover);
     text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    text-transform: uppercase; /* In maiuscolo */
 }
 
 .pres-author-role {
-    font-size: 0.95rem;
+    font-size: 1.4rem; /* Ingrandito da 0.95rem */
     color: var(--text-muted);
     font-style: italic;
-    margin-top: -10px;
+    margin-top: -5px;
+    text-transform: uppercase; /* In maiuscolo */
 }
 
 .pres-author-points-badge {
     background: linear-gradient(135deg, #f1c40f, #d35400);
     color: #000;
-    font-weight: 800;
-    font-size: 1.6rem;
-    padding: 8px 24px;
-    border-radius: 30px;
+    font-weight: 900;
+    font-size: 2.2rem; /* Ingrandito da 1.6rem */
+    padding: 10px 30px;
+    border-radius: 35px;
     box-shadow: 0 8px 20px rgba(241, 196, 15, 0.4);
     letter-spacing: 1px;
-    margin-top: 10px;
+    margin-top: 15px;
+    text-transform: uppercase; /* In maiuscolo */
     animation: pulseGlow 2s infinite;
 }
 
@@ -1696,13 +1702,14 @@ h1, h2, h3, h4 {
 
 .pres-author-intro {
     font-family: var(--font-heading);
-    font-size: 1.2rem;
-    line-height: 1.5;
+    font-size: 1.8rem; /* Ingrandito da 1.2rem */
+    line-height: 1.4;
     font-style: italic;
     color: var(--text-main);
-    border-left: 4px solid var(--primary-color);
-    padding-left: 15px;
-    margin-bottom: 10px;
+    border-left: 6px solid var(--primary-color);
+    padding-left: 20px;
+    margin-bottom: 20px;
+    text-transform: uppercase; /* In maiuscolo */
 }
 
 .pres-bonus-item {
@@ -1711,9 +1718,11 @@ h1, h2, h3, h4 {
     align-items: center;
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(141, 160, 63, 0.15);
-    padding: 10px 20px;
-    border-radius: 10px;
-    font-size: 1rem;
+    padding: 15px 30px;
+    border-radius: 12px;
+    font-size: 1.5rem; /* Ingrandito da 1rem */
+    font-weight: 700;
+    text-transform: uppercase; /* In maiuscolo */
     opacity: 0;
     transform: translateX(20px);
     transition: all 0.4s ease-out;
@@ -1759,15 +1768,16 @@ h1, h2, h3, h4 {
 
 .pres-podium-team-name {
     text-align: center;
-    font-size: 1.15rem;
-    font-weight: 700;
-    margin-bottom: 10px;
+    font-size: 1.7rem; /* Ingrandito da 1.15rem */
+    font-weight: 800;
+    margin-bottom: 12px;
     text-shadow: 0 3px 6px rgba(0,0,0,0.9);
     color: #fff;
-    min-height: 50px;
+    min-height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
+    text-transform: uppercase; /* In maiuscolo */
 }
 
 .pres-podium-step {
@@ -1811,10 +1821,11 @@ h1, h2, h3, h4 {
 }
 
 .pres-podium-pts {
-    font-size: 1.1rem;
-    font-weight: 700;
+    font-size: 1.6rem; /* Ingrandito da 1.1rem */
+    font-weight: 800;
     margin-top: 5px;
     letter-spacing: 0.5px;
+    text-transform: uppercase; /* In maiuscolo */
 }
 
 .pres-podium-col.p1 .pres-podium-pts { color: #5c4308; }
@@ -1824,7 +1835,7 @@ h1, h2, h3, h4 {
 /* Leaderboard List Rows */
 .pres-leaderboard-list {
     width: 100%;
-    max-width: 650px;
+    max-width: 750px; /* Allargato */
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -1835,9 +1846,10 @@ h1, h2, h3, h4 {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 24px;
-    border-radius: 12px;
-    font-size: 1.15rem;
+    padding: 18px 30px; /* Più grande */
+    border-radius: 15px;
+    font-size: 1.8rem; /* Ingrandito da 1.15rem */
+    text-transform: uppercase; /* In maiuscolo */
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(141, 160, 63, 0.15);
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
@@ -1859,18 +1871,18 @@ h1, h2, h3, h4 {
 
 .pres-row-rank {
     font-family: var(--font-heading);
-    font-size: 1.4rem;
-    font-weight: 700;
+    font-size: 2.2rem; /* Ingrandito da 1.4rem */
+    font-weight: 800;
     color: var(--primary-color);
-    width: 30px;
+    width: 45px;
 }
 
 .pres-row-name {
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .pres-row-points {
-    font-weight: 700;
+    font-weight: 800;
     color: var(--primary-hover);
 }
 
