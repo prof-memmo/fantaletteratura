@@ -44,6 +44,7 @@
                 <li style="margin-top: 15px;"><a href="#" class="admin-tab-btn active" data-target="admin-view-autori" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-lock fa-fw"></i> Pagina Admin - gestionale</a></li>
                 <li><a href="#" class="admin-tab-btn" data-target="admin-view-profilo" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-user-gear fa-fw"></i> Mio Profilo Docente</a></li>
                 <li><a href="#" class="admin-tab-btn" data-target="admin-view-presentazioni" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-desktop fa-fw"></i> Presentazioni LIM</a></li>
+                <li><a href="#" class="admin-tab-btn" data-target="admin-view-locandine" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-image fa-fw"></i> Locandine</a></li>
                 
                 <div style="padding: 10px 20px; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-top: 15px; letter-spacing: 1px;">Aree Nascoste</div>
                 <li><a href="#" class="admin-tab-btn" data-target="admin-preview-prof" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-chalkboard-user fa-fw"></i> Buongiorno Prof</a></li>
@@ -72,6 +73,7 @@
                 <button class="btn admin-tab-btn" data-target="admin-view-profilo" style="flex:1; padding: 10px 5px; font-size: 0.8rem;"><i class="fa-solid fa-user-gear"></i> Profilo</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-classifica" style="width:100%; padding: 10px 5px; font-size: 0.8rem; margin-bottom: 5px;"><i class="fa-solid fa-ranking-star"></i> Classifica Globale</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-presentazioni" style="width:100%; padding: 10px 5px; font-size: 0.8rem; background: #2ecc71 !important; color: #000 !important; font-weight: 800; border: 2px solid #000; box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);"><i class="fa-solid fa-desktop"></i> Presentazioni LIM</button>
+                <button class="btn admin-tab-btn" data-target="admin-view-locandine" style="width:100%; padding: 10px 5px; font-size: 0.8rem; background: linear-gradient(135deg, #e67e22, #d35400) !important; color: #fff !important; font-weight: 800; border: none; box-shadow: 0 4px 10px rgba(230, 126, 34, 0.35);"><i class="fa-solid fa-image"></i> Locandine</button>
             </div>
 
             <section id="admin-view-autori" class="admin-view active">
@@ -365,6 +367,19 @@
                         </div>
                     </div>
 
+                    <!-- Tornei Interni (Opzionale) -->
+                    <div class="input-group" style="margin-bottom: 25px;">
+                        <label><i class="fa-solid fa-trophy"></i> 4. Tornei Interni (Opzionale)</label>
+                        <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">
+                            Mostra le classifiche dedicate ai tuoi tornei. (Seleziona i tornei che vuoi includere nella presentazione)
+                        </p>
+                        <div id="pres-tornei-container" class="pres-selection-grid" style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));">
+                            <!-- Popolato dinamicamente da app.js -->
+                            <div class="glass" style="padding:10px; text-align:center; color:var(--text-muted); grid-column:1/-1;">Caricamento tornei...</div>
+                        </div>
+                    </div>
+
+
                     <!-- Autori in Evidenza -->
                     <div class="input-group" style="margin-bottom: 25px;">
                         <label><i class="fa-solid fa-feather-pointed"></i> Autori da Illustrare nella Scena 6 (Seleziona quelli studiati)</label>
@@ -516,6 +531,96 @@
         <div class="pres-footer">
             <span class="pres-slide-num" id="pres-slide-num">Slide 1/9</span>
             <span class="pres-nav-tip"><i class="fa-solid fa-keyboard"></i> Premi <strong>Spazio</strong> / <strong>Freccia Destra</strong> o <strong>Click</strong> per avanzare. <strong>Esc</strong> per uscire.</span>
+        </div>
+    </div>
+
+    <!-- VIEW: Locandine (overlay fullscreen come le presentazioni) -->
+    <div id="admin-view-locandine" class="locandine-overlay" style="display:none;">
+        <div class="locandine-panel">
+
+            <!-- Header -->
+            <div class="locandine-header">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <i class="fa-solid fa-image" style="font-size:1.4rem; color:#e67e22;"></i>
+                    <div>
+                        <h2 style="margin:0; font-size:1.3rem;">Locandine</h2>
+                        <p style="margin:0; font-size:0.78rem; color:var(--text-muted);">Personalizza e scarica le locandine per i tuoi incontri</p>
+                    </div>
+                </div>
+                <button class="locandine-close-btn" onclick="window.chiudiLocandine()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="locandine-body">
+
+                <!-- Colonna Sinistra: Configurazione -->
+                <div class="locandine-config">
+
+                    <!-- 1. Scegli Locandina -->
+                    <div class="locandine-section">
+                        <label class="locandine-label"><i class="fa-solid fa-1"></i> Scegli la locandina</label>
+                        <div class="locandine-card-grid">
+                            <div class="locandine-type-card active" data-poster="inizio" onclick="window.selezionaLocandina(this)">
+                                <div class="locandine-type-icon"><i class="fa-solid fa-flag-checkered"></i></div>
+                                <div class="locandine-type-title">Inizio</div>
+                                <div class="locandine-type-desc">Lancio del campionato</div>
+                            </div>
+                            <div class="locandine-type-card" data-poster="semifinali" onclick="window.selezionaLocandina(this)">
+                                <div class="locandine-type-icon"><i class="fa-solid fa-forward-step"></i></div>
+                                <div class="locandine-type-title">Semifinali</div>
+                                <div class="locandine-type-desc">Fase semifinale</div>
+                            </div>
+                            <div class="locandine-type-card" data-poster="finali" onclick="window.selezionaLocandina(this)">
+                                <div class="locandine-type-icon"><i class="fa-solid fa-trophy"></i></div>
+                                <div class="locandine-type-title">Finali</div>
+                                <div class="locandine-type-desc">L'evento conclusivo</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Personalizza il testo -->
+                    <div class="locandine-section">
+                        <label class="locandine-label"><i class="fa-solid fa-2"></i> Informazioni sull'incontro</label>
+                        <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:12px; line-height:1.4;">Il testo verrà aggiunto in una barra bianca in calce alla locandina, in maiuscolo. Lascia vuoto per non mostrare la barra.</p>
+
+                        <div class="input-group" style="margin-bottom:12px;">
+                            <label style="font-size:0.8rem; color:var(--text-muted); margin-bottom:6px;">📅 Data</label>
+                            <input type="text" id="locandina-data" class="input-control" placeholder="Es: 15 Maggio 2025" oninput="window.aggiornaAnteprimaLocandina()">
+                        </div>
+                        <div class="input-group" style="margin-bottom:12px;">
+                            <label style="font-size:0.8rem; color:var(--text-muted); margin-bottom:6px;">📍 Luogo</label>
+                            <input type="text" id="locandina-luogo" class="input-control" placeholder="Es: Aula Magna — I.C. Da Vinci" oninput="window.aggiornaAnteprimaLocandina()">
+                        </div>
+                        <div class="input-group" style="margin-bottom:12px;">
+                            <label style="font-size:0.8rem; color:var(--text-muted); margin-bottom:6px;">🕐 Orario</label>
+                            <input type="text" id="locandina-orario" class="input-control" placeholder="Es: Ore 10:30" oninput="window.aggiornaAnteprimaLocandina()">
+                        </div>
+                        <div class="input-group">
+                            <label style="font-size:0.8rem; color:var(--text-muted); margin-bottom:6px;">✏️ Note aggiuntive (opzionale)</label>
+                            <input type="text" id="locandina-note" class="input-control" placeholder="Es: Ingresso libero" oninput="window.aggiornaAnteprimaLocandina()">
+                        </div>
+                    </div>
+
+                    <!-- 3. Scarica -->
+                    <div class="locandine-section">
+                        <button class="locandine-download-btn" onclick="window.scaricaLocandina()">
+                            <i class="fa-solid fa-download"></i>
+                            Scarica Locandina
+                        </button>
+                        <p style="font-size:0.73rem; color:var(--text-muted); margin-top:8px; text-align:center; line-height:1.3;">Il file verrà scaricato in formato JPEG ad alta qualità</p>
+                    </div>
+                </div>
+
+                <!-- Colonna Destra: Anteprima -->
+                <div class="locandine-preview">
+                    <div class="locandine-canvas-wrapper">
+                        <canvas id="locandina-canvas"></canvas>
+                        <div class="locandine-canvas-label"><i class="fa-solid fa-eye"></i> Anteprima</div>
+                    </div>
+                </div>
+
+            </div>
         </div>
     </div>
 

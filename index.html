@@ -455,6 +455,8 @@
                      
                      <button type="button" class="btn mb-2" onclick="navigateTo('view-missioni'); openNuovaMissioneModal();"><i class="fa-solid fa-list-check"></i> Carica una Missione</button>
                      <button type="button" class="btn mb-2" onclick="navigateTo('view-squadra')"><i class="fa-solid fa-plus-circle"></i> Carica una nuova squadra</button>
+                     <button type="button" class="btn mb-2" onclick="window.apriLocandine()" style="background: linear-gradient(135deg, #e67e22, #d35400) !important; color: #fff !important; font-weight: 800; border: none; box-shadow: 0 4px 10px rgba(230, 126, 34, 0.35);"><i class="fa-solid fa-image"></i> Crea una Locandina</button>
+                     <button type="button" class="btn mb-2" onclick="navigateTo('view-presentazioni'); window.initPresentazioniTab();" style="background: linear-gradient(135deg, #2ecc71, #27ae60) !important; color: #fff !important; font-weight: 800; border: none; box-shadow: 0 4px 10px rgba(46, 204, 113, 0.35);"><i class="fa-solid fa-desktop"></i> Genera Presentazione LIM</button>
                      
                      <!-- Associazione collaboratore via codice squadra -->
                      <div style="display: flex; gap: 8px; margin-bottom: 20px; width: 100%;">
@@ -496,6 +498,124 @@
                 </div>
             </section>
         </main>
+
+        
+<section id="view-presentazioni" class="view" style="display:none;">
+                <div style="display:flex; align-items:center; justify-content:space-between; padding: 0 15px; margin-bottom: 10px;">
+                    <h2 style="margin:0;"><i class="fa-solid fa-desktop"></i> Presentazioni LIM</h2>
+                    <button class="btn-secondary" onclick="navigateTo('view-profilo')" style="padding:8px 16px; border-radius:20px; font-size:0.82rem; white-space:nowrap;"><i class="fa-solid fa-arrow-left"></i> Profilo</button>
+                </div>
+                <div class="glass" style="padding: 20px; margin: 0 15px 20px 15px;">
+                    <p style="font-size:0.9rem; margin-bottom: 20px; line-height: 1.4; color: var(--text-muted);">
+                        Configura e avvia una presentazione animata a schermo intero da proiettare in classe. I dati delle classifiche e degli autori verranno caricati in tempo reale.
+                    </p>
+                    
+                    <!-- Tipo di Presentazione -->
+                    <div class="input-group">
+                        <label><i class="fa-solid fa-calendar-days"></i> 1. Tipo di Presentazione</label>
+                        <div class="pres-selection-grid">
+                            <div class="pres-card active" data-type="tipo" data-value="intermedia" onclick="window.selectPresOption(this)">
+                                <div class="pres-card-icon"><i class="fa-solid fa-circle-play"></i></div>
+                                <div class="pres-card-title">Intermedia</div>
+                                <div class="pres-card-desc">Risultati ordinari durante l'anno</div>
+                            </div>
+                            <div class="pres-card" data-type="tipo" data-value="semifinale" onclick="window.selectPresOption(this)">
+                                <div class="pres-card-icon"><i class="fa-solid fa-forward-step"></i></div>
+                                <div class="pres-card-title">Semifinale</div>
+                                <div class="pres-card-desc">Scontro per determinare i finalisti</div>
+                            </div>
+                            <div class="pres-card" data-type="tipo" data-value="finale" onclick="window.selectPresOption(this)">
+                                <div class="pres-card-icon"><i class="fa-solid fa-trophy"></i></div>
+                                <div class="pres-card-title">Finale</div>
+                                <div class="pres-card-desc">L'evento conclusivo che incorona i campioni</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campionati -->
+                    <div class="input-group">
+                        <label><i class="fa-solid fa-map-location-dot"></i> 2. Campionati / Gironi da includere</label>
+                        <div class="pres-selection-grid">
+                            <div class="pres-card active" data-type="campionato" data-value="terze" onclick="window.togglePresOption(this)">
+                                <div class="pres-card-icon">📘</div>
+                                <div class="pres-card-title">Terze</div>
+                                <div class="pres-card-desc">Contemporanea: Autori Italiani</div>
+                            </div>
+                            <div class="pres-card active" data-type="campionato" data-value="seconde" onclick="window.togglePresOption(this)">
+                                <div class="pres-card-icon">📙</div>
+                                <div class="pres-card-title">Seconde</div>
+                                <div class="pres-card-desc">Età Moderna</div>
+                            </div>
+                            <div class="pres-card active" data-type="campionato" data-value="avanzato" onclick="window.togglePresOption(this)">
+                                <div class="pres-card-icon">📒</div>
+                                <div class="pres-card-title">Avanzato</div>
+                                <div class="pres-card-desc">Contemporanea Internazionale</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Classifiche -->
+                    <div class="input-group">
+                        <label><i class="fa-solid fa-list-ol"></i> 3. Classifiche da mostrare per ciascun girone</label>
+                        <div class="pres-selection-grid">
+                            <div class="pres-card active" data-type="classifica" data-value="autori" onclick="window.togglePresOption(this)">
+                                <div class="pres-card-icon"><i class="fa-solid fa-feather-pointed"></i></div>
+                                <div class="pres-card-title">Classifica Autori</div>
+                                <div class="pres-card-desc">Punti ottenuti solo dagli autori in squadra</div>
+                            </div>
+                            <div class="pres-card active" data-type="classifica" data-value="missioni" onclick="window.togglePresOption(this)">
+                                <div class="pres-card-icon"><i class="fa-solid fa-circle-check"></i></div>
+                                <div class="pres-card-title">Classifica Missioni</div>
+                                <div class="pres-card-desc">Punti accumulati con le missioni in classe (+5pt)</div>
+                            </div>
+                            <div class="pres-card active" data-type="classifica" data-value="globale" onclick="window.togglePresOption(this)">
+                                <div class="pres-card-icon"><i class="fa-solid fa-globe"></i></div>
+                                <div class="pres-card-title">Classifica Globale</div>
+                                <div class="pres-card-desc">Punteggio totale: Autori + Missioni</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tornei Interni (Opzionale) -->
+                    <div class="input-group" style="margin-bottom: 25px;">
+                        <label><i class="fa-solid fa-trophy"></i> 4. Tornei Interni (Opzionale)</label>
+                        <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">
+                            Mostra le classifiche dedicate ai tuoi tornei. (Seleziona i tornei che vuoi includere nella presentazione)
+                        </p>
+                        <div id="pres-tornei-container" class="pres-selection-grid" style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));">
+                            <!-- Popolato dinamicamente da app.js -->
+                            <div class="glass" style="padding:10px; text-align:center; color:var(--text-muted); grid-column:1/-1;">Caricamento tornei...</div>
+                        </div>
+                    </div>
+
+
+                    <!-- Autori in Evidenza -->
+                    <div class="input-group" style="margin-bottom: 25px;">
+                        <label><i class="fa-solid fa-feather-pointed"></i> Autori da Illustrare nella Scena 6 (Seleziona quelli studiati)</label>
+                        <div id="pres-autori-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; max-height: 200px; overflow-y: auto; padding: 10px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 8px;">
+                            <!-- Inseriti da JS in base alla modalità -->
+                        </div>
+                    </div>
+
+                    <!-- Augurio Finale -->
+                    <div class="input-group">
+                        <label><i class="fa-solid fa-wand-magic-sparkles"></i> Saluto / Augurio Finale</label>
+                        <select id="pres-augurio-select" class="input-control" onchange="window.gestisciAugurioCustom(this.value)">
+                            <option value="Buono studio e buone vacanze invernali! ❄️">Vacanze Invernali ❄️</option>
+                            <option value="Buono studio e buone vacanze pasquali! 🕊️">Vacanze Pasquali 🕊️</option>
+                            <option value="Buono studio e buone vacanze estive! ☀️">Vacanze Estive ☀️</option>
+                            <option value="Buono studio e buon fine settimana! 🕶️">Fine Settimana 🕶️</option>
+                            <option value="Buono studio e in bocca al lupo per le prossime sfide! 🚀">In bocca al lupo 🚀</option>
+                            <option value="custom">✍️ Testo Personalizzato...</option>
+                        </select>
+                        <input type="text" id="pres-augurio-custom" class="input-control mt-1" placeholder="Scrivi il tuo augurio personalizzato qui..." style="display: none;">
+                    </div>
+
+                    <button type="button" class="btn" style="margin-top: 15px; background: #2ecc71 !important; color: #000 !important; font-weight: 800; font-size: 1.1rem; border-radius: 30px; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);" onclick="window.avviaPresentazioneLIM()">
+                        <i class="fa-solid fa-play"></i> Avvia Presentazione a Schermo Intero
+                    </button>
+                </div>
+            </section>
 
         <!-- Final Footer (Desktop & Hidden Area) -->
         <footer style="padding: 20px; text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 20px;">
@@ -782,6 +902,121 @@
             <div style="display:flex; gap:10px;">
                 <button class="btn" style="flex:1;" onclick="aggiungiCollaboratore()"><i class="fa-solid fa-plus"></i> Aggiungi</button>
                 <button class="btn btn-secondary" style="flex:1;" onclick="document.getElementById('modal-collaboratori').style.display='none'">Chiudi</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="presentation-overlay" style="display: none;">
+        <!-- Sfondo Video o Immagine -->
+        <video id="pres-bg-video" autoplay loop muted playsinline style="display: none;"></video>
+        <div id="pres-bg-image" style="display: none;"></div>
+        
+        <!-- Header di Controllo -->
+        <div class="pres-header">
+            <span class="pres-title"><i class="fa-solid fa-desktop"></i> Fantaletteratura LIM</span>
+            <button class="pres-close-btn" onclick="window.chiudiPresentazioneLIM()" title="Esci dalla presentazione (Esc)"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <!-- Contenuto della Slide -->
+        <div id="pres-content-wrapper">
+            <div id="pres-content">
+                <!-- Generato da JS -->
+            </div>
+        </div>
+
+        <!-- Control Navigation Instructions -->
+        <div class="pres-footer">
+            <span class="pres-slide-num" id="pres-slide-num">Slide 1/9</span>
+            <span class="pres-nav-tip"><i class="fa-solid fa-keyboard"></i> Premi <strong>Spazio</strong> / <strong>Freccia Destra</strong> o <strong>Click</strong> per avanzare. <strong>Esc</strong> per uscire.</span>
+        </div>
+    </div>
+
+    <!-- VIEW: Locandine (overlay fullscreen come le presentazioni) -->
+    <div id="admin-view-locandine" class="locandine-overlay" style="display:none;">
+        <div class="locandine-panel">
+
+            <!-- Header -->
+            <div class="locandine-header">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <i class="fa-solid fa-image" style="font-size:1.4rem; color:#e67e22;"></i>
+                    <div>
+                        <h2 style="margin:0; font-size:1.3rem;">Locandine</h2>
+                        <p style="margin:0; font-size:0.78rem; color:var(--text-muted);">Personalizza e scarica le locandine per i tuoi incontri</p>
+                    </div>
+                </div>
+                <button class="locandine-close-btn" onclick="window.chiudiLocandine()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="locandine-body">
+
+                <!-- Colonna Sinistra: Configurazione -->
+                <div class="locandine-config">
+
+                    <!-- 1. Scegli Locandina -->
+                    <div class="locandine-section">
+                        <label class="locandine-label"><i class="fa-solid fa-1"></i> Scegli la locandina</label>
+                        <div class="locandine-card-grid">
+                            <div class="locandine-type-card active" data-poster="inizio" onclick="window.selezionaLocandina(this)">
+                                <div class="locandine-type-icon"><i class="fa-solid fa-flag-checkered"></i></div>
+                                <div class="locandine-type-title">Inizio</div>
+                                <div class="locandine-type-desc">Lancio del campionato</div>
+                            </div>
+                            <div class="locandine-type-card" data-poster="semifinali" onclick="window.selezionaLocandina(this)">
+                                <div class="locandine-type-icon"><i class="fa-solid fa-forward-step"></i></div>
+                                <div class="locandine-type-title">Semifinali</div>
+                                <div class="locandine-type-desc">Fase semifinale</div>
+                            </div>
+                            <div class="locandine-type-card" data-poster="finali" onclick="window.selezionaLocandina(this)">
+                                <div class="locandine-type-icon"><i class="fa-solid fa-trophy"></i></div>
+                                <div class="locandine-type-title">Finali</div>
+                                <div class="locandine-type-desc">L'evento conclusivo</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Personalizza il testo -->
+                    <div class="locandine-section">
+                        <label class="locandine-label"><i class="fa-solid fa-2"></i> Informazioni sull'incontro</label>
+                        <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:12px; line-height:1.4;">Il testo verrà aggiunto in una barra bianca in calce alla locandina, in maiuscolo. Lascia vuoto per non mostrare la barra.</p>
+
+                        <div class="input-group" style="margin-bottom:12px;">
+                            <label style="font-size:0.8rem; color:var(--text-muted); margin-bottom:6px;">📅 Data</label>
+                            <input type="text" id="locandina-data" class="input-control" placeholder="Es: 15 Maggio 2025" oninput="window.aggiornaAnteprimaLocandina()">
+                        </div>
+                        <div class="input-group" style="margin-bottom:12px;">
+                            <label style="font-size:0.8rem; color:var(--text-muted); margin-bottom:6px;">📍 Luogo</label>
+                            <input type="text" id="locandina-luogo" class="input-control" placeholder="Es: Aula Magna — I.C. Da Vinci" oninput="window.aggiornaAnteprimaLocandina()">
+                        </div>
+                        <div class="input-group" style="margin-bottom:12px;">
+                            <label style="font-size:0.8rem; color:var(--text-muted); margin-bottom:6px;">🕐 Orario</label>
+                            <input type="text" id="locandina-orario" class="input-control" placeholder="Es: Ore 10:30" oninput="window.aggiornaAnteprimaLocandina()">
+                        </div>
+                        <div class="input-group">
+                            <label style="font-size:0.8rem; color:var(--text-muted); margin-bottom:6px;">✏️ Note aggiuntive (opzionale)</label>
+                            <input type="text" id="locandina-note" class="input-control" placeholder="Es: Ingresso libero" oninput="window.aggiornaAnteprimaLocandina()">
+                        </div>
+                    </div>
+
+                    <!-- 3. Scarica -->
+                    <div class="locandine-section">
+                        <button class="locandine-download-btn" onclick="window.scaricaLocandina()">
+                            <i class="fa-solid fa-download"></i>
+                            Scarica Locandina
+                        </button>
+                        <p style="font-size:0.73rem; color:var(--text-muted); margin-top:8px; text-align:center; line-height:1.3;">Il file verrà scaricato in formato JPEG ad alta qualità</p>
+                    </div>
+                </div>
+
+                <!-- Colonna Destra: Anteprima -->
+                <div class="locandine-preview">
+                    <div class="locandine-canvas-wrapper">
+                        <canvas id="locandina-canvas"></canvas>
+                        <div class="locandine-canvas-label"><i class="fa-solid fa-eye"></i> Anteprima</div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
