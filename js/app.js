@@ -3854,80 +3854,23 @@ window.initPresentazioniTab = async function() {
     await window.aggiornaCampiPresentazione();
 };
 
+window.selectPresOption = function(element) {
+    const type = element.getAttribute('data-type');
+    const cards = element.parentNode.querySelectorAll(`.pres-card[data-type="${type}"]`);
+    cards.forEach(card => card.classList.remove('active'));
+    element.classList.add('active');
+    window.aggiornaCampiPresentazione();
+};
+
+window.togglePresOption = function(element) {
+    element.classList.toggle('active');
+    window.aggiornaCampiPresentazione();
+};
+
 window.aggiornaCampiPresentazione = async function() {
-    const selectedCamps = Array.from(document.querySelectorAll('input[name="pres-campionati"]:checked')).map(el => el.value);
+    const selectedCamps = Array.from(document.querySelectorAll('.pres-card[data-type="campionato"].active')).map(el => el.getAttribute('data-value'));
     
-    // 1. Aggiorna contenitore Tornei/Classifiche
-    const torneiContainer = document.getElementById('pres-tornei-container');
-    if (torneiContainer) {
-        torneiContainer.innerHTML = '';
-        
-        if (selectedCamps.length > 0) {
-            // Aggiungi la classifica globale per ogni campionato selezionato
-            selectedCamps.forEach(camp => {
-                const modeCfg = GAME_MODES[camp] || GAME_MODES.terze;
-                
-                const label = document.createElement('label');
-                label.className = 'checkbox-container';
-                label.style.paddingLeft = '30px';
-                label.style.marginBottom = '8px';
-                label.style.fontSize = '0.85rem';
-                
-                const input = document.createElement('input');
-                input.type = 'checkbox';
-                input.name = 'pres-tornei';
-                input.value = `global-${camp}`;
-                input.checked = true; // Spuntata di default
-                
-                const span = document.createElement('span');
-                span.className = 'checkmark';
-                span.style.top = '1px';
-                span.style.height = '18px';
-                span.style.width = '18px';
-                
-                label.appendChild(input);
-                label.appendChild(document.createTextNode(`🏆 Classifica Globale - ${modeCfg.title.toUpperCase()}`));
-                label.appendChild(span);
-                torneiContainer.appendChild(label);
-            });
-            
-            try {
-                const tourneys = await window.fanta_db.getTournaments();
-                tourneys.forEach(tour => {
-                    if (tour.mode && selectedCamps.includes(tour.mode)) {
-                        const label = document.createElement('label');
-                        label.className = 'checkbox-container';
-                        label.style.paddingLeft = '30px';
-                        label.style.marginBottom = '8px';
-                        label.style.fontSize = '0.85rem';
-                        
-                        const input = document.createElement('input');
-                        input.type = 'checkbox';
-                        input.name = 'pres-tornei';
-                        input.value = tour.id;
-                        input.checked = false;
-                        
-                        const span = document.createElement('span');
-                        span.className = 'checkmark';
-                        span.style.top = '1px';
-                        span.style.height = '18px';
-                        span.style.width = '18px';
-                        
-                        label.appendChild(input);
-                        label.appendChild(document.createTextNode(`🛡️ Torneo: ${tour.name.toUpperCase()} (${tour.mode.toUpperCase()})`));
-                        label.appendChild(span);
-                        torneiContainer.appendChild(label);
-                    }
-                });
-            } catch (e) {
-                console.error("Errore caricamento tornei in presentazione:", e);
-            }
-        } else {
-            torneiContainer.innerHTML = '<div style="color: var(--text-muted); font-size:0.85rem; padding: 5px;">Seleziona almeno un campionato per visualizzare i tornei.</div>';
-        }
-    }
-    
-    // 2. Aggiorna contenitore Autori
+    // Aggiorna contenitore Autori
     const autoriContainer = document.getElementById('pres-autori-container');
     if (autoriContainer) {
         autoriContainer.innerHTML = '';
@@ -3993,8 +3936,9 @@ window.gestisciAugurioCustom = function(val) {
 };
 
 window.avviaPresentazioneLIM = async function() {
-    const selectedCamps = Array.from(document.querySelectorAll('input[name="pres-campionati"]:checked')).map(el => el.value);
-    const selectedTorneoIds = Array.from(document.querySelectorAll('input[name="pres-tornei"]:checked')).map(el => el.value);
+    const selectedCamps = Array.from(document.querySelectorAll('.pres-card[data-type="campionato"].active')).map(el => el.getAttribute('data-value'));
+    const selectedClassifiche = Array.from(document.querySelectorAll('.pres-card[data-type="classifica"].active')).map(el => el.getAttribute('data-value'));
+    const selectedTipo = document.querySelector('.pres-card[data-type="tipo"].active') ? document.querySelector('.pres-card[data-type="tipo"].active').getAttribute('data-value') : 'intermedia';
     const customGreetingSelect = document.getElementById('pres-augurio-select').value;
     
     if (selectedCamps.length === 0) {
@@ -4002,8 +3946,8 @@ window.avviaPresentazioneLIM = async function() {
         return;
     }
     
-    if (selectedTorneoIds.length === 0) {
-        alert("Seleziona almeno una classifica o torneo da mostrare!");
+    if (selectedClassifiche.length === 0) {
+        alert("Seleziona almeno una classifica da mostrare!");
         return;
     }
     
@@ -4040,17 +3984,18 @@ window.avviaPresentazioneLIM = async function() {
     
     try {
         const tourneys = await window.fanta_db.getTournaments();
+        const presentationTypeName = selectedTipo === 'finale' ? 'FINALE' : (selectedTipo === 'semifinale' ? 'SEMIFINALE' : 'INTERMEDIA');
         
         presSlides.push({
             type: 'intro',
-            subtitle: `Fantaletteratura`.toUpperCase(),
+            subtitle: `Fantaletteratura • PRESENTAZIONE ${presentationTypeName}`.toUpperCase(),
             text: `Benvenuti alla presentazione dei risultati di oggi!<br>Scopriamo l'andamento delle classifiche.`
         });
         
         presSlides.push({
             type: 'rules',
             subtitle: `Remainder regole`.toUpperCase(),
-            text: `Ogni squadra ha scelto 5 autori con un budget di 2500 lire.<br>L'obiettivo è totalizzare più punti possibile con bonus degli autori e missioni in classe (+5 punti per ciascuna convalidata).`
+            text: `Ogni squadra ha scelto 5 autori con un budget di 2500 lire.<br>L'obiettivo è totalizzare più punti possibile con i bonus degli autori e le missioni in classe (+5 punti per ciascuna convalidata).`
         });
         
         presSlides.push({
@@ -4103,83 +4048,100 @@ window.avviaPresentazioneLIM = async function() {
                         author: author,
                         intro: introText,
                         bonuses: bonuses,
-                        totalPts: author.isPointsRevealed ? author.points : 0
+                        totalPts: (author.isPointsRevealed || checkedAutori.includes(`${camp}:${author.id}`)) ? author.points : 0
                     });
                 }
             });
             
-            // 1. Classifica Globale del Girone (se selezionata)
-            if (selectedTorneoIds.includes(`global-${camp}`)) {
-                const calculatedTeams = allTeamsGlobal.map(t => {
-                    let authPts = 0;
-                    t.authors.forEach(aid => {
-                        let a = pool.find(x => x.id === aid);
-                        if (a && a.isPointsRevealed) authPts += a.points;
-                    });
-                    return {
-                        id: t.id,
-                        name: t.name,
-                        points: authPts + ((t.missionsCompleted || 0) * 5)
-                    };
+            // Calcolo punteggi per le squadre di questo girone
+            const calculatedTeams = allTeamsGlobal.map(t => {
+                let authPts = 0;
+                t.authors.forEach(aid => {
+                    let a = pool.find(x => x.id === aid);
+                    if (a && (a.isPointsRevealed || checkedAutori.includes(`${camp}:${a.id}`))) {
+                        authPts += a.points;
+                    }
                 });
-                calculatedTeams.sort((a,b) => a.points - b.points);
+                const missPts = (t.missionsCompleted || 0) * 5;
+                const totPts = authPts + missPts;
                 
-                const torneoName = `CLASSIFICA GLOBALE - ${modeCfg.title.toUpperCase()}`;
+                return {
+                    id: t.id,
+                    name: t.name,
+                    authPoints: authPts,
+                    missPoints: missPts,
+                    totPoints: totPts
+                };
+            });
+            
+            // 1. Classifica Autori
+            if (selectedClassifiche.includes('autori')) {
+                const sorted = [...calculatedTeams].sort((a,b) => a.authPoints - b.authPoints);
+                const teamsForRank = sorted.map(t => ({ id: t.id, name: t.name, points: t.authPoints }));
+                const torneoName = `CLASSIFICA AUTORI - ${modeCfg.title.toUpperCase()}`;
+                
                 presSlides.push({
                     type: 'suspense',
                     subtitle: `ED ORA...`,
-                    text: `SCOPRIAMO LA CLASSIFICA:<br>${torneoName}`
+                    text: `SCOPRIAMO LA CLASSIFICA AUTORI:<br>${modeCfg.title.toUpperCase()}`
                 });
                 presSlides.push({
                     type: 'leaderboard-list',
                     torneoName: torneoName,
-                    teams: calculatedTeams
+                    teams: teamsForRank
                 });
                 presSlides.push({
                     type: 'podium',
                     torneoName: torneoName,
-                    teams: calculatedTeams
+                    teams: teamsForRank
                 });
             }
             
-            // 2. Classifiche dei Tornei appartenenti a questo girone (se selezionati)
-            tourneys.forEach(tour => {
-                if (tour.mode === camp && selectedTorneoIds.includes(tour.id)) {
-                    const teamIds = tour.teams || [];
-                    const filteredTeams = allTeamsGlobal.filter(t => teamIds.includes(t.id));
-                    
-                    const calculatedTeams = filteredTeams.map(t => {
-                        let authPts = 0;
-                        t.authors.forEach(aid => {
-                            let a = pool.find(x => x.id === aid);
-                            if (a && a.isPointsRevealed) authPts += a.points;
-                        });
-                        return {
-                            id: t.id,
-                            name: t.name,
-                            points: authPts + ((t.missionsCompleted || 0) * 5)
-                        };
-                    });
-                    calculatedTeams.sort((a,b) => a.points - b.points);
-                    
-                    const torneoName = `TORNEO: ${tour.name.toUpperCase()}`;
-                    presSlides.push({
-                        type: 'suspense',
-                        subtitle: `ED ORA...`,
-                        text: `SCOPRIAMO LA CLASSIFICA:<br>${torneoName}`
-                    });
-                    presSlides.push({
-                        type: 'leaderboard-list',
-                        torneoName: torneoName,
-                        teams: calculatedTeams
-                    });
-                    presSlides.push({
-                        type: 'podium',
-                        torneoName: torneoName,
-                        teams: calculatedTeams
-                    });
-                }
-            });
+            // 2. Classifica Missioni
+            if (selectedClassifiche.includes('missioni')) {
+                const sorted = [...calculatedTeams].sort((a,b) => a.missPoints - b.missPoints);
+                const teamsForRank = sorted.map(t => ({ id: t.id, name: t.name, points: t.missPoints }));
+                const torneoName = `CLASSIFICA MISSIONI - ${modeCfg.title.toUpperCase()}`;
+                
+                presSlides.push({
+                    type: 'suspense',
+                    subtitle: `ED ORA...`,
+                    text: `SCOPRIAMO LA CLASSIFICA MISSIONI:<br>${modeCfg.title.toUpperCase()}`
+                });
+                presSlides.push({
+                    type: 'leaderboard-list',
+                    torneoName: torneoName,
+                    teams: teamsForRank
+                });
+                presSlides.push({
+                    type: 'podium',
+                    torneoName: torneoName,
+                    teams: teamsForRank
+                });
+            }
+            
+            // 3. Classifica Globale
+            if (selectedClassifiche.includes('globale')) {
+                const sorted = [...calculatedTeams].sort((a,b) => a.totPoints - b.totPoints);
+                const teamsForRank = sorted.map(t => ({ id: t.id, name: t.name, points: t.totPoints }));
+                const torneoName = `CLASSIFICA GLOBALE - ${modeCfg.title.toUpperCase()}`;
+                
+                presSlides.push({
+                    type: 'suspense',
+                    subtitle: `ED ORA...`,
+                    text: `SCOPRIAMO LA CLASSIFICA GLOBALE:<br>${modeCfg.title.toUpperCase()}`
+                });
+                presSlides.push({
+                    type: 'leaderboard-list',
+                    torneoName: torneoName,
+                    teams: teamsForRank
+                });
+                presSlides.push({
+                    type: 'podium',
+                    torneoName: torneoName,
+                    teams: teamsForRank
+                });
+            }
         }
         
         presSlides.push({

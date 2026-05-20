@@ -299,33 +299,69 @@
                         Configura e avvia una presentazione animata a schermo intero da proiettare in classe. I dati delle classifiche e degli autori verranno caricati in tempo reale.
                     </p>
                     
-                    <!-- Campionati -->
+                    <!-- Tipo di Presentazione -->
                     <div class="input-group">
-                        <label><i class="fa-solid fa-trophy"></i> Seleziona Campionati / Gironi da includere</label>
-                        <div id="pres-campionati-container" style="display: flex; flex-direction: column; gap: 8px; padding: 10px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 8px;">
-                            <label class="checkbox-container" style="padding-left: 30px; font-size: 0.9rem; margin-bottom: 0;">
-                                <input type="checkbox" name="pres-campionati" value="terze" checked onchange="window.aggiornaCampiPresentazione()">
-                                📘 CONTEMPORANEA: AUTORI ITALIANI (TERZE)
-                                <span class="checkmark" style="top: 1px; height: 18px; width: 18px;"></span>
-                            </label>
-                            <label class="checkbox-container" style="padding-left: 30px; font-size: 0.9rem; margin-bottom: 0;">
-                                <input type="checkbox" name="pres-campionati" value="seconde" checked onchange="window.aggiornaCampiPresentazione()">
-                                📙 ETÀ MODERNA (SECONDE)
-                                <span class="checkmark" style="top: 1px; height: 18px; width: 18px;"></span>
-                            </label>
-                            <label class="checkbox-container" style="padding-left: 30px; font-size: 0.9rem; margin-bottom: 0;">
-                                <input type="checkbox" name="pres-campionati" value="avanzato" checked onchange="window.aggiornaCampiPresentazione()">
-                                📒 CONTEMPORANEA: AUTORI INTERNAZIONALI (AVANZATO)
-                                <span class="checkmark" style="top: 1px; height: 18px; width: 18px;"></span>
-                            </label>
+                        <label><i class="fa-solid fa-calendar-days"></i> 1. Tipo di Presentazione</label>
+                        <div class="pres-selection-grid">
+                            <div class="pres-card active" data-type="tipo" data-value="intermedia" onclick="window.selectPresOption(this)">
+                                <div class="pres-card-icon"><i class="fa-solid fa-circle-play"></i></div>
+                                <div class="pres-card-title">Intermedia</div>
+                                <div class="pres-card-desc">Risultati ordinari durante l'anno</div>
+                            </div>
+                            <div class="pres-card" data-type="tipo" data-value="semifinale" onclick="window.selectPresOption(this)">
+                                <div class="pres-card-icon"><i class="fa-solid fa-forward-step"></i></div>
+                                <div class="pres-card-title">Semifinale</div>
+                                <div class="pres-card-desc">Scontro per determinare i finalisti</div>
+                            </div>
+                            <div class="pres-card" data-type="tipo" data-value="finale" onclick="window.selectPresOption(this)">
+                                <div class="pres-card-icon"><i class="fa-solid fa-trophy"></i></div>
+                                <div class="pres-card-title">Finale</div>
+                                <div class="pres-card-desc">L'evento conclusivo che incorona i campioni</div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Torneo -->
+                    <!-- Campionati -->
                     <div class="input-group">
-                        <label><i class="fa-solid fa-sitemap"></i> Seleziona Classifiche/Tornei da includere</label>
-                        <div id="pres-tornei-container" style="display: flex; flex-direction: column; gap: 8px; padding: 10px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 8px; max-height: 150px; overflow-y: auto;">
-                            <!-- Inseriti da JS -->
+                        <label><i class="fa-solid fa-map-location-dot"></i> 2. Campionati / Gironi da includere</label>
+                        <div class="pres-selection-grid">
+                            <div class="pres-card active" data-type="campionato" data-value="terze" onclick="window.togglePresOption(this)">
+                                <div class="pres-card-icon">📘</div>
+                                <div class="pres-card-title">Terze</div>
+                                <div class="pres-card-desc">Contemporanea: Autori Italiani</div>
+                            </div>
+                            <div class="pres-card active" data-type="campionato" data-value="seconde" onclick="window.togglePresOption(this)">
+                                <div class="pres-card-icon">📙</div>
+                                <div class="pres-card-title">Seconde</div>
+                                <div class="pres-card-desc">Età Moderna</div>
+                            </div>
+                            <div class="pres-card active" data-type="campionato" data-value="avanzato" onclick="window.togglePresOption(this)">
+                                <div class="pres-card-icon">📒</div>
+                                <div class="pres-card-title">Avanzato</div>
+                                <div class="pres-card-desc">Contemporanea Internazionale</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Classifiche -->
+                    <div class="input-group">
+                        <label><i class="fa-solid fa-list-ol"></i> 3. Classifiche da mostrare per ciascun girone</label>
+                        <div class="pres-selection-grid">
+                            <div class="pres-card active" data-type="classifica" data-value="autori" onclick="window.togglePresOption(this)">
+                                <div class="pres-card-icon"><i class="fa-solid fa-feather-pointed"></i></div>
+                                <div class="pres-card-title">Classifica Autori</div>
+                                <div class="pres-card-desc">Punti ottenuti solo dagli autori in squadra</div>
+                            </div>
+                            <div class="pres-card active" data-type="classifica" data-value="missioni" onclick="window.togglePresOption(this)">
+                                <div class="pres-card-icon"><i class="fa-solid fa-circle-check"></i></div>
+                                <div class="pres-card-title">Classifica Missioni</div>
+                                <div class="pres-card-desc">Punti accumulati con le missioni in classe (+5pt)</div>
+                            </div>
+                            <div class="pres-card active" data-type="classifica" data-value="globale" onclick="window.togglePresOption(this)">
+                                <div class="pres-card-icon"><i class="fa-solid fa-globe"></i></div>
+                                <div class="pres-card-title">Classifica Globale</div>
+                                <div class="pres-card-desc">Punteggio totale: Autori + Missioni</div>
+                            </div>
                         </div>
                     </div>
 
