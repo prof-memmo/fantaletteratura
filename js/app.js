@@ -3880,7 +3880,7 @@ window.aggiornaCampiPresentazione = async function() {
                 const modeCfg = GAME_MODES[camp] || GAME_MODES.terze;
                 const pool = modeCfg.authors || AUTHORS;
                 
-                // Recuperiamo le squadre di questo girone/campionato per trovare gli autori "matchati"
+                // Recuperiamo le squadre di questo girone/campionato per identificare gli autori "in squadra"
                 let matchedAuthorIds = new Set();
                 try {
                     const teams = await window.fanta_db.getTeams(camp);
@@ -3906,44 +3906,37 @@ window.aggiornaCampiPresentazione = async function() {
                 header.textContent = (modeCfg.label || modeCfg.shortLabel || camp).toUpperCase();
                 autoriContainer.appendChild(header);
                 
-                // Mostriamo solo gli autori effettivamente in squadra (scelti da almeno una squadra)
-                const filteredPool = pool.filter(a => matchedAuthorIds.has(a.id));
-                
-                if (filteredPool.length === 0) {
-                    const noAutori = document.createElement('div');
-                    noAutori.style.gridColumn = '1 / -1';
-                    noAutori.style.color = 'var(--text-muted)';
-                    noAutori.style.fontSize = '0.85rem';
-                    noAutori.style.padding = '5px';
-                    noAutori.textContent = 'Nessun autore selezionato dalle squadre di questo girone.';
-                    autoriContainer.appendChild(noAutori);
-                } else {
-                    filteredPool.forEach(a => {
-                        const label = document.createElement('label');
-                        label.className = 'checkbox-container';
-                        label.style.paddingLeft = '30px';
-                        label.style.marginBottom = '8px';
-                        label.style.fontSize = '0.85rem';
-                        
-                        const input = document.createElement('input');
-                        input.type = 'checkbox';
-                        input.name = 'pres-autori';
-                        input.value = `${camp}:${a.id}`;
-                        // Spuntato se la scheda è già uscita nel campionato
-                        input.checked = !!a.isSchedaRevealed;
-                        
-                        const span = document.createElement('span');
-                        span.className = 'checkmark';
-                        span.style.top = '1px';
-                        span.style.height = '18px';
-                        span.style.width = '18px';
-                        
-                        label.appendChild(input);
-                        label.appendChild(document.createTextNode(a.name));
-                        label.appendChild(span);
-                        autoriContainer.appendChild(label);
-                    });
-                }
+                pool.forEach(a => {
+                    const isMatched = matchedAuthorIds.has(a.id);
+                    const label = document.createElement('label');
+                    label.className = 'checkbox-container';
+                    label.style.paddingLeft = '30px';
+                    label.style.marginBottom = '8px';
+                    label.style.fontSize = '0.85rem';
+                    if (!isMatched) {
+                        label.style.opacity = '0.55'; // Più chiaro se non scelto da nessuna squadra
+                    }
+                    
+                    const input = document.createElement('input');
+                    input.type = 'checkbox';
+                    input.name = 'pres-autori';
+                    input.value = `${camp}:${a.id}`;
+                    // Spuntato se la scheda è già uscita nel campionato
+                    input.checked = !!a.isSchedaRevealed;
+                    
+                    const span = document.createElement('span');
+                    span.className = 'checkmark';
+                    span.style.top = '1px';
+                    span.style.height = '18px';
+                    span.style.width = '18px';
+                    
+                    const displayName = isMatched ? `${a.name} (in squadra)` : a.name;
+                    
+                    label.appendChild(input);
+                    label.appendChild(document.createTextNode(displayName));
+                    label.appendChild(span);
+                    autoriContainer.appendChild(label);
+                });
             }
         } else {
             autoriContainer.innerHTML = '<div style="color: var(--text-muted); font-size:0.85rem; padding: 5px;">Seleziona almeno un campionato per visualizzare gli autori.</div>';
