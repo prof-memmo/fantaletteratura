@@ -3876,22 +3876,9 @@ window.aggiornaCampiPresentazione = async function() {
         autoriContainer.innerHTML = '';
         
         if (selectedCamps.length > 0) {
-            for (const camp of selectedCamps) {
+            selectedCamps.forEach(camp => {
                 const modeCfg = GAME_MODES[camp] || GAME_MODES.terze;
                 const pool = modeCfg.authors || AUTHORS;
-                
-                // Recuperiamo le squadre di questo girone/campionato per identificare gli autori "in squadra"
-                let matchedAuthorIds = new Set();
-                try {
-                    const teams = await window.fanta_db.getTeams(camp);
-                    teams.forEach(t => {
-                        if (t.authors && Array.isArray(t.authors)) {
-                            t.authors.forEach(aid => matchedAuthorIds.add(aid));
-                        }
-                    });
-                } catch (err) {
-                    console.error(`Errore nel recupero delle squadre per il campionato ${camp}:`, err);
-                }
                 
                 // Intestazione gruppo campionato
                 const header = document.createElement('div');
@@ -3907,15 +3894,11 @@ window.aggiornaCampiPresentazione = async function() {
                 autoriContainer.appendChild(header);
                 
                 pool.forEach(a => {
-                    const isMatched = matchedAuthorIds.has(a.id);
                     const label = document.createElement('label');
                     label.className = 'checkbox-container';
                     label.style.paddingLeft = '30px';
                     label.style.marginBottom = '8px';
                     label.style.fontSize = '0.85rem';
-                    if (!isMatched) {
-                        label.style.opacity = '0.55'; // Più chiaro se non scelto da nessuna squadra
-                    }
                     
                     const input = document.createElement('input');
                     input.type = 'checkbox';
@@ -3930,14 +3913,12 @@ window.aggiornaCampiPresentazione = async function() {
                     span.style.height = '18px';
                     span.style.width = '18px';
                     
-                    const displayName = isMatched ? `${a.name} (in squadra)` : a.name;
-                    
                     label.appendChild(input);
-                    label.appendChild(document.createTextNode(displayName));
+                    label.appendChild(document.createTextNode(a.name));
                     label.appendChild(span);
                     autoriContainer.appendChild(label);
                 });
-            }
+            });
         } else {
             autoriContainer.innerHTML = '<div style="color: var(--text-muted); font-size:0.85rem; padding: 5px;">Seleziona almeno un campionato per visualizzare gli autori.</div>';
         }
