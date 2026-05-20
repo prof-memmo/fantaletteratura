@@ -4396,7 +4396,10 @@ window.avanzaPresentazione = function() {
             const item = document.getElementById(`pres-bonus-${presAuthorBonusIndex}`);
             if (item) {
                 item.style.display = 'flex';
-                setTimeout(() => item.classList.add('revealed'), 20);
+                setTimeout(() => {
+                    item.classList.add('revealed');
+                    item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 20);
             }
             presAuthorBonusIndex++;
             return; 
@@ -4418,6 +4421,7 @@ window.avanzaPresentazione = function() {
             const row = document.getElementById(`pres-row-${presLeaderboardRevealIndex}`);
             if (row) {
                 row.style.display = 'flex';
+                setTimeout(() => row.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
             }
             presLeaderboardRevealIndex++;
             return; 
@@ -4584,13 +4588,6 @@ window.presClickHandler = function(e) {
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
 
-        // Dimensioni del canvas = proporzioni originali dell'immagine
-        canvas.width  = img.naturalWidth;
-        canvas.height = img.naturalHeight;
-
-        // 1. Disegna la locandina
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
         // 2. Raccogli i testi dai campi
         const dataVal   = (document.getElementById('locandina-data')   || {}).value  || '';
         const luogoVal  = (document.getElementById('locandina-luogo')  || {}).value  || '';
@@ -4598,13 +4595,23 @@ window.presClickHandler = function(e) {
         const noteVal   = (document.getElementById('locandina-note')   || {}).value  || '';
 
         const parti = [dataVal, luogoVal, orarioVal, noteVal].filter(s => s.trim() !== '');
-        if (parti.length === 0) return; // nessun testo, lascia la locandina pura
+        
+        let barHeight = 0;
+        if (parti.length > 0) {
+            barHeight = _calcolaAltezzaBarra(ctx, parti, img.naturalWidth);
+        }
 
-        // 3. Calcola righe da stampare (ciascuna parte su riga separata)
-        const barHeight = _calcolaAltezzaBarra(ctx, parti, canvas.width);
-        const barY = canvas.height - barHeight;
+        // Dimensioni del canvas = proporzioni originali dell'immagine + eventuale barra sotto
+        canvas.width  = img.naturalWidth;
+        canvas.height = img.naturalHeight + barHeight;
 
-        // 4. Disegna la barra bianca
+        // 1. Disegna la locandina (usando l'altezza originaria dell'immagine)
+        ctx.drawImage(img, 0, 0, canvas.width, img.naturalHeight);
+
+        if (parti.length === 0) return; // nessun testo, fine.
+
+        // 4. Disegna la barra bianca SOTTO la locandina
+        const barY = img.naturalHeight;
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, barY, canvas.width, barHeight);
 
