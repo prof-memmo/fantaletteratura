@@ -4047,17 +4047,7 @@ window.avviaPresentazioneLIM = async function() {
             text: `Benvenuti alla presentazione dei risultati di oggi!<br>Scopriamo l'andamento delle classifiche.`
         });
         
-        presSlides.push({
-            type: 'rules',
-            subtitle: `Remainder regole`.toUpperCase(),
-            text: `Ogni squadra ha scelto 5 autori con un budget di 2500 lire.<br>L'obiettivo è totalizzare più punti possibile con i bonus degli autori e le missioni in classe (+5 punti per ciascuna convalidata).`
-        });
-        
-        presSlides.push({
-            type: 'premi',
-            subtitle: `I Premi finali`.toUpperCase(),
-            text: `Ci saranno gloria eterna, attestati di merito scolastico e premi speciali per i primi tre classificati di ciascun girone!`
-        });
+
         
         // Costruisci le slide per ogni campionato spuntato in sequenza
         for (const camp of selectedCamps) {
@@ -4483,10 +4473,35 @@ window.chiudiPresentazioneLIM = function() {
     }
 };
 
+window.indietroPresentazione = function() {
+    const slide = presSlides[presCurrentIndex];
+    if (!slide) return;
+    
+    if (slide.type === 'author' && presAuthorBonusIndex > 0) {
+        presAuthorBonusIndex = 0;
+        window.renderPresentationSlide();
+        return;
+    }
+    
+    if ((slide.type === 'leaderboard-list' || slide.type === 'podium') && presLeaderboardRevealIndex > 0) {
+        presLeaderboardRevealIndex = 0;
+        window.renderPresentationSlide();
+        return;
+    }
+    
+    if (presCurrentIndex > 0) {
+        presCurrentIndex--;
+        window.renderPresentationSlide();
+    }
+};
+
 window.presKeydownHandler = function(e) {
     if (e.code === 'Space' || e.code === 'ArrowRight') {
         e.preventDefault();
         window.avanzaPresentazione();
+    } else if (e.code === 'ArrowLeft') {
+        e.preventDefault();
+        window.indietroPresentazione();
     } else if (e.code === 'Escape') {
         window.chiudiPresentazioneLIM();
     }
