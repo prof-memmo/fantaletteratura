@@ -4758,7 +4758,6 @@ window.presClickHandler = function(e) {
             const logoY = 70;
             
             ctx.save();
-            ctx.globalCompositeOperation = "multiply";
             ctx.drawImage(_logoFantaImage, (canvas.width - logoW)/2, logoY, logoW, logoH);
             ctx.restore();
             
@@ -4847,8 +4846,7 @@ window.presClickHandler = function(e) {
             const logoH = (_logoProfImage.height / _logoProfImage.width) * logoW;
             
             ctx.save();
-            ctx.globalCompositeOperation = "multiply";
-            ctx.drawImage(_logoProfImage, canvas.width - logoW - 60, canvas.height - logoH - 60, logoW, logoH);
+            ctx.drawImage(_logoProfImage, canvas.width - logoW - 80, canvas.height - logoH - 80, logoW, logoH);
             ctx.restore();
         }
     }
