@@ -4730,31 +4730,25 @@ window.presClickHandler = function(e) {
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
 
-        // A4 a 150 DPI → 1240 × 1754 px (stampa di qualità su A4)
-        const W = 1240;
-        const H = 1754;
+        // A4 Orizzontale a 150 DPI → 1754 × 1240 px
+        const W = 1754;
+        const H = 1240;
         canvas.width  = W;
         canvas.height = H;
 
-        // ── Sfondo ──────────────────────────────────────────────────
-        if (_attestatoImage && _attestatoImage.complete && _attestatoImage.naturalHeight !== 0) {
-            // Scala l'immagine di sfondo a coprire tutto l'A4
-            ctx.drawImage(_attestatoImage, 0, 0, W, H);
-        } else {
-            // Fallback: sfondo bianco con doppia cornice blu navy
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, W, H);
+        // ── Sfondo e Cornice Blu ─────────────────────────────────────
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, W, H);
 
-            // Cornice esterna
-            ctx.strokeStyle = '#1a3a6e';
-            ctx.lineWidth = 14;
-            ctx.strokeRect(28, 28, W - 56, H - 56);
+        // Cornice esterna (Blu Navy)
+        ctx.strokeStyle = '#1a3a6e';
+        ctx.lineWidth = 14;
+        ctx.strokeRect(30, 30, W - 60, H - 60);
 
-            // Cornice interna sottile
-            ctx.strokeStyle = '#2a5298';
-            ctx.lineWidth = 4;
-            ctx.strokeRect(48, 48, W - 96, H - 96);
-        }
+        // Cornice interna sottile (Blu Navy più chiaro)
+        ctx.strokeStyle = '#2a5298';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(52, 52, W - 104, H - 104);
 
         const nome           = (document.getElementById('attestato-nome')           || {}).value || '';
         const campionato     = (document.getElementById('attestato-campionato')     || {}).value || '';
@@ -4764,9 +4758,9 @@ window.presClickHandler = function(e) {
         // ── Logo Fantaletteratura (centro in alto) ───────────────────
         let logoBottomY = 160;
         if (_logoFantaImage && _logoFantaImage.complete && _logoFantaImage.naturalHeight !== 0) {
-            const logoW = 180;
+            const logoW = 160;
             const logoH = (_logoFantaImage.naturalHeight / _logoFantaImage.naturalWidth) * logoW;
-            const logoY = 120;
+            const logoY = 100;
 
             ctx.save();
             ctx.drawImage(_logoFantaImage, (W - logoW) / 2, logoY, logoW, logoH);
@@ -4777,15 +4771,15 @@ window.presClickHandler = function(e) {
             ctx.fillStyle     = '#1e1e1e';
             ctx.textAlign     = 'center';
             ctx.textBaseline  = 'middle';
-            ctx.font          = 'bold 38px Arial';
+            ctx.font          = 'bold 36px Arial';
             ctx.fillText('Fantaletteratura', W / 2, logoBottomY + 28);
             logoBottomY += 60;
         }
 
         // ── Linea decorativa orizzontale ─────────────────────────────
-        const lineY = logoBottomY + 30;
+        const lineY = logoBottomY + 20;
         ctx.save();
-        const grad = ctx.createLinearGradient(100, lineY, W - 100, lineY);
+        const grad = ctx.createLinearGradient(W/2 - 400, lineY, W/2 + 400, lineY);
         grad.addColorStop(0,   'rgba(26,58,110,0)');
         grad.addColorStop(0.2, '#1a3a6e');
         grad.addColorStop(0.8, '#1a3a6e');
@@ -4793,8 +4787,8 @@ window.presClickHandler = function(e) {
         ctx.strokeStyle = grad;
         ctx.lineWidth   = 2;
         ctx.beginPath();
-        ctx.moveTo(100, lineY);
-        ctx.lineTo(W - 100, lineY);
+        ctx.moveTo(W/2 - 400, lineY);
+        ctx.lineTo(W/2 + 400, lineY);
         ctx.stroke();
         ctx.restore();
 
@@ -4808,18 +4802,18 @@ window.presClickHandler = function(e) {
 
         // ── "Si attesta che" ─────────────────────────────────────────
         ctx.font = '32px Arial';
-        ctx.fillText('Si attesta che', W / 2, titleY + 90);
+        ctx.fillText('Si attesta che', W / 2, titleY + 80);
 
         // ── Nome ─────────────────────────────────────────────────────
         ctx.fillStyle = '#1a3a6e';
-        ctx.font      = 'bold 62px Arial';
-        const nomeY   = titleY + 190;
+        ctx.font      = 'bold 72px Arial';
+        const nomeY   = titleY + 180;
         if (nome) {
             ctx.fillText(nome.toUpperCase(), W / 2, nomeY);
         } else {
             ctx.beginPath();
-            ctx.moveTo(W / 2 - 240, nomeY + 20);
-            ctx.lineTo(W / 2 + 240, nomeY + 20);
+            ctx.moveTo(W / 2 - 300, nomeY + 25);
+            ctx.lineTo(W / 2 + 300, nomeY + 25);
             ctx.lineWidth   = 2;
             ctx.strokeStyle = 'rgba(0,0,0,0.2)';
             ctx.stroke();
@@ -4831,21 +4825,21 @@ window.presClickHandler = function(e) {
         ctx.strokeStyle = 'rgba(26,58,110,0.3)';
         ctx.lineWidth   = 1;
         ctx.beginPath();
-        ctx.moveTo(200, sep1Y);
-        ctx.lineTo(W - 200, sep1Y);
+        ctx.moveTo(W/2 - 350, sep1Y);
+        ctx.lineTo(W/2 + 350, sep1Y);
         ctx.stroke();
         ctx.restore();
 
         // ── Classificazione / Partecipazione ─────────────────────────
         ctx.fillStyle = '#1e1e1e';
         ctx.font      = '32px Arial';
-        const partY   = sep1Y + 60;
+        const partY   = sep1Y + 70;
 
         if (classificazione) {
             ctx.fillText('si classifica come', W / 2, partY);
 
             ctx.fillStyle = '#1a3a6e';
-            ctx.font      = 'bold 52px Arial';
+            ctx.font      = 'bold 56px Arial';
             ctx.fillText(classificazione.toUpperCase(), W / 2, partY + 80);
 
             ctx.fillStyle = '#1e1e1e';
@@ -4857,13 +4851,13 @@ window.presClickHandler = function(e) {
             ctx.fillText('ha partecipato con successo a', W / 2, partY);
 
             ctx.fillStyle = '#1a3a6e';
-            ctx.font      = 'bold 46px Arial';
+            ctx.font      = 'bold 50px Arial';
             if (campionato) {
                 ctx.fillText(campionato, W / 2, partY + 80);
             } else {
                 ctx.beginPath();
-                ctx.moveTo(W / 2 - 220, partY + 100);
-                ctx.lineTo(W / 2 + 220, partY + 100);
+                ctx.moveTo(W / 2 - 250, partY + 100);
+                ctx.lineTo(W / 2 + 250, partY + 100);
                 ctx.lineWidth   = 2;
                 ctx.strokeStyle = 'rgba(0,0,0,0.2)';
                 ctx.stroke();
@@ -4881,51 +4875,12 @@ window.presClickHandler = function(e) {
             ctx.fillText('Anno Scolastico ___________', W / 2, annoY);
         }
 
-        // ── Linea separatrice centrale ───────────────────────────────
-        const sep2Y = annoY + 60;
-        ctx.save();
-        const grad2 = ctx.createLinearGradient(100, sep2Y, W - 100, sep2Y);
-        grad2.addColorStop(0,   'rgba(26,58,110,0)');
-        grad2.addColorStop(0.2, '#1a3a6e');
-        grad2.addColorStop(0.8, '#1a3a6e');
-        grad2.addColorStop(1,   'rgba(26,58,110,0)');
-        ctx.strokeStyle = grad2;
-        ctx.lineWidth   = 2;
-        ctx.beginPath();
-        ctx.moveTo(100, sep2Y);
-        ctx.lineTo(W - 100, sep2Y);
-        ctx.stroke();
-        ctx.restore();
-
-        // ── Area firma (in basso) ─────────────────────────────────────
-        const firmaY = H - 260;
-        ctx.fillStyle    = '#1e1e1e';
-        ctx.textAlign    = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.font         = '22px Arial';
-
-        // Firma sinistra
-        ctx.beginPath();
-        ctx.moveTo(140, firmaY);
-        ctx.lineTo(440, firmaY);
-        ctx.strokeStyle = '#1a3a6e';
-        ctx.lineWidth   = 1.5;
-        ctx.stroke();
-        ctx.fillText("Il Docente Referente", 290, firmaY + 30);
-
-        // Firma destra
-        ctx.beginPath();
-        ctx.moveTo(W - 440, firmaY);
-        ctx.lineTo(W - 140, firmaY);
-        ctx.stroke();
-        ctx.fillText("Il Dirigente Scolastico", W - 290, firmaY + 30);
-
-        // ── Logo Prof (in basso a destra) ─────────────────────────────
+        // ── Logo Prof (in basso a destra, leggermente più piccolo per orizzontale) ──
         if (_logoProfImage && _logoProfImage.complete && _logoProfImage.naturalHeight !== 0) {
-            const logoW = 160;
+            const logoW = 140;
             const logoH = (_logoProfImage.naturalHeight / _logoProfImage.naturalWidth) * logoW;
             ctx.save();
-            ctx.drawImage(_logoProfImage, W - logoW - 100, H - logoH - 100, logoW, logoH);
+            ctx.drawImage(_logoProfImage, W - logoW - 80, H - logoH - 80, logoW, logoH);
             ctx.restore();
         }
     }
