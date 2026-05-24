@@ -4756,31 +4756,20 @@ window.presClickHandler = function(e) {
             const logoW = 140;
             const logoH = (_logoFantaImage.height / _logoFantaImage.width) * logoW;
             const logoY = 70;
+            
+            ctx.save();
+            ctx.globalCompositeOperation = "multiply";
             ctx.drawImage(_logoFantaImage, (canvas.width - logoW)/2, logoY, logoW, logoH);
+            ctx.restore();
+            
             logoBottomY = logoY + logoH;
             
-            // Disegna scritta Fantaletteratura in semicerchio
+            // Disegna scritta Fantaletteratura dritta
             ctx.fillStyle = "#1e1e1e";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            ctx.font = "bold 22px Arial";
-            const text = "Fantaletteratura";
-            const radius = logoW / 2 + 15;
-            const cx = canvas.width / 2;
-            const cy = logoY + logoH / 2;
-            const angleSpan = Math.PI * 0.7; // copre circa il 70% della parte inferiore
-            const startAngle = Math.PI / 2 - angleSpan / 2;
-            
-            ctx.save();
-            for (let i = 0; i < text.length; i++) {
-                const charAngle = startAngle + (i / (text.length - 1)) * angleSpan;
-                ctx.save();
-                ctx.translate(cx + Math.cos(charAngle) * radius, cy + Math.sin(charAngle) * radius);
-                ctx.rotate(charAngle - Math.PI / 2); // la lettera guarda verso il centro
-                ctx.fillText(text[i], 0, 0);
-                ctx.restore();
-            }
-            ctx.restore();
+            ctx.font = "bold 24px Arial";
+            ctx.fillText("Fantaletteratura", canvas.width / 2, logoBottomY + 25);
         }
 
         ctx.fillStyle = "#1e1e1e"; // Testo scuro su base bianca
@@ -4856,7 +4845,11 @@ window.presClickHandler = function(e) {
         if (_logoProfImage && _logoProfImage.complete && _logoProfImage.naturalHeight !== 0) {
             const logoW = 160;
             const logoH = (_logoProfImage.height / _logoProfImage.width) * logoW;
+            
+            ctx.save();
+            ctx.globalCompositeOperation = "multiply";
             ctx.drawImage(_logoProfImage, canvas.width - logoW - 60, canvas.height - logoH - 60, logoW, logoH);
+            ctx.restore();
         }
     }
 
