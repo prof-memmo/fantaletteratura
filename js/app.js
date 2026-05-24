@@ -4675,7 +4675,6 @@ window.presClickHandler = function(e) {
 
 })(); // fine IIFE Locandine
 (function() {
-(function() {
     let _attestatoImage = null;
     let _logoProfImage = null;
     let _logoFantaImage = null;
