@@ -4746,12 +4746,18 @@ window.presClickHandler = function(e) {
         const nome = (document.getElementById('attestato-nome') || {}).value || '';
         const campionato = (document.getElementById('attestato-campionato') || {}).value || '';
         const anno = (document.getElementById('attestato-anno') || {}).value || '';
+        const classificazione = (document.getElementById('attestato-classificazione') || {}).value || '';
 
         // Fantaletteratura Logo top center
         if (_logoFantaImage && _logoFantaImage.complete && _logoFantaImage.naturalHeight !== 0) {
             const logoW = 200;
             const logoH = (_logoFantaImage.height / _logoFantaImage.width) * logoW;
             ctx.drawImage(_logoFantaImage, (canvas.width - logoW)/2, 100, logoW, logoH);
+            
+            ctx.fillStyle = "#ffffff";
+            ctx.textAlign = "center";
+            ctx.font = "bold 30px Arial";
+            ctx.fillText("Fantaletteratura", canvas.width / 2, 100 + logoH + 35);
         }
 
         ctx.fillStyle = "#ffffff";
@@ -4759,7 +4765,7 @@ window.presClickHandler = function(e) {
         ctx.textBaseline = "middle";
 
         ctx.font = "bold 60px Arial";
-        ctx.fillText("ATTESTATO DI PARTECIPAZIONE", canvas.width / 2, 350);
+        ctx.fillText("TARGA DI RICONOSCIMENTO", canvas.width / 2, 350);
 
         ctx.font = "40px Arial";
         ctx.fillText("Si attesta che", canvas.width / 2, 430);
@@ -4779,43 +4785,63 @@ window.presClickHandler = function(e) {
 
         ctx.fillStyle = "#ffffff";
         ctx.font = "40px Arial";
-        ctx.fillText("ha partecipato con successo a", canvas.width / 2, 650);
-
-        ctx.font = "bold 50px Arial";
-        if (campionato) {
-            ctx.fillText(campionato, canvas.width / 2, 740);
+        
+        if (classificazione) {
+            ctx.fillText("si classifica come", canvas.width / 2, 650);
+            
+            ctx.fillStyle = "#f1c40f";
+            ctx.font = "bold 60px Arial";
+            ctx.fillText(classificazione.toUpperCase(), canvas.width / 2, 730);
+            
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "35px Arial";
+            if (campionato) {
+                ctx.fillText(`nel campionato: ${campionato}`, canvas.width / 2, 800);
+            }
         } else {
-            ctx.beginPath();
-            ctx.moveTo(canvas.width / 2 - 250, 760);
-            ctx.lineTo(canvas.width / 2 + 250, 760);
-            ctx.lineWidth = 3;
-            ctx.strokeStyle = "rgba(255,255,255,0.4)";
-            ctx.stroke();
+            ctx.fillText("ha partecipato con successo a", canvas.width / 2, 650);
+            
+            ctx.fillStyle = "#f1c40f";
+            ctx.font = "bold 50px Arial";
+            if (campionato) {
+                ctx.fillText(campionato, canvas.width / 2, 740);
+            } else {
+                ctx.beginPath();
+                ctx.moveTo(canvas.width / 2 - 250, 760);
+                ctx.lineTo(canvas.width / 2 + 250, 760);
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = "rgba(255,255,255,0.4)";
+                ctx.stroke();
+            }
         }
 
+        ctx.fillStyle = "#ffffff";
         ctx.font = "35px Arial";
+        const yAnno = classificazione ? 880 : 850;
         if (anno) {
-            ctx.fillText("Anno Scolastico " + anno, canvas.width / 2, 850);
+            ctx.fillText("Anno Scolastico " + anno, canvas.width / 2, yAnno);
         } else {
             ctx.beginPath();
-            ctx.moveTo(canvas.width / 2 - 150, 870);
-            ctx.lineTo(canvas.width / 2 + 150, 870);
+            ctx.moveTo(canvas.width / 2 - 150, yAnno + 20);
+            ctx.lineTo(canvas.width / 2 + 150, yAnno + 20);
             ctx.lineWidth = 3;
             ctx.strokeStyle = "rgba(255,255,255,0.4)";
             ctx.stroke();
-            ctx.fillText("Anno Scolastico", canvas.width / 2, 830);
+            ctx.fillText("Anno Scolastico", canvas.width / 2, yAnno - 20);
         }
 
         if (_logoProfImage && _logoProfImage.complete && _logoProfImage.naturalHeight !== 0) {
-            const logoW = 200;
+            const logoW = 180;
             const logoH = (_logoProfImage.height / _logoProfImage.width) * logoW;
             ctx.drawImage(_logoProfImage, canvas.width - logoW - 120, canvas.height - logoH - 120, logoW, logoH);
             
-            ctx.font = "italic 30px Arial";
-            ctx.textAlign = "right";
-            ctx.fillText("Prof. Memmo", canvas.width - 120, canvas.height - 90);
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "italic 45px 'Brush Script MT', 'Caveat', cursive";
+            ctx.textAlign = "center";
+            ctx.fillText("Prof. Memmo", canvas.width - 120 - logoW/2, canvas.height - 90);
         } else {
-            ctx.font = "italic 40px Arial";
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "italic 45px 'Brush Script MT', 'Caveat', cursive";
             ctx.textAlign = "right";
             ctx.fillText("Prof. Memmo", canvas.width - 120, canvas.height - 120);
         }

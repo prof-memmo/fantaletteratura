@@ -1057,7 +1057,20 @@
                         </div>
                         <div class="input-group" style="margin-bottom:12px;">
                             <label style="font-size:0.8rem; color:var(--text-muted); margin-bottom:6px;">Anno Scolastico</label>
-                            <input type="text" id="attestato-anno" class="input-control" placeholder="Es: 2025/2026" oninput="window.aggiornaAnteprimaAttestato()">
+                            <select id="attestato-anno" class="input-control" onchange="window.aggiornaAnteprimaAttestato()">
+                                <option value="2025/2026">2025/2026</option>
+                                <option value="2024/2025">2024/2025</option>
+                                <option value="2026/2027">2026/2027</option>
+                            </select>
+                        </div>
+                        <div class="input-group" style="margin-bottom:12px;">
+                            <label style="font-size:0.8rem; color:var(--text-muted); margin-bottom:6px;">Classificazione</label>
+                            <select id="attestato-classificazione" class="input-control" onchange="window.aggiornaAnteprimaAttestato()">
+                                <option value="">Nessuna (Partecipazione)</option>
+                                <option value="Primo Classificato">Primo Classificato</option>
+                                <option value="Secondo Classificato">Secondo Classificato</option>
+                                <option value="Terzo Classificato">Terzo Classificato</option>
+                            </select>
                         </div>
                     </div>
                     <div class="locandine-section">
