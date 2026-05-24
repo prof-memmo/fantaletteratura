@@ -4689,8 +4689,8 @@ window.presClickHandler = function(e) {
         if (!_attestatoImage) {
             _attestatoImage = new Image();
             _attestatoImage.crossOrigin = "anonymous";
-            // Use the beautiful finali locandina as background
-            _attestatoImage.src = 'assets/locandine/locandina_finali.jpg';
+            // Usa il nuovo sfondo caricato dall'utente
+            _attestatoImage.src = 'assets/locandine/attestato_nuovo_bg.jpg';
             _attestatoImage.onload = () => _disegnaAttestato();
             _attestatoImage.onerror = () => {
                 console.warn("Nessuno sfondo attestato trovato.");
@@ -4704,15 +4704,8 @@ window.presClickHandler = function(e) {
             _logoProfImage.src = 'assets/logo_prof.png';
             _logoProfImage.onload = () => _disegnaAttestato();
         }
-        
-        if (!_logoFantaImage) {
-            _logoFantaImage = new Image();
-            _logoFantaImage.crossOrigin = "anonymous";
-            _logoFantaImage.src = 'assets/logo_fantaletteratura.png';
-            _logoFantaImage.onload = () => _disegnaAttestato();
-        }
 
-        if (_attestatoImage && _logoProfImage && _logoFantaImage) {
+        if (_attestatoImage && _logoProfImage) {
             _disegnaAttestato();
         }
     };
@@ -4738,81 +4731,18 @@ window.presClickHandler = function(e) {
         canvas.width  = W;
         canvas.height = H;
 
-        // Funzione helper per simulare roundRect se non supportata
-        const drawRoundRect = (x, y, w, h, r) => {
-            ctx.beginPath();
-            ctx.moveTo(x + r, y);
-            ctx.arcTo(x + w, y, x + w, y + h, r);
-            ctx.arcTo(x + w, y + h, x, y + h, r);
-            ctx.arcTo(x, y + h, x, y, r);
-            ctx.arcTo(x, y, x + w, y, r);
-            ctx.closePath();
-        };
-
-        // ── Sfondo Premium ──────────────────────────────────────────────────
+        // ── Sfondo Nuovo ──────────────────────────────────────────────────
         if (_attestatoImage && _attestatoImage.complete && _attestatoImage.naturalHeight !== 0) {
-            // L'immagine è probabilmente verticale, la disegniamo per riempire (cover) l'area orizzontale
-            const imgRatio = _attestatoImage.naturalWidth / _attestatoImage.naturalHeight;
-            const canvasRatio = W / H;
-            let drawW = W;
-            let drawH = H;
-            let drawX = 0;
-            let drawY = 0;
-
-            if (imgRatio < canvasRatio) {
-                drawH = W / imgRatio;
-                drawY = (H - drawH) / 2;
-            } else {
-                drawW = H * imgRatio;
-                drawX = (W - drawW) / 2;
-            }
-
             ctx.save();
-            ctx.drawImage(_attestatoImage, drawX, drawY, drawW, drawH);
-            
-            // Effetto scurimento generale dello sfondo esterno
-            ctx.fillStyle = 'rgba(15, 17, 8, 0.4)';
-            ctx.fillRect(0, 0, W, H);
-            ctx.restore();
-
-            // ── Glassmorphism Card Centrale ──────────────────────────────────
-            const cardX = 120;
-            const cardY = 100;
-            const cardW = W - 240;
-            const cardH = H - 200;
-            const cardR = 40;
-
-            ctx.save();
-            drawRoundRect(cardX, cardY, cardW, cardH, cardR);
-            ctx.clip();
-            // Disegna lo sfondo di nuovo ma fortemente sfocato e scurito (Glass effect)
-            ctx.filter = 'blur(25px) brightness(0.3)';
-            ctx.drawImage(_attestatoImage, drawX, drawY, drawW, drawH);
-            ctx.restore();
-
-            // Aggiungi overlay colore alla card
-            ctx.save();
-            drawRoundRect(cardX, cardY, cardW, cardH, cardR);
-            ctx.fillStyle = 'rgba(20, 24, 15, 0.65)';
-            ctx.fill();
-            // Bordo glass
-            ctx.lineWidth = 4;
-            ctx.strokeStyle = 'rgba(141, 160, 63, 0.4)'; // Verde oliva semitrasparente
-            ctx.stroke();
-            // Doppio bordo interno
-            drawRoundRect(cardX + 20, cardY + 20, cardW - 40, cardH - 40, cardR - 10);
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-            ctx.stroke();
+            ctx.drawImage(_attestatoImage, 0, 0, W, H);
             ctx.restore();
         } else {
-            // Fallback scuro
-            ctx.fillStyle = '#0f1108';
+            // Fallback
+            ctx.fillStyle = '#f5f5f0';
             ctx.fillRect(0, 0, W, H);
-            drawRoundRect(120, 100, W - 240, H - 200, 40);
-            ctx.strokeStyle = '#8da03f';
-            ctx.lineWidth = 8;
-            ctx.stroke();
+            ctx.strokeStyle = '#1a3a6e';
+            ctx.lineWidth = 14;
+            ctx.strokeRect(30, 30, W - 60, H - 60);
         }
 
         const nome           = (document.getElementById('attestato-nome')           || {}).value || '';
@@ -4820,61 +4750,24 @@ window.presClickHandler = function(e) {
         const anno           = (document.getElementById('attestato-anno')           || {}).value || '';
         const classificazione = (document.getElementById('attestato-classificazione') || {}).value || '';
 
-        // ── Logo Fantaletteratura ───────────────────────
-        let logoBottomY = 160;
-        if (_logoFantaImage && _logoFantaImage.complete && _logoFantaImage.naturalHeight !== 0) {
-            const logoW = 200;
-            const logoH = (_logoFantaImage.naturalHeight / _logoFantaImage.naturalWidth) * logoW;
-            const logoY = 130;
-
-            ctx.save();
-            // Aggiungo ombra al logo per farlo risaltare sul buio
-            ctx.shadowColor = 'rgba(0,0,0,0.8)';
-            ctx.shadowBlur = 15;
-            ctx.drawImage(_logoFantaImage, (W - logoW) / 2, logoY, logoW, logoH);
-            ctx.restore();
-
-            logoBottomY = logoY + logoH + 20;
-
-            ctx.fillStyle     = '#f5f5f0'; // Testo chiaro
-            ctx.textAlign     = 'center';
-            ctx.textBaseline  = 'middle';
-            ctx.font          = 'bold 44px Arial';
-            ctx.fillText('Fantaletteratura', W / 2, logoBottomY + 20);
-            logoBottomY += 60;
-        }
-
-        // ── Linea decorativa ─────────────────────────────
-        const lineY = logoBottomY + 10;
-        ctx.save();
-        const grad = ctx.createLinearGradient(W/2 - 400, lineY, W/2 + 400, lineY);
-        grad.addColorStop(0,   'rgba(141, 160, 63, 0)');
-        grad.addColorStop(0.2, '#8da03f');
-        grad.addColorStop(0.8, '#8da03f');
-        grad.addColorStop(1,   'rgba(141, 160, 63, 0)');
-        ctx.strokeStyle = grad;
-        ctx.lineWidth   = 3;
-        ctx.beginPath();
-        ctx.moveTo(W/2 - 400, lineY);
-        ctx.lineTo(W/2 + 400, lineY);
-        ctx.stroke();
-        ctx.restore();
+        // Il logo "Fantaletteratura" è già nell'immagine, quindi partiamo a scrivere un po' più in basso.
+        let logoBottomY = 380; 
 
         // ── Titolo ───────────────────────────────────────────────────
-        const titleY = lineY + 70;
-        ctx.fillStyle    = '#d4af37'; // Oro brillante
+        const titleY = logoBottomY + 20;
+        ctx.fillStyle    = '#1a3a6e'; // Blu scuro
         ctx.textAlign    = 'center';
         ctx.textBaseline = 'middle';
         ctx.font         = 'bold 56px Arial';
         ctx.fillText('ATTESTATO DI MERITO', W / 2, titleY);
 
         // ── "Si attesta che" ─────────────────────────────────────────
-        ctx.fillStyle = '#b0b5a8';
+        ctx.fillStyle = '#1e1e1e';
         ctx.font = '36px Arial';
         ctx.fillText('Si attesta che', W / 2, titleY + 80);
 
         // ── Nome ─────────────────────────────────────────────────────
-        ctx.fillStyle = '#ffffff'; // Bianco puro per il nome
+        ctx.fillStyle = '#1a3a6e'; // Blu Navy
         ctx.font      = 'bold 76px Arial';
         const nomeY   = titleY + 180;
         if (nome) {
@@ -4884,14 +4777,14 @@ window.presClickHandler = function(e) {
             ctx.moveTo(W / 2 - 300, nomeY + 25);
             ctx.lineTo(W / 2 + 300, nomeY + 25);
             ctx.lineWidth   = 2;
-            ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+            ctx.strokeStyle = 'rgba(26,58,110,0.4)';
             ctx.stroke();
         }
 
         // ── Linea separatrice ────────────────────────────────────────
         const sep1Y = nomeY + 70;
         ctx.save();
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+        ctx.strokeStyle = 'rgba(26, 58, 110, 0.3)';
         ctx.lineWidth   = 1.5;
         ctx.beginPath();
         ctx.moveTo(W/2 - 350, sep1Y);
@@ -4907,7 +4800,7 @@ window.presClickHandler = function(e) {
         if (classificazione) {
             ctx.fillText('si classifica come', W / 2, partY);
 
-            ctx.fillStyle = '#1a3a6e';
+            ctx.fillStyle = '#1a3a6e'; 
             ctx.font      = 'bold 60px Arial';
             ctx.fillText(classificazione.toUpperCase(), W / 2, partY + 80);
 
@@ -4928,7 +4821,7 @@ window.presClickHandler = function(e) {
                 ctx.moveTo(W / 2 - 250, partY + 100);
                 ctx.lineTo(W / 2 + 250, partY + 100);
                 ctx.lineWidth   = 2;
-                ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+                ctx.strokeStyle = 'rgba(26,58,110,0.4)';
                 ctx.stroke();
             }
         }
@@ -4944,12 +4837,13 @@ window.presClickHandler = function(e) {
             ctx.fillText('Anno Scolastico ___________', W / 2, annoY);
         }
 
-        // ── Logo Prof (in basso a destra) ────────────────────────────
+        // ── Logo Prof (in basso a destra, sopra i libri) ─────────────
         if (_logoProfImage && _logoProfImage.complete && _logoProfImage.naturalHeight !== 0) {
-            const logoW = 140;
+            const logoW = 120;
             const logoH = (_logoProfImage.naturalHeight / _logoProfImage.naturalWidth) * logoW;
             ctx.save();
-            ctx.drawImage(_logoProfImage, W - logoW - 80, H - logoH - 80, logoW, logoH);
+            ctx.globalAlpha = 0.9;
+            ctx.drawImage(_logoProfImage, W - logoW - 120, H - logoH - 120, logoW, logoH);
             ctx.restore();
         }
     }
