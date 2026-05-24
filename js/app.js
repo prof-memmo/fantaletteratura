@@ -4755,7 +4755,7 @@ window.presClickHandler = function(e) {
         if (_logoFantaImage && _logoFantaImage.complete && _logoFantaImage.naturalHeight !== 0) {
             const logoW = 140;
             const logoH = (_logoFantaImage.height / _logoFantaImage.width) * logoW;
-            const logoY = 70;
+            const logoY = 110;
             
             ctx.save();
             ctx.drawImage(_logoFantaImage, (canvas.width - logoW)/2, logoY, logoW, logoH);
@@ -4767,8 +4767,8 @@ window.presClickHandler = function(e) {
             ctx.fillStyle = "#1e1e1e";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            ctx.font = "bold 24px Arial";
-            ctx.fillText("Fantaletteratura", canvas.width / 2, logoBottomY + 25);
+            ctx.font = "bold 34px Arial";
+            ctx.fillText("Fantaletteratura", canvas.width / 2, logoBottomY + 30);
         }
 
         ctx.fillStyle = "#1e1e1e"; // Testo scuro su base bianca
