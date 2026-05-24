@@ -652,7 +652,12 @@
                         </div>
                         <div class="input-group" style="margin-bottom:12px;">
                             <label style="font-size:0.8rem; color:var(--text-muted); margin-bottom:6px;">Campionato</label>
-                            <input type="text" id="attestato-campionato" class="input-control" placeholder="Es: Campionato Dantesco" oninput="window.aggiornaAnteprimaAttestato()">
+                            <select id="attestato-campionato" class="input-control" onchange="window.aggiornaAnteprimaAttestato()">
+                                <option value="">Nessuno (Lascia spazio vuoto)</option>
+                                <option value="Contemporanea: Autori Italiani">📘 Contemporanea: Autori Italiani</option>
+                                <option value="Età Moderna">📙 Età Moderna</option>
+                                <option value="Contemporanea: Autori Italiani e Internazionali">📒 Contemporanea: Autori Italiani e Internazionali</option>
+                            </select>
                         </div>
                         <div class="input-group" style="margin-bottom:12px;">
                             <label style="font-size:0.8rem; color:var(--text-muted); margin-bottom:6px;">Anno Scolastico</label>
