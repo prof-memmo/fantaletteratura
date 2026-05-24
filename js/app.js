@@ -4697,7 +4697,7 @@ window.presClickHandler = function(e) {
         if (!_attestatoImage) {
             _attestatoImage = new Image();
             _attestatoImage.crossOrigin = "anonymous";
-            _attestatoImage.src = 'assets/locandine/attestato_bg.png';
+            _attestatoImage.src = 'assets/locandine/attestato_bg_white.png';
             _attestatoImage.onload = () => _disegnaAttestato();
             _attestatoImage.onerror = () => {
                 console.warn("Nessuno sfondo attestato trovato.");
@@ -4707,7 +4707,7 @@ window.presClickHandler = function(e) {
         if (!_logoProfImage) {
             _logoProfImage = new Image();
             _logoProfImage.crossOrigin = "anonymous";
-            _logoProfImage.src = 'assets/prof_memmo.png';
+            _logoProfImage.src = 'assets/avatar.png';
             _logoProfImage.onload = () => _disegnaAttestato();
         }
         if (!_logoFantaImage) {
@@ -4730,17 +4730,19 @@ window.presClickHandler = function(e) {
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
 
-        canvas.width = 1600;
-        canvas.height = 1131;
-
+        // Imposta dimensioni in base all'immagine o un default (es. 1024x1024)
         if (_attestatoImage && _attestatoImage.complete && _attestatoImage.naturalHeight !== 0) {
+            canvas.width = _attestatoImage.naturalWidth;
+            canvas.height = _attestatoImage.naturalHeight;
             ctx.drawImage(_attestatoImage, 0, 0, canvas.width, canvas.height);
         } else {
-            ctx.fillStyle = "#1e1e1e";
+            canvas.width = 1024;
+            canvas.height = 1024;
+            ctx.fillStyle = "#ffffff";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.strokeStyle = "#f1c40f";
-            ctx.lineWidth = 15;
-            ctx.strokeRect(40, 40, canvas.width - 80, canvas.height - 80);
+            ctx.lineWidth = 10;
+            ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60);
         }
 
         const nome = (document.getElementById('attestato-nome') || {}).value || '';
@@ -4749,101 +4751,112 @@ window.presClickHandler = function(e) {
         const classificazione = (document.getElementById('attestato-classificazione') || {}).value || '';
 
         // Fantaletteratura Logo top center
+        let logoBottomY = 120;
         if (_logoFantaImage && _logoFantaImage.complete && _logoFantaImage.naturalHeight !== 0) {
-            const logoW = 200;
+            const logoW = 140;
             const logoH = (_logoFantaImage.height / _logoFantaImage.width) * logoW;
-            ctx.drawImage(_logoFantaImage, (canvas.width - logoW)/2, 100, logoW, logoH);
+            const logoY = 70;
+            ctx.drawImage(_logoFantaImage, (canvas.width - logoW)/2, logoY, logoW, logoH);
+            logoBottomY = logoY + logoH;
             
-            ctx.fillStyle = "#ffffff";
+            // Disegna scritta Fantaletteratura in semicerchio
+            ctx.fillStyle = "#1e1e1e";
             ctx.textAlign = "center";
-            ctx.font = "bold 30px Arial";
-            ctx.fillText("Fantaletteratura", canvas.width / 2, 100 + logoH + 35);
+            ctx.textBaseline = "middle";
+            ctx.font = "bold 22px Arial";
+            const text = "Fantaletteratura";
+            const radius = logoW / 2 + 15;
+            const cx = canvas.width / 2;
+            const cy = logoY + logoH / 2;
+            const angleSpan = Math.PI * 0.7; // copre circa il 70% della parte inferiore
+            const startAngle = Math.PI / 2 - angleSpan / 2;
+            
+            ctx.save();
+            for (let i = 0; i < text.length; i++) {
+                const charAngle = startAngle + (i / (text.length - 1)) * angleSpan;
+                ctx.save();
+                ctx.translate(cx + Math.cos(charAngle) * radius, cy + Math.sin(charAngle) * radius);
+                ctx.rotate(charAngle - Math.PI / 2); // la lettera guarda verso il centro
+                ctx.fillText(text[i], 0, 0);
+                ctx.restore();
+            }
+            ctx.restore();
         }
 
-        ctx.fillStyle = "#ffffff";
+        ctx.fillStyle = "#1e1e1e"; // Testo scuro su base bianca
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
 
-        ctx.font = "bold 60px Arial";
-        ctx.fillText("TARGA DI RICONOSCIMENTO", canvas.width / 2, 350);
+        ctx.font = "bold 45px Arial";
+        ctx.fillText("TARGA DI RICONOSCIMENTO", canvas.width / 2, 280);
 
-        ctx.font = "40px Arial";
-        ctx.fillText("Si attesta che", canvas.width / 2, 430);
+        ctx.font = "28px Arial";
+        ctx.fillText("Si attesta che", canvas.width / 2, 340);
 
-        ctx.fillStyle = "#f1c40f";
-        ctx.font = "bold 75px Arial";
+        ctx.fillStyle = "#d4af37"; // Oro leggibile su bianco
+        ctx.font = "bold 55px Arial";
         if (nome) {
-            ctx.fillText(nome.toUpperCase(), canvas.width / 2, 540);
+            ctx.fillText(nome.toUpperCase(), canvas.width / 2, 420);
         } else {
             ctx.beginPath();
-            ctx.moveTo(canvas.width / 2 - 300, 560);
-            ctx.lineTo(canvas.width / 2 + 300, 560);
-            ctx.lineWidth = 3;
-            ctx.strokeStyle = "rgba(255,255,255,0.4)";
+            ctx.moveTo(canvas.width / 2 - 200, 435);
+            ctx.lineTo(canvas.width / 2 + 200, 435);
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "rgba(0,0,0,0.2)";
             ctx.stroke();
         }
 
-        ctx.fillStyle = "#ffffff";
-        ctx.font = "40px Arial";
+        ctx.fillStyle = "#1e1e1e";
+        ctx.font = "28px Arial";
         
         if (classificazione) {
-            ctx.fillText("si classifica come", canvas.width / 2, 650);
+            ctx.fillText("si classifica come", canvas.width / 2, 500);
             
-            ctx.fillStyle = "#f1c40f";
-            ctx.font = "bold 60px Arial";
-            ctx.fillText(classificazione.toUpperCase(), canvas.width / 2, 730);
+            ctx.fillStyle = "#d4af37";
+            ctx.font = "bold 45px Arial";
+            ctx.fillText(classificazione.toUpperCase(), canvas.width / 2, 560);
             
-            ctx.fillStyle = "#ffffff";
-            ctx.font = "35px Arial";
+            ctx.fillStyle = "#1e1e1e";
+            ctx.font = "26px Arial";
             if (campionato) {
-                ctx.fillText(`nel campionato: ${campionato}`, canvas.width / 2, 800);
+                ctx.fillText(`nel campionato: ${campionato}`, canvas.width / 2, 610);
             }
         } else {
-            ctx.fillText("ha partecipato con successo a", canvas.width / 2, 650);
+            ctx.fillText("ha partecipato con successo a", canvas.width / 2, 500);
             
-            ctx.fillStyle = "#f1c40f";
-            ctx.font = "bold 50px Arial";
+            ctx.fillStyle = "#d4af37";
+            ctx.font = "bold 40px Arial";
             if (campionato) {
-                ctx.fillText(campionato, canvas.width / 2, 740);
+                ctx.fillText(campionato, canvas.width / 2, 570);
             } else {
                 ctx.beginPath();
-                ctx.moveTo(canvas.width / 2 - 250, 760);
-                ctx.lineTo(canvas.width / 2 + 250, 760);
-                ctx.lineWidth = 3;
-                ctx.strokeStyle = "rgba(255,255,255,0.4)";
+                ctx.moveTo(canvas.width / 2 - 180, 585);
+                ctx.lineTo(canvas.width / 2 + 180, 585);
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = "rgba(0,0,0,0.2)";
                 ctx.stroke();
             }
         }
 
-        ctx.fillStyle = "#ffffff";
-        ctx.font = "35px Arial";
-        const yAnno = classificazione ? 880 : 850;
+        ctx.fillStyle = "#1e1e1e";
+        ctx.font = "26px Arial";
+        const yAnno = classificazione ? 670 : 640;
         if (anno) {
             ctx.fillText("Anno Scolastico " + anno, canvas.width / 2, yAnno);
         } else {
             ctx.beginPath();
-            ctx.moveTo(canvas.width / 2 - 150, yAnno + 20);
-            ctx.lineTo(canvas.width / 2 + 150, yAnno + 20);
-            ctx.lineWidth = 3;
-            ctx.strokeStyle = "rgba(255,255,255,0.4)";
+            ctx.moveTo(canvas.width / 2 - 100, yAnno + 15);
+            ctx.lineTo(canvas.width / 2 + 100, yAnno + 15);
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "rgba(0,0,0,0.2)";
             ctx.stroke();
-            ctx.fillText("Anno Scolastico", canvas.width / 2, yAnno - 20);
+            ctx.fillText("Anno Scolastico", canvas.width / 2, yAnno - 15);
         }
 
         if (_logoProfImage && _logoProfImage.complete && _logoProfImage.naturalHeight !== 0) {
-            const logoW = 180;
+            const logoW = 160;
             const logoH = (_logoProfImage.height / _logoProfImage.width) * logoW;
-            ctx.drawImage(_logoProfImage, canvas.width - logoW - 120, canvas.height - logoH - 120, logoW, logoH);
-            
-            ctx.fillStyle = "#ffffff";
-            ctx.font = "italic 45px 'Brush Script MT', 'Caveat', cursive";
-            ctx.textAlign = "center";
-            ctx.fillText("Prof. Memmo", canvas.width - 120 - logoW/2, canvas.height - 90);
-        } else {
-            ctx.fillStyle = "#ffffff";
-            ctx.font = "italic 45px 'Brush Script MT', 'Caveat', cursive";
-            ctx.textAlign = "right";
-            ctx.fillText("Prof. Memmo", canvas.width - 120, canvas.height - 120);
+            ctx.drawImage(_logoProfImage, canvas.width - logoW - 60, canvas.height - logoH - 60, logoW, logoH);
         }
     }
 
