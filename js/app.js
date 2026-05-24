@@ -4701,7 +4701,7 @@ window.presClickHandler = function(e) {
         if (!_logoProfImage) {
             _logoProfImage = new Image();
             _logoProfImage.crossOrigin = "anonymous";
-            _logoProfImage.src = 'assets/logo_prof.png';
+            _logoProfImage.src = 'assets/prof_memmo.png';
             _logoProfImage.onload = () => _disegnaAttestato();
         }
 
@@ -4750,11 +4750,10 @@ window.presClickHandler = function(e) {
         const anno           = (document.getElementById('attestato-anno')           || {}).value || '';
         const classificazione = (document.getElementById('attestato-classificazione') || {}).value || '';
 
-        // Il logo "Fantaletteratura" è già nell'immagine, quindi partiamo a scrivere un po' più in basso.
-        let logoBottomY = 380; 
+        // Il testo inizia sotto il sottotitolo "La sfida dei capolavori" nell'immagine caricata
+        const titleY = 480; 
 
         // ── Titolo ───────────────────────────────────────────────────
-        const titleY = logoBottomY + 20;
         ctx.fillStyle    = '#1a3a6e'; // Blu scuro
         ctx.textAlign    = 'center';
         ctx.textBaseline = 'middle';
@@ -4764,12 +4763,13 @@ window.presClickHandler = function(e) {
         // ── "Si attesta che" ─────────────────────────────────────────
         ctx.fillStyle = '#1e1e1e';
         ctx.font = '36px Arial';
-        ctx.fillText('Si attesta che', W / 2, titleY + 80);
+        ctx.fillText('Si attesta che', W / 2, titleY + 70);
 
         // ── Nome ─────────────────────────────────────────────────────
-        ctx.fillStyle = '#1a3a6e'; // Blu Navy
-        ctx.font      = 'bold 76px Arial';
-        const nomeY   = titleY + 180;
+        ctx.fillStyle    = '#1a3a6e'; // Blu Navy
+        ctx.font         = 'bold 76px Arial';
+        
+        const nomeY = titleY + 160;
         if (nome) {
             ctx.fillText(nome.toUpperCase(), W / 2, nomeY);
         } else {
@@ -4782,7 +4782,7 @@ window.presClickHandler = function(e) {
         }
 
         // ── Linea separatrice ────────────────────────────────────────
-        const sep1Y = nomeY + 70;
+        const sep1Y = nomeY + 60;
         ctx.save();
         ctx.strokeStyle = 'rgba(26, 58, 110, 0.3)';
         ctx.lineWidth   = 1.5;
@@ -4795,19 +4795,19 @@ window.presClickHandler = function(e) {
         // ── Classificazione / Partecipazione ─────────────────────────
         ctx.fillStyle = '#1e1e1e';
         ctx.font      = '36px Arial';
-        const partY   = sep1Y + 70;
+        const partY   = sep1Y + 60;
 
         if (classificazione) {
             ctx.fillText('si classifica come', W / 2, partY);
 
             ctx.fillStyle = '#1a3a6e'; 
             ctx.font      = 'bold 60px Arial';
-            ctx.fillText(classificazione.toUpperCase(), W / 2, partY + 80);
+            ctx.fillText(classificazione.toUpperCase(), W / 2, partY + 70);
 
             ctx.fillStyle = '#1e1e1e';
             ctx.font      = '34px Arial';
             if (campionato) {
-                ctx.fillText('nel campionato: ' + campionato, W / 2, partY + 160);
+                ctx.fillText('nel campionato: ' + campionato, W / 2, partY + 130);
             }
         } else {
             ctx.fillText('ha partecipato con successo a', W / 2, partY);
@@ -4815,11 +4815,11 @@ window.presClickHandler = function(e) {
             ctx.fillStyle = '#1a3a6e';
             ctx.font      = 'bold 54px Arial';
             if (campionato) {
-                ctx.fillText(campionato, W / 2, partY + 80);
+                ctx.fillText(campionato, W / 2, partY + 70);
             } else {
                 ctx.beginPath();
-                ctx.moveTo(W / 2 - 250, partY + 100);
-                ctx.lineTo(W / 2 + 250, partY + 100);
+                ctx.moveTo(W / 2 - 250, partY + 90);
+                ctx.lineTo(W / 2 + 250, partY + 90);
                 ctx.lineWidth   = 2;
                 ctx.strokeStyle = 'rgba(26,58,110,0.4)';
                 ctx.stroke();
@@ -4827,7 +4827,7 @@ window.presClickHandler = function(e) {
         }
 
         // ── Anno Scolastico ──────────────────────────────────────────
-        const annoOffsetY = classificazione ? 270 : 200;
+        const annoOffsetY = classificazione ? 210 : 160;
         const annoY       = partY + annoOffsetY;
         ctx.fillStyle = '#1e1e1e';
         ctx.font      = '30px Arial';
@@ -4837,13 +4837,16 @@ window.presClickHandler = function(e) {
             ctx.fillText('Anno Scolastico ___________', W / 2, annoY);
         }
 
-        // ── Logo Prof (in basso a destra, sopra i libri) ─────────────
+        // ── Logo Prof (in basso al centro) ─────────────
         if (_logoProfImage && _logoProfImage.complete && _logoProfImage.naturalHeight !== 0) {
-            const logoW = 120;
+            const logoW = 180;
             const logoH = (_logoProfImage.naturalHeight / _logoProfImage.naturalWidth) * logoW;
+            const logoX = W / 2 - logoW / 2;
+            const logoY = H - logoH - 60; // 60px dal bordo inferiore
+
             ctx.save();
-            ctx.globalAlpha = 0.9;
-            ctx.drawImage(_logoProfImage, W - logoW - 120, H - logoH - 120, logoW, logoH);
+            ctx.globalAlpha = 1.0;
+            ctx.drawImage(_logoProfImage, logoX, logoY, logoW, logoH);
             ctx.restore();
         }
     }
