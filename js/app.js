@@ -4736,48 +4736,72 @@ window.presClickHandler = function(e) {
         canvas.width  = W;
         canvas.height = H;
 
-        // ── Sfondo e Cornice Blu ─────────────────────────────────────
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, W, H);
+        // ── Sfondo e Cornice Orizzontale ─────────────────────────────
+        if (_attestatoImage && _attestatoImage.complete && _attestatoImage.naturalHeight !== 0) {
+            ctx.save();
+            // Il bordo dorato diventa blu scuro con questo filtro
+            ctx.filter = 'hue-rotate(190deg) saturate(1.8) brightness(0.9)';
+            // L'immagine viene stirata in orizzontale (il trofeo potrebbe risultare un po' largo,
+            // ma mantiene il bordo ricercato originale)
+            ctx.drawImage(_attestatoImage, 0, 0, W, H);
+            ctx.restore();
 
-        // Cornice esterna (Blu Navy)
-        ctx.strokeStyle = '#1a3a6e';
-        ctx.lineWidth = 14;
-        ctx.strokeRect(30, 30, W - 60, H - 60);
+            // Aggiungo il gradiente richiesto usando la modalità di fusione "multiply"
+            // Questo colorerà lo sfondo bianco dell'immagine senza coprire i dettagli scuri/blu
+            ctx.save();
+            ctx.globalCompositeOperation = 'multiply';
+            const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+            bgGrad.addColorStop(0, '#eaf2f8'); // Azzurrino chiarissimo
+            bgGrad.addColorStop(0.5, '#ffffff'); // Bianco in mezzo
+            bgGrad.addColorStop(1, '#d4e6f1'); // Azzurrino in basso
+            ctx.fillStyle = bgGrad;
+            ctx.fillRect(0, 0, W, H);
+            ctx.restore();
+        } else {
+            // Fallback: Sfondo bianco con gradiente azzurrino e doppia cornice
+            const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+            bgGrad.addColorStop(0, '#eaf2f8');
+            bgGrad.addColorStop(1, '#ffffff');
+            ctx.fillStyle = bgGrad;
+            ctx.fillRect(0, 0, W, H);
 
-        // Cornice interna sottile (Blu Navy più chiaro)
-        ctx.strokeStyle = '#2a5298';
-        ctx.lineWidth = 4;
-        ctx.strokeRect(52, 52, W - 104, H - 104);
+            ctx.strokeStyle = '#1a3a6e';
+            ctx.lineWidth = 14;
+            ctx.strokeRect(30, 30, W - 60, H - 60);
+
+            ctx.strokeStyle = '#2a5298';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(52, 52, W - 104, H - 104);
+        }
 
         const nome           = (document.getElementById('attestato-nome')           || {}).value || '';
         const campionato     = (document.getElementById('attestato-campionato')     || {}).value || '';
         const anno           = (document.getElementById('attestato-anno')           || {}).value || '';
         const classificazione = (document.getElementById('attestato-classificazione') || {}).value || '';
 
-        // ── Logo Fantaletteratura (centro in alto) ───────────────────
+        // ── Logo Fantaletteratura (InGRANDITO) ───────────────────────
         let logoBottomY = 160;
         if (_logoFantaImage && _logoFantaImage.complete && _logoFantaImage.naturalHeight !== 0) {
-            const logoW = 160;
+            const logoW = 240; // Ingrandito da 160 a 240
             const logoH = (_logoFantaImage.naturalHeight / _logoFantaImage.naturalWidth) * logoW;
-            const logoY = 100;
+            const logoY = 80;
 
             ctx.save();
             ctx.drawImage(_logoFantaImage, (W - logoW) / 2, logoY, logoW, logoH);
             ctx.restore();
 
-            logoBottomY = logoY + logoH + 10;
+            logoBottomY = logoY + logoH + 20;
 
-            ctx.fillStyle     = '#1e1e1e';
+            ctx.fillStyle     = '#1a3a6e'; // Fatto blu scuro invece che nero
             ctx.textAlign     = 'center';
             ctx.textBaseline  = 'middle';
-            ctx.font          = 'bold 36px Arial';
-            ctx.fillText('Fantaletteratura', W / 2, logoBottomY + 28);
-            logoBottomY += 60;
+            ctx.font          = 'bold 54px Arial'; // Ingrandito da 36 a 54
+            ctx.fillText('Fantaletteratura', W / 2, logoBottomY + 30);
+            logoBottomY += 70;
         }
 
         // ── Linea decorativa orizzontale ─────────────────────────────
-        const lineY = logoBottomY + 20;
+        const lineY = logoBottomY + 10;
         ctx.save();
         const grad = ctx.createLinearGradient(W/2 - 400, lineY, W/2 + 400, lineY);
         grad.addColorStop(0,   'rgba(26,58,110,0)');
@@ -4785,7 +4809,7 @@ window.presClickHandler = function(e) {
         grad.addColorStop(0.8, '#1a3a6e');
         grad.addColorStop(1,   'rgba(26,58,110,0)');
         ctx.strokeStyle = grad;
-        ctx.lineWidth   = 2;
+        ctx.lineWidth   = 3;
         ctx.beginPath();
         ctx.moveTo(W/2 - 400, lineY);
         ctx.lineTo(W/2 + 400, lineY);
@@ -4797,16 +4821,16 @@ window.presClickHandler = function(e) {
         ctx.fillStyle    = '#1e1e1e';
         ctx.textAlign    = 'center';
         ctx.textBaseline = 'middle';
-        ctx.font         = 'bold 52px Arial';
+        ctx.font         = 'bold 56px Arial';
         ctx.fillText('ATTESTATO DI MERITO', W / 2, titleY);
 
         // ── "Si attesta che" ─────────────────────────────────────────
-        ctx.font = '32px Arial';
+        ctx.font = '36px Arial';
         ctx.fillText('Si attesta che', W / 2, titleY + 80);
 
         // ── Nome ─────────────────────────────────────────────────────
         ctx.fillStyle = '#1a3a6e';
-        ctx.font      = 'bold 72px Arial';
+        ctx.font      = 'bold 76px Arial';
         const nomeY   = titleY + 180;
         if (nome) {
             ctx.fillText(nome.toUpperCase(), W / 2, nomeY);
@@ -4823,7 +4847,7 @@ window.presClickHandler = function(e) {
         const sep1Y = nomeY + 70;
         ctx.save();
         ctx.strokeStyle = 'rgba(26,58,110,0.3)';
-        ctx.lineWidth   = 1;
+        ctx.lineWidth   = 1.5;
         ctx.beginPath();
         ctx.moveTo(W/2 - 350, sep1Y);
         ctx.lineTo(W/2 + 350, sep1Y);
@@ -4832,18 +4856,18 @@ window.presClickHandler = function(e) {
 
         // ── Classificazione / Partecipazione ─────────────────────────
         ctx.fillStyle = '#1e1e1e';
-        ctx.font      = '32px Arial';
+        ctx.font      = '36px Arial';
         const partY   = sep1Y + 70;
 
         if (classificazione) {
             ctx.fillText('si classifica come', W / 2, partY);
 
             ctx.fillStyle = '#1a3a6e';
-            ctx.font      = 'bold 56px Arial';
+            ctx.font      = 'bold 60px Arial';
             ctx.fillText(classificazione.toUpperCase(), W / 2, partY + 80);
 
             ctx.fillStyle = '#1e1e1e';
-            ctx.font      = '30px Arial';
+            ctx.font      = '34px Arial';
             if (campionato) {
                 ctx.fillText('nel campionato: ' + campionato, W / 2, partY + 160);
             }
@@ -4851,7 +4875,7 @@ window.presClickHandler = function(e) {
             ctx.fillText('ha partecipato con successo a', W / 2, partY);
 
             ctx.fillStyle = '#1a3a6e';
-            ctx.font      = 'bold 50px Arial';
+            ctx.font      = 'bold 54px Arial';
             if (campionato) {
                 ctx.fillText(campionato, W / 2, partY + 80);
             } else {
@@ -4868,14 +4892,14 @@ window.presClickHandler = function(e) {
         const annoOffsetY = classificazione ? 270 : 200;
         const annoY       = partY + annoOffsetY;
         ctx.fillStyle = '#1e1e1e';
-        ctx.font      = '28px Arial';
+        ctx.font      = '30px Arial';
         if (anno) {
             ctx.fillText('Anno Scolastico ' + anno, W / 2, annoY);
         } else {
             ctx.fillText('Anno Scolastico ___________', W / 2, annoY);
         }
 
-        // ── Logo Prof (in basso a destra, leggermente più piccolo per orizzontale) ──
+        // ── Logo Prof (in basso a destra) ────────────────────────────
         if (_logoProfImage && _logoProfImage.complete && _logoProfImage.naturalHeight !== 0) {
             const logoW = 140;
             const logoH = (_logoProfImage.naturalHeight / _logoProfImage.naturalWidth) * logoW;
