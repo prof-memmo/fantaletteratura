@@ -4740,7 +4740,7 @@ window.presClickHandler = function(e) {
             canvas.height = 1024;
             ctx.fillStyle = "#ffffff";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.strokeStyle = "#f1c40f";
+            ctx.strokeStyle = "#1a3a6e";
             ctx.lineWidth = 10;
             ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60);
         }
@@ -4781,7 +4781,7 @@ window.presClickHandler = function(e) {
         ctx.font = "28px Arial";
         ctx.fillText("Si attesta che", canvas.width / 2, 340);
 
-        ctx.fillStyle = "#d4af37"; // Oro leggibile su bianco
+        ctx.fillStyle = "#1a3a6e"; // Blu navy su base bianca
         ctx.font = "bold 55px Arial";
         if (nome) {
             ctx.fillText(nome.toUpperCase(), canvas.width / 2, 420);
@@ -4800,7 +4800,7 @@ window.presClickHandler = function(e) {
         if (classificazione) {
             ctx.fillText("si classifica come", canvas.width / 2, 500);
             
-            ctx.fillStyle = "#d4af37";
+            ctx.fillStyle = "#1a3a6e";
             ctx.font = "bold 45px Arial";
             ctx.fillText(classificazione.toUpperCase(), canvas.width / 2, 560);
             
@@ -4812,7 +4812,7 @@ window.presClickHandler = function(e) {
         } else {
             ctx.fillText("ha partecipato con successo a", canvas.width / 2, 500);
             
-            ctx.fillStyle = "#d4af37";
+            ctx.fillStyle = "#1a3a6e";
             ctx.font = "bold 40px Arial";
             if (campionato) {
                 ctx.fillText(campionato, canvas.width / 2, 570);
