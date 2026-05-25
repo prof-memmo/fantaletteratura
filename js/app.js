@@ -4285,15 +4285,17 @@ window.renderPresentationSlide = function() {
         
         container.innerHTML = `
             <div class="pres-slide-author">
-                <div class="pres-author-left">
+                <div class="pres-author-sticky-header">
                     <img src="${slide.author.image}" class="pres-author-avatar" onerror="this.src='avatar_autori/default.png'">
-                    <div class="pres-author-name">${slide.author.name}</div>
-                    <div class="pres-author-role">${slide.author.role || ''}</div>
+                    <div class="pres-author-header-info">
+                        <div class="pres-author-name">${slide.author.name}</div>
+                        <div class="pres-author-role">${slide.author.role || ''}</div>
+                    </div>
                     <div class="pres-author-points-badge" id="pres-author-pts-badge" style="visibility: hidden;">
                         ${slide.totalPts} PUNTI
                     </div>
                 </div>
-                <div class="pres-author-right">
+                <div class="pres-author-body">
                     <div class="pres-author-intro">${slide.intro}</div>
                     <div style="display:flex; flex-direction:column; gap:10px;">
                         ${bonusesHtml}
