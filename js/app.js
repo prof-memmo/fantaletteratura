@@ -953,6 +953,7 @@ async function setupAdminPanel() {
         const counts = {
             tutti: allUsers.length,
             teacher: allUsers.filter(u => u.role === 'teacher').length,
+            studente: allUsers.filter(u => u.role === 'studente').length,
             guest: allUsers.filter(u => u.role === 'guest').length
         };
         
@@ -965,6 +966,10 @@ async function setupAdminPanel() {
                 <div class="admin-stat-card ${currentAdminDocentiFilter === 'teacher' ? 'active' : ''}" onclick="window.setAdminDocentiFilter('teacher')">
                     <div class="stat-value">${counts.teacher}</div>
                     <div class="stat-label">DOCENTI</div>
+                </div>
+                <div class="admin-stat-card ${currentAdminDocentiFilter === 'studente' ? 'active' : ''}" onclick="window.setAdminDocentiFilter('studente')">
+                    <div class="stat-value">${counts.studente}</div>
+                    <div class="stat-label">STUDENTI</div>
                 </div>
                 <div class="admin-stat-card ${currentAdminDocentiFilter === 'guest' ? 'active' : ''}" onclick="window.setAdminDocentiFilter('guest')">
                     <div class="stat-value">${counts.guest}</div>
@@ -988,7 +993,14 @@ async function setupAdminPanel() {
 
         if (filteredUsers.length === 0) list.innerHTML = '<i>Nessun iscritto trovato.</i>';
         filteredUsers.forEach(u => {
-            let roleLabel = u.role === 'teacher' ? '<span style="color:#3498db; font-size:0.7rem; font-weight:800; text-transform:uppercase;">[Docente]</span>' : '<span style="color:#e67e22; font-size:0.7rem; font-weight:800; text-transform:uppercase;">[Fantamico]</span>';
+            let roleLabel = '';
+            if (u.role === 'teacher' || u.role === 'docente') {
+                roleLabel = '<span style="color:#3498db; font-size:0.7rem; font-weight:800; text-transform:uppercase;">[Docente]</span>';
+            } else if (u.role === 'studente') {
+                roleLabel = '<span style="color:#2ecc71; font-size:0.7rem; font-weight:800; text-transform:uppercase;">[Studente]</span>';
+            } else {
+                roleLabel = '<span style="color:#e67e22; font-size:0.7rem; font-weight:800; text-transform:uppercase;">[Fantamico]</span>';
+            }
             let log = u.approvedAt ? `<br><small class="text-muted">Approvato: ${u.approvedAt.toDate ? u.approvedAt.toDate().toLocaleString() : u.approvedAt}</small>` : '';
             list.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid rgba(255,255,255,0.05);">
                 <div>${roleLabel} <span>${u.email}</span> &mdash; <strong>${u.name}</strong>${log}</div>
@@ -1716,7 +1728,7 @@ window.approvaMissione = async function(mid, tid) {
         const allTeams = await fanta_db.getTeams();
         const team = allTeams.find(t => t.id === tid);
         if(team) {
-            const newCount = parseInt(team.missionsCompleted || 0, 10) + 1;
+            const newCount = parseFloat(team.missionsCompleted || 0) + 1;
             const ref = await window.fanta_db.getTeamDocRef(tid);
             await ref.update({ missionsCompleted: newCount });
         }
@@ -1757,7 +1769,7 @@ window.approvaTutteMissioni = async function() {
         pending.forEach(m => {
             const team = allTeams.find(t => t.id === m.teamId);
             if(team) {
-                const currentCount = teamUpdates[m.teamId] !== undefined ? teamUpdates[m.teamId] : parseInt(team.missionsCompleted || 0, 10);
+                const currentCount = teamUpdates[m.teamId] !== undefined ? teamUpdates[m.teamId] : parseFloat(team.missionsCompleted || 0);
                 teamUpdates[m.teamId] = currentCount + 1;
             }
         });
@@ -1997,10 +2009,14 @@ window.selfHealMissionsCount = async function() {
         // 3. Verifica per ciascuna squadra se il conteggio coincide con le missioni approvate realmente presenti
         let hasChanges = false;
         for (const team of teams) {
-            const actualCount = approvedMissions.filter(m => m.teamId === team.id).length;
-            const expectedCount = parseInt(team.missionsCompleted || 0, 10);
+            // Calcola il conteggio reale come somma pesata dei punti delle missioni
+            const actualCount = approvedMissions
+                .filter(m => m.teamId === team.id)
+                .reduce((sum, m) => sum + (m.punti !== undefined ? Number(m.punti) : 5) / 5, 0);
+            const expectedCount = parseFloat(team.missionsCompleted || 0);
             
-            if (actualCount !== expectedCount) {
+            // Confronto con tolleranza per float
+            if (Math.abs(actualCount - expectedCount) > 0.01) {
                 console.log(`Self-Healing: Correzione missionsCompleted per il team ${team.name} (ID: ${team.id}) da ${expectedCount} a ${actualCount}`);
                 const ref = await window.fanta_db.getTeamDocRef(team.id);
                 await ref.update({ missionsCompleted: actualCount });
@@ -2135,13 +2151,6 @@ function checkLoginSession() {
 
 async function loginDocente(event) {
     if(event) event.preventDefault();
-    
-    const checkAge = document.getElementById('welcome-check-age')?.checked;
-    const checkPrivacy = document.getElementById('welcome-check-privacy')?.checked;
-    if (!checkAge || !checkPrivacy) {
-        alert("Devi confermare l'età e accettare Privacy Policy e Termini per continuare.");
-        return;
-    }
 
     const emailInput = document.getElementById('docente-email-input').value.trim().toLowerCase();
     const passwordInput = document.getElementById('docente-password-input').value.trim();
@@ -2194,13 +2203,6 @@ window.selectOnboardingRole = async function(role) {
 };
 
 async function loginGoogle() {
-    const checkAge = document.getElementById('welcome-check-age')?.checked;
-    const checkPrivacy = document.getElementById('welcome-check-privacy')?.checked;
-    if (!checkAge || !checkPrivacy) {
-        alert("Devi confermare l'età e accettare Privacy Policy e Termini per continuare.");
-        return;
-    }
-
     try {
         const result = await fanta_db.loginWithGoogle();
         const user = result.user;
@@ -4863,4 +4865,1173 @@ window.presClickHandler = function(e) {
         link.href = canvas.toDataURL('image/jpeg', 0.95);
         link.click();
     };
+
+    /* =========================================
+       MOTORE GIOCHI LIM
+       ========================================= */
+
+    // ── Tab switcher (Classifiche / Test & Giochi LIM) ──
+    window.switchLimTab = function(tab) {
+        const panelClass = document.getElementById('lim-panel-classifiche');
+        const panelGioco = document.getElementById('lim-panel-giochi');
+        const btnClass   = document.getElementById('lim-tab-classifiche');
+        const btnGioco   = document.getElementById('lim-tab-giochi');
+        if (!panelClass || !panelGioco) return;
+
+        if (tab === 'classifiche') {
+            panelClass.style.display = '';
+            panelGioco.style.display = 'none';
+            if (btnClass) {
+                btnClass.style.background = 'var(--primary-color)';
+                btnClass.style.color = '#000';
+                btnClass.style.opacity = '1';
+            }
+            if (btnGioco) {
+                btnGioco.style.background = '';
+                btnGioco.style.color = '';
+                btnGioco.style.opacity = '0.7';
+            }
+        } else {
+            panelClass.style.display = 'none';
+            panelGioco.style.display = '';
+            if (btnGioco) {
+                btnGioco.style.background = 'linear-gradient(135deg,#9b59b6,#6c3483)';
+                btnGioco.style.color = '#fff';
+                btnGioco.style.opacity = '1';
+                btnGioco.style.border = 'none';
+            }
+            if (btnClass) {
+                btnClass.style.background = '';
+                btnClass.style.color = '';
+                btnClass.style.opacity = '0.7';
+            }
+            window.initGiocoLIMPanel();
+        }
+    };
+
+    // ── Inizializzazione pannello Giochi ──
+    window.initGiocoLIMPanel = async function() {
+        const squadreContainer = document.getElementById('gioco-squadre-container');
+        if (squadreContainer) {
+            squadreContainer.innerHTML = '<span style="color:var(--text-muted); font-size:0.8rem; grid-column:1/-1;"><i class="fa-solid fa-spinner fa-spin"></i> Caricamento squadre...</span>';
+            try {
+                const allTeams = await getAllTeams();
+                let myTeams = [];
+                if (currentUserEmail === 'prof.memmo@gmail.com') {
+                    myTeams = allTeams;
+                } else if (currentUserEmail) {
+                    myTeams = allTeams.filter(t => t.ownerEmail === currentUserEmail || (t.collaborators && t.collaborators.includes(currentUserEmail)) || (t.createdBy === currentUserEmail));
+                }
+                
+                if (myTeams.length === 0) {
+                    squadreContainer.innerHTML = '<span style="color:var(--danger-color); font-size:0.8rem; grid-column:1/-1;">Nessuna squadra trovata. Crea prima una squadra nel tuo profilo.</span>';
+                } else {
+                    myTeams.sort((a,b) => (a.name || '').localeCompare(b.name || ''));
+                    squadreContainer.innerHTML = myTeams.map(t => {
+                        const campInfo = GAME_MODES[t.campionato] || GAME_MODES.terze;
+                        return `
+                            <label class="checkbox-container" style="font-size: 0.85rem; padding: 10px 10px 10px 30px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;">
+                                <input type="checkbox" name="gioco-squadra" value="${t.id}" data-name="${t.name.replace(/"/g, '&quot;')}" data-campionato="${t.campionato}">
+                                <span class="checkmark" style="top: 12px; left: 10px;"></span>
+                                <strong>${t.name}</strong> <span style="font-size:0.75rem; color:${campInfo.colorPrimary}; margin-left:5px;">(${campInfo.shortLabel})</span>
+                            </label>
+                        `;
+                    }).join('');
+                }
+            } catch (e) {
+                console.error("Errore initGiocoLIMPanel:", e);
+                squadreContainer.innerHTML = `<span style="color:var(--danger-color); font-size:0.8rem; grid-column:1/-1;">Errore: ${e.message}</span>`;
+            }
+        }
+
+        window.aggiornaFiltriGioco();
+    };
+
+    // ── Selezione opzioni con card ──
+    window.selectGiocoOption = function(el) {
+        const type = el.getAttribute('data-type');
+        const siblings = el.parentNode.querySelectorAll(`.pres-card[data-type="${type}"]`);
+        siblings.forEach(s => s.classList.remove('active'));
+        el.classList.add('active');
+
+        if (type === 'gioco-campionato') {
+            window.aggiornaFiltriGioco();
+        }
+    };
+
+    // ── Aggiornamento filtri del gioco ──
+    window.aggiornaFiltriGioco = function() {
+        const campCard = document.querySelector('.pres-card[data-type="gioco-campionato"].active');
+        if (!campCard) return;
+        const campId = campCard.getAttribute('data-value');
+
+        const modeCfg = GAME_MODES[campId] || GAME_MODES.terze;
+        const authors = modeCfg.authors || [];
+
+        const correntiContainer = document.getElementById('gioco-correnti-container');
+        if (correntiContainer) {
+            const movementsSet = new Set();
+            authors.forEach(a => {
+                const mov = window.AUTHOR_MOVEMENTS[a.id];
+                if (mov) movementsSet.add(mov);
+            });
+            const movements = Array.from(movementsSet).sort();
+
+            if (movements.length === 0) {
+                correntiContainer.innerHTML = '<span style="color:var(--text-muted); font-size:0.8rem;">Nessuna corrente per questo campionato.</span>';
+            } else {
+                correntiContainer.innerHTML = movements.map(mov => `
+                    <label class="checkbox-container" style="font-size: 0.8rem; margin: 4px; padding-left: 20px; color: var(--text-main);">
+                        <input type="checkbox" name="gioco-corrente" value="${mov}" onchange="window.aggiornaFiltriAutori()">
+                        <span class="checkmark" style="height: 14px; width: 14px; top: 2px;"></span>
+                        ${mov}
+                    </label>
+                `).join('');
+            }
+        }
+
+        window.aggiornaFiltriAutori();
+    };
+
+    window.aggiornaFiltriAutori = function() {
+        const campCard = document.querySelector('.pres-card[data-type="gioco-campionato"].active');
+        if (!campCard) return;
+        const campId = campCard.getAttribute('data-value');
+
+        const modeCfg = GAME_MODES[campId] || GAME_MODES.terze;
+        const authors = modeCfg.authors || [];
+        const checkedCorrenti = Array.from(document.querySelectorAll('input[name="gioco-corrente"]:checked')).map(el => el.value);
+
+        const autoriContainer = document.getElementById('gioco-autori-container');
+        if (autoriContainer) {
+            let filteredAuthors = authors;
+            if (checkedCorrenti.length > 0) {
+                filteredAuthors = authors.filter(a => checkedCorrenti.includes(window.AUTHOR_MOVEMENTS[a.id]));
+            }
+
+            if (filteredAuthors.length === 0) {
+                autoriContainer.innerHTML = '<span style="color:var(--text-muted); font-size:0.8rem; grid-column:1/-1;">Nessun autore corrisponde ai filtri selezionati.</span>';
+            } else {
+                autoriContainer.innerHTML = filteredAuthors.map(a => {
+                    const mov = window.AUTHOR_MOVEMENTS[a.id] || 'Nessuna Corrente';
+                    return `
+                        <label class="checkbox-container" style="font-size: 0.8rem; padding: 5px 5px 5px 25px; border-bottom:1px solid rgba(255,255,255,0.02);">
+                            <input type="checkbox" name="gioco-autore" value="${a.id}" checked>
+                            <span class="checkmark" style="top: 6px; left: 5px; height: 14px; width: 14px;"></span>
+                            <strong>${a.name}</strong> <small style="color:var(--text-muted);">(${mov})</small>
+                        </label>
+                    `;
+                }).join('');
+            }
+        }
+    };
+
+    // ── Avvio Gioco LIM ──
+    window.avviaGiocoLIM = function() {
+        const giocoCard = document.querySelector('.pres-card[data-type="gioco"].active');
+        const campCard = document.querySelector('.pres-card[data-type="gioco-campionato"].active');
+        const puntiCard = document.querySelector('.pres-card[data-type="gioco-punti"].active');
+
+        if (!giocoCard || !campCard) {
+            alert("Configurazione non completa!");
+            return;
+        }
+
+        const gameTypeAttr = giocoCard.getAttribute('data-value');
+        const campionato = campCard.getAttribute('data-value');
+        const puntiInPalio = 5; // Sempre 5 punti per equità nei campionati
+
+        const checkedAutori = Array.from(document.querySelectorAll('input[name="gioco-autore"]:checked')).map(el => el.value);
+        if (checkedAutori.length === 0) {
+            alert("Seleziona almeno un autore da includere nel gioco!");
+            return;
+        }
+
+        const checkedSquadreCheckboxes = Array.from(document.querySelectorAll('input[name="gioco-squadra"]:checked'));
+        if (checkedSquadreCheckboxes.length === 0) {
+            alert("Seleziona almeno una squadra partecipante per iniziare la sfida!");
+            return;
+        }
+
+        const squadre = checkedSquadreCheckboxes.map(el => ({
+            id: el.value,
+            name: el.getAttribute('data-name'),
+            score: 0
+        }));
+
+        // Rileva quali tipologie di gioco hanno contenuti validi per il campionato e gli autori selezionati
+        let availableTypes = [];
+        let itemsByGameType = {};
+
+        const gamesConfig = [
+            { type: 'quiz', array: window.QUIZ_QUESTIONS || [] },
+            { type: 'impiccato', array: window.IMPICCATO_WORDS || [] },
+            { type: 'puzzle', array: window.PUZZLE_POEMS || [] },
+            { type: 'cloze', array: window.FILL_THE_BLANKS || [] },
+            { type: 'incipit', array: window.INCIPIT_MAXIMS || [] }
+        ];
+
+        gamesConfig.forEach(cfg => {
+            const filtered = cfg.array.filter(item => item.campionato === campionato && checkedAutori.includes(item.authorId));
+            if (filtered.length > 0) {
+                availableTypes.push(cfg.type);
+                itemsByGameType[cfg.type] = filtered.sort(() => Math.random() - 0.5);
+            }
+        });
+
+        if (availableTypes.length === 0) {
+            alert("Nessun contenuto disponibile per il campionato e gli autori selezionati.");
+            return;
+        }
+
+        // Costruiamo esattamente 5 round (o quanti più possibile) con tipologie differenti (round-robin)
+        let rounds = [];
+        let typesToCycle = [...availableTypes].sort(() => Math.random() - 0.5);
+        let usedCount = {};
+        availableTypes.forEach(t => usedCount[t] = 0);
+
+        while (rounds.length < 5) {
+            let addedInThisCycle = false;
+            for (const type of typesToCycle) {
+                if (rounds.length >= 5) break;
+                const pool = itemsByGameType[type];
+                const currentUsed = usedCount[type];
+                if (pool && currentUsed < pool.length) {
+                    const chosenItem = { ...pool[currentUsed], gameType: type };
+                    rounds.push(chosenItem);
+                    usedCount[type]++;
+                    addedInThisCycle = true;
+                }
+            }
+            if (!addedInThisCycle) {
+                break;
+            }
+        }
+
+        if (rounds.length === 0) {
+            alert("Nessuna domanda o parola corrisponde ai filtri selezionati per questo campionato ed autori.");
+            return;
+        }
+
+        window.limGameState = {
+            gameType: 'misto',
+            campionato: campionato,
+            puntiInPalio: puntiInPalio,
+            squadre: squadre,
+            rounds: rounds,
+            currentRoundIndex: 0,
+            activeRoundState: {},
+            timerInterval: null
+        };
+
+        document.body.style.overflow = 'hidden';
+        const overlay = document.getElementById('presentation-overlay');
+        if (overlay) {
+            overlay.style.display = 'flex';
+        }
+
+        window.prevPresKeydownHandler = window.presKeydownHandler;
+        document.removeEventListener('keydown', window.presKeydownHandler);
+
+        window.giocoKeydownHandler = function(e) {
+            if (e.code === 'Escape') {
+                if (confirm("Vuoi davvero interrompere il gioco e uscire? I punteggi non verranno salvati.")) {
+                    window.chiudiGiocoLIM();
+                }
+            }
+        };
+        document.addEventListener('keydown', window.giocoKeydownHandler);
+
+        window.renderGameRound();
+    };
+
+    // ── Gestione Punteggio Sidebar ──
+    window.modificaPuntiGioco = function(teamId, delta) {
+        const state = window.limGameState;
+        if (!state) return;
+        const team = state.squadre.find(t => t.id === teamId);
+        if (team) {
+            team.score = Math.max(0, team.score + delta);
+            const scoreEl = document.getElementById(`game-score-${teamId}`);
+            if (scoreEl) {
+                scoreEl.textContent = team.score;
+                scoreEl.classList.remove('score-updated');
+                void scoreEl.offsetWidth; // trigger reflow
+                scoreEl.classList.add('score-updated');
+            }
+        }
+    };
+
+    // ── Render Round Generico ──
+    window.renderGameRound = function() {
+        const state = window.limGameState;
+        if (!state) return;
+
+        if (state.timerInterval) {
+            clearInterval(state.timerInterval);
+            state.timerInterval = null;
+        }
+
+        const overlay = document.getElementById('presentation-overlay');
+        if (overlay) {
+            overlay.style.background = 'radial-gradient(circle at center, #1b0a2a 0%, #08030d 100%)';
+        }
+
+        const bgVideo = document.getElementById('pres-bg-video');
+        if (bgVideo) {
+            bgVideo.style.display = 'none';
+            bgVideo.pause();
+        }
+
+        const roundNumEl = document.getElementById('pres-slide-num');
+        if (roundNumEl) {
+            roundNumEl.textContent = `Round ${state.currentRoundIndex + 1} / ${state.rounds.length}`;
+        }
+
+        const container = document.getElementById('pres-content');
+        if (!container) return;
+
+        if (state.currentRoundIndex >= state.rounds.length) {
+            window.renderFineGioco();
+            return;
+        }
+
+        const currentItem = state.rounds[state.currentRoundIndex];
+        const gameType = currentItem.gameType || 'quiz';
+
+        const roundNumEl = document.getElementById('pres-slide-num');
+        if (roundNumEl) {
+            let typeLabel = 'Sfida';
+            if (gameType === 'quiz') typeLabel = 'Quiz a Tempo';
+            else if (gameType === 'impiccato') typeLabel = 'Impiccato';
+            else if (gameType === 'puzzle') typeLabel = 'Puzzle Versi';
+            else if (gameType === 'cloze') typeLabel = 'Completa Frase';
+            else if (gameType === 'incipit') typeLabel = 'A Chi Appartiene?';
+            roundNumEl.textContent = `Round ${state.currentRoundIndex + 1} / ${state.rounds.length} (${typeLabel})`;
+        }
+
+        const container = document.getElementById('pres-content');
+        if (!container) return;
+
+        let sidebarHtml = `
+            <div class="game-sidebar">
+                <h3>Tabellone Punti</h3>
+                <div class="sidebar-teams-list">
+        `;
+        state.squadre.forEach(t => {
+            sidebarHtml += `
+                <div class="game-team-card" id="team-card-${t.id}">
+                    <div class="game-team-name">${t.name}</div>
+                    <div class="game-team-score-controls">
+                        <button class="score-btn minus" onclick="window.modificaPuntiGioco('${t.id}', -1)">&minus;</button>
+                        <div class="game-team-score" id="game-score-${t.id}">${t.score}</div>
+                        <button class="score-btn" onclick="window.modificaPuntiGioco('${t.id}', 1)">&plus;</button>
+                    </div>
+                </div>
+            `;
+        });
+        sidebarHtml += `
+                </div>
+                <div style="font-size:0.72rem; color:var(--text-muted); text-align:center; margin-top:10px; line-height:1.3;">
+                    Ogni round vinto assegna +1 punto (max 5pt totali).<br>
+                    Il docente assegna i punti round per round alle squadre.
+                </div>
+            </div>
+        `;
+
+        let mainHtml = '';
+        if (gameType === 'quiz') {
+            mainHtml = window.renderQuizRound(currentItem);
+        } else if (gameType === 'impiccato') {
+            mainHtml = window.renderImpiccatoRound(currentItem);
+        } else if (gameType === 'puzzle') {
+            mainHtml = window.renderPuzzleRound(currentItem);
+        } else if (gameType === 'cloze') {
+            mainHtml = window.renderClozeRound(currentItem);
+        } else if (gameType === 'incipit') {
+            mainHtml = window.renderIncipitRound(currentItem);
+        }
+
+        container.innerHTML = `
+            <div class="game-layout">
+                <div class="game-main" id="game-main-content">
+                    ${mainHtml}
+                </div>
+                ${sidebarHtml}
+            </div>
+        `;
+
+        if (gameType === 'quiz') {
+            window.avviaQuizTimer();
+        }
+    };
+
+    // ── GAME 1: Quiz a Tempo ──
+    window.renderQuizRound = function(item) {
+        const state = window.limGameState;
+        state.activeRoundState = {
+            correctAnswerIndex: item.correct,
+            answered: false
+        };
+
+        const letters = ['A', 'B', 'C', 'D'];
+        let optionsHtml = '<div class="quiz-options-grid">';
+        item.options.forEach((opt, idx) => {
+            optionsHtml += `
+                <div class="quiz-option-card" id="quiz-opt-${idx}" onclick="window.verificaRispostaQuiz(${idx})">
+                    <span class="option-letter">${letters[idx]}</span>
+                    <span>${opt}</span>
+                </div>
+            `;
+        });
+        optionsHtml += '</div>';
+
+        return `
+            <div style="text-align:center; width:100%;">
+                <span class="mode-badge mode-gold" style="margin-bottom:15px; display:inline-block; font-weight:800; font-size:0.75rem;">QUIZ A TEMPO</span>
+                <p style="font-size: 0.95rem; color: #bdc3c7; margin-bottom: 20px; font-style: italic;">Consegna: Rispondi alla domanda a risposta multipla prima dello scadere del tempo!</p>
+                <h2 style="font-size:1.6rem; font-weight:700; margin-bottom:25px; line-height:1.3; max-width:800px; margin-left:auto; margin-right:auto;">${item.question}</h2>
+                
+                <div class="timer-container" style="margin-left:auto; margin-right:auto;">
+                    <div class="timer-bar-bg">
+                        <div class="timer-bar-fill" id="timer-bar-fill" style="width:100%;"></div>
+                    </div>
+                    <div class="timer-text" id="timer-text">30 SECONDI RIMASTI</div>
+                </div>
+
+                ${optionsHtml}
+                
+                <button class="btn btn-secondary" id="btn-next-round" style="margin-top:25px; display:none; margin-left:auto; margin-right:auto;" onclick="window.avanzaGiocoRound()">
+                    Continua <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        `;
+    };
+
+    window.avviaQuizTimer = function() {
+        const state = window.limGameState;
+        if (!state) return;
+
+        let secondsLeft = 30;
+        const fillEl = document.getElementById('timer-bar-fill');
+        const textEl = document.getElementById('timer-text');
+
+        state.timerInterval = setInterval(() => {
+            secondsLeft--;
+            if (fillEl) {
+                const pct = (secondsLeft / 30) * 100;
+                fillEl.style.width = `${pct}%`;
+            }
+            if (textEl) {
+                textEl.textContent = `${secondsLeft} SECONDI RIMASTI`;
+            }
+
+            if (secondsLeft <= 0) {
+                clearInterval(state.timerInterval);
+                state.timerInterval = null;
+                window.verificaRispostaQuiz(-1);
+            }
+        }, 1000);
+    };
+
+    window.verificaRispostaQuiz = function(selectedIdx) {
+        const state = window.limGameState;
+        if (!state || state.activeRoundState.answered) return;
+
+        state.activeRoundState.answered = true;
+        if (state.timerInterval) {
+            clearInterval(state.timerInterval);
+            state.timerInterval = null;
+        }
+
+        const correctIdx = state.activeRoundState.correctAnswerIndex;
+
+        for (let i = 0; i < 4; i++) {
+            const el = document.getElementById(`quiz-opt-${i}`);
+            if (el) {
+                el.classList.add('disabled');
+                if (i === correctIdx) {
+                    el.classList.add('correct');
+                } else if (i === selectedIdx) {
+                    el.classList.add('wrong');
+                }
+            }
+        }
+
+        const timerText = document.getElementById('timer-text');
+        if (timerText) {
+            if (selectedIdx === -1) {
+                timerText.textContent = "TEMPO SCADUTO!";
+                timerText.style.color = "var(--danger-color)";
+            } else if (selectedIdx === correctIdx) {
+                timerText.textContent = "RISPOSTA CORRETTA!";
+                timerText.style.color = "#2ecc71";
+            } else {
+                timerText.textContent = "RISPOSTA ERRATA!";
+                timerText.style.color = "var(--danger-color)";
+            }
+        }
+
+        const btnNext = document.getElementById('btn-next-round');
+        if (btnNext) {
+            btnNext.style.display = 'block';
+        }
+    };
+
+    // ── GAME 2: Impiccato ──
+    window.renderImpiccatoRound = function(item) {
+        const state = window.limGameState;
+        const word = item.word.toUpperCase().replace(/[ÀÁÄ]/g, 'A').replace(/[ÈÉË]/g, 'E').replace(/[ÌÍÏ]/g, 'I').replace(/[ÒÓÖ]/g, 'O').replace(/[ÙÚÜ]/g, 'U');
+        
+        state.activeRoundState = {
+            word: word,
+            clue: item.clue,
+            guessedLetters: new Set(),
+            errors: 0,
+            maxErrors: 6
+        };
+
+        return window.getImpiccatoHtml();
+    };
+
+    window.getImpiccatoHtml = function() {
+        const state = window.limGameState;
+        const roundState = state.activeRoundState;
+
+        let heartsHtml = '';
+        for (let i = 0; i < roundState.maxErrors; i++) {
+            if (i < roundState.maxErrors - roundState.errors) {
+                heartsHtml += '<span style="color:#e74c3c; margin:0 2px;"><i class="fa-solid fa-heart"></i></span>';
+            } else {
+                heartsHtml += '<span style="color:#555; margin:0 2px;"><i class="fa-solid fa-heart-crack"></i></span>';
+            }
+        }
+
+        let wordHtml = '<div class="hangman-word-container">';
+        let completed = true;
+        for (let i = 0; i < roundState.word.length; i++) {
+            const char = roundState.word[i];
+            if (char === ' ' || char === '-' || char === '\'') {
+                wordHtml += `<div class="hangman-letter-box space">${char}</div>`;
+            } else if (roundState.guessedLetters.has(char)) {
+                wordHtml += `<div class="hangman-letter-box">${char}</div>`;
+            } else {
+                wordHtml += `<div class="hangman-letter-box">&nbsp;</div>`;
+                completed = false;
+            }
+        }
+        wordHtml += '</div>';
+
+        const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+        let keyboardHtml = '<div class="keyboard-grid" style="margin-left:auto; margin-right:auto;">';
+        alphabet.forEach(letter => {
+            let classVal = '';
+            if (roundState.guessedLetters.has(letter)) {
+                if (roundState.word.includes(letter)) {
+                    classVal = 'used-correct';
+                } else {
+                    classVal = 'used-wrong';
+                }
+            }
+            keyboardHtml += `
+                <button class="keyboard-key ${classVal}" onclick="window.inserisciLetteraImpiccato('${letter}')">
+                    ${letter}
+                </button>
+            `;
+        });
+        keyboardHtml += '</div>';
+
+        const isGameOver = roundState.errors >= roundState.maxErrors;
+        let statusText = '';
+        let nextBtnStyle = 'display:none;';
+        if (isGameOver) {
+            statusText = `<h3 style="color:var(--danger-color); font-weight:800; margin-bottom:15px;">HAI PERSO! La parola era: <span style="letter-spacing:2px; color:#fff;">${roundState.word}</span></h3>`;
+            nextBtnStyle = 'display:block;';
+            keyboardHtml = '';
+        } else if (completed) {
+            statusText = `<h3 style="color:#2ecc71; font-weight:800; margin-bottom:15px;">CORRETTO! Ottimo lavoro!</h3>`;
+            nextBtnStyle = 'display:block;';
+            keyboardHtml = '';
+        }
+
+        return `
+            <div style="text-align:center; width:100%;">
+                <span class="mode-badge mode-gold" style="margin-bottom:15px; display:inline-block; font-weight:800; font-size:0.75rem;">IMPICCATO</span>
+                <p style="font-size: 0.95rem; color: #bdc3c7; margin-bottom: 20px; font-style: italic;">Consegna: Indovina la parola misteriosa selezionando le lettere. Attenzione alle vite (cuori) a disposizione!</p>
+                <p style="font-size:1.15rem; font-weight:600; color:var(--text-main); margin-bottom:20px; max-width:700px; margin-left:auto; margin-right:auto;">
+                    <strong>Indizio:</strong> ${roundState.clue}
+                </p>
+
+                <div class="hangman-lives">
+                    ${heartsHtml}
+                </div>
+
+                ${wordHtml}
+
+                ${statusText}
+
+                ${keyboardHtml}
+
+                <button class="btn btn-secondary" id="btn-next-round" style="margin-top:25px; ${nextBtnStyle} margin-left:auto; margin-right:auto;" onclick="window.avanzaGiocoRound()">
+                    Continua <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        `;
+    };
+
+    window.inserisciLetteraImpiccato = function(letter) {
+        const state = window.limGameState;
+        if (!state) return;
+        const roundState = state.activeRoundState;
+        if (roundState.errors >= roundState.maxErrors) return;
+        if (roundState.guessedLetters.has(letter)) return;
+
+        roundState.guessedLetters.add(letter);
+        if (!roundState.word.includes(letter)) {
+            roundState.errors++;
+        }
+
+        const gameMain = document.getElementById('game-main-content');
+        if (gameMain) {
+            gameMain.innerHTML = window.getImpiccatoHtml();
+        }
+    };
+
+    // ── GAME 3: Puzzle Versi ──
+    window.renderPuzzleRound = function(item) {
+        const state = window.limGameState;
+        const originalLines = [...item.lines];
+        let shuffledIndexes = originalLines.map((line, idx) => idx).sort(() => Math.random() - 0.5);
+        
+        let isSorted = true;
+        for (let i = 0; i < shuffledIndexes.length; i++) {
+            if (shuffledIndexes[i] !== i) isSorted = false;
+        }
+        if (isSorted && shuffledIndexes.length > 1) {
+            const temp = shuffledIndexes[0];
+            shuffledIndexes[0] = shuffledIndexes[1];
+            shuffledIndexes[1] = temp;
+        }
+
+        state.activeRoundState = {
+            title: item.title,
+            originalLines: originalLines,
+            currentOrder: shuffledIndexes,
+            checked: false,
+            correct: false
+        };
+
+        return window.getPuzzleHtml();
+    };
+
+    window.getPuzzleHtml = function() {
+        const state = window.limGameState;
+        const roundState = state.activeRoundState;
+
+        let linesHtml = '<div class="puzzle-lines-list" style="margin-left:auto; margin-right:auto;">';
+        roundState.currentOrder.forEach((origIdx, currentIdx) => {
+            const lineText = roundState.originalLines[origIdx];
+            let cardClass = '';
+            if (roundState.checked) {
+                cardClass = (origIdx === currentIdx) ? 'correct' : 'wrong';
+            }
+
+            let controlsHtml = '';
+            if (!roundState.correct) {
+                controlsHtml = `
+                    <div class="puzzle-line-controls">
+                        <button class="puzzle-control-btn" onclick="window.spostaVerso(${currentIdx}, -1)" ${currentIdx === 0 ? 'disabled style="opacity:0.3;"' : ''}><i class="fa-solid fa-arrow-up"></i></button>
+                        <button class="puzzle-control-btn" onclick="window.spostaVerso(${currentIdx}, 1)" ${currentIdx === roundState.currentOrder.length - 1 ? 'disabled style="opacity:0.3;"' : ''}><i class="fa-solid fa-arrow-down"></i></button>
+                    </div>
+                `;
+            }
+
+            linesHtml += `
+                <div class="puzzle-line-item ${cardClass}">
+                    <span style="font-weight:800; font-size:0.8rem; color:var(--text-muted); margin-right:10px;">${currentIdx + 1}.</span>
+                    <div class="puzzle-line-text">${lineText}</div>
+                    ${controlsHtml}
+                </div>
+            `;
+        });
+        linesHtml += '</div>';
+
+        let statusHtml = '';
+        let verifyBtnHtml = `
+            <button class="btn" style="margin-top:20px; background:var(--primary-color) !important; color:#000 !important; font-weight:800; margin-left:auto; margin-right:auto;" onclick="window.verificaOrdinePuzzle()">
+                Verifica Ordine
+            </button>
+        `;
+
+        if (roundState.correct) {
+            statusHtml = `<h3 style="color:#2ecc71; font-weight:800; margin-bottom:15px;">CORRETTO! I versi sono riordinati!</h3>`;
+            verifyBtnHtml = `
+                <button class="btn btn-secondary" id="btn-next-round" style="margin-top:20px; margin-left:auto; margin-right:auto;" onclick="window.avanzaGiocoRound()">
+                    Continua <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            `;
+        } else if (roundState.checked) {
+            statusHtml = `<h4 style="color:var(--danger-color); font-weight:800; margin-bottom:15px;">Alcuni versi sono ancora fuori posto. Riprova!</h4>`;
+        }
+
+        return `
+            <div style="text-align:center; width:100%;">
+                <span class="mode-badge mode-gold" style="margin-bottom:15px; display:inline-block; font-weight:800; font-size:0.75rem;">PUZZLE VERSI</span>
+                <p style="font-size: 0.95rem; color: #bdc3c7; margin-bottom: 20px; font-style: italic;">Consegna: Ordina i versi della poesia usando i pulsanti Su/Giù e verifica la correttezza!</p>
+                <h2 style="font-size:1.4rem; font-weight:700; margin-bottom:5px;">Riordina i versi della poesia</h2>
+                <p style="font-size:1rem; color:var(--text-muted); margin-bottom:20px;"><strong>Opera:</strong> ${roundState.title}</p>
+
+                ${linesHtml}
+
+                ${statusHtml}
+
+                ${verifyBtnHtml}
+            </div>
+        `;
+    };
+
+    window.spostaVerso = function(index, direction) {
+        const state = window.limGameState;
+        if (!state) return;
+        const roundState = state.activeRoundState;
+        if (roundState.correct) return;
+
+        const order = roundState.currentOrder;
+        const targetIndex = index + direction;
+        if (targetIndex < 0 || targetIndex >= order.length) return;
+
+        const temp = order[index];
+        order[index] = order[targetIndex];
+        order[targetIndex] = temp;
+        roundState.checked = false;
+
+        const gameMain = document.getElementById('game-main-content');
+        if (gameMain) {
+            gameMain.innerHTML = window.getPuzzleHtml();
+        }
+    };
+
+    window.verificaOrdinePuzzle = function() {
+        const state = window.limGameState;
+        if (!state) return;
+        const roundState = state.activeRoundState;
+
+        roundState.checked = true;
+        let isCorrect = true;
+        for (let i = 0; i < roundState.currentOrder.length; i++) {
+            if (roundState.currentOrder[i] !== i) {
+                isCorrect = false;
+            }
+        }
+        roundState.correct = isCorrect;
+
+        const gameMain = document.getElementById('game-main-content');
+        if (gameMain) {
+            gameMain.innerHTML = window.getPuzzleHtml();
+        }
+    };
+
+    // ── GAME 4: Completa la Frase (Cloze) ──
+    window.renderClozeRound = function(item) {
+        const state = window.limGameState;
+        const distruttori = ["infinito", "dolce", "mare", "colle", "parola", "cuore"].filter(w => !item.blanks.includes(w));
+        const poolWords = [...item.blanks, distruttori[0], distruttori[1]].sort(() => Math.random() - 0.5);
+
+        state.activeRoundState = {
+            originalText: item.text,
+            blanks: item.blanks,
+            clue: item.clue,
+            poolWords: poolWords,
+            userAnswers: new Array(item.blanks.length).fill(null),
+            activeBlankIndex: 0,
+            checked: false,
+            correct: false
+        };
+
+        return window.getClozeHtml();
+    };
+
+    window.getClozeHtml = function() {
+        const state = window.limGameState;
+        const roundState = state.activeRoundState;
+
+        let displayHtml = roundState.originalText;
+        let index = 0;
+
+        let parts = displayHtml.split(/\[[^\]]+\]/);
+        let parsedText = '';
+        for (let i = 0; i < parts.length; i++) {
+            parsedText += parts[i];
+            if (i < parts.length - 1) {
+                const filledWord = roundState.userAnswers[index];
+                
+                let slotClass = 'cloze-word-slot';
+                if (index === roundState.activeBlankIndex) {
+                    slotClass += ' active';
+                }
+                if (filledWord) {
+                    slotClass += ' filled';
+                }
+                if (roundState.checked) {
+                    const isCorrect = (filledWord || '').toLowerCase() === roundState.blanks[index].toLowerCase();
+                    slotClass += isCorrect ? ' correct' : ' wrong';
+                }
+
+                parsedText += `
+                    <span class="${slotClass}" onclick="window.selezionaBlankCloze(${index})">
+                        ${filledWord ? filledWord : '?' }
+                    </span>
+                `;
+                index++;
+            }
+        }
+
+        let chipsHtml = '<div class="cloze-chips-container" style="margin-left:auto; margin-right:auto;">';
+        roundState.poolWords.forEach(word => {
+            const isUsed = roundState.userAnswers.includes(word);
+            chipsHtml += `
+                <button class="word-chip ${isUsed ? 'used' : ''}" onclick="window.inserisciParolaCloze('${word.replace(/'/g, "\\'")}')">
+                    ${word}
+                </button>
+            `;
+        });
+        chipsHtml += '</div>';
+
+        let statusHtml = '';
+        let verifyBtnHtml = `
+            <button class="btn" style="margin-top:25px; background:var(--primary-color) !important; color:#000 !important; font-weight:800; margin-left:auto; margin-right:auto;" onclick="window.verificaCloze()">
+                Verifica Parole
+            </button>
+        `;
+
+        if (roundState.correct) {
+            statusHtml = `<h3 style="color:#2ecc71; font-weight:800; margin-bottom:15px;">CORRETTO! Citazione completata!</h3>`;
+            verifyBtnHtml = `
+                <button class="btn btn-secondary" id="btn-next-round" style="margin-top:25px; margin-left:auto; margin-right:auto;" onclick="window.avanzaGiocoRound()">
+                    Continua <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            `;
+            chipsHtml = '';
+        } else if (roundState.checked) {
+            statusHtml = `<h4 style="color:var(--danger-color); font-weight:800; margin-bottom:15px;">Alcune parole inserite sono errate. Riprova!</h4>`;
+        }
+
+        return `
+            <div style="text-align:center; width:100%;">
+                <span class="mode-badge mode-gold" style="margin-bottom:15px; display:inline-block; font-weight:800; font-size:0.75rem;">COMPLETA LA FRASE</span>
+                <p style="font-size: 0.95rem; color: #bdc3c7; margin-bottom: 20px; font-style: italic;">Consegna: Fai clic sulle parole per riempire gli spazi vuoti nell'ordine corretto!</p>
+                <h2 style="font-size:1.4rem; font-weight:700; margin-bottom:5px;">Riempi gli spazi vuoti</h2>
+                <p style="font-size:0.95rem; color:var(--text-muted); margin-bottom:30px;"><strong>Indizio:</strong> ${roundState.clue}</p>
+
+                <div class="cloze-text-display" style="margin-left:auto; margin-right:auto;">
+                    ${parsedText}
+                </div>
+
+                ${chipsHtml}
+
+                ${statusHtml}
+
+                ${verifyBtnHtml}
+            </div>
+        `;
+    };
+
+    window.selezionaBlankCloze = function(idx) {
+        const state = window.limGameState;
+        if (!state) return;
+        const roundState = state.activeRoundState;
+        if (roundState.correct) return;
+
+        if (roundState.userAnswers[idx]) {
+            roundState.userAnswers[idx] = null;
+            roundState.checked = false;
+        }
+        roundState.activeBlankIndex = idx;
+
+        const gameMain = document.getElementById('game-main-content');
+        if (gameMain) {
+            gameMain.innerHTML = window.getClozeHtml();
+        }
+    };
+
+    window.inserisciParolaCloze = function(word) {
+        const state = window.limGameState;
+        if (!state) return;
+        const roundState = state.activeRoundState;
+        if (roundState.correct) return;
+
+        const activeIdx = roundState.activeBlankIndex;
+        if (activeIdx < 0 || activeIdx >= roundState.userAnswers.length) return;
+
+        roundState.userAnswers[activeIdx] = word;
+        roundState.checked = false;
+
+        let nextIdx = -1;
+        for (let i = 0; i < roundState.userAnswers.length; i++) {
+            if (roundState.userAnswers[i] === null) {
+                nextIdx = i;
+                break;
+            }
+        }
+        roundState.activeBlankIndex = nextIdx;
+
+        const gameMain = document.getElementById('game-main-content');
+        if (gameMain) {
+            gameMain.innerHTML = window.getClozeHtml();
+        }
+    };
+
+    window.verificaCloze = function() {
+        const state = window.limGameState;
+        if (!state) return;
+        const roundState = state.activeRoundState;
+
+        roundState.checked = true;
+        let isCorrect = true;
+        for (let i = 0; i < roundState.blanks.length; i++) {
+            const userAns = roundState.userAnswers[i] || '';
+            const correctAns = roundState.blanks[i];
+            if (userAns.toLowerCase() !== correctAns.toLowerCase()) {
+                isCorrect = false;
+            }
+        }
+        roundState.correct = isCorrect;
+
+        const gameMain = document.getElementById('game-main-content');
+        if (gameMain) {
+            gameMain.innerHTML = window.getClozeHtml();
+        }
+    };
+
+    // ── GAME 5: A Chi Appartiene ──
+    window.renderIncipitRound = function(item) {
+        const state = window.limGameState;
+        state.activeRoundState = {
+            correctAnswerIndex: item.correct,
+            answered: false
+        };
+
+        const letters = ['A', 'B', 'C', 'D'];
+        let optionsHtml = '<div class="quiz-options-grid">';
+        item.options.forEach((opt, idx) => {
+            optionsHtml += `
+                <div class="quiz-option-card" id="incipit-opt-${idx}" onclick="window.verificaIncipit(${idx})">
+                    <span class="option-letter">${letters[idx]}</span>
+                    <span>${opt}</span>
+                </div>
+            `;
+        });
+        optionsHtml += '</div>';
+
+        return `
+            <div style="text-align:center; width:100%;">
+                <span class="mode-badge mode-gold" style="margin-bottom:15px; display:inline-block; font-weight:800; font-size:0.75rem;">A CHI APPARTIENE?</span>
+                <p style="font-size: 0.95rem; color: #bdc3c7; margin-bottom: 20px; font-style: italic;">Consegna: Leggi la citazione o l'incipit e indica l'autore corretto tra le opzioni proposte!</p>
+                <h3 style="font-size:1.25rem; font-weight:700; margin-bottom:15px;">Identifica l'autore della celebre citazione</h3>
+                
+                <div class="incipit-quote-box" style="margin-left:auto; margin-right:auto;">
+                    ${item.text}
+                </div>
+
+                ${optionsHtml}
+                
+                <button class="btn btn-secondary" id="btn-next-round" style="margin-top:25px; display:none; margin-left:auto; margin-right:auto;" onclick="window.avanzaGiocoRound()">
+                    Continua <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        `;
+    };
+
+    window.verificaIncipit = function(selectedIdx) {
+        const state = window.limGameState;
+        if (!state || state.activeRoundState.answered) return;
+
+        state.activeRoundState.answered = true;
+        const correctIdx = state.activeRoundState.correctAnswerIndex;
+
+        for (let i = 0; i < 4; i++) {
+            const el = document.getElementById(`incipit-opt-${i}`);
+            if (el) {
+                el.classList.add('disabled');
+                if (i === correctIdx) {
+                    el.classList.add('correct');
+                } else if (i === selectedIdx) {
+                    el.classList.add('wrong');
+                }
+            }
+        }
+
+        const btnNext = document.getElementById('btn-next-round');
+        if (btnNext) {
+            btnNext.style.display = 'block';
+        }
+    };
+
+    // ── Fine Gioco ──
+    window.avanzaGiocoRound = function() {
+        const state = window.limGameState;
+        if (!state) return;
+        state.currentRoundIndex++;
+        window.renderGameRound();
+    };
+
+    window.renderFineGioco = function() {
+        const state = window.limGameState;
+        if (!state) return;
+
+        if (state.timerInterval) {
+            clearInterval(state.timerInterval);
+            state.timerInterval = null;
+        }
+
+        let maxScore = -1;
+        let winners = [];
+        state.squadre.forEach(t => {
+            if (t.score > maxScore) {
+                maxScore = t.score;
+                winners = [t];
+            } else if (t.score === maxScore) {
+                winners.push(t);
+            }
+        });
+
+        const hasScore = maxScore > 0;
+        let winnerText = '';
+        if (hasScore) {
+            winnerText = `Sfida terminata! I punti verranno assegnati automaticamente alle squadre.`;
+        } else {
+            winnerText = "Nessun punto totalizzato durante la sfida!";
+        }
+
+        if (hasScore && typeof confetti === 'function') {
+            confetti({
+                particleCount: 150,
+                spread: 80,
+                origin: { y: 0.6 }
+            });
+        }
+
+        let scoresHtml = '<div class="endgame-scores-grid" style="margin-left:auto; margin-right:auto;">';
+        state.squadre.forEach(t => {
+            scoresHtml += `
+                <div class="endgame-score-card ${t.score > 0 ? 'winner' : ''}">
+                    <div class="team-name">${t.name}</div>
+                    <div class="team-pts">${t.score} pt</div>
+                    ${t.score > 0 ? `<div style="font-size:0.75rem; color:#f1c40f; margin-top:5px; font-weight:800;"><i class="fa-solid fa-star"></i> +${t.score} Punti in Classifica</div>` : ''}
+                </div>
+            `;
+        });
+        scoresHtml += '</div>';
+
+        let statusSavingHtml = hasScore 
+            ? `<p id="lim-saving-status" style="color:#2ecc71; font-weight:800; font-size:1.1rem; margin:20px auto;"><i class="fa-solid fa-spinner fa-spin"></i> Salvataggio automatico dei punti in corso...</p>`
+            : `<p style="color:var(--text-muted); font-size:1rem; margin:20px auto;">Nessun punto da salvare.</p>`;
+
+        const container = document.getElementById('pres-content');
+        if (container) {
+            container.innerHTML = `
+                <div class="endgame-display">
+                    <span style="font-size:4rem; margin-bottom:15px; display:block;">🏆</span>
+                    <h2 class="endgame-title">Sfida Conclusa!</h2>
+                    <h3 class="endgame-subtitle" style="margin-bottom:30px;">${winnerText}</h3>
+
+                    ${scoresHtml}
+
+                    ${statusSavingHtml}
+
+                    <button class="btn btn-secondary" style="margin-top:20px; width:auto; padding:8px 25px; margin-left:auto; margin-right:auto;" onclick="window.chiudiGiocoLIM()">
+                        Chiudi Gioco
+                    </button>
+                </div>
+            `;
+        }
+
+        // Avvia il salvataggio automatico se ci sono punteggi > 0
+        if (hasScore) {
+            setTimeout(() => {
+                window.assegnaPuntiGiocoFirestore();
+            }, 1000);
+        }
+    };
+
+    window.assegnaPuntiGiocoFirestore = async function() {
+        const state = window.limGameState;
+        if (!state) return;
+
+        const teamsToAward = state.squadre.filter(t => t.score > 0);
+        if (teamsToAward.length === 0) return;
+
+        try {
+            const allTeams = await getAllTeams();
+            let summaryMessages = [];
+
+            for (const team of teamsToAward) {
+                const puntiToAward = Math.min(5, Math.max(0, team.score));
+                const dbTeam = allTeams.find(t => t.id === team.id);
+                if (!dbTeam) continue;
+
+                // Usa parseFloat per gestire punteggi non interi
+                const currentCount = parseFloat(dbTeam.missionsCompleted || 0);
+                const newCount = currentCount + (puntiToAward / 5);
+
+                const ref = window.db.collection("teams").doc(team.id);
+                await ref.update({ missionsCompleted: newCount });
+
+                const missionData = {
+                    teamId: team.id,
+                    titolo: `SFIDA LIM: +${puntiToAward}PT`.toUpperCase(),
+                    punti: puntiToAward, // Nuovo campo punti per tracciamento esplicito
+                    ownerEmail: currentUserEmail || '',
+                    status: 'approved',
+                    approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                await window.db.collection("missions").add(missionData);
+                summaryMessages.push(`- ${team.name}: +${puntiToAward} punti`);
+            }
+
+            const statusEl = document.getElementById('lim-saving-status');
+            if (statusEl) {
+                statusEl.innerHTML = `<span style="color:#2ecc71;"><i class="fa-solid fa-circle-check"></i> Punti salvati correttamente!</span>`;
+            }
+
+            alert(`Complimenti! Avete guadagnato i seguenti punti:\n\n${summaryMessages.join('\n')}`);
+        } catch (e) {
+            console.error("Errore salvataggio automatico punti gioco LIM:", e);
+            const statusEl = document.getElementById('lim-saving-status');
+            if (statusEl) {
+                statusEl.innerHTML = `<span style="color:#e74c3c;"><i class="fa-solid fa-circle-xmark"></i> Errore di salvataggio: ${e.message}</span>`;
+            }
+            alert("Errore durante il salvataggio dei punti: " + e.message);
+        }
+    };
+
+    window.chiudiGiocoLIM = function() {
+        const state = window.limGameState;
+        if (state && state.timerInterval) {
+            clearInterval(state.timerInterval);
+        }
+
+        document.body.style.overflow = '';
+        const overlay = document.getElementById('presentation-overlay');
+        if (overlay) {
+            overlay.style.display = 'none';
+            overlay.style.background = '';
+        }
+
+        document.removeEventListener('keydown', window.giocoKeydownHandler);
+
+        if (window.prevPresKeydownHandler) {
+            window.presKeydownHandler = window.prevPresKeydownHandler;
+            document.addEventListener('keydown', window.presKeydownHandler);
+        }
+
+        window.limGameState = null;
+
+        if (typeof window.renderPresentazioniLIM === 'function') {
+            window.renderPresentazioniLIM();
+        }
+    };
 })();
+
