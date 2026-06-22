@@ -953,7 +953,8 @@ async function setupAdminPanel() {
         const counts = {
             tutti: allUsers.length,
             teacher: allUsers.filter(u => u.role === 'teacher').length,
-            guest: allUsers.filter(u => u.role === 'guest').length
+            guest: allUsers.filter(u => u.role === 'guest').length,
+            student: allUsers.filter(u => u.role !== 'teacher' && u.role !== 'guest').length
         };
         
         if (statsContainer) {
@@ -966,6 +967,10 @@ async function setupAdminPanel() {
                     <div class="stat-value">${counts.teacher}</div>
                     <div class="stat-label">DOCENTI</div>
                 </div>
+                <div class="admin-stat-card ${currentAdminDocentiFilter === 'student' ? 'active' : ''}" onclick="window.setAdminDocentiFilter('student')">
+                    <div class="stat-value">${counts.student}</div>
+                    <div class="stat-label">STUDENTI</div>
+                </div>
                 <div class="admin-stat-card ${currentAdminDocentiFilter === 'guest' ? 'active' : ''}" onclick="window.setAdminDocentiFilter('guest')">
                     <div class="stat-value">${counts.guest}</div>
                     <div class="stat-label">FANTAMICI</div>
@@ -977,7 +982,11 @@ async function setupAdminPanel() {
         
         let users = allUsers;
         if (currentAdminDocentiFilter !== 'tutti') {
-            users = allUsers.filter(u => u.role === currentAdminDocentiFilter);
+            if (currentAdminDocentiFilter === 'student') {
+                users = allUsers.filter(u => u.role !== 'teacher' && u.role !== 'guest');
+            } else {
+                users = allUsers.filter(u => u.role === currentAdminDocentiFilter);
+            }
         }
         
         list.innerHTML = '';
@@ -988,10 +997,14 @@ async function setupAdminPanel() {
 
         if (filteredUsers.length === 0) list.innerHTML = '<i>Nessun iscritto trovato.</i>';
         filteredUsers.forEach(u => {
-            let roleLabel = u.role === 'teacher' ? '<span style="color:#3498db; font-size:0.7rem; font-weight:800; text-transform:uppercase;">[Docente]</span>' : '<span style="color:#e67e22; font-size:0.7rem; font-weight:800; text-transform:uppercase;">[Fantamico]</span>';
+            let roleLabel = '';
+            if (u.role === 'teacher') roleLabel = '<span style="color:#3498db; font-size:0.7rem; font-weight:800; text-transform:uppercase;">[Docente]</span>';
+            else if (u.role === 'guest') roleLabel = '<span style="color:#e67e22; font-size:0.7rem; font-weight:800; text-transform:uppercase;">[Fantamico]</span>';
+            else roleLabel = '<span style="color:#2ecc71; font-size:0.7rem; font-weight:800; text-transform:uppercase;">[Studente]</span>';
+            
             let log = u.approvedAt ? `<br><small class="text-muted">Approvato: ${u.approvedAt.toDate ? u.approvedAt.toDate().toLocaleString() : u.approvedAt}</small>` : '';
             list.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid rgba(255,255,255,0.05);">
-                <div>${roleLabel} <span>${u.email}</span> &mdash; <strong>${u.name}</strong>${log}</div>
+                <div>${roleLabel} <span>${u.email}</span> &mdash; <strong>${u.name || 'Senza Nome'}</strong>${log}</div>
                 <button class="btn btn-secondary text-danger" style="padding:4px 8px; font-size:0.75rem; width:auto; background:var(--bg-card); border-color:var(--danger-color);" onclick="eliminaDocente('${u.email}')"><i class="fa-solid fa-trash"></i></button>
             </div>`;
         });
@@ -1613,6 +1626,25 @@ window.renderAdminProfilo = async function() {
 
     if(emailField) emailField.value = currentUserEmail;
 
+    const masterArea = document.getElementById('admin-master-area');
+    if (masterArea) {
+        masterArea.style.display = (currentUserEmail === 'prof.memmo@gmail.com') ? 'block' : 'none';
+    }
+
+    window.archiviaAnnoCorrente = async function() {
+        if(currentUserEmail !== 'prof.memmo@gmail.com') return;
+        const currentYear = new Date().getFullYear();
+        if(!confirm(`Sei ASSOLUTAMENTE sicuro di voler archiviare e resettare l'anno ${currentYear}? L'operazione non è reversibile.`)) return;
+        try {
+            const backupName = prompt("Inserisci un nome per l'archivio (es: Fantaletteratura_2025_2026):", `Archivio_${currentYear}`);
+            if(!backupName) return;
+            // Funzionalità di mock che in prod deve chiamare un cloud function
+            alert(`Archiviazione "${backupName}" simulata con successo. Il database verrà svuotato.`);
+        } catch(e) {
+            console.error(e);
+            alert("Errore archiviazione.");
+        }
+    };
     // Render Squadre
     let teams = (await getAllTeams()).filter(t => t.ownerEmail === currentUserEmail);
     sqList.innerHTML = '';
@@ -2174,9 +2206,11 @@ window.selectOnboardingRole = async function(role) {
         await fanta_db.logout();
         navigateTo('view-iscrizione');
     } else if (role === 'studente') {
+        if (window.FantaTimer) window.FantaTimer.startSession(email);
         navigateTo('view-studenti');
-    } else if (role === 'fantamico') {
+    } else if (role === 'fantamico' || role === 'guest') {
         try {
+            if (window.FantaTimer) window.FantaTimer.startSession(email);
             await window.db.collection("users").doc(email).set({
                 email: email,
                 role: role,
@@ -4862,5 +4896,88 @@ window.presClickHandler = function(e) {
         link.download = `attestato_${nome.replace(/\s+/g, '_').toLowerCase()}.jpg`;
         link.href = canvas.toDataURL('image/jpeg', 0.95);
         link.click();
+    };
+
+    // --- GIOCO: CANTAMI O DIVA ---
+    window.cantamiTimerInterval = null;
+    window.cantamiCurrentTeamId = null;
+
+    window.avviaCantamiDiva = async function() {
+        const modal = document.getElementById('modal-cantami-diva');
+        if(!modal) return;
+        
+        let allTeams = await window.getAllTeams();
+        if(window.currentUserEmail !== 'prof.memmo@gmail.com') {
+            allTeams = allTeams.filter(t => t.ownerEmail === window.currentUserEmail || (t.collaboratori && t.collaboratori.includes(window.currentUserEmail)));
+        }
+        
+        const select = document.getElementById('diva-team-select');
+        select.innerHTML = allTeams.map(t => `<option value="${t.id}">${t.name} (${t.classe || ''})</option>`).join('');
+        
+        document.getElementById('diva-game-area').style.display = 'none';
+        modal.style.display = 'flex';
+    };
+
+    window.estraiCantamiDiva = async function() {
+        const teamId = document.getElementById('diva-team-select').value;
+        if(!teamId) return alert('Seleziona una squadra.');
+        
+        const allTeams = await window.getAllTeams();
+        const team = allTeams.find(t => t.id === teamId);
+        if(!team || !team.authors || team.authors.length === 0) return alert('Questa squadra non ha autori!');
+        
+        const randAid = team.authors[Math.floor(Math.random() * team.authors.length)];
+        const modeInfo = GAME_MODES[team.mode || 'terze'];
+        const pool = (modeInfo && modeInfo.authors) ? modeInfo.authors : window.AUTHORS;
+        const author = pool.find(a => a.id === randAid) || window.AUTHORS.find(a => a.id === randAid);
+        
+        if(!author) return alert('Errore recupero autore.');
+        
+        window.cantamiCurrentTeamId = teamId;
+        document.getElementById('diva-author-img').src = author.image;
+        document.getElementById('diva-author-name').textContent = author.name;
+        document.getElementById('diva-timer').textContent = '30';
+        document.getElementById('diva-timer').style.color = 'var(--accent-gold)';
+        document.getElementById('diva-game-area').style.display = 'block';
+        
+        if(window.cantamiTimerInterval) clearInterval(window.cantamiTimerInterval);
+        
+        let timeLeft = 30;
+        window.cantamiTimerInterval = setInterval(() => {
+            timeLeft--;
+            const timerEl = document.getElementById('diva-timer');
+            timerEl.textContent = timeLeft;
+            if(timeLeft <= 10) timerEl.style.color = 'var(--danger-color)';
+            if(timeLeft <= 0) {
+                clearInterval(window.cantamiTimerInterval);
+                timerEl.textContent = 'Tempo Scaduto!';
+            }
+        }, 1000);
+    };
+
+    window.terminaCantamiDiva = async function(assegnaPunti) {
+        if(window.cantamiTimerInterval) clearInterval(window.cantamiTimerInterval);
+        if(assegnaPunti && window.cantamiCurrentTeamId) {
+            try {
+                const teamDocRef = window.db.collection('teams').doc(window.cantamiCurrentTeamId);
+                const teamDoc = await teamDocRef.get();
+                if(teamDoc.exists) {
+                    await window.db.collection('missions').add({
+                        teamId: window.cantamiCurrentTeamId,
+                        teamName: teamDoc.data().name,
+                        title: 'Vittoria in Cantami o Diva (LIM)',
+                        description: 'Punti assegnati durante la sfida Cantami o Diva alla LIM',
+                        status: 'approved',
+                        points: 5,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    alert('Punti assegnati con successo!');
+                }
+            } catch(e) {
+                console.error(e);
+                alert('Errore assegnazione punti.');
+            }
+        }
+        document.getElementById('modal-cantami-diva').style.display = 'none';
     };
 })();

@@ -287,6 +287,12 @@
                         <button type="button" class="btn" style="flex:1; min-width:140px; background: var(--accent-gold);" onclick="openInviteModal()"><i class="fa-solid fa-paper-plane"></i> Invita Collega</button>
                     </div>
 
+                    <div id="admin-master-area" style="display:none; margin-bottom: 20px; padding: 15px; border: 1px solid var(--danger-color); border-radius: 10px; background: rgba(231, 76, 60, 0.1);">
+                        <h3 class="text-danger"><i class="fa-solid fa-triangle-exclamation"></i> Danger Zone: Archiviazione Annuale</h3>
+                        <p style="font-size: 0.85rem; margin-bottom: 10px;">Questa opzione trasferisce tutte le squadre e studenti dell'anno in corso nell'Archivio Storico, resettando le classifiche. Non è reversibile!</p>
+                        <button type="button" class="btn text-danger" style="background: transparent; border: 1px solid var(--danger-color);" onclick="window.archiviaAnnoCorrente()"><i class="fa-solid fa-box-archive"></i> Esegui Archiviazione Anno</button>
+                    </div>
+
                     <h3 class="text-primary">Le tue squadre</h3>
                     <div id="admin-profilo-squadre-list" style="margin-bottom:20px;"></div>
 
@@ -390,6 +396,13 @@
                         </div>
                     </div>
 
+                    <!-- Gioco: Cantami o Diva -->
+                    <div class="input-group" style="margin-bottom: 25px;">
+                        <label><i class="fa-solid fa-microphone-lines"></i> Gioco in classe: "Cantami, o Diva"</label>
+                        <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">Interroga un alunno casuale su un autore casuale in 30 secondi.</p>
+                        <button type="button" class="btn" style="background:#8e44ad; color:#fff;" onclick="window.avviaCantamiDiva()"><i class="fa-solid fa-play"></i> Avvia "Cantami, o Diva"</button>
+                    </div>
+
                     <!-- Augurio Finale -->
                     <div class="input-group">
                         <label><i class="fa-solid fa-wand-magic-sparkles"></i> Saluto / Augurio Finale</label>
@@ -439,6 +452,27 @@
             </div>
             
             <button class="btn btn-secondary" onclick="document.getElementById('share-modal').style.display='none'" style="width:100%;">Chiudi</button>
+        </div>
+    </div>
+
+    
+    <!-- Modal Cantami o Diva -->
+    <div id="modal-cantami-diva" class="modal-wip" style="z-index:4000;" onclick="if(event.target===this)document.getElementById('modal-cantami-diva').style.display='none'">
+        <div class="modal-wip-content" style="max-width:500px; text-align:center;">
+            <h2 style="color:#8e44ad; font-family:var(--font-heading);"><i class="fa-solid fa-microphone-lines"></i> Cantami, o Diva</h2>
+            <p style="color:var(--text-muted); font-size:0.9rem;">Seleziona una squadra da interrogare:</p>
+            <select id="diva-team-select" class="input-control" style="margin-bottom:15px;"></select>
+            <button class="btn" style="background:#8e44ad; width:100%;" onclick="window.estraiCantamiDiva()">Estrai Autore</button>
+            
+            <div id="diva-game-area" style="display:none; margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;">
+                <img id="diva-author-img" src="" style="width:100px; height:100px; border-radius:50%; object-fit:cover; margin-bottom:10px; border:3px solid #8e44ad;">
+                <h3 id="diva-author-name" style="color:#fff; font-size:1.5rem; margin-bottom:10px;">Nome Autore</h3>
+                <div id="diva-timer" style="font-size:3rem; font-family:monospace; color:var(--accent-gold); margin-bottom:15px;">30</div>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn" style="flex:1; background:#2ecc71;" onclick="window.terminaCantamiDiva(true)">Assegna Punti (+5)</button>
+                    <button class="btn btn-secondary" style="flex:1;" onclick="window.terminaCantamiDiva(false)">Tempo Scaduto</button>
+                </div>
+            </div>
         </div>
     </div>
 
