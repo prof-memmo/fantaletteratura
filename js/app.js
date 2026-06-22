@@ -1908,6 +1908,16 @@ window.openAuthorSchedaModal = function(authorId, modeKey = null) {
             <img src="${author.image}" onclick="if(window.openImageModal) window.openImageModal('${author.image}')" style="width:80px; height:80px; border-radius:50%; object-fit:cover; background:#fff; cursor:pointer; border: 2px solid var(--accent-gold); box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Clicca per ingrandire">
         </div>
         <div style="font-size:0.95rem; line-height:1.6; color:#e0e0e0; margin-bottom:10px;">${author.schedaHTML}</div>
+        <div style="margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:15px;">
+            <h4 style="color:var(--accent-gold); margin-bottom:10px;"><i class="fa-solid fa-gamepad"></i> Missioni Autore</h4>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+                <button class="btn" style="padding:6px 12px; font-size:0.8rem; background:rgba(212,175,55,0.15); border:1px solid var(--accent-gold);" onclick="document.getElementById('scheda-autore-modal').style.display='none'; window.EroiMinigames.startMinigame('quiz', 'quiz_letteratura')"><i class="fa-solid fa-list-check"></i> Quiz</button>
+                <button class="btn" style="padding:6px 12px; font-size:0.8rem; background:rgba(212,175,55,0.15); border:1px solid var(--accent-gold);" onclick="document.getElementById('scheda-autore-modal').style.display='none'; window.EroiMinigames.startMinigame('impiccato', 'quiz_letteratura')"><i class="fa-solid fa-pen-nib"></i> Impiccato</button>
+                <button class="btn" style="padding:6px 12px; font-size:0.8rem; background:rgba(212,175,55,0.15); border:1px solid var(--accent-gold);" onclick="document.getElementById('scheda-autore-modal').style.display='none'; window.EroiMinigames.startMinigame('cloze', 'quiz_letteratura')"><i class="fa-solid fa-align-left"></i> Cloze</button>
+                <button class="btn" style="padding:6px 12px; font-size:0.8rem; background:rgba(212,175,55,0.15); border:1px solid var(--accent-gold);" onclick="document.getElementById('scheda-autore-modal').style.display='none'; window.EroiMinigames.startMinigame('puzzle', 'quiz_letteratura')"><i class="fa-solid fa-puzzle-piece"></i> Puzzle</button>
+                <button class="btn" style="padding:6px 12px; font-size:0.8rem; background:rgba(212,175,55,0.15); border:1px solid var(--accent-gold);" onclick="document.getElementById('scheda-autore-modal').style.display='none'; window.EroiMinigames.startMinigame('versi', 'quiz_letteratura')"><i class="fa-solid fa-align-justify"></i> Versi</button>
+            </div>
+        </div>
     `;
     document.getElementById('scheda-autore-modal').style.display = 'block';
 };
@@ -4970,6 +4980,9 @@ window.presClickHandler = function(e) {
                         status: 'approved',
                         points: 5,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    await teamDocRef.update({
+                        points: (teamDoc.data().points || 0) + 5
                     });
                     alert('Punti assegnati con successo!');
                 }

@@ -1102,8 +1102,22 @@
     <script src="js/firebase-config.js"></script>
     <script src="js/firebase-service.js"></script>
 
+    <!-- Modale Minigiochi -->
+    <div id="minigame-container" class="modal-wip" style="z-index: 5000; overflow-y:auto;" onclick="if(event.target===this) { window.EroiMinigames && window.EroiMinigames.closeMinigame(); }">
+        <div class="modal-wip-content" style="max-width:600px; padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 14px;">
+              <h3 id="minigame-title" style="font-family: var(--font-heading); color: var(--accent-gold); font-size: 1.2rem; margin:0;">Mini-Gioco</h3>
+              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="window.EroiMinigames.closeMinigame()">
+                <i class="fa-solid fa-xmark"></i> Chiudi
+              </button>
+            </div>
+            <div id="minigame-content"><!-- Contenuto dinamico del mini-gioco --></div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="js/data.js"></script>
+    <script src="js/minigames.js"></script>
     <script src="js/app.js?v=2"></script>
 </body>
 </html>

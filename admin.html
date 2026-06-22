@@ -403,6 +403,19 @@
                         <button type="button" class="btn" style="background:#8e44ad; color:#fff;" onclick="window.avviaCantamiDiva()"><i class="fa-solid fa-play"></i> Avvia "Cantami, o Diva"</button>
                     </div>
 
+                    <!-- Sfida LIM -->
+                    <div class="input-group" style="margin-bottom: 25px;">
+                        <label><i class="fa-solid fa-gamepad"></i> Lancia Sfida LIM (Minigiochi)</label>
+                        <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">Avvia un minigioco visibile alla LIM per sfide tra squadre. Verrà caricato il pacchetto Fantaletteratura.</p>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <button type="button" class="btn btn-secondary" onclick="window.EroiMinigames.startMinigame('quiz', 'quiz_letteratura')">Quiz</button>
+                            <button type="button" class="btn btn-secondary" onclick="window.EroiMinigames.startMinigame('impiccato', 'quiz_letteratura')">Impiccato</button>
+                            <button type="button" class="btn btn-secondary" onclick="window.EroiMinigames.startMinigame('cloze', 'quiz_letteratura')">Cloze</button>
+                            <button type="button" class="btn btn-secondary" onclick="window.EroiMinigames.startMinigame('puzzle', 'quiz_letteratura')">Puzzle</button>
+                            <button type="button" class="btn btn-secondary" onclick="window.EroiMinigames.startMinigame('versi', 'quiz_letteratura')">Versi</button>
+                        </div>
+                    </div>
+
                     <!-- Augurio Finale -->
                     <div class="input-group">
                         <label><i class="fa-solid fa-wand-magic-sparkles"></i> Saluto / Augurio Finale</label>
@@ -741,8 +754,22 @@
     <script src="js/firebase-config.js"></script>
     <script src="js/firebase-service.js"></script>
 
+    <!-- Modale Minigiochi -->
+    <div id="minigame-container" class="modal-wip" style="z-index: 5000; overflow-y:auto;" onclick="if(event.target===this) { window.EroiMinigames && window.EroiMinigames.closeMinigame(); }">
+        <div class="modal-wip-content" style="max-width:600px; padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 14px;">
+              <h3 id="minigame-title" style="font-family: var(--font-heading); color: var(--accent-gold); font-size: 1.2rem; margin:0;">Mini-Gioco</h3>
+              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="window.EroiMinigames.closeMinigame()">
+                <i class="fa-solid fa-xmark"></i> Chiudi
+              </button>
+            </div>
+            <div id="minigame-content"><!-- Contenuto dinamico del mini-gioco --></div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="js/data.js"></script>
+    <script src="js/minigames.js"></script>
     <script src="js/app.js?v=2"></script>
 </body>
 </html>
