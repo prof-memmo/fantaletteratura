@@ -457,6 +457,20 @@
                      
                      <button type="button" class="btn mb-2" onclick="navigateTo('view-missioni'); openNuovaMissioneModal();"><i class="fa-solid fa-list-check"></i> Carica una Missione</button>
                      <button type="button" class="btn mb-2" onclick="navigateTo('view-squadra')"><i class="fa-solid fa-plus-circle"></i> Carica una nuova squadra</button>
+                     
+                     <div style="margin: 20px 0; padding: 15px; border: 1px solid var(--accent-gold); border-radius: 8px; background: rgba(212,175,55,0.05);">
+                         <h4 style="color:var(--accent-gold); margin-bottom: 10px; margin-top: 0;"><i class="fa-solid fa-dice"></i> Sfida Casuale (Tutti gli Autori)</h4>
+                         <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:10px;">Lancia una sfida che mescola tutti gli argomenti e gli autori studiati per farmare punti.</p>
+                         <button type="button" class="btn btn-secondary mb-1" onclick="window.EroiMinigames.startManche('mixed')" style="width:100%; border-color:var(--accent-gold); color:var(--accent-gold);"><i class="fa-solid fa-trophy"></i> Avvia Manche Casuale (Max 20pt)</button>
+                         <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:10px;">
+                            <button class="btn btn-secondary" style="padding:6px 12px; font-size:0.8rem;" onclick="window.EroiMinigames.startMinigame('quiz', 'mixed')">Quiz (Max 2pt)</button>
+                            <button class="btn btn-secondary" style="padding:6px 12px; font-size:0.8rem;" onclick="window.EroiMinigames.startMinigame('impiccato', 'mixed')">Impiccato (Max 2pt)</button>
+                            <button class="btn btn-secondary" style="padding:6px 12px; font-size:0.8rem;" onclick="window.EroiMinigames.startMinigame('cloze', 'mixed')">Cloze (Max 2pt)</button>
+                            <button class="btn btn-secondary" style="padding:6px 12px; font-size:0.8rem;" onclick="window.EroiMinigames.startMinigame('puzzle', 'mixed')">Puzzle (Max 2pt)</button>
+                            <button class="btn btn-secondary" style="padding:6px 12px; font-size:0.8rem;" onclick="window.EroiMinigames.startMinigame('versi', 'mixed')">Versi (Max 2pt)</button>
+                         </div>
+                     </div>
+                     
                      <button type="button" class="btn mb-2" onclick="window.apriLocandine()" style="background: linear-gradient(135deg, #e67e22, #d35400) !important; color: #fff !important; font-weight: 800; border: none; box-shadow: 0 4px 10px rgba(230, 126, 34, 0.35);"><i class="fa-solid fa-image"></i> Crea una Locandina</button>
                      <button type="button" class="btn mb-2" onclick="window.apriAttestati()" style="background: linear-gradient(135deg, #f1c40f, #f39c12) !important; color: #fff !important; font-weight: 800; border: none; box-shadow: 0 4px 10px rgba(241, 196, 15, 0.35);"><i class="fa-solid fa-certificate"></i> Crea un Attestato</button>
                      <button type="button" class="btn mb-2" onclick="navigateTo('view-presentazioni'); window.initPresentazioniTab();" style="background: linear-gradient(135deg, #2ecc71, #27ae60) !important; color: #fff !important; font-weight: 800; border: none; box-shadow: 0 4px 10px rgba(46, 204, 113, 0.35);"><i class="fa-solid fa-desktop"></i> Genera Presentazione LIM</button>

@@ -405,14 +405,15 @@
 
                     <!-- Sfida LIM -->
                     <div class="input-group" style="margin-bottom: 25px;">
-                        <label><i class="fa-solid fa-gamepad"></i> Lancia Sfida LIM (Minigiochi)</label>
-                        <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">Avvia un minigioco visibile alla LIM per sfide tra squadre. Verrà caricato il pacchetto Fantaletteratura.</p>
-                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                            <button type="button" class="btn btn-secondary" onclick="window.EroiMinigames.startMinigame('quiz', 'quiz_letteratura')">Quiz</button>
-                            <button type="button" class="btn btn-secondary" onclick="window.EroiMinigames.startMinigame('impiccato', 'quiz_letteratura')">Impiccato</button>
-                            <button type="button" class="btn btn-secondary" onclick="window.EroiMinigames.startMinigame('cloze', 'quiz_letteratura')">Cloze</button>
-                            <button type="button" class="btn btn-secondary" onclick="window.EroiMinigames.startMinigame('puzzle', 'quiz_letteratura')">Puzzle</button>
-                            <button type="button" class="btn btn-secondary" onclick="window.EroiMinigames.startMinigame('versi', 'quiz_letteratura')">Versi</button>
+                        <label><i class="fa-solid fa-gamepad"></i> Lancia Sfida LIM Casuale (Tutti gli autori)</label>
+                        <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">Avvia un minigioco visibile alla LIM che mescola domande su tutti gli autori. Verrà caricato il pacchetto generale.</p>
+                        <button type="button" class="btn btn-secondary mb-1" onclick="window.EroiMinigames.startManche('mixed')" style="width:100%; border-color:var(--accent-gold); color:var(--accent-gold);"><i class="fa-solid fa-trophy"></i> Avvia Manche Completa Casuale</button>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+                            <button type="button" class="btn btn-secondary" onclick="window.EroiMinigames.startMinigame('quiz', 'mixed')">Quiz</button>
+                            <button type="button" class="btn btn-secondary" onclick="window.EroiMinigames.startMinigame('impiccato', 'mixed')">Impiccato</button>
+                            <button type="button" class="btn btn-secondary" onclick="window.EroiMinigames.startMinigame('cloze', 'mixed')">Cloze</button>
+                            <button type="button" class="btn btn-secondary" onclick="window.EroiMinigames.startMinigame('puzzle', 'mixed')">Puzzle</button>
+                            <button type="button" class="btn btn-secondary" onclick="window.EroiMinigames.startMinigame('versi', 'mixed')">Versi</button>
                         </div>
                     </div>
 

@@ -8,15 +8,48 @@
   // =====================================================
 
   
+  
   const MISSION_DATA = {
-    quiz_letteratura: {
-      topic: "Fantaletteratura",
+    'a1': { // Foscolo
+      topic: "Ugo Foscolo",
       impiccato: [
-        { word: "LEOPARDI", hint: "Autore de L'Infinito" },
-        { word: "FOSCOLO", hint: "Scrisse I Sepolcri" },
-        { word: "VERGA", hint: "Esponente principale del Verismo italiano" },
-        { word: "PIRANDELLO", hint: "Premio Nobel, scrisse Il fu Mattia Pascal" },
-        { word: "DANNUNZIO", hint: "Il Vate, figura chiave dell'Estetismo" }
+        { word: "SEPOLCRI", hint: "Famoso carme dedicato a Pindemonte" },
+        { word: "ORTIS", hint: "Cognome del protagonista delle sue ultime lettere" },
+        { word: "ESILIO", hint: "Condizione in cui vive l'ultima parte della vita" }
+      ],
+      puzzle: [
+        { img: "avatar_autori/Foscolo.png", title: "Ritratto di Foscolo", pieceCount: 16 }
+      ],
+      cloze: [
+        {
+          text: "Né più mai toccherò le sacre _, ove il mio corpo fanciulletto _",
+          words: ["sponde", "giacque"]
+        }
+      ],
+      versi: [
+        {
+          title: "A Zacinto",
+          lines: [
+            "Né più mai toccherò le sacre sponde",
+            "ove il mio corpo fanciulletto giacque,",
+            "Zacinto mia, che te specchi nell'onde"
+          ]
+        }
+      ],
+      quiz: [
+        { q: "Chi è l'autore de 'Le ultime lettere di Jacopo Ortis'?", o: ["Giacomo Leopardi", "Ugo Foscolo", "Alessandro Manzoni", "Giosuè Carducci"], a: 1 },
+        { q: "A chi è dedicato il carme 'Dei Sepolcri'?", o: ["Ippolito Pindemonte", "Alessandro Manzoni", "Giacomo Leopardi", "Vincenzo Monti"], a: 0 },
+        { q: "Qual è il tema principale di 'A Zacinto'?", o: ["L'esilio", "La guerra", "L'amore non corrisposto", "La morte"], a: 0 },
+        { q: "Quale movimento letterario anticipa Foscolo con l'Ortis?", o: ["Neoclassicismo", "Illuminismo", "Romanticismo", "Verismo"], a: 2 },
+        { q: "Quale trattato deluse profondamente Foscolo?", o: ["Trattato di Versailles", "Trattato di Campoformio", "Pace di Vienna", "Trattato di Parigi"], a: 1 }
+      ]
+    },
+    'a2': { // Leopardi
+      topic: "Giacomo Leopardi",
+      impiccato: [
+        { word: "INFINITO", hint: "Sempre caro mi fu quest'ermo colle..." },
+        { word: "PESSIMISMO", hint: "Visione della vita tipica del poeta" },
+        { word: "RECANATI", hint: "Città natale" }
       ],
       puzzle: [
         { img: "avatar_autori/Leopardi.png", title: "Ritratto di Leopardi", pieceCount: 16 }
@@ -38,17 +71,121 @@
         }
       ],
       quiz: [
-        { q: "Qual è la corrente letteraria di Giovanni Verga?", o: ["Verismo", "Romanticismo", "Neoclassicismo", "Futurismo"], a: 0 },
-        { q: "Chi è l'autore de 'Le ultime lettere di Jacopo Ortis'?", o: ["Giacomo Leopardi", "Ugo Foscolo", "Alessandro Manzoni", "Giosuè Carducci"], a: 1 },
-        { q: "A quale autore si associa il concetto di 'Estetismo'?", o: ["Italo Svevo", "Luigi Pirandello", "Gabriele D'Annunzio", "Giovanni Pascoli"], a: 2 },
-        { q: "Chi scrisse 'La coscienza di Zeno'?", o: ["Luigi Pirandello", "Italo Svevo", "Eugenio Montale", "Umberto Saba"], a: 1 },
-        { q: "Come si chiama la raccolta più nota di Giuseppe Ungaretti?", o: ["L'Allegria", "Ossi di seppia", "Myricae", "Alcyone"], a: 0 },
-        { q: "Chi ha scritto 'I Malavoglia'?", o: ["Giovanni Verga", "Luigi Capuana", "Grazia Deledda", "Matilde Serao"], a: 0 },
-        { q: "A che secolo appartiene principalmente il Decadentismo?", o: ["XVIII", "XIX-XX", "XXI", "XVII"], a: 1 },
-        { q: "In quale romanzo troviamo il personaggio di Vitangelo Moscarda?", o: ["Il fu Mattia Pascal", "Uno, nessuno e centomila", "La coscienza di Zeno", "I Promessi Sposi"], a: 1 },
-        { q: "La poesia 'X Agosto' di chi è?", o: ["Giovanni Pascoli", "Giacomo Leopardi", "Ugo Foscolo", "Eugenio Montale"], a: 0 },
-        { q: "Quale animale è associato al male di vivere in Montale?", o: ["Cavallo", "Rivo strozzato", "Asino", "Cane"], a: 1 }
+        { q: "Dove nacque Leopardi?", o: ["Firenze", "Roma", "Recanati", "Napoli"], a: 2 },
+        { q: "Qual è la raccolta più celebre di Leopardi?", o: ["I Promessi Sposi", "I Canti", "Le Odi", "I Sepolcri"], a: 1 },
+        { q: "Chi è 'Silvia' in 'A Silvia'?", o: ["Sua sorella", "Teresa Fattorini", "Paolina Leopardi", "Silvia Monti"], a: 1 },
+        { q: "Come viene definito il pessimismo finale di Leopardi?", o: ["Storico", "Cosmico", "Individuale", "Illusorio"], a: 1 },
+        { q: "Quale tra queste NON è un'opera di Leopardi?", o: ["Zibaldone", "Operette morali", "I Malavoglia", "Canti"], a: 2 }
       ]
+    },
+    'a5': { // Verga
+      topic: "Giovanni Verga",
+      impiccato: [
+        { word: "VERISMO", hint: "Corrente letteraria italiana" },
+        { word: "MALAVOGLIA", hint: "Romanzo sulla famiglia Toscano" },
+        { word: "SICILIA", hint: "Regione in cui sono ambientate le opere" }
+      ],
+      puzzle: [
+        { img: "avatar_autori/Verga.png", title: "Ritratto di Verga", pieceCount: 16 }
+      ],
+      cloze: [
+        {
+          text: "I _ sono una famiglia di pescatori che vive nel paese di _.",
+          words: ["Malavoglia", "Aci Trezza"]
+        }
+      ],
+      versi: [
+        {
+          title: "Rosso Malpelo",
+          lines: [
+            "Malpelo si chiamava così perché aveva i capelli rossi;",
+            "ed aveva i capelli rossi perché era un ragazzo malizioso",
+            "e cattivo."
+          ]
+        }
+      ],
+      quiz: [
+        { q: "Quale corrente letteraria fondò Verga in Italia?", o: ["Neorealismo", "Verismo", "Romanticismo", "Decadentismo"], a: 1 },
+        { q: "Come si chiamava la barca dei Malavoglia?", o: ["La Provvidenza", "La Speranza", "Il Destino", "La Fortuna"], a: 0 },
+        { q: "Chi scrisse Rosso Malpelo?", o: ["Luigi Pirandello", "Gabriele D'Annunzio", "Giovanni Verga", "Italo Svevo"], a: 2 },
+        { q: "In quale paese della Sicilia è ambientato 'I Malavoglia'?", o: ["Palermo", "Catania", "Aci Trezza", "Siracusa"], a: 2 },
+        { q: "Quale tecnica narrativa è tipica di Verga?", o: ["Flusso di coscienza", "Straniamento", "Monologo interiore", "Prosa poetica"], a: 1 }
+      ]
+    },
+    'a7': { // D'Annunzio
+      topic: "Gabriele D'Annunzio",
+      impiccato: [
+        { word: "ESTETISMO", hint: "Il culto della bellezza" },
+        { word: "PIACERE", hint: "Celebre romanzo con Andrea Sperelli" },
+        { word: "VATE", hint: "Soprannome di D'Annunzio" }
+      ],
+      puzzle: [
+        { img: "avatar_autori/DAnnunzio.png", title: "Ritratto di D'Annunzio", pieceCount: 16 }
+      ],
+      cloze: [
+        {
+          text: "Taci. Su le soglie del _, non odo parole che dici _...",
+          words: ["bosco", "umane"]
+        }
+      ],
+      versi: [
+        {
+          title: "La pioggia nel pineto",
+          lines: [
+            "Taci. Su le soglie",
+            "del bosco non odo",
+            "parole che dici umane;"
+          ]
+        }
+      ],
+      quiz: [
+        { q: "Come era soprannominato D'Annunzio?", o: ["Il Vate", "Il Maestro", "Il Profeta", "Il Sommo"], a: 0 },
+        { q: "Quale romanzo introduce l'Estetismo in Italia?", o: ["Il Piacere", "I Malavoglia", "La Coscienza di Zeno", "Il fu Mattia Pascal"], a: 0 },
+        { q: "A chi è dedicata 'La pioggia nel pineto'?", o: ["Beatrice", "Laura", "Ermione", "Silvia"], a: 2 },
+        { q: "Dove costruì la sua dimora monumentale, il Vittoriale?", o: ["Pescara", "Gardone Riviera", "Roma", "Fiume"], a: 1 },
+        { q: "Qual è il tema principale dell'Estetismo?", o: ["Il culto della scienza", "Il culto della bellezza", "L'impegno politico", "La denuncia sociale"], a: 1 }
+      ]
+    },
+    'a8': { // Pirandello
+      topic: "Luigi Pirandello",
+      impiccato: [
+        { word: "MASCHERA", hint: "Rappresenta le diverse forme che assumiamo" },
+        { word: "PASCAL", hint: "Il fu Mattia..." },
+        { word: "UMORISMO", hint: "Il sentimento del contrario" }
+      ],
+      puzzle: [
+        { img: "avatar_autori/Pirandello.png", title: "Ritratto di Pirandello", pieceCount: 16 }
+      ],
+      cloze: [
+        {
+          text: "Imparerai a tue _, che nel lungo tragitto della _, incontrerai tante _ e pochi _.",
+          words: ["spese", "vita", "maschere", "volti"]
+        }
+      ],
+      versi: [
+        {
+          title: "Uno, nessuno e centomila",
+          lines: [
+            "La vita non conclude.",
+            "E non sa di nomi, la vita."
+          ]
+        }
+      ],
+      quiz: [
+        { q: "Quale premio Nobel ricevette Pirandello?", o: ["Medicina", "Pace", "Letteratura", "Fisica"], a: 2 },
+        { q: "Quale concetto è fondamentale nella poetica pirandelliana?", o: ["La fanciullezza", "La maschera", "La natura", "L'esilio"], a: 1 },
+        { q: "Chi è il protagonista di 'Uno, nessuno e centomila'?", o: ["Mattia Pascal", "Vitangelo Moscarda", "Zeno Cosini", "Andrea Sperelli"], a: 1 },
+        { q: "Cosa si intende per 'Umorismo' in Pirandello?", o: ["Una barzelletta", "Il sentimento del contrario", "La parodia", "La commedia dell'arte"], a: 1 },
+        { q: "Quanti sono i personaggi in cerca d'autore nella famosa opera teatrale?", o: ["Due", "Quattro", "Sei", "Otto"], a: 2 }
+      ]
+    },
+    'mixed': {
+      topic: "Sfida Casuale Mista",
+      impiccato: [],
+      puzzle: [],
+      cloze: [],
+      versi: [],
+      quiz: []
     }
   };
 
@@ -98,14 +235,46 @@
   };
 
   function getData(missionId) {
-    // Prova corrispondenza diretta, poi per prefisso categoria
-    if (MISSION_DATA[missionId]) return MISSION_DATA[missionId];
-    // Mappatura per categoria da prefisso id
-    if (missionId && missionId.startsWith('mit_')) return MISSION_DATA.mit_caos;
-    if (missionId && missionId.startsWith('il_')) return MISSION_DATA.ili_achille;
-    if (missionId && (missionId.startsWith('od_') || missionId.startsWith('ods_'))) return MISSION_DATA.od_viaggio;
-    if (missionId && (missionId.startsWith('en_') || missionId.startsWith('ene_'))) return MISSION_DATA.en_enea;
-    return DEFAULT_DATA;
+      if (missionId === 'mixed') {
+          // Build mixed data dynamically from MISSION_DATA and window.revealedAuthors
+          let mixedData = {
+              topic: "Sfida Casuale Mista",
+              impiccato: [],
+              puzzle: [],
+              cloze: [],
+              versi: [],
+              quiz: []
+          };
+          
+          let validAuthors = window.revealedAuthors ? window.revealedAuthors.map(a => a.id) : Object.keys(MISSION_DATA);
+          if(validAuthors.length === 0) validAuthors = ['a1', 'a2', 'a3', 'a4', 'a5']; // Fallback
+          
+          for(let aid of validAuthors) {
+              if(MISSION_DATA[aid] && aid !== 'mixed') {
+                  if(MISSION_DATA[aid].impiccato) mixedData.impiccato.push(...MISSION_DATA[aid].impiccato);
+                  if(MISSION_DATA[aid].puzzle) mixedData.puzzle.push(...MISSION_DATA[aid].puzzle);
+                  if(MISSION_DATA[aid].cloze) mixedData.cloze.push(...MISSION_DATA[aid].cloze);
+                  if(MISSION_DATA[aid].versi) mixedData.versi.push(...MISSION_DATA[aid].versi);
+                  if(MISSION_DATA[aid].quiz) mixedData.quiz.push(...MISSION_DATA[aid].quiz);
+              }
+          }
+          
+          // Shuffle them so it's really random
+          const shuffle = (array) => {
+              for (let i = array.length - 1; i > 0; i--) {
+                  const j = Math.floor(Math.random() * (i + 1));
+                  [array[i], array[j]] = [array[j], array[i]];
+              }
+          };
+          shuffle(mixedData.impiccato);
+          shuffle(mixedData.puzzle);
+          shuffle(mixedData.cloze);
+          shuffle(mixedData.versi);
+          shuffle(mixedData.quiz);
+          
+          return mixedData;
+      }
+      return MISSION_DATA[missionId] || MISSION_DATA['a1'];
   }
 
   // =====================================================
@@ -118,10 +287,15 @@
   let clozeState = {};
   let versiState = {};
 
+
   // =====================================================
   // API PUBBLICA
   // =====================================================
   window.EroiMinigames = {
+    isMancheMode: false,
+    mancheGames: [],
+    mancheScore: 0,
+    quizState: { questions: [], current: 0, score: 0 },
 
     startMinigame: function(type, missionId) {
       currentMissionId = missionId || null;
@@ -132,13 +306,6 @@
       const title = document.getElementById('minigame-title');
       if (!container || !content) return;
 
-      // Nasconde le liste
-      const missionsContainer = document.getElementById('missions-categories-container');
-      const quizContainer = document.getElementById('active-quiz-container');
-      if (quizContainer && quizContainer.style.display !== 'none') {
-        // Lanciato durante un quiz — non fare nulla di speciale
-      }
-
       container.style.display = 'flex';
       currentMinigame = type;
       container.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -147,27 +314,142 @@
       const topicBadge = data.topic ? `<span style="font-size:0.75rem; background:rgba(212,175,55,0.12); border:1px solid rgba(212,175,55,0.3); padding:2px 10px; border-radius:4px; color:var(--gold); margin-left:8px;">${data.topic}</span>` : '';
 
       const typeLabels = {
+        quiz: '❓ Quiz',
         impiccato: '🎭 Impiccato',
         puzzle: '🧩 Riordina la Frase',
         cloze: '📝 Cloze — Completa il Testo',
         versi: '📜 Riordina i Versi'
       };
-      title.innerHTML = (typeLabels[type] || type) + topicBadge;
+      title.innerHTML = (this.isMancheMode ? '🏆 MANCHE COMPLETA - ' : '') + (typeLabels[type] || type) + topicBadge;
 
       switch(type) {
         case 'impiccato': this.initImpiccato(content, data); break;
         case 'puzzle':    this.initPuzzle(content, data); break;
         case 'cloze':     this.initCloze(content, data); break;
         case 'versi':     this.initVersi(content, data); break;
+        case 'quiz':      this.initQuiz(content, data); break;
       }
+    },
+
+    startManche: function(authorId) {
+      this.isMancheMode = true;
+      this.mancheGames = ['quiz', 'impiccato', 'cloze', 'puzzle', 'versi'];
+      this.mancheScore = 0;
+      this.nextMancheGame(authorId);
+    },
+
+    nextMancheGame: function(authorId) {
+      if (this.mancheGames.length === 0) {
+        this.isMancheMode = false;
+        const xp = Math.min(20, this.mancheScore);
+        
+        const content = document.getElementById('minigame-content');
+        content.innerHTML = `<div style="text-align:center; padding: 30px;">
+            <h2 style="color:var(--accent-gold); font-size:2rem; margin-bottom:15px;">🎉 MANCHE COMPLETATA!</h2>
+            <p style="font-size:1.2rem; color:#fff;">Hai completato tutti i giochi della manche.</p>
+            <div style="font-size:3rem; font-weight:bold; color:#16a34a; margin:20px 0;">+${xp} PUNTI</div>
+            <button class="btn" style="background:#16a34a; color:#fff;" onclick="EroiMinigames.finalizeMancheReward(${xp})">Riscuoti Punti</button>
+        </div>`;
+        return;
+      }
+      const nextGame = this.mancheGames.shift();
+      this.startMinigame(nextGame, authorId);
+    },
+
+    finalizeMancheReward: function(xp) {
+        this.assignPointsToTeam(xp);
+        this.closeMinigame();
+    },
+
+    assignPointsToTeam: function(xp) {
+        if (window.currentUserRole === 'studente' && window.currentUserTeamId && window.db) {
+            window.db.collection('teams').doc(window.currentUserTeamId).get().then(doc => {
+                if(doc.exists) {
+                    const t = doc.data();
+                    window.db.collection('teams').doc(t.id).update({
+                        points: (t.points || 0) + xp
+                    });
+                    if(window.showToast) {
+                        window.showToast(`+${xp} Punti guadagnati per la tua squadra!`, 'success');
+                    } else {
+                        alert(`+${xp} Punti guadagnati per la tua squadra!`);
+                    }
+                }
+            });
+        } else if (window.currentUserRole === 'docente' || window.currentUserRole === 'admin') {
+            alert(`+${xp} Punti per la squadra selezionata. (Assegnali manualmente dal pannello LIM).`);
+        }
     },
 
     closeMinigame: function() {
       const container = document.getElementById('minigame-container');
       if (container) container.style.display = 'none';
       currentMinigame = null;
+      this.isMancheMode = false;
     },
 
+    // =====================================================
+    // QUIZ
+    // =====================================================
+    initQuiz: function(container, data) {
+        let pool = data.quiz || [];
+        if (pool.length === 0) {
+            container.innerHTML = '<p>Nessun quiz disponibile per questo autore.</p>';
+            return;
+        }
+        
+        // Take up to 10 questions
+        this.quizState.questions = pool.slice(0, 10);
+        this.quizState.current = 0;
+        this.quizState.score = 0;
+        
+        this.renderQuizQuestion(container);
+    },
+    
+    renderQuizQuestion: function(container) {
+        if (this.quizState.current >= this.quizState.questions.length) {
+            this.endQuiz(container);
+            return;
+        }
+        
+        const qData = this.quizState.questions[this.quizState.current];
+        const progress = `Domanda ${this.quizState.current + 1} di ${this.quizState.questions.length}`;
+        
+        const optionsHtml = qData.o.map((opt, idx) => `
+            <button class="btn btn-secondary" style="display:block; width:100%; text-align:left; margin-bottom:10px; padding:12px; font-size:0.95rem; white-space:normal; height:auto; line-height:1.4;" onclick="EroiMinigames.answerQuiz(${idx})">${opt}</button>
+        `).join('');
+        
+        container.innerHTML = `
+            <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:15px; text-transform:uppercase; letter-spacing:1px; font-weight:bold;">${progress}</div>
+            <h3 style="color:#fff; font-size:1.2rem; margin-bottom:20px; line-height:1.4;">${qData.q}</h3>
+            <div>${optionsHtml}</div>
+        `;
+    },
+    
+    answerQuiz: function(selectedIdx) {
+        const qData = this.quizState.questions[this.quizState.current];
+        if (selectedIdx === qData.a) {
+            this.quizState.score++;
+        }
+        this.quizState.current++;
+        this.renderQuizQuestion(document.getElementById('minigame-content'));
+    },
+    
+    endQuiz: function(container) {
+        const total = this.quizState.questions.length;
+        const correct = this.quizState.score;
+        let points = (correct >= total / 2) ? 2 : 0;
+        if (this.isMancheMode) points = Math.round((correct / total) * 5); // up to 5 points for manche
+        
+        container.innerHTML = `
+            <div style="text-align:center; padding:20px;">
+                <h3 style="color:var(--accent-gold); font-size:1.5rem; margin-bottom:15px;">Quiz Terminato!</h3>
+                <p style="font-size:1.1rem; color:#fff; margin-bottom:20px;">Hai risposto correttamente a ${correct} domande su ${total}.</p>
+                ${points > 0 ? `<div style="color:#16a34a; font-weight:bold; font-size:1.1rem; margin-bottom:15px;">🎉 Risultato positivo!</div>` : `<div style="color:#ef4444; font-weight:bold; font-size:1.1rem; margin-bottom:15px;">Purtroppo non hai superato il test.</div>`}
+                <button class="btn" onclick="EroiMinigames.rewardAndNext('quiz', ${points}, 0)">Continua</button>
+            </div>
+        `;
+    },
     // =====================================================
     // IMPICCATO
     // =====================================================
@@ -502,27 +784,23 @@
     // =====================================================
     // RICOMPENSE
     // =====================================================
-    rewardAndNext: function(type, xp, dracme) {
+    
+    rewardAndNext: function(type, baseXP, dracme) {
       try {
-        if (window.currentUserRole === 'studente' && window.currentUserTeamId && window.db) {
-            window.db.collection('teams').doc(window.currentUserTeamId).get().then(doc => {
-                if(doc.exists) {
-                    const t = doc.data();
-                    window.db.collection('teams').doc(t.id).update({
-                        points: (t.points || 0) + xp
-                    });
-                    if(window.showToast) {
-                        window.showToast(`+${xp} Punti guadagnati per la tua squadra!`, 'success');
-                    } else {
-                        alert(`+${xp} Punti guadagnati per la tua squadra!`);
-                    }
-                }
-            });
-        } else if (window.currentUserRole === 'docente' || window.currentUserRole === 'admin') {
-            alert(`+${xp} Punti. (Sei in modalità Docente/Admin alla LIM, puoi assegnare i punti manualmente alle squadre).`);
+        if (this.isMancheMode) {
+            let manchePts = (type === 'quiz') ? baseXP : 4; // Fino a 4 per gioco, totale 20
+            this.mancheScore += manchePts;
+            this.nextMancheGame(currentMissionId);
+        } else {
+            let xp = 2; // Massimo 2 punti gioco singolo per i minigiochi classici
+            if (type === 'quiz') xp = baseXP; // il quiz passa il suo punteggio calcolato (max 2)
+            if (xp > 2) xp = 2; // Sicurezza: massimo 2 per gioco singolo in ogni caso
+            if (xp > 0) {
+                this.assignPointsToTeam(xp);
+            }
+            this.startMinigame(type, currentMissionId);
         }
       } catch(e) { console.warn('Reward error:', e); }
-      this.startMinigame(type, currentMissionId);
     }
   };
 
