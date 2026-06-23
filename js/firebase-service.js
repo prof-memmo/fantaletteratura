@@ -179,7 +179,9 @@ window.fanta_db = {
         const snapshot = await window.db.collection("users")
             .where("teamId", "==", teamId)
             .where("role", "==", "studente").get();
-        return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+        return snapshot.docs
+            .map(doc => ({ ...doc.data(), id: doc.id }))
+            .filter(u => u.status !== 'archived');
     },
     moveStudent: async (studentEmail, newTeamId, newTeamCode) => {
         await window.db.collection("users").doc(studentEmail.toLowerCase()).update({

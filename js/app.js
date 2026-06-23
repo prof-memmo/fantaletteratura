@@ -1634,21 +1634,37 @@ window.renderAdminProfilo = async function() {
     window.archiviaAnnoCorrente = async function() {
         if(currentUserEmail !== 'prof.memmo@gmail.com') return;
         const currentYear = new Date().getFullYear();
-        if(!confirm(`Sei ASSOLUTAMENTE sicuro di voler archiviare e resettare l'anno ${currentYear}? L'operazione non è reversibile.`)) return;
+        if(!confirm(`Sei ASSOLUTAMENTE sicuro di voler archiviare l'anno ${currentYear}?`)) return;
         try {
             const backupName = prompt("Inserisci un nome per l'archivio (es: Fantaletteratura_2025_2026):", `Archivio_${currentYear}`);
             if(!backupName) return;
             
-            // Svuota lo storico dei minigiochi
+            const usersSnapshot = await window.db.collection('users').get();
+            const teamsSnapshot = await window.db.collection('teams').get();
+            
+            let batch = window.db.batch();
+            
+            usersSnapshot.docs.forEach(doc => {
+                const data = doc.data();
+                if (data.role !== 'admin' && data.role !== 'docente') {
+                    batch.update(doc.ref, { archivedYear: backupName, status: 'archived', teamId: null, teamCode: null });
+                }
+            });
+
+            teamsSnapshot.docs.forEach(doc => {
+                batch.update(doc.ref, { archivedYear: backupName, status: 'archived' });
+            });
+
             if (window.fanta_db && window.fanta_db.clearMinigameLogs) {
                 await window.fanta_db.clearMinigameLogs();
             }
-            
-            // Funzionalità di mock che in prod deve chiamare un cloud function
-            alert(`Archiviazione "${backupName}" completata con successo. Lo Storico Minigiochi e le squadre sono stati azzerati.`);
+
+            await batch.commit();
+            alert(`Archiviazione "${backupName}" completata con successo. Studenti e squadre sono stati archiviati.`);
+            window.location.reload();
         } catch(e) {
             console.error(e);
-            alert("Errore archiviazione.");
+            alert("Errore archiviazione: " + e.message);
         }
     };
     // Render Squadre
@@ -2130,6 +2146,32 @@ function checkLoginSession() {
                 const doc = await window.db.collection("users").doc(email).get();
                 
                 if (doc.exists && doc.data().role) {
+                    const userData = doc.data();
+                    if (userData.status === 'archived' && userData.role === 'studente') {
+                        const newTeamCode = prompt("Il tuo account è stato archiviato. Inserisci il nuovo Codice Squadra per l'anno in corso per riattivarti:");
+                        if (newTeamCode) {
+                            const team = await fanta_db.getTeamByCode(newTeamCode);
+                            if (team) {
+                                await window.db.collection("users").doc(email).update({
+                                    status: 'active',
+                                    teamId: team.id,
+                                    teamCode: newTeamCode
+                                });
+                                alert("Bentornato! Sei stato riattivato.");
+                                window.location.reload();
+                                return;
+                            } else {
+                                alert("Codice squadra non valido.");
+                                fanta_db.logout();
+                                return;
+                            }
+                        } else {
+                            alert("Codice necessario per riattivare l'account.");
+                            fanta_db.logout();
+                            return;
+                        }
+                    }
+
                     // Utente approvato e ha un ruolo
                     const role = doc.data().role;
                     currentUserRole = role;
@@ -2635,7 +2677,7 @@ function setLoggedOut() {
 async function getAllTeams() {
     try {
         const dbTeams = await fanta_db.getTeams();
-        return dbTeams;
+        return dbTeams.filter(t => t.status !== 'archived');
     } catch (e) {
         console.error("Errore recupero squadre da Firebase:", e);
         return [];
