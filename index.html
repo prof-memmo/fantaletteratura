@@ -16,6 +16,32 @@
         <!-- VIEWS -->
         <main id="main-content">
             
+            <!-- VIEW: Pausa Obbligatoria -->
+            <section id="view-pausa-obbligatoria" class="view" style="display: none;">
+                <div style="max-width: 600px; margin: 0 auto; text-align: center; padding: 20px;">
+                    <svg width="0" height="0" style="position: absolute;">
+                        <filter id="remove-white" color-interpolation-filters="sRGB">
+                            <feColorMatrix type="matrix" values="
+                                1 0 0 0 0
+                                0 1 0 0 0
+                                0 0 1 0 0
+                                -3 -3 -3 1 8" />
+                        </filter>
+                    </svg>
+                    <h2 style="color: var(--primary-color); margin-bottom: 20px; font-size: 2rem;">Tempo di Riposo!</h2>
+                    <div id="pausa-video-container" style="margin-bottom: 20px;">
+                        <video id="gatto-video" src="assets/Gatto che dorme.mp4" autoplay loop muted playsinline style="filter: url(#remove-white); max-width: 100%; max-height: 250px;"></video>
+                    </div>
+                    <p style="font-size: 1.1rem; color: #444; line-height: 1.5; margin-bottom: 20px;">
+                        Hai studiato per 45 minuti! È il momento di fare una pausa.<br><br>
+                        Allontanati dallo schermo per riposare gli occhi e la mente.
+                    </p>
+                    <div id="pausa-countdown" style="font-size: 3rem; font-family: monospace; font-weight: bold; color: var(--primary-color); margin-bottom: 20px;">
+                        15:00
+                    </div>
+                </div>
+            </section>
+
             <!-- VIEW: Welcome Home -->
             <section id="view-welcome" class="view active">
 
