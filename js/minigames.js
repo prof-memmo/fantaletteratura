@@ -296,8 +296,140 @@
     mancheGames: [],
     mancheScore: 0,
     quizState: { questions: [], current: 0, score: 0 },
+    
+    // Nuove variabili per coda turni squadre
+    gameQueue: [],
+    currentTurnIndex: 0,
+    tempSelectedType: null,
+    tempMissionId: null,
+
+    openTeamSelection: async function(type, missionId) {
+        this.tempSelectedType = type;
+        this.tempMissionId = missionId;
+        
+        const listDiv = document.getElementById('team-selector-list');
+        const modal = document.getElementById('team-selector-modal');
+        if (!listDiv || !modal) {
+            // Fallback se la UI manca
+            if (type === 'manche') this.startMancheLegacy(missionId);
+            else this.startMinigameDirect(type, missionId);
+            return;
+        }
+
+        modal.style.display = 'flex';
+        listDiv.innerHTML = '<div style="text-align:center; padding:10px;"><i class="fa-solid fa-spinner fa-spin"></i> Caricamento...</div>';
+
+        try {
+            const allTeams = window.fanta_db ? await window.fanta_db.getTeams() : [];
+            const myTeams = allTeams.filter(t => t.ownerEmail === window.currentUserEmail);
+            
+            if (myTeams.length === 0) {
+                listDiv.innerHTML = '<p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">Nessuna squadra disponibile. Crea una squadra dal tuo profilo per poter giocare.</p>';
+                return;
+            }
+
+            listDiv.innerHTML = myTeams.map(t => `
+                <label style="display:flex; align-items:center; gap:10px; background:rgba(212,175,55,0.05); padding:10px; border:1px solid rgba(212,175,55,0.2); border-radius:8px; cursor:pointer;">
+                    <input type="checkbox" class="team-selector-checkbox" value="${t.id}" data-name="${t.name}" checked>
+                    <span style="font-weight:bold; color:var(--text-light);">${t.name}</span>
+                </label>
+            `).join('');
+
+        } catch (e) {
+            console.error("Errore caricamento squadre per minigioco", e);
+            listDiv.innerHTML = '<p style="color:red; font-size:0.8rem;">Errore caricamento squadre.</p>';
+        }
+    },
+
+    confirmTeamSelection: function() {
+        const checkboxes = document.querySelectorAll('.team-selector-checkbox:checked');
+        if (checkboxes.length === 0) {
+            alert("Seleziona almeno una squadra per iniziare.");
+            return;
+        }
+
+        const selectedTeams = Array.from(checkboxes).map(cb => ({
+            id: cb.value,
+            name: cb.dataset.name
+        }));
+
+        document.getElementById('team-selector-modal').style.display = 'none';
+        this.buildGameQueue(this.tempSelectedType, this.tempMissionId, selectedTeams);
+    },
+
+    buildGameQueue: function(type, missionId, teams) {
+        this.gameQueue = [];
+        this.currentTurnIndex = 0;
+        this.isMancheMode = (type === 'manche');
+
+        if (type === 'manche') {
+            const games = ['quiz', 'impiccato', 'cloze', 'puzzle', 'versi'];
+            teams.forEach(t => {
+                games.forEach(g => {
+                    this.gameQueue.push({ teamId: t.id, teamName: t.name, game: g, missionId: missionId });
+                });
+            });
+        } else {
+            teams.forEach(t => {
+                this.gameQueue.push({ teamId: t.id, teamName: t.name, game: type, missionId: missionId });
+            });
+        }
+
+        // Shuffle queue
+        for (let i = this.gameQueue.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [this.gameQueue[i], this.gameQueue[j]] = [this.gameQueue[j], this.gameQueue[i]];
+        }
+
+        this.playNextInQueue();
+    },
+
+    playNextInQueue: function() {
+        if (this.currentTurnIndex >= this.gameQueue.length) {
+            this.isMancheMode = false;
+            const content = document.getElementById('minigame-content');
+            if (content) {
+                content.innerHTML = `<div style="text-align:center; padding: 30px;">
+                    <h2 style="color:var(--accent-gold); font-size:2rem; margin-bottom:15px;">🎉 TUTTI I TURNI COMPLETATI!</h2>
+                    <p style="font-size:1.2rem; color:#fff;">Le squadre hanno terminato i minigiochi.</p>
+                    <button class="btn" style="background:#16a34a; color:#fff; margin-top:20px;" onclick="window.EroiMinigames.closeMinigame()">Chiudi</button>
+                </div>`;
+            }
+            const banner = document.getElementById('minigame-turn-banner');
+            if (banner) banner.style.display = 'none';
+            return;
+        }
+
+        const turn = this.gameQueue[this.currentTurnIndex];
+        
+        const banner = document.getElementById('minigame-turn-banner');
+        const bannerTeam = document.getElementById('minigame-turn-team');
+        if (banner && bannerTeam) {
+            banner.style.display = 'block';
+            bannerTeam.textContent = turn.teamName;
+        }
+
+        this.mancheScore = 0; // reset
+        this.startMinigameDirect(turn.game, turn.missionId);
+    },
 
     startMinigame: function(type, missionId) {
+        if (window.currentUserRole !== 'docente' && window.currentUserRole !== 'admin') {
+            this.startMinigameDirect(type, missionId);
+            return;
+        }
+        this.openTeamSelection(type, missionId);
+    },
+
+    startManche: function(authorId) {
+        if (window.currentUserRole !== 'docente' && window.currentUserRole !== 'admin') {
+            this.startMancheLegacy(authorId);
+            return;
+        }
+        this.openTeamSelection('manche', authorId);
+    },
+
+    startMinigameDirect: function(type, missionId) {
       currentMissionId = missionId || null;
       const data = getData(missionId);
 
@@ -331,7 +463,7 @@
       }
     },
 
-    startManche: function(authorId) {
+    startMancheLegacy: function(authorId) {
       this.isMancheMode = true;
       this.mancheGames = ['quiz', 'impiccato', 'cloze', 'puzzle', 'versi'];
       this.mancheScore = 0;
@@ -353,15 +485,65 @@
         return;
       }
       const nextGame = this.mancheGames.shift();
-      this.startMinigame(nextGame, authorId);
+      this.startMinigameDirect(nextGame, authorId);
     },
 
     finalizeMancheReward: function(xp) {
-        this.assignPointsToTeam(xp);
+        this.assignPointsToTeamLegacy(xp);
         this.closeMinigame();
     },
 
-    assignPointsToTeam: function(xp) {
+    assignPointsToTeam: async function(xp) {
+        const isQueueActive = (this.gameQueue && this.gameQueue.length > 0 && this.currentTurnIndex < this.gameQueue.length);
+
+        if (isQueueActive) {
+            const currentTurn = this.gameQueue[this.currentTurnIndex];
+            
+            if (currentTurn.game === 'versi') {
+                alert(`Hai terminato il minigioco 'Versi'. Assegna MANUALMENTE i punti alla ${currentTurn.teamName} dal tuo pannello LIM.`);
+                if (window.fanta_db && window.fanta_db.saveMinigameLog) {
+                    window.fanta_db.saveMinigameLog({
+                        teamId: currentTurn.teamId,
+                        teamName: currentTurn.teamName,
+                        game: currentTurn.game,
+                        points: 0 // Assegnazione manuale, segniamo 0 per lo storico (o potremmo omettere i punti)
+                    });
+                }
+            } else {
+                try {
+                    const doc = await window.db.collection('teams').doc(currentTurn.teamId).get();
+                    if(doc.exists) {
+                        const t = doc.data();
+                        await window.db.collection('teams').doc(currentTurn.teamId).update({
+                            points: (t.points || 0) + xp
+                        });
+                        alert(`+${xp} Punti assegnati AUTOMATICAMENTE a ${currentTurn.teamName}!`);
+                        
+                        // Salva nel log
+                        if (window.fanta_db && window.fanta_db.saveMinigameLog) {
+                            window.fanta_db.saveMinigameLog({
+                                teamId: currentTurn.teamId,
+                                teamName: currentTurn.teamName,
+                                game: currentTurn.game,
+                                points: xp
+                            });
+                        }
+                    }
+                } catch(e) {
+                    console.error("Errore aggiornamento punti", e);
+                    alert(`Errore nell'assegnazione automatica a ${currentTurn.teamName}. Assegnali manualmente.`);
+                }
+            }
+            
+            this.currentTurnIndex++;
+            this.playNextInQueue();
+            return;
+        }
+
+        this.assignPointsToTeamLegacy(xp);
+    },
+
+    assignPointsToTeamLegacy: function(xp) {
         if (window.currentUserRole === 'studente' && window.currentUserTeamId && window.db) {
             window.db.collection('teams').doc(window.currentUserTeamId).get().then(doc => {
                 if(doc.exists) {
@@ -384,8 +566,13 @@
     closeMinigame: function() {
       const container = document.getElementById('minigame-container');
       if (container) container.style.display = 'none';
+      const banner = document.getElementById('minigame-turn-banner');
+      if (banner) banner.style.display = 'none';
+      
       currentMinigame = null;
       this.isMancheMode = false;
+      this.gameQueue = [];
+      this.currentTurnIndex = 0;
     },
 
     // =====================================================
@@ -787,18 +974,39 @@
     
     rewardAndNext: function(type, baseXP, dracme) {
       try {
+        const isQueueActive = (this.gameQueue && this.gameQueue.length > 0 && this.currentTurnIndex < this.gameQueue.length);
+
+        if (isQueueActive) {
+            let xp = 0;
+            if (this.isMancheMode) {
+                 xp = (type === 'quiz') ? baseXP : 4; 
+            } else {
+                 xp = (type === 'quiz') ? baseXP : 2; 
+                 if (xp > 2) xp = 2;
+            }
+            
+            if (xp > 0 || type === 'versi') { 
+                this.assignPointsToTeam(xp); 
+            } else {
+                this.currentTurnIndex++;
+                this.playNextInQueue();
+            }
+            return;
+        }
+
+        // Legacy (Studente)
         if (this.isMancheMode) {
-            let manchePts = (type === 'quiz') ? baseXP : 4; // Fino a 4 per gioco, totale 20
+            let manchePts = (type === 'quiz') ? baseXP : 4;
             this.mancheScore += manchePts;
             this.nextMancheGame(currentMissionId);
         } else {
-            let xp = 2; // Massimo 2 punti gioco singolo per i minigiochi classici
-            if (type === 'quiz') xp = baseXP; // il quiz passa il suo punteggio calcolato (max 2)
-            if (xp > 2) xp = 2; // Sicurezza: massimo 2 per gioco singolo in ogni caso
+            let xp = 2;
+            if (type === 'quiz') xp = baseXP;
+            if (xp > 2) xp = 2;
             if (xp > 0) {
-                this.assignPointsToTeam(xp);
+                this.assignPointsToTeamLegacy(xp);
             }
-            this.startMinigame(type, currentMissionId);
+            this.startMinigameDirect(type, currentMissionId);
         }
       } catch(e) { console.warn('Reward error:', e); }
     }

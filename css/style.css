@@ -2281,3 +2281,22 @@ h1, h2, h3, h4 {
         padding: 20px;
     }
 }
+
+/* MUSIC PLAYER POPUP */
+#music-player-popup.visible {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+}
+
+#music-player-popup .music-control-btn:hover {
+    color: var(--accent-gold) !important;
+}
+
+#music-player-popup .music-play-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(212,175,55,0.7) !important;
+}
+
+#music-player-popup .music-shuffle-btn:hover {
+    color: var(--accent-gold) !important;
+}

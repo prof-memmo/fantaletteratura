@@ -193,3 +193,41 @@ window.fanta_db = {
         await ref.update(data);
     }
 };
+
+// --- MINIGAME LOGS ---
+window.fanta_db.saveMinigameLog = async (logData) => {
+    try {
+        const docRef = window.db.collection('minigame_logs').doc();
+        await docRef.set({
+            ...logData,
+            timestamp: logData.timestamp || new Date().toISOString()
+        });
+        return true;
+    } catch (e) {
+        console.error("Error saving minigame log", e);
+        return false;
+    }
+};
+
+window.fanta_db.getMinigameLogs = async () => {
+    try {
+        const snap = await window.db.collection('minigame_logs').orderBy('timestamp', 'desc').get();
+        return snap.docs.map(d => d.data());
+    } catch (e) {
+        console.error("Error getting minigame logs", e);
+        return [];
+    }
+};
+
+window.fanta_db.clearMinigameLogs = async () => {
+    try {
+        const snap = await window.db.collection('minigame_logs').get();
+        const batch = window.db.batch();
+        snap.docs.forEach(d => batch.delete(d.ref));
+        await batch.commit();
+        return true;
+    } catch (e) {
+        console.error("Error clearing minigame logs", e);
+        return false;
+    }
+};

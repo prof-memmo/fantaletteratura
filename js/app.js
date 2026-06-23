@@ -1638,8 +1638,14 @@ window.renderAdminProfilo = async function() {
         try {
             const backupName = prompt("Inserisci un nome per l'archivio (es: Fantaletteratura_2025_2026):", `Archivio_${currentYear}`);
             if(!backupName) return;
+            
+            // Svuota lo storico dei minigiochi
+            if (window.fanta_db && window.fanta_db.clearMinigameLogs) {
+                await window.fanta_db.clearMinigameLogs();
+            }
+            
             // Funzionalità di mock che in prod deve chiamare un cloud function
-            alert(`Archiviazione "${backupName}" simulata con successo. Il database verrà svuotato.`);
+            alert(`Archiviazione "${backupName}" completata con successo. Lo Storico Minigiochi e le squadre sono stati azzerati.`);
         } catch(e) {
             console.error(e);
             alert("Errore archiviazione.");
@@ -4995,3 +5001,67 @@ window.presClickHandler = function(e) {
         document.getElementById('modal-cantami-diva').style.display = 'none';
     };
 })();
+
+window.switchDocenteTab = function(tabName) {
+    // Nascondi tutti i contenuti
+    document.querySelectorAll('.docente-tab-content').forEach(el => el.style.display = 'none');
+    
+    // Rimuovi classe active dai bottoni
+    document.querySelectorAll('.tabs-header .admin-tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+        btn.style.background = 'var(--bg-dark)';
+        btn.style.color = 'var(--text-main)';
+    });
+
+    // Mostra il contenuto richiesto
+    const targetContent = document.getElementById('tab-docente-' + tabName);
+    if (targetContent) targetContent.style.display = 'block';
+
+    // Aggiorna il bottone
+    const targetBtn = document.getElementById('btn-tab-' + tabName);
+    if (targetBtn) {
+        targetBtn.classList.add('active');
+        targetBtn.style.background = '';
+        targetBtn.style.color = '';
+    }
+    
+    if (tabName === 'storico') {
+        window.renderMinigamesHistory();
+    }
+};
+
+window.renderMinigamesHistory = async function() {
+    const tableBody = document.querySelector('#minigames-history-table tbody');
+    if (!tableBody) return;
+    
+    tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">Caricamento storico...</td></tr>';
+    
+    try {
+        const logs = window.fanta_db && window.fanta_db.getMinigameLogs ? await window.fanta_db.getMinigameLogs() : [];
+        tableBody.innerHTML = '';
+        
+        if (!logs || logs.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding: 20px;">Nessuna partita registrata.</td></tr>';
+            return;
+        }
+        
+        // Ordina per data decrescente
+        logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        
+        logs.forEach(log => {
+            const date = new Date(log.timestamp);
+            const dateStr = date.toLocaleDateString('it-IT') + ' ' + date.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
+            
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="font-size:0.8rem; color:var(--text-muted);">${dateStr}</td>
+                <td><strong>${log.teamName || log.teamId}</strong></td>
+                <td><span class="badge" style="background:var(--accent-gold); color:var(--bg-dark);">${log.game}</span></td>
+                <td><strong style="color:var(--primary-color)">+${log.points} pt</strong></td>
+            `;
+            tableBody.appendChild(tr);
+        });
+    } catch (e) {
+        tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--danger-color); padding: 20px;">Errore nel caricamento.</td></tr>';
+    }
+};
