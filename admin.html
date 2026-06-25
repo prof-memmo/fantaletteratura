@@ -295,8 +295,16 @@
 
                     <div id="admin-master-area" style="display:none; margin-bottom: 20px; padding: 15px; border: 1px solid var(--danger-color); border-radius: 10px; background: rgba(231, 76, 60, 0.1);">
                         <h3 class="text-danger"><i class="fa-solid fa-triangle-exclamation"></i> Danger Zone: Archiviazione Annuale</h3>
-                        <p style="font-size: 0.85rem; margin-bottom: 10px;">Questa opzione trasferisce tutte le squadre e studenti dell'anno in corso nell'Archivio Storico, resettando le classifiche. Non è reversibile!</p>
+                        <p style="font-size: 0.85rem; margin-bottom: 10px;">Questa opzione archivia tutte le squadre e studenti dell'anno in corso, salvandone una "fotografia" della classifica. Se necessario, l'operazione potrà essere annullata dall'Archivio Storico.</p>
                         <button type="button" class="btn text-danger" style="background: transparent; border: 1px solid var(--danger-color);" onclick="window.archiviaAnnoCorrente()"><i class="fa-solid fa-box-archive"></i> Esegui Archiviazione Anno</button>
+                    </div>
+
+                    <div id="admin-historical-archives-area" style="display:none; margin-bottom: 30px; padding: 15px; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; background: rgba(255, 255, 255, 0.02);">
+                        <h3 style="color: var(--accent-gold); margin-top:0;"><i class="fa-solid fa-clock-rotate-left"></i> Archivio Storico</h3>
+                        <p style="font-size: 0.85rem; margin-bottom: 15px; color: var(--text-muted);">Consulta le classifiche degli anni passati o ripristina un anno archiviato per errore.</p>
+                        <div id="admin-historical-archives-list">
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">Caricamento archivio in corso...</p>
+                        </div>
                     </div>
 
                     <h3 class="text-primary">Le tue squadre</h3>

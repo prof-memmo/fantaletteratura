@@ -1667,6 +1667,109 @@ window.renderAdminProfilo = async function() {
             alert("Errore archiviazione: " + e.message);
         }
     };
+
+    window.ripristinaAnnoArchiviato = async function(backupName) {
+        if(currentUserEmail !== 'prof.memmo@gmail.com') return;
+        if(!confirm(`Sei ASSOLUTAMENTE sicuro di voler RIPRISTINARE l'anno archiviato "${backupName}"?\nQuesta operazione rimetterà in gioco tutte le squadre e gli studenti di quell'anno.`)) return;
+        try {
+            const usersSnapshot = await window.db.collection('users').where('archivedYear', '==', backupName).get();
+            const teamsSnapshot = await window.db.collection('teams').where('archivedYear', '==', backupName).get();
+            const archivesSnapshot = await window.db.collection('archives').where('yearName', '==', backupName).get();
+            
+            let batch = window.db.batch();
+            
+            usersSnapshot.docs.forEach(doc => {
+                const data = doc.data();
+                batch.update(doc.ref, { 
+                    status: 'active', 
+                    teamId: data.archivedTeamId || null, 
+                    teamCode: data.archivedTeamCode || null,
+                    archivedYear: firebase.firestore.FieldValue.delete(),
+                    archivedTeamId: firebase.firestore.FieldValue.delete(),
+                    archivedTeamCode: firebase.firestore.FieldValue.delete()
+                });
+            });
+
+            teamsSnapshot.docs.forEach(doc => {
+                batch.update(doc.ref, { 
+                    status: 'approved',
+                    archivedYear: firebase.firestore.FieldValue.delete()
+                });
+            });
+
+            archivesSnapshot.docs.forEach(doc => {
+                batch.delete(doc.ref);
+            });
+
+            await batch.commit();
+            alert(`Ripristino dell'anno "${backupName}" completato con successo!`);
+            window.location.reload();
+        } catch(e) {
+            console.error(e);
+            alert("Errore durante il ripristino: " + e.message);
+        }
+    };
+
+    window.loadHistoricalArchives = async function() {
+        if(currentUserEmail !== 'prof.memmo@gmail.com') return;
+        try {
+            const snapshot = await window.db.collection('archives').orderBy('timestamp', 'desc').get();
+            const container = document.getElementById('admin-historical-archives-list');
+            if(!container) return;
+            
+            if(snapshot.empty) {
+                container.innerHTML = '<p style="color:var(--text-muted); font-size: 0.9rem;">Nessun anno archiviato trovato.</p>';
+                return;
+            }
+            
+            let html = '<div style="display: flex; flex-direction: column; gap: 15px;">';
+            snapshot.docs.forEach(doc => {
+                const data = doc.data();
+                const d = data.timestamp ? data.timestamp.toDate().toLocaleDateString() : 'Data Sconosciuta';
+                
+                let lbHtml = '<div style="margin-top:10px; display:none; background:rgba(0,0,0,0.2); padding:10px; border-radius:6px;" id="archive-lb-'+doc.id+'">';
+                lbHtml += '<h4 style="margin-bottom:10px; color:var(--gold); border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px;">Classifica Finale</h4>';
+                
+                if(data.leaderboard && data.leaderboard.length > 0) {
+                    data.leaderboard.forEach((t, i) => {
+                        let badge = '';
+                        if(i===0) badge = '🥇';
+                        else if(i===1) badge = '🥈';
+                        else if(i===2) badge = '🥉';
+                        else badge = (i+1)+'°';
+                        
+                        lbHtml += `<div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px dashed rgba(255,255,255,0.05); font-size:0.9rem;">
+                            <span>${badge} <strong>${t.name}</strong> <span style="color:var(--text-muted); font-size:0.8rem;">(${t.classRoom} - ${t.school})</span></span>
+                            <span style="color:var(--gold); font-weight:bold;">${t.points} pt</span>
+                        </div>`;
+                    });
+                } else {
+                    lbHtml += '<p style="font-size:0.85rem; color:var(--text-muted);">Classifica non disponibile o vuota.</p>';
+                }
+                lbHtml += '</div>';
+
+                html += `
+                <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <h4 style="margin: 0; color: var(--text-light); font-size: 1.1rem;"><i class="fa-solid fa-box-archive" style="color:var(--accent-gold);"></i> ${data.yearName}</h4>
+                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Archiviato il: ${d}</div>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="const el = document.getElementById('archive-lb-${doc.id}'); el.style.display = el.style.display === 'none' ? 'block' : 'none';"><i class="fa-solid fa-eye"></i> Classifica</button>
+                            <button class="btn text-danger" style="background: rgba(231, 76, 60, 0.1); border: 1px solid var(--danger-color); padding: 6px 12px; font-size: 0.8rem;" onclick="window.ripristinaAnnoArchiviato('${data.yearName}')"><i class="fa-solid fa-rotate-left"></i> Ripristina</button>
+                        </div>
+                    </div>
+                    ${lbHtml}
+                </div>`;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        } catch(e) {
+            console.error("Errore caricamento archivio storico:", e);
+        }
+    };
+
     // Render Squadre
     let teams = (await getAllTeams()).filter(t => t.ownerEmail === currentUserEmail);
     sqList.innerHTML = '';
