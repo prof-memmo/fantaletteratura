@@ -2300,3 +2300,26 @@ h1, h2, h3, h4 {
 #music-player-popup .music-shuffle-btn:hover {
     color: var(--accent-gold) !important;
 }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   MODAL FULLSCREEN — Per i Minigiochi
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.modal-fullscreen {
+    padding: 0 !important;
+}
+
+.modal-fullscreen .modal-wip-content {
+    max-width: 100% !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    border: none !important;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-fullscreen #minigame-content {
+    flex: 1;
+    overflow-y: auto;
+}
