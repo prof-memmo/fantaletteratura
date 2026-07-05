@@ -418,6 +418,15 @@
                                 <input type="email" name="email" class="input-control" placeholder="La tua email" required>
                             </div>
                             <div class="input-group">
+                                <label>Tipologia della comunicazione</label>
+                                <select name="topic" class="input-control" required style="background-color: var(--color-bg); cursor: pointer; padding: 0.875rem 1rem; border-radius: 8px; border: 1px solid rgba(0,0,0,0.1); width: 100%;">
+                                    <option value="" disabled selected>Seleziona un'opzione...</option>
+                                    <option value="Richiesta di informazioni">Richiesta di informazioni</option>
+                                    <option value="Opinioni">Opinioni</option>
+                                    <option value="Altro">Altro</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
                                 <label>Messaggio</label>
                                 <textarea name="message" class="input-control" placeholder="Come posso aiutarti?" rows="5" id="contatti-messaggio" required></textarea>
                             </div>
