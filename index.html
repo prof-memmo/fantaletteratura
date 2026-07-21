@@ -481,6 +481,11 @@
                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; flex-wrap: wrap;">
                       <h2>Profilo Utente</h2>
                       <div style="display: flex; align-items: center; gap: 8px;">
+                          <!-- Modifica Profilo -->
+                          <button class="btn" style="width: auto; padding: 8px 14px; border-radius: 20px; font-size: 0.8rem; background: var(--bg-dark); color: var(--accent-gold); border: 1px solid var(--accent-gold); font-weight: 600; margin: 0; display: flex; align-items: center; gap: 6px;" onclick="window.openEditProfileModal()">
+                              <i class="fa-solid fa-user-edit"></i> <span class="hide-mobile">Modifica Profilo</span>
+                          </button>
+                          
                           <!-- Invita un collega -->
                           <button class="btn" style="width: auto; padding: 8px 14px; border-radius: 20px; font-size: 0.8rem; background: var(--accent-gold); color: var(--bg-dark); font-weight: 600; margin: 0; display: flex; align-items: center; gap: 6px;" onclick="openInviteModal()">
                               <i class="fa-solid fa-paper-plane"></i> <span class="hide-mobile">Invita Collega</span>
@@ -1223,6 +1228,29 @@
                 <!-- Popolato da JS -->
             </div>
             <button class="btn" style="width:100%;" onclick="window.EroiMinigames.confirmTeamSelection()"><i class="fa-solid fa-play"></i> Inizia Sfida</button>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="edit-profile-modal" class="modal-wip modal-fullscreen" style="z-index: 5000; overflow-y:auto;" onclick="if(event.target===this) { this.style.display='none'; }">
+        <div class="modal-wip-content glass" style="padding: 20px; max-width: 450px; margin: 40px auto; position: relative;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 14px;">
+              <h3 style="font-family: var(--font-heading); color: var(--accent-gold); font-size: 1.2rem; margin:0;"><i class="fa-solid fa-user-edit"></i> Modifica Profilo</h3>
+              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="document.getElementById('edit-profile-modal').style.display='none'">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+            <form id="form-edit-profile" onsubmit="event.preventDefault(); window.saveProfileData();">
+                <div style="margin-bottom: 1.5rem; text-align: left;">
+                    <label style="display: block; font-weight: 800; color: var(--accent-gold); margin-bottom: 0.5rem; font-size: 0.9rem;">Nome e Cognome / Nickname:</label>
+                    <input type="text" id="edit-profile-name" required class="input-control" style="width: 100%;">
+                </div>
+                <div style="margin-bottom: 1.5rem; text-align: left;" id="edit-profile-school-group" style="display:none;">
+                    <label style="display: block; font-weight: 800; color: var(--accent-gold); margin-bottom: 0.5rem; font-size: 0.9rem;">Scuola:</label>
+                    <input type="text" id="edit-profile-school" class="input-control" style="width: 100%;">
+                </div>
+                <button type="submit" class="btn" style="width: 100%; padding: 1rem; border-radius: 30px; font-weight: 800;">Salva Modifiche</button>
+            </form>
         </div>
     </div>
 

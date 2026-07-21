@@ -5210,3 +5210,66 @@ window.renderMinigamesHistory = async function() {
         tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--danger-color); padding: 20px;">Errore nel caricamento.</td></tr>';
     }
 };
+
+window.openEditProfileModal = async function() {
+    const user = window.auth.currentUser;
+    if (!user) return;
+    
+    const modal = document.getElementById('edit-profile-modal');
+    const nameInput = document.getElementById('edit-profile-name');
+    const schoolGroup = document.getElementById('edit-profile-school-group');
+    const schoolInput = document.getElementById('edit-profile-school');
+    
+    try {
+        const doc = await window.db.collection('users').doc(user.email.toLowerCase()).get();
+        if (!doc.exists) return;
+        
+        const userData = doc.data();
+        const isTeacher = (userData.role === 'docente' || userData.role === 'teacher' || userData.role === 'admin' || user.email === 'prof.memmo@gmail.com');
+        
+        if (isTeacher) {
+            schoolGroup.style.display = 'block';
+            schoolInput.value = userData.school || '';
+        } else {
+            schoolGroup.style.display = 'none';
+        }
+        
+        nameInput.value = userData.name || user.displayName || '';
+        modal.style.display = 'block';
+    } catch (err) {
+        console.error(err);
+    }
+};
+
+window.saveProfileData = async function() {
+    const user = window.auth.currentUser;
+    if (!user) return;
+    
+    const nameInput = document.getElementById('edit-profile-name').value.trim();
+    const schoolInput = document.getElementById('edit-profile-school').value.trim();
+    
+    if (!nameInput) {
+        alert('Il nome non può essere vuoto.');
+        return;
+    }
+    
+    try {
+        const docRef = window.db.collection('users').doc(user.email.toLowerCase());
+        const doc = await docRef.get();
+        const userData = doc.exists ? doc.data() : {};
+        
+        const isTeacher = (userData.role === 'docente' || userData.role === 'teacher' || userData.role === 'admin' || user.email === 'prof.memmo@gmail.com');
+        const updateData = { name: nameInput };
+        if (isTeacher) {
+            updateData.school = schoolInput;
+        }
+        
+        await docRef.update(updateData);
+        alert('Profilo aggiornato con successo!');
+        document.getElementById('edit-profile-modal').style.display = 'none';
+        
+    } catch (err) {
+        console.error(err);
+        alert('Errore durante il salvataggio.');
+    }
+};
