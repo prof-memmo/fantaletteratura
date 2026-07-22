@@ -1004,8 +1004,11 @@ async function setupAdminPanel() {
             
             let log = u.approvedAt ? `<br><small class="text-muted">Approvato: ${u.approvedAt.toDate ? u.approvedAt.toDate().toLocaleString() : u.approvedAt}</small>` : '';
             list.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid rgba(255,255,255,0.05);">
-                <div>${roleLabel} <span>${u.email}</span> &mdash; <strong>${u.name || 'Senza Nome'}</strong> <a href="mailto:${u.email}" title="Scrivi a ${u.name || 'Senza Nome'}" style="color:var(--accent-gold); margin-left:6px; text-decoration:none;"><i class="fa-solid fa-envelope"></i></a>${log}</div>
-                <button class="btn btn-secondary text-danger" style="padding:4px 8px; font-size:0.75rem; width:auto; background:var(--bg-card); border-color:var(--danger-color);" onclick="eliminaDocente('${u.email}')"><i class="fa-solid fa-trash"></i></button>
+                <div>${roleLabel} <span>${u.email}</span> &mdash; <strong>${u.name || 'Senza Nome'}</strong>${log}</div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <a href="mailto:${u.email}" title="Scrivi a ${u.name || 'Senza Nome'}" style="color:var(--accent-gold); text-decoration:none;"><i class="fa-solid fa-envelope"></i></a>
+                    <button class="btn btn-secondary text-danger" style="padding:4px 8px; font-size:0.75rem; width:auto; background:var(--bg-card); border-color:var(--danger-color);" onclick="eliminaDocente('${u.email}')"><i class="fa-solid fa-trash"></i></button>
+                </div>
             </div>`;
         });
     };
