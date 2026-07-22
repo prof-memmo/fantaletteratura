@@ -941,6 +941,17 @@ async function setupAdminPanel() {
         window.renderAdminDocenti();
     };
 
+    window.sortAdminDocenti = function(col) {
+        if (!window.adminDocentiSortObj) window.adminDocentiSortObj = { col: 'date', asc: false };
+        if (window.adminDocentiSortObj.col === col) {
+            window.adminDocentiSortObj.asc = !window.adminDocentiSortObj.asc;
+        } else {
+            window.adminDocentiSortObj.col = col;
+            window.adminDocentiSortObj.asc = true;
+        }
+        window.renderAdminDocenti();
+    };
+
     window.renderAdminDocenti = async function(filterText = '') {
         const list = document.getElementById('admin-docenti-list');
         const statsContainer = document.getElementById('admin-docenti-stats');
@@ -995,7 +1006,40 @@ async function setupAdminPanel() {
             return (u.email || '').toLowerCase().includes(q) || (u.name || '').toLowerCase().includes(q);
         });
 
-        if (filteredUsers.length === 0) list.innerHTML = '<i>Nessun iscritto trovato.</i>';
+        if (filteredUsers.length === 0) {
+            list.innerHTML = '<i>Nessun iscritto trovato.</i>';
+            return;
+        }
+
+        const state = window.adminDocentiSortObj || { col: 'date', asc: false };
+        filteredUsers.sort((a, b) => {
+            let valA, valB;
+            if (state.col === 'email') { valA = (a.email || '').toLowerCase(); valB = (b.email || '').toLowerCase(); }
+            else if (state.col === 'role') { valA = (a.role || '').toLowerCase(); valB = (b.role || '').toLowerCase(); }
+            else if (state.col === 'date') { 
+                let dA = a.createdAt || a.joinedAt;
+                let dB = b.createdAt || b.joinedAt;
+                valA = dA ? (dA.toMillis ? dA.toMillis() : new Date(dA).getTime()) : 0; 
+                valB = dB ? (dB.toMillis ? dB.toMillis() : new Date(dB).getTime()) : 0; 
+            }
+            else { valA = (a.email || '').toLowerCase(); valB = (b.email || '').toLowerCase(); }
+            
+            if (valA < valB) return state.asc ? -1 : 1;
+            if (valA > valB) return state.asc ? 1 : -1;
+            return 0;
+        });
+
+        list.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:2px solid var(--accent-gold); font-size:0.8rem; text-transform:uppercase; color:var(--accent-gold);">
+                <div style="display:flex; gap:15px; width:100%;">
+                    <div style="cursor:pointer; flex: 1;" onclick="window.sortAdminDocenti('role')">Ruolo <i class="fa-solid fa-sort" style="margin-left:5px; color:#888;"></i></div>
+                    <div style="cursor:pointer; flex: 2;" onclick="window.sortAdminDocenti('email')">Utente <i class="fa-solid fa-sort" style="margin-left:5px; color:#888;"></i></div>
+                    <div style="cursor:pointer; flex: 1;" onclick="window.sortAdminDocenti('date')">Data Iscrizione <i class="fa-solid fa-sort" style="margin-left:5px; color:#888;"></i></div>
+                    <div style="flex: 1; text-align:right;">Azioni</div>
+                </div>
+            </div>
+        `;
+
         filteredUsers.forEach(u => {
             let roleLabel = '';
             if (u.role === 'teacher') roleLabel = '<span style="color:#3498db; font-size:0.7rem; font-weight:800; text-transform:uppercase;">[Docente]</span>';
@@ -1003,11 +1047,18 @@ async function setupAdminPanel() {
             else roleLabel = '<span style="color:#2ecc71; font-size:0.7rem; font-weight:800; text-transform:uppercase;">[Studente]</span>';
             
             let log = u.approvedAt ? `<br><small class="text-muted">Approvato: ${u.approvedAt.toDate ? u.approvedAt.toDate().toLocaleString() : u.approvedAt}</small>` : '';
+            let dataIsc = u.createdAt || u.joinedAt;
+            let dataStr = dataIsc ? (dataIsc.toDate ? dataIsc.toDate().toLocaleDateString() : new Date(dataIsc).toLocaleDateString()) : 'N/D';
+
             list.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid rgba(255,255,255,0.05);">
-                <div>${roleLabel} <span>${u.email}</span> &mdash; <strong>${u.name || 'Senza Nome'}</strong>${log}</div>
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <a href="mailto:${u.email}" title="Scrivi a ${u.name || 'Senza Nome'}" style="color:var(--accent-gold); text-decoration:none;"><i class="fa-solid fa-envelope"></i></a>
-                    <button class="btn btn-secondary text-danger" style="padding:4px 8px; font-size:0.75rem; width:auto; background:var(--bg-card); border-color:var(--danger-color);" onclick="eliminaDocente('${u.email}')"><i class="fa-solid fa-trash"></i></button>
+                <div style="display:flex; gap:15px; width:100%; align-items:center;">
+                    <div style="flex: 1;">${roleLabel}</div>
+                    <div style="flex: 2;"><span>${u.email}</span> &mdash; <strong>${u.name || 'Senza Nome'}</strong>${log}</div>
+                    <div style="flex: 1;"><span style="font-size:0.75rem; color:#888;"><i class="fa-solid fa-calendar-days"></i> ${dataStr}</span></div>
+                    <div style="display:flex; align-items:center; gap:10px; flex: 1; justify-content:flex-end;">
+                        <a href="mailto:${u.email}" title="Scrivi a ${u.name || 'Senza Nome'}" style="color:var(--accent-gold); text-decoration:none;"><i class="fa-solid fa-envelope"></i></a>
+                        <button class="btn btn-secondary text-danger" style="padding:4px 8px; font-size:0.75rem; width:auto; background:var(--bg-card); border-color:var(--danger-color);" onclick="eliminaDocente('${u.email}')"><i class="fa-solid fa-trash"></i></button>
+                    </div>
                 </div>
             </div>`;
         });
