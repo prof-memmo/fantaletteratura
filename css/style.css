@@ -119,6 +119,9 @@ body {
     background-image: 
         radial-gradient(circle at 50% 50%, rgba(141, 160, 63, 0.05), transparent),
         url('https://www.transparenttextures.com/patterns/p6.png');
+    overscroll-behavior-y: none;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 h1, h2, h3, h4 {
@@ -2322,4 +2325,34 @@ h1, h2, h3, h4 {
 .modal-fullscreen #minigame-content {
     flex: 1;
     overflow-y: auto;
+}
+
+/* ==========================================
+   MIGLIORIE APP-FRIENDLY E MOBILE
+   ========================================== */
+@media (max-width: 768px) {
+    /* SPAZIO TITOLO: riduce padding-top della view su schermi ridotti */
+    .view {
+        padding-top: 10px !important;
+        padding-bottom: 20px !important;
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+    }
+    
+    /* Su smartphone non usiamo "card", ma un layout piatto fluido come le app native */
+    .glass {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        padding: 10px 5px !important;
+        margin-bottom: 15px !important;
+    }
+    
+    .bottom-bar .tab-item span {
+        text-transform: lowercase !important;
+        white-space: nowrap !important;
+        font-size: 0.58rem !important;
+    }
 }
