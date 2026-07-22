@@ -243,12 +243,21 @@ h1, h2, h3, h4 {
     backdrop-filter: var(--glass-blur);
     border-top: 1px solid var(--glass-border);
     display: flex;
-    justify-content: space-around;
+    justify-content: flex-start;
     align-items: center;
     position: fixed;
     bottom: 0;
     width: 100%;
     z-index: 1000;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 5px;
+}
+
+.bottom-bar::-webkit-scrollbar {
+    display: none;
 }
 
 .tab-item {
@@ -261,8 +270,12 @@ h1, h2, h3, h4 {
     font-size: 0.65rem;
     transition: all 0.3s ease;
     padding: 5px;
-    flex: 1;
-    min-width: 0;
+    flex: 0 0 auto;
+    min-width: 75px;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.1;
+    word-break: break-word;
 }
 
 .tab-item i {
@@ -2331,10 +2344,10 @@ h1, h2, h3, h4 {
    MIGLIORIE APP-FRIENDLY E MOBILE
    ========================================== */
 @media (max-width: 768px) {
-    /* SPAZIO TITOLO: riduce padding-top della view su schermi ridotti */
+    /* SPAZIO TITOLO: riduce padding-top della view su schermi ridotti per avvicinare alla barra */
     .view {
-        padding-top: 10px !important;
-        padding-bottom: 20px !important;
+        padding-top: 5px !important;
+        padding-bottom: 5px !important;
         padding-left: 5px !important;
         padding-right: 5px !important;
     }
