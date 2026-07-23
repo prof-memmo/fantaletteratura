@@ -933,11 +933,11 @@ h1, h2, h3, h4 {
     body.no-sidebar #app-container {
         padding-bottom: 100px !important;
     }
-}
     
     .menu-btn {
         display: none;
     }
+}
     
     #app-container {
         max-width: none !important;
@@ -2391,19 +2391,28 @@ h1, h2, h3, h4 {
 
 @media (max-width: 768px) {
     .admin-main-nav-container {
-        justify-content: flex-start;
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none; /* Firefox */
-        padding-bottom: 5px; /* for scrollbar spacing */
-    }
-    
-    .admin-main-nav-container::-webkit-scrollbar {
-        display: none; /* Safari and Chrome */
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        padding: 0 10px;
     }
     
     .admin-main-nav-container .btn {
-        flex: 0 0 auto; /* don't shrink, scroll horizontally */
+        min-width: 0; /* Remove 150px constraint */
+        width: 100%;
+        padding: 8px 4px;
+        font-size: 0.65rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        white-space: normal;
+        line-height: 1.2;
+    }
+    
+    .admin-main-nav-container .btn i {
+        margin-bottom: 4px;
+        font-size: 1.1rem;
     }
 }
