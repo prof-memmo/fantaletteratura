@@ -945,15 +945,7 @@ async function setupAdminPanel() {
         // Ricarica la tabella dopo un breve delay
         setTimeout(() => {
             loadTeacherRequests();
-            `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
-            `Entra nella piattaforma qui:\n` +
-            `👉 ${appUrl}\n\n` +
-            `Usa la tua email (${email}) per accedere come Docente dalla Home.\n\n` +
-            `Per qualsiasi dubbio o supporto, scrivi a prof.memmo@gmail.com\n\n` +
-            `Buon Fantaletteratura! 📖🔥\n\n` +
-            `— Il Team di Fantaletteratura`
-        );
-        window.location.href = `mailto:${email}?subject=${emailSubject}&body=${emailBody}`;
+        }, 1500);
         
         await window.renderAdminRichieste();
         await window.renderAdminDocenti();
