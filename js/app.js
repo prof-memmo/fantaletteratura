@@ -876,8 +876,6 @@ async function setupAdminPanel() {
         
         alert("Docente approvato con successo! Invio della mail in corso...");
         const appUrl = window.location.origin + window.location.pathname.replace('admin.html', 'index.html');
-        const nomeDocente = req.name || 'Prof';
-        const emailSubject = encodeURIComponent('✅ Benvenuto in Fantaletteratura!');
         const emailBody = encodeURIComponent(
             `Ciao ${nomeDocente}!\n\n` +
             `La tua richiesta di iscrizione a Fantaletteratura è stata APPROVATA. 🎉\n` +
@@ -908,6 +906,45 @@ async function setupAdminPanel() {
             `• Creare tornei privati tra classi o scuole diverse\n\n` +
             `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
             `🔗 ACCEDI ORA\n` +
+            `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+            `Puoi effettuare il login da qui:\n${appUrl}\n\n` +
+            `Buon divertimento e che la letteratura sia con te!\n` +
+            `Il team di Prof. Memmo`
+        );
+
+        // --- INTEGRAZIONE HUB ---
+        try {
+            const configHub = {
+                apiKey: "AIzaSyD-n2m-kYEuzGXPMKclZTggf4Y5Zm8_cdM",
+                authDomain: "prof-memmo-hub.firebaseapp.com",
+                projectId: "prof-memmo-hub",
+                storageBucket: "prof-memmo-hub.firebasestorage.app",
+                messagingSenderId: "839149485689",
+                appId: "1:839149485689:web:531776ce3cf495a6f23697"
+            };
+            let hubApp;
+            if (!firebase.apps.find(a => a.name === 'Hub')) {
+                hubApp = firebase.initializeApp(configHub, 'Hub');
+            } else {
+                hubApp = firebase.app('Hub');
+            }
+            await hubApp.firestore().collection("hub_posta_inviata").add({
+                destinatarioEmail: email,
+                destinatarioNome: nomeDocente,
+                gioco: 'Fantaletteratura',
+                oggetto: '✅ Benvenuto in Fantaletteratura!',
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        } catch(e) {
+            console.warn("Errore salvataggio log nell'Hub:", e);
+        }
+
+        // Lancia il client di posta
+        window.location.href = `mailto:${email}?subject=${emailSubject}&body=${emailBody}`;
+        
+        // Ricarica la tabella dopo un breve delay
+        setTimeout(() => {
+            loadTeacherRequests();
             `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
             `Entra nella piattaforma qui:\n` +
             `👉 ${appUrl}\n\n` +
