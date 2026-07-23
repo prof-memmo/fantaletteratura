@@ -2371,3 +2371,39 @@ h1, h2, h3, h4 {
         font-size: 0.58rem !important;
     }
 }
+
+/* Admin navigation bar styling (for mobile horizontal scroll) */
+.admin-main-nav-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 0 15px;
+    margin-bottom: 20px;
+}
+
+.admin-main-nav-container .btn {
+    flex: 1;
+    min-width: 150px;
+    padding: 10px 5px;
+    font-size: 0.8rem;
+}
+
+@media (max-width: 768px) {
+    .admin-main-nav-container {
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none; /* Firefox */
+        padding-bottom: 5px; /* for scrollbar spacing */
+    }
+    
+    .admin-main-nav-container::-webkit-scrollbar {
+        display: none; /* Safari and Chrome */
+    }
+    
+    .admin-main-nav-container .btn {
+        flex: 0 0 auto; /* don't shrink, scroll horizontally */
+    }
+}
