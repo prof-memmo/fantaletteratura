@@ -253,7 +253,9 @@ h1, h2, h3, h4 {
     overflow-y: hidden;
     flex-wrap: nowrap;
     -webkit-overflow-scrolling: touch;
-    padding: 0 5px;
+    padding: 0 15px;
+    gap: 15px;
+    scrollbar-width: none;
 }
 
 .bottom-bar::-webkit-scrollbar {
@@ -271,7 +273,7 @@ h1, h2, h3, h4 {
     transition: all 0.3s ease;
     padding: 5px;
     flex: 0 0 auto;
-    min-width: 75px;
+    min-width: 85px;
     white-space: normal;
     text-align: center;
     line-height: 1.1;
