@@ -290,6 +290,10 @@ h1, h2, h3, h4 {
 
 /* Tooltips (Desktop only) */
 @media screen and (min-width: 1024px) {
+    .bottom-bar {
+        overflow: visible !important;
+    }
+
     .tab-item {
         position: relative;
     }
@@ -915,6 +919,7 @@ h1, h2, h3, h4 {
         box-shadow: 0 15px 35px rgba(0,0,0,0.5);
         margin-left: 0 !important;
         z-index: 1500;
+        overflow: visible !important;
     }
 
     body.no-sidebar .tab-item {
