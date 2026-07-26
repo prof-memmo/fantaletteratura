@@ -272,8 +272,8 @@ h1, h2, h3, h4 {
     font-size: 0.65rem;
     transition: all 0.3s ease;
     padding: 5px;
-    flex: 0 0 auto;
-    min-width: 85px;
+    flex: 0 0 calc(28% - 10px);
+    max-width: 100px;
     white-space: normal;
     text-align: center;
     line-height: 1.1;
