@@ -64,25 +64,11 @@
         });
     };
 
-    // Load Firebase scripts if they don't exist
-    if (typeof firebase === 'undefined') {
-        const script1 = document.createElement('script');
-        script1.src = "https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js";
-        const script2 = document.createElement('script');
-        script2.src = "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js";
-        const script3 = document.createElement('script');
-        script3.src = "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js";
-        
-        script1.onload = () => {
-            script2.onload = () => {
-                script3.onload = () => checkStatus();
-                document.head.appendChild(script3);
-            };
-            document.head.appendChild(script2);
-        };
-        document.head.appendChild(script1);
-    } else {
-        // Firebase is loaded, but we must wait for Auth to initialize
-        setTimeout(checkStatus, 1500); // Small delay to let primary auth resolve
-    }
+    // Wait for Firebase to be loaded by the main app
+    const checkInterval = setInterval(() => {
+        if (typeof firebase !== 'undefined' && typeof firebase.initializeApp === 'function') {
+            clearInterval(checkInterval);
+            setTimeout(checkStatus, 500); // small delay to let primary app initialize
+        }
+    }, 100);
 })();
