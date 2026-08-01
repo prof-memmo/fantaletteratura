@@ -6,7 +6,7 @@ window.fanta_db = {
     loginWithGoogle: () => {
         const provider = new firebase.auth.GoogleAuthProvider();
         provider.setCustomParameters({ prompt: 'select_account' });
-        return window.auth.signInWithPopup(provider);
+        return window.auth.signInWithRedirect(provider);
     },
 
     logout: () => window.auth.signOut(),

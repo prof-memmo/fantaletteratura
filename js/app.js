@@ -2488,7 +2488,13 @@ async function loginGoogle() {
         // checkLoginSession gestirà la logica di approvazione/reindirizzamento
     } catch (error) {
         console.error("Google Login Error:", error);
-        alert("Errore durante l'accesso con Google.");
+        if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+            // Ignoriamo l'errore: su Safari iOS spesso il popup si "stacca" ma il login prosegue in background.
+            // onAuthStateChanged rileverà l'accesso completato tra poco.
+            console.log("Popup interrotto. Attendiamo il completamento in background...");
+        } else {
+            alert("Attendi qualche istante o ricarica la pagina. Se sei su Instagram, apri il sito in Safari/Chrome.");
+        }
     }
 }
 
