@@ -2271,6 +2271,14 @@ window.selfHealMissionsCount = async function() {
 };
 
 function checkLoginSession() {
+    // Risolvi esplicitamente il redirect se presente, per assicurarci che
+    // Firebase processi l'accesso appena la pagina si ricarica dopo Google
+    if (window.auth && typeof window.auth.getRedirectResult === 'function') {
+        window.auth.getRedirectResult().catch(error => {
+            console.error("Errore getRedirectResult:", error);
+        });
+    }
+
     // Ripristina modalità se salvata
     const savedMode = localStorage.getItem('fanta_active_mode');
     if (savedMode) {
