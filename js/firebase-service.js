@@ -6,8 +6,8 @@ window.fanta_db = {
     loginWithGoogle: () => {
         const provider = new firebase.auth.GoogleAuthProvider();
         provider.setCustomParameters({ prompt: 'select_account' });
-        // Torniamo a signInWithRedirect perché i giochi ora si aprono in una nuova scheda
-        return window.auth.signInWithRedirect(provider);
+        // Usiamo signInWithPopup per evitare i blocchi di Cross-Site Tracking (ITP) su Safari/iOS
+        return window.auth.signInWithPopup(provider);
     },
 
     logout: () => window.auth.signOut(),
