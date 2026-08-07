@@ -1217,7 +1217,18 @@
     
     <!-- Configurazione & Service Layer -->
     <script src="js/firebase-config.js"></script>
-    <script src="js/firebase-service.js"></script>
+    <!-- Auth Modules -->
+    <script src="js/auth/login.js"></script>
+    <script src="js/auth/logout.js"></script>
+    <script src="js/auth/session.js"></script>
+    <script src="js/auth/user.js"></script>
+    <script src="js/auth/roles.js"></script>
+    <!-- Services Modules -->
+    <script src="js/services/database.js"></script>
+    <script src="js/services/classes.js"></script>
+    <script src="js/services/teams.js"></script>
+    <script src="js/services/activities.js"></script>
+    <script src="js/services/users.js"></script>
 
     <!-- Modale Selezione Squadre per Minigiochi -->
     <div id="team-selector-modal" class="modal-wip" style="z-index: 5100; overflow-y:auto; display:none;" onclick="if(event.target===this) { this.style.display='none'; }">
@@ -1298,6 +1309,11 @@
     <script src="js/data.js"></script>
     <script src="js/music.js"></script>
     <script src="js/minigames.js"></script>
+    <!-- Components -->
+    <script src="js/components/navbar.js"></script>
+    <script src="js/components/modals.js"></script>
+    <!-- Dashboard -->
+    <script src="js/dashboard/admin-logic.js"></script>
     <script src="js/app.js?v=2"></script>
 </body>
 </html>
