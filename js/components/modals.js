@@ -13,14 +13,6 @@ function closeWipModal() {
     if (modal) modal.classList.remove('active');
 }
 
-/* ─────────────────────────────────────────────────────────────
-   LEADERBOARD MODE SELECTION
-───────────────────────────────────────────────────────────── */
-function selectLeaderboardMode(modeId) {
-    const mode = GAME_MODES[modeId];
-    if (!mode) return;
-
-
 function openLegalModal(type) {
     if (type === 'privacy') hasReadPrivacy = true;
     if (type === 'termini') hasReadTermini = true;
@@ -38,3 +30,7 @@ function closeLegalModal(type) {
         // Non ripristiniamo l'overflow se un'altra modale è aperta
         if (!document.querySelector('.modal-legal[style*="display: flex"]') && 
             !document.querySelector('.modal-legal[style*="display: block"]')) {
+            document.body.style.overflow = '';
+        }
+    }
+}

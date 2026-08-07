@@ -216,8 +216,12 @@ function selectTeamMode(modeId) {
 }
 
 /* ─────────────────────────────────────────────────────────────
-   WIP MODAL
+   LEADERBOARD MODE SELECTION
 ───────────────────────────────────────────────────────────── */
+function selectLeaderboardMode(modeId) {
+    const mode = GAME_MODES[modeId];
+    if (!mode) return;
+    
     if (!mode.available) {
         openWipModal(`La classifica <strong>${mode.label}</strong> non è ancora disponibile. Stiamo preparando gli autori!`);
         return;
@@ -1294,10 +1298,6 @@ async function logoutDocente() {
 let hasReadPrivacy = false;
 let hasReadTermini = false;
 
-            document.body.style.overflow = 'auto';
-        }
-    }
-}
 
 // Chiudi modali cliccando fuori dal contenuto
 window.onclick = function(event) {
