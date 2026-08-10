@@ -511,10 +511,10 @@
                 }
             } else {
                 try {
-                    const doc = await window.db.collection('teams').doc(currentTurn.teamId).get();
+                    const doc = await window.db.collection('fanta_teams').doc(currentTurn.teamId).get();
                     if(doc.exists) {
                         const t = doc.data();
-                        await window.db.collection('teams').doc(currentTurn.teamId).update({
+                        await window.db.collection('fanta_teams').doc(currentTurn.teamId).update({
                             points: (t.points || 0) + xp
                         });
                         alert(`+${xp} Punti assegnati AUTOMATICAMENTE a ${currentTurn.teamName}!`);
@@ -545,10 +545,10 @@
 
     assignPointsToTeamLegacy: function(xp) {
         if (window.currentUserRole === 'studente' && window.currentUserTeamId && window.db) {
-            window.db.collection('teams').doc(window.currentUserTeamId).get().then(doc => {
+            window.db.collection('fanta_teams').doc(window.currentUserTeamId).get().then(doc => {
                 if(doc.exists) {
                     const t = doc.data();
-                    window.db.collection('teams').doc(t.id).update({
+                    window.db.collection('fanta_teams').doc(t.id).update({
                         points: (t.points || 0) + xp
                     });
                     if(window.showToast) {

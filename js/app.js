@@ -529,7 +529,7 @@ window.apriCollaboratori = async function(teamId, teamName) {
     }
 
     try {
-        const teamDoc = await window.db.collection('teams').doc(teamId).get();
+        const teamDoc = await window.db.collection('fanta_teams').doc(teamId).get();
         const colList = teamDoc.data()?.collaboratori || [];
         window._renderCollaboratoriLista(teamId, colList);
     } catch (e) {
@@ -564,7 +564,7 @@ window.aggiungiCollaboratore = async function() {
 
     try {
         // Verifica che l'email sia un docente approvato
-        const userDoc = await window.db.collection('users').doc(email).get();
+        const userDoc = await window.db.collection('fanta_users').doc(email).get();
         if (!userDoc.exists || (userDoc.data().role !== 'teacher' && userDoc.data().role !== 'docente')) {
             alert('Email non trovata o non corrisponde a un docente approvato.');
             return;
@@ -573,7 +573,7 @@ window.aggiungiCollaboratore = async function() {
         document.getElementById('collaboratori-new-email').value = '';
         alert('Collaboratore aggiunto!');
         // Aggiorna la lista
-        const teamDoc = await window.db.collection('teams').doc(teamId).get();
+        const teamDoc = await window.db.collection('fanta_teams').doc(teamId).get();
         window._renderCollaboratoriLista(teamId, teamDoc.data()?.collaboratori || []);
         if (window.location.pathname.includes('admin.html')) {
             if (typeof window.renderAdminSquadre === 'function') window.renderAdminSquadre();
@@ -590,7 +590,7 @@ window.rimuoviCollaboratore = async function(teamId, email) {
     if (!confirm(`Rimuovere ${email} dai collaboratori?`)) return;
     try {
         await fanta_db.removeCollaboratore(teamId, email);
-        const teamDoc = await window.db.collection('teams').doc(teamId).get();
+        const teamDoc = await window.db.collection('fanta_teams').doc(teamId).get();
         window._renderCollaboratoriLista(teamId, teamDoc.data()?.collaboratori || []);
         if (window.location.pathname.includes('admin.html')) {
             if (typeof window.renderAdminSquadre === 'function') window.renderAdminSquadre();
@@ -794,7 +794,7 @@ window.selfHealMissionsCount = async function() {
         if (!currentUserEmail) return;
         
         // 1. Recupera tutte le missioni approvate
-        const missionsSnap = await window.db.collection("missions").where("status", "==", "approved").get();
+        const missionsSnap = await window.db.collection('fanta_missions').where("status", "==", "approved").get();
         const approvedMissions = missionsSnap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
         
         // 2. Recupera i team in base al ruolo dell'utente
@@ -859,11 +859,46 @@ function checkLoginSession() {
     }
 
     fanta_db.onAuthStateChanged(async (user) => {
+        if (!user) {
+            // Reindirizzamento al Login Centrale dell'Hub
+            window.location.href = '../prof-memmo-admin-gestione-generale/portal.html';
+            return;
+        }
+
         if (user) {
             const email = user.email.toLowerCase();
             currentUserEmail = email;
             
-            // Protezione pannello admin
+            // 1. Verifica sull'Hub Centrale (Single Sign-On Auth)
+            try {
+                const hubDoc = await window.db.collection('hub_users').doc(user.uid).get();
+                if (!hubDoc.exists) {
+                    alert("Profilo Hub non trovato. Completa l'onboarding nell'Hub.");
+                    window.location.href = '../prof-memmo-admin-gestione-generale/portal.html';
+                    return;
+                }
+                
+                const hubData = hubDoc.data();
+                if (hubData.statusAccount !== 'active') {
+                    alert("Accesso negato: L'account non è attivo nell'Hub (potrebbe essere sospeso o in attesa di approvazione).");
+                    window.location.href = '../prof-memmo-admin-gestione-generale/portal.html';
+                    return;
+                }
+                
+                if (!hubData.platforms || !hubData.platforms.fantaletteratura || !hubData.platforms.fantaletteratura.enabled) {
+                    alert("Accesso negato: Piattaforma FantaLetteratura non abilitata per il tuo profilo.");
+                    window.location.href = '../prof-memmo-admin-gestione-generale/portal.html';
+                    return;
+                }
+                
+            } catch (err) {
+                console.error("Errore verifica Hub:", err);
+                alert("Errore di sicurezza Hub. Riprova.");
+                window.location.href = '../prof-memmo-admin-gestione-generale/portal.html';
+                return;
+            }
+
+            // 2. Protezione pannello admin locale
             if (window.location.pathname.includes('admin.html')) {
                 if (email !== "prof.memmo@gmail.com") {
                     alert("Accesso negato. Solo l'amministratore può accedere al pannello di controllo.");
@@ -872,7 +907,7 @@ function checkLoginSession() {
                 }
             }
 
-            // Prof Memmo ha accesso diretto
+            // 3. Prof Memmo ha accesso diretto
             if (email === "prof.memmo@gmail.com") {
                 currentUserRole = 'docente';
                 setLoggedIn(email, 'docente');
@@ -882,13 +917,11 @@ function checkLoginSession() {
                     const _c = document.getElementById('app-container');
                     if (_c) _c.style.display = 'block';
                     
-                    // Se siamo in admin, rendiamo certi ricaricamenti forzati
                     if(typeof window.renderAdminAutori === 'function') window.renderAdminAutori();
                     if(typeof window.renderAdminRichieste === 'function') window.renderAdminRichieste();
                     if(typeof renderNotifiche === 'function') renderNotifiche();
                 }
 
-                // Mostra il link al pannello admin nel menù
                 const adminMenuItem = document.getElementById('menu-admin-item');
                 if (adminMenuItem) adminMenuItem.style.display = 'block';
                 
@@ -902,14 +935,13 @@ function checkLoginSession() {
                     }
                 }
                 
-                // Esegui allineamento punteggi a caldo
                 window.selfHealMissionsCount();
                 return;
             }
             
             // Verifica ruolo su Firestore
             try {
-                const doc = await window.db.collection("users").doc(email).get();
+                const doc = await window.db.collection('fanta_users').doc(email).get();
                 
                 if (doc.exists && doc.data().role) {
                     const userData = doc.data();
@@ -918,7 +950,7 @@ function checkLoginSession() {
                         if (newTeamCode) {
                             const team = await fanta_db.getTeamByCode(newTeamCode);
                             if (team) {
-                                await window.db.collection("users").doc(email).update({
+                                await window.db.collection('fanta_users').doc(email).update({
                                     status: 'active',
                                     teamId: team.id,
                                     teamCode: newTeamCode
@@ -1036,7 +1068,7 @@ window.selectOnboardingRole = async function(role) {
     } else if (role === 'fantamico' || role === 'guest') {
         try {
             if (window.FantaTimer) window.FantaTimer.startSession(email);
-            await window.db.collection("users").doc(email).set({
+            await window.db.collection('fanta_users').doc(email).set({
                 email: email,
                 role: role,
                 name: user.displayName || email.split('@')[0],
@@ -1153,7 +1185,7 @@ async function checkStudentConsent() {
         const user = window.auth.currentUser;
         if (user) {
             try {
-                await window.db.collection("users").doc(user.email.toLowerCase()).set({
+                await window.db.collection('fanta_users').doc(user.email.toLowerCase()).set({
                     email: user.email.toLowerCase(),
                     role: 'studente',
                     teamId: team.id,
@@ -1544,7 +1576,7 @@ async function renderProfilo() {
     // Carica tutti gli studenti una volta sola
     let allStudentsMap = {};
     try {
-        const snap = await window.db.collection("users").where("role", "==", "studente").get();
+        const snap = await window.db.collection('fanta_users').where("role", "==", "studente").get();
         snap.docs.forEach(d => { allStudentsMap[d.data().teamId] = allStudentsMap[d.data().teamId] || []; allStudentsMap[d.data().teamId].push(d.data()); });
     } catch(e) { /* ignora */ }
 
@@ -1813,7 +1845,7 @@ async function renderProfilo() {
         profMisList.innerHTML = '<i>Caricamento missioni convalidate...</i>';
         try {
             // Ottieni tutte le missioni convalidate
-            const snap = await window.db.collection("missions").where("status", "==", "approved").get();
+            const snap = await window.db.collection('fanta_missions').where("status", "==", "approved").get();
             const approvedMissions = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             
             // Filtra solo quelle delle squadre dell'utente (proprietario o collaboratore)
@@ -1897,7 +1929,7 @@ window.uniscitiComeCollaboratore = async function() {
     }
 
     try {
-        const snap = await window.db.collection('teams').where('joinCode', '==', code).get();
+        const snap = await window.db.collection('fanta_teams').where('joinCode', '==', code).get();
         if (snap.empty) {
             alert("Nessuna squadra trovata con il codice specificato.");
             return;
@@ -1917,7 +1949,7 @@ window.uniscitiComeCollaboratore = async function() {
             return;
         }
 
-        await window.db.collection('teams').doc(teamDoc.id).update({
+        await window.db.collection('fanta_teams').doc(teamDoc.id).update({
             collaboratori: firebase.firestore.FieldValue.arrayUnion(currentUserEmail)
         });
 
@@ -1997,7 +2029,7 @@ async function renderNotifiche() {
 
             if (allMyTeamIds.length > 0) {
                 try {
-                    const snap = await window.db.collection("missions")
+                    const snap = await window.db.collection('fanta_missions')
                         .where("teamId", "in", allMyTeamIds.slice(0, 30))
                         .get();
                     const myMissions = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }))
@@ -2276,7 +2308,7 @@ window.segnaTutteNotificheComeLette = async function() {
             const allMyTeamIds = [...myTeamIds, ...collabTeams.map(t => t.id)];
 
             if (allMyTeamIds.length > 0) {
-                const snap = await window.db.collection("missions")
+                const snap = await window.db.collection('fanta_missions')
                     .where("teamId", "in", allMyTeamIds.slice(0, 30))
                     .get();
                 const myMissions = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }))
@@ -2406,7 +2438,7 @@ async function joinTorneo(event) {
         if(selectedIds.length === 0) { alert("Seleziona almeno una tua squadra da iscrivere."); return; }
         
         const updatedTeams = [...new Set([...(tournament.teams || []), ...selectedIds])];
-        await window.db.collection("tournaments").doc(tourId).update({ teams: updatedTeams });
+        await window.db.collection('fanta_tournaments').doc(tourId).update({ teams: updatedTeams });
         await fanta_db.updateInviteStatus(invId, 'accepted');
         
         document.getElementById('join-torneo-modal').style.display = 'none';
@@ -2498,7 +2530,7 @@ async function inviaInvitoTorneo(event) {
     
     try {
         const requests = await fanta_db.getTeacherRequests();
-        const snapshotUsers = await window.db.collection("users").where("email", "==", targetEmail).get();
+        const snapshotUsers = await window.db.collection('fanta_users').where("email", "==", targetEmail).get();
         const isRegistered = !snapshotUsers.empty;
 
         if(!isRegistered) {
@@ -3769,10 +3801,10 @@ window.presClickHandler = function(e) {
         if(window.cantamiTimerInterval) clearInterval(window.cantamiTimerInterval);
         if(assegnaPunti && window.cantamiCurrentTeamId) {
             try {
-                const teamDocRef = window.db.collection('teams').doc(window.cantamiCurrentTeamId);
+                const teamDocRef = window.db.collection('fanta_teams').doc(window.cantamiCurrentTeamId);
                 const teamDoc = await teamDocRef.get();
                 if(teamDoc.exists) {
-                    await window.db.collection('missions').add({
+                    await window.db.collection('fanta_missions').add({
                         teamId: window.cantamiCurrentTeamId,
                         teamName: teamDoc.data().name,
                         title: 'Vittoria in Cantami o Diva (LIM)',
@@ -3869,7 +3901,7 @@ window.openEditProfileModal = async function() {
     const schoolInput = document.getElementById('edit-profile-school');
     
     try {
-        const doc = await window.db.collection('users').doc(user.email.toLowerCase()).get();
+        const doc = await window.db.collection('fanta_users').doc(user.email.toLowerCase()).get();
         if (!doc.exists) return;
         
         const userData = doc.data();
@@ -3902,7 +3934,7 @@ window.saveProfileData = async function() {
     }
     
     try {
-        const docRef = window.db.collection('users').doc(user.email.toLowerCase());
+        const docRef = window.db.collection('fanta_users').doc(user.email.toLowerCase());
         const doc = await docRef.get();
         const userData = doc.exists ? doc.data() : {};
         

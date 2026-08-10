@@ -11,12 +11,12 @@ window.fanta_db.mapTeamDoc = (doc) => {
 
 window.fanta_db.getTeamDocRef = async (teamId) => {
     // 1. Cerca per ID del documento diretto (se coincide con teamId)
-    const docRef = window.db.collection("teams").doc(teamId);
+    const docRef = window.db.collection('fanta_teams').doc(teamId);
     const docSnap = await docRef.get();
     if (docSnap.exists) return docRef;
     
     // 2. Altrimenti, cerca un documento dove il campo "id" è uguale a teamId
-    const querySnap = await window.db.collection("teams").where("id", "==", teamId).get();
+    const querySnap = await window.db.collection('fanta_teams').where("id", "==", teamId).get();
     if (!querySnap.empty) {
         return querySnap.docs[0].ref;
     }
@@ -34,7 +34,7 @@ window.fanta_db.saveTeam = async (teamData) => {
         return 'FL-' + result;
     };
 
-    const docRef = await window.db.collection("teams").add({
+    const docRef = await window.db.collection('fanta_teams').add({
         ...teamData,
         joinCode: generateCode(),
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -43,20 +43,20 @@ window.fanta_db.saveTeam = async (teamData) => {
 };
 
 window.fanta_db.getTeams = async (mode = 'all') => {
-    let query = window.db.collection("teams");
+    let query = window.db.collection('fanta_teams');
     if (mode !== 'all') query = query.where("mode", "==", mode);
     const snapshot = await query.get();
     return snapshot.docs.map(doc => window.fanta_db.mapTeamDoc(doc));
 };
 
 window.fanta_db.getTeamByCode = async (code) => {
-    const snapshot = await window.db.collection("teams").where("joinCode", "==", code.toUpperCase()).get();
+    const snapshot = await window.db.collection('fanta_teams').where("joinCode", "==", code.toUpperCase()).get();
     if (snapshot.empty) return null;
     return window.fanta_db.mapTeamDoc(snapshot.docs[0]);
 };
 
 window.fanta_db.getUserTeams = async (email) => {
-    const snapshot = await window.db.collection("teams").where("ownerEmail", "==", email).get();
+    const snapshot = await window.db.collection('fanta_teams').where("ownerEmail", "==", email).get();
     return snapshot.docs.map(doc => window.fanta_db.mapTeamDoc(doc));
 };
 
@@ -85,7 +85,7 @@ window.fanta_db.removeCollaboratore = async (teamId, email) => {
 };
 
 window.fanta_db.getCollaboratedTeams = async (email) => {
-    const snapshot = await window.db.collection("teams")
+    const snapshot = await window.db.collection('fanta_teams')
         .where("collaboratori", "array-contains", email.toLowerCase()).get();
     return snapshot.docs.map(doc => window.fanta_db.mapTeamDoc(doc));
 };

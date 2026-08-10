@@ -45,7 +45,7 @@
         }
         
         const db = app.firestore();
-        db.collection('games_status').doc(GAME_ID).onSnapshot(doc => {
+        db.collection('fanta_games_status').doc(GAME_ID).onSnapshot(doc => {
             if (doc.exists) {
                 const data = doc.data();
                 if (!data.isActive) {

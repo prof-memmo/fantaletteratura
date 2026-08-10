@@ -150,7 +150,7 @@ async function setupAdminPanel() {
         if(!req) return;
 
         // Aggiungiamo alla collezione 'users' su Firestore
-        await window.db.collection("users").doc(email).set({
+        await window.db.collection('fanta_users').doc(email).set({
             email: email,
             name: req.name,
             school: req.school,
@@ -160,7 +160,7 @@ async function setupAdminPanel() {
         });
 
         // Rimuoviamo dalla collezione 'pending_requests'
-        await window.db.collection("pending_requests").doc(req.id).delete();
+        await window.db.collection('fanta_pending_requests').doc(req.id).delete();
         
         alert("Docente approvato con successo! Invio della mail in corso...");
         const appUrl = window.location.origin + window.location.pathname.replace('admin.html', 'index.html');
@@ -242,7 +242,7 @@ async function setupAdminPanel() {
     window.rifiutaRichiesta = async function(id) {
         if(!confirm("Cancellare richiesta?")) return;
         try {
-            await window.db.collection("pending_requests").doc(id).delete();
+            await window.db.collection('fanta_pending_requests').doc(id).delete();
             await window.renderAdminRichieste();
         } catch(e) {
             console.error(e);
@@ -275,7 +275,7 @@ async function setupAdminPanel() {
         if (!list) return;
         
         // Fetch all users to get counts
-        const snapshotAll = await window.db.collection("users").get();
+        const snapshotAll = await window.db.collection('fanta_users').get();
         const allUsers = snapshotAll.docs.map(doc => doc.data());
         
         const counts = {
@@ -452,7 +452,7 @@ async function setupAdminPanel() {
         let allTeams = await getAllTeams();
         
         // Carica tutti gli utenti per associare ruoli e scuole
-        const snapshotAllUsers = await window.db.collection("users").get();
+        const snapshotAllUsers = await window.db.collection('fanta_users').get();
         const allUsers = snapshotAllUsers.docs.map(doc => doc.data());
         const userMap = {};
         allUsers.forEach(u => {
@@ -549,7 +549,7 @@ async function setupAdminPanel() {
         }
 
         // Carica tutti gli studenti una volta sola per efficienza
-        const allUsersSnap = await window.db.collection("users").where("role", "==", "studente").get();
+        const allUsersSnap = await window.db.collection('fanta_users').where("role", "==", "studente").get();
         const allStudents = allUsersSnap.docs.map(d => d.data());
 
         list.innerHTML = '';
@@ -704,10 +704,10 @@ async function setupAdminPanel() {
             const allTeams = await fanta_db.getTeams();
             
             // Per il conteggio delle statistiche
-            const approvedSnap = await window.db.collection("missions").where("status", "==", "approved").get();
+            const approvedSnap = await window.db.collection('fanta_missions').where("status", "==", "approved").get();
             const approvedCount = approvedSnap.size;
             
-            const rejectedSnap = await window.db.collection("missions").where("status", "==", "rejected").get();
+            const rejectedSnap = await window.db.collection('fanta_missions').where("status", "==", "rejected").get();
             const rejectedCount = rejectedSnap.size;
             
             const pendingCount = pending.length;
@@ -767,7 +767,7 @@ async function setupAdminPanel() {
         
         try {
             const allTeams = await getAllTeams();
-            const snap = await window.db.collection("missions").where("status", "==", "approved").get();
+            const snap = await window.db.collection('fanta_missions').where("status", "==", "approved").get();
             const approvedMissions = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             
             list.innerHTML = '';
@@ -1010,8 +1010,8 @@ window.renderAdminProfilo = async function() {
             const backupName = prompt("Inserisci un nome per l'archivio (es: Fantaletteratura_2025_2026):", `Archivio_${currentYear}`);
             if(!backupName) return;
             
-            const usersSnapshot = await window.db.collection('users').get();
-            const teamsSnapshot = await window.db.collection('teams').get();
+            const usersSnapshot = await window.db.collection('fanta_users').get();
+            const teamsSnapshot = await window.db.collection('fanta_teams').get();
             
             let batch = window.db.batch();
             
@@ -1043,9 +1043,9 @@ window.renderAdminProfilo = async function() {
         if(currentUserEmail !== 'prof.memmo@gmail.com') return;
         if(!confirm(`Sei ASSOLUTAMENTE sicuro di voler RIPRISTINARE l'anno archiviato "${backupName}"?\nQuesta operazione rimetterà in gioco tutte le squadre e gli studenti di quell'anno.`)) return;
         try {
-            const usersSnapshot = await window.db.collection('users').where('archivedYear', '==', backupName).get();
-            const teamsSnapshot = await window.db.collection('teams').where('archivedYear', '==', backupName).get();
-            const archivesSnapshot = await window.db.collection('archives').where('yearName', '==', backupName).get();
+            const usersSnapshot = await window.db.collection('fanta_users').where('archivedYear', '==', backupName).get();
+            const teamsSnapshot = await window.db.collection('fanta_teams').where('archivedYear', '==', backupName).get();
+            const archivesSnapshot = await window.db.collection('fanta_archives').where('yearName', '==', backupName).get();
             
             let batch = window.db.batch();
             
@@ -1084,7 +1084,7 @@ window.renderAdminProfilo = async function() {
     window.loadHistoricalArchives = async function() {
         if(currentUserEmail !== 'prof.memmo@gmail.com') return;
         try {
-            const snapshot = await window.db.collection('archives').orderBy('timestamp', 'desc').get();
+            const snapshot = await window.db.collection('fanta_archives').orderBy('timestamp', 'desc').get();
             const container = document.getElementById('admin-historical-archives-list');
             if(!container) return;
             
@@ -1259,7 +1259,7 @@ window.approvaMissione = async function(mid, tid) {
 
 window.rifiutaMissione = async function(mid) {
     try {
-        await window.db.collection("missions").doc(mid).update({ status: 'rejected' });
+        await window.db.collection('fanta_missions').doc(mid).update({ status: 'rejected' });
         if(typeof window.renderAdminMissioniPending === 'function') window.renderAdminMissioniPending();
     } catch (e) {
         console.error("Errore rifiuto missione:", e);
