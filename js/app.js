@@ -860,8 +860,9 @@ function checkLoginSession() {
 
     fanta_db.onAuthStateChanged(async (user) => {
         if (!user) {
-            // Reindirizzamento al Login Centrale dell'Hub
-            window.location.href = '../prof-memmo-gestione-siti/portal.html';
+            // Mostra il login locale su FantaLetteratura senza reindirizzare
+            document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
+            document.getElementById('view-welcome').style.display = 'block';
             return;
         }
 
