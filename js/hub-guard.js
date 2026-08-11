@@ -32,19 +32,8 @@
 
     // Initialize Hub Firebase if not already initialized
     const checkStatus = () => {
-        let app = null;
-        if (firebase.apps.length > 0) {
-            app = firebase.apps.find(a => a.name === "HubGuardApp");
-        }
-        
-        if (!app) {
-            app = firebase.initializeApp({
-                apiKey: "AIzaSyD-n2m-kYEuzGXPMKclZTggf4Y5Zm8_cdM",
-                projectId: "prof-memmo-hub"
-            }, "HubGuardApp");
-        }
-        
-        const db = app.firestore();
+        // Usa l'app di default che è già connessa all'Hub
+        const db = firebase.firestore();
         db.collection('fanta_games_status').doc(GAME_ID).onSnapshot(doc => {
             if (doc.exists) {
                 const data = doc.data();

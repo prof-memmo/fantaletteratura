@@ -871,6 +871,7 @@ function checkLoginSession() {
             
             // 1. Verifica sull'Hub Centrale (Single Sign-On Auth)
             try {
+                // Il database di default fanta_db E' il database Hub
                 const hubDoc = await window.db.collection('hub_users').doc(user.uid).get();
                 if (!hubDoc.exists) {
                     alert("Profilo Hub non trovato. Completa l'onboarding nell'Hub.");
