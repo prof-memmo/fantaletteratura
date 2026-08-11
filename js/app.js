@@ -861,7 +861,7 @@ function checkLoginSession() {
     fanta_db.onAuthStateChanged(async (user) => {
         if (!user) {
             // Reindirizzamento al Login Centrale dell'Hub
-            window.location.href = '../prof-memmo-admin-gestione-generale/portal.html';
+            window.location.href = '../prof-memmo-gestione-siti/portal.html';
             return;
         }
 
@@ -874,27 +874,27 @@ function checkLoginSession() {
                 const hubDoc = await window.db.collection('hub_users').doc(user.uid).get();
                 if (!hubDoc.exists) {
                     alert("Profilo Hub non trovato. Completa l'onboarding nell'Hub.");
-                    window.location.href = '../prof-memmo-admin-gestione-generale/portal.html';
+                    window.location.href = '../prof-memmo-gestione-siti/portal.html';
                     return;
                 }
                 
                 const hubData = hubDoc.data();
                 if (hubData.statusAccount !== 'active') {
                     alert("Accesso negato: L'account non è attivo nell'Hub (potrebbe essere sospeso o in attesa di approvazione).");
-                    window.location.href = '../prof-memmo-admin-gestione-generale/portal.html';
+                    window.location.href = '../prof-memmo-gestione-siti/portal.html';
                     return;
                 }
                 
                 if (!hubData.platforms || !hubData.platforms.fantaletteratura || !hubData.platforms.fantaletteratura.enabled) {
                     alert("Accesso negato: Piattaforma FantaLetteratura non abilitata per il tuo profilo.");
-                    window.location.href = '../prof-memmo-admin-gestione-generale/portal.html';
+                    window.location.href = '../prof-memmo-gestione-siti/portal.html';
                     return;
                 }
                 
             } catch (err) {
                 console.error("Errore verifica Hub:", err);
                 alert("Errore di sicurezza Hub. Riprova.");
-                window.location.href = '../prof-memmo-admin-gestione-generale/portal.html';
+                window.location.href = '../prof-memmo-gestione-siti/portal.html';
                 return;
             }
 
