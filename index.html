@@ -149,7 +149,7 @@
                         <label class="checkbox-container">
                             <input type="checkbox" id="student-check-privacy">
                             <span class="checkmark"></span>
-                            Accetto la <a href="#" onclick="event.preventDefault(); openLegalModal('privacy')" style="color:var(--primary-color);">Privacy Policy</a> e i <a href="#" onclick="event.preventDefault(); openLegalModal('termini')" style="color:var(--primary-color);">Termini e Condizioni</a>
+                            Accetto la <a href="#" onclick="event.preventDefault(); openSharedModal('privacy')" style="color:var(--primary-color);">Privacy Policy</a> e i <a href="#" onclick="event.preventDefault(); openSharedModal('termini')" style="color:var(--primary-color);">Termini e Condizioni</a>
                         </label>
                     </div>
 
@@ -365,8 +365,8 @@
                     <p>Il gioco Fantaletteratura rispetta la tua privacy e protegge i tuoi dati personali in conformità al GDPR.</p>
                     <p>Per consultare il testo completo, visita le pagine dedicate:</p>
                     <div style="display:flex; flex-direction:column; gap:10px; margin-top:15px;">
-                        <button class="btn btn-secondary" onclick="openLegalModal('privacy')"><i class="fa-solid fa-user-lock"></i> Leggi Privacy Policy</button>
-                        <button class="btn btn-secondary" onclick="openLegalModal('termini')"><i class="fa-solid fa-file-invoice"></i> Leggi Termini e Condizioni</button>
+                        <button class="btn btn-secondary" onclick="openSharedModal('privacy')"><i class="fa-solid fa-user-lock"></i> Leggi Privacy Policy</button>
+                        <button class="btn btn-secondary" onclick="openSharedModal('termini')"><i class="fa-solid fa-file-invoice"></i> Leggi Termini e Condizioni</button>
                     </div>
                 </div>
             </section>
@@ -426,7 +426,7 @@
                                 <label class="checkbox-container" style="font-size: 0.8rem;">
                                     <input type="checkbox" id="contact-check-privacy">
                                     <span class="checkmark"></span>
-                                    Accetto la <a href="#" onclick="event.preventDefault(); openLegalModal('privacy')" style="color:var(--primary-color);">Privacy Policy</a>
+                                    Accetto la <a href="#" onclick="event.preventDefault(); openSharedModal('privacy')" style="color:var(--primary-color);">Privacy Policy</a>
                                 </label>
                             </div>
                             
@@ -706,8 +706,8 @@
         <!-- Final Footer (Desktop & Hidden Area) -->
         <footer style="padding: 5px 20px; text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 20px;">
             <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 10px;">
-                <a href="#" onclick="event.preventDefault(); openLegalModal('privacy')" style="color: inherit; text-decoration: none;">Privacy Policy</a>
-                <a href="#" onclick="event.preventDefault(); openLegalModal('termini')" style="color: inherit; text-decoration: none;">Termini e Condizioni</a>
+                <a href="#" onclick="event.preventDefault(); openSharedModal('privacy')" style="color: inherit; text-decoration: none;">Privacy Policy</a>
+                <a href="#" onclick="event.preventDefault(); openSharedModal('termini')" style="color: inherit; text-decoration: none;">Termini e Condizioni</a>
             </div>
             <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 15px;">
                 <img src="assets/patamu.png" alt="Patamu" style="height: 80px; object-fit: contain;">
