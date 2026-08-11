@@ -23,6 +23,8 @@ if (typeof firebase !== 'undefined') {
     // chiamate db.collection() effettuate dal codice esistente.
     const originalCollection = window.db.collection.bind(window.db);
     window.db.collection = function(path) {
+        // Eccezioni per le collezioni dell'Hub
+        if (path === 'hub_users' || path === 'games_status' || path === 'fanta_games_status') return originalCollection(path);
         // Se il path ha già il prefisso (per qualche motivo), non lo aggiunge
         if (path.startsWith('fanta_')) return originalCollection(path);
         return originalCollection('fanta_' + path);
