@@ -861,8 +861,13 @@ function checkLoginSession() {
     fanta_db.onAuthStateChanged(async (user) => {
         if (!user) {
             // Mostra il login locale su FantaLetteratura senza reindirizzare
-            document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
-            document.getElementById('view-welcome').style.display = 'block';
+            if(typeof window.navigateTo === 'function') {
+                window.navigateTo('view-welcome');
+            } else {
+                document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+                document.getElementById('view-welcome').classList.add('active');
+                document.getElementById('view-welcome').style.display = '';
+            }
             return;
         }
 

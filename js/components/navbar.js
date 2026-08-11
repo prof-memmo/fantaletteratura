@@ -41,6 +41,7 @@ function navigateTo(viewId, pushHistory = true) {
     // Hide all views
     document.querySelectorAll('.view').forEach(view => {
         view.classList.remove('active');
+        view.style.display = ''; // Remove any inline display block/none
     });
     
     // Show target view
