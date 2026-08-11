@@ -881,20 +881,20 @@ function checkLoginSession() {
                 const hubDoc = await window.db.collection('hub_users').doc(user.uid).get();
                 if (!hubDoc.exists) {
                     alert("Profilo Hub non trovato. Completa l'onboarding nell'Hub.");
-                    window.location.href = '../prof-memmo-admin-gestione-generale/portal.html';
+                    window.location.href = 'https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html';
                     return;
                 }
                 
                 const hubData = hubDoc.data();
                 if (hubData.statusAccount !== 'active') {
                     alert("Accesso negato: L'account non è attivo nell'Hub (potrebbe essere sospeso o in attesa di approvazione).");
-                    window.location.href = '../prof-memmo-admin-gestione-generale/portal.html';
+                    window.location.href = 'https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html';
                     return;
                 }
                 
                 if (!hubData.platforms || !hubData.platforms.fantaletteratura || !hubData.platforms.fantaletteratura.enabled) {
                     alert("Accesso negato: Piattaforma FantaLetteratura non abilitata per il tuo profilo.");
-                    window.location.href = '../prof-memmo-admin-gestione-generale/portal.html';
+                    window.location.href = 'https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html';
                     return;
                 }
                 
@@ -1019,13 +1019,13 @@ function checkLoginSession() {
             setLoggedOut();
             if (window.location.pathname.includes('admin.html')) {
                 alert("Devi effettuare l'accesso per visualizzare il pannello admin.");
-                window.location.href = '../prof-memmo-admin-gestione-generale/portal.html?redirect=fantaletteratura';
+                window.location.href = 'https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html?redirect=fantaletteratura';
             } else if (pendingInitialView) {
                 // Se c'è una vista specifica richiesta (es: una scheda pubblica che può esser vista da sloggato?), andiamo a quella. 
                 // Ma per sicurezza del single sign-on forziamo il redirect alla portal:
-                window.location.href = '../prof-memmo-admin-gestione-generale/portal.html?redirect=fantaletteratura';
+                window.location.href = 'https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html?redirect=fantaletteratura';
             } else {
-                window.location.href = '../prof-memmo-admin-gestione-generale/portal.html?redirect=fantaletteratura';
+                window.location.href = 'https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html?redirect=fantaletteratura';
             }
         }
     });
