@@ -1019,11 +1019,13 @@ function checkLoginSession() {
             setLoggedOut();
             if (window.location.pathname.includes('admin.html')) {
                 alert("Devi effettuare l'accesso per visualizzare il pannello admin.");
-                window.location.href = 'index.html';
+                window.location.href = '../prof-memmo-admin-gestione-generale/portal.html?redirect=fantaletteratura';
             } else if (pendingInitialView) {
-                const target = pendingInitialView;
-                pendingInitialView = null;
-                navigateTo(target, false);
+                // Se c'è una vista specifica richiesta (es: una scheda pubblica che può esser vista da sloggato?), andiamo a quella. 
+                // Ma per sicurezza del single sign-on forziamo il redirect alla portal:
+                window.location.href = '../prof-memmo-admin-gestione-generale/portal.html?redirect=fantaletteratura';
+            } else {
+                window.location.href = '../prof-memmo-admin-gestione-generale/portal.html?redirect=fantaletteratura';
             }
         }
     });
