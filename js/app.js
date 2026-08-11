@@ -1475,7 +1475,7 @@ function setupTeamSave() {
     const saveBtn = document.getElementById('btn-save-team');
     if (!saveBtn) return;
     
-    saveBtn.addEventListener('click', () => {
+    saveBtn.addEventListener('click', async () => {
         if (!currentUserEmail) {
             alert("Devi identificarti nella Home prima di salvare una squadra!");
             navigateTo('view-welcome');
@@ -1486,6 +1486,30 @@ function setupTeamSave() {
             alert("Scegli la modalità di gioco prima di salvare la squadra!");
             return;
         }
+        
+        // --- Controllo Limiti Piano Base ---
+        if (window.FantaPermissions && !window.FantaPermissions.can('create_team')) {
+            alert("Hai raggiunto il limite per il tuo piano.");
+            return;
+        }
+        if (window.FantaPermissions) {
+            let planKey = 'base';
+            if (window.currentUserPiano) {
+                const p = window.currentUserPiano.toLowerCase();
+                if (p.includes('viandante')) planKey = 'viandante';
+                else if (p.includes('docente') && p.includes('ecosistema')) planKey = 'docente_ecosistema';
+                else if (p.includes('docente')) planKey = 'docente_didattico';
+            }
+            if (planKey === 'base') {
+                const userTeams = await fanta_db.getUserTeams(currentUserEmail);
+                const activeTeams = userTeams.filter(t => t.status !== 'archived');
+                if (activeTeams.length >= 4) {
+                    alert("Limite Raggiunto: Il piano Base consente massimo 4 squadre. Passa a un piano superiore per creare infinite squadre!");
+                    return;
+                }
+            }
+        }
+        // --- Fine Controllo Limiti ---
 
         const teamNameInput = document.querySelector('#view-squadra input[placeholder="Es: I Promessi Sposi"]').value.trim();
         const teamClasseInput = document.getElementById('team-classe-input').value.trim();
