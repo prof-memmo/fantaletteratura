@@ -1606,6 +1606,22 @@ async function renderProfilo() {
     const squadreList = document.getElementById('profilo-squadre-list');
     if(!squadreList) return;
 
+    // --- Controllo Avviso Limite 4 Squadre per Piano Base ---
+    const userPlan = (window.currentUserPiano || 'base').toLowerCase();
+    const isBasePlan = !userPlan.includes('docente') && !userPlan.includes('ecosistema') && !userPlan.includes('viandante');
+    
+    if (isBasePlan && myTeams.length > 4) {
+        const warningDiv = document.createElement('div');
+        warningDiv.style.cssText = 'background: #ffffe0; border: 2px solid #f59e0b; border-radius: 12px; padding: 1.2rem 1.5rem; margin-bottom: 1.5rem; color: #92400e; font-size: 0.95rem; line-height: 1.6;';
+        warningDiv.innerHTML = `
+            <strong style="color: #b45309; font-size: 1.05rem;">🔒 Limite Versione Base Raggiunto (${myTeams.length} squadre su max 4 ammesse)</strong><br>
+            Il tuo abbonamento per l'anno scolastico precedente è scaduto ed il tuo profilo è attualmente in <b>Versione Base</b>.<br>
+            Con la Versione Base puoi mantenere attive <b>al massimo 4 squadre</b> per il campionato di quest'anno. 
+            Le prime 4 squadre del tuo elenco parteciperanno regolarmente, oppure puoi <a href="https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html" target="_blank" style="color: #b45309; font-weight: bold; text-decoration: underline;">rinnovare l'abbonamento nell'Hub</a> per sbloccarle tutte senza limiti!
+        `;
+        squadreList.parentNode.insertBefore(warningDiv, squadreList);
+    }
+
     // Carica tutti gli studenti una volta sola
     let allStudentsMap = {};
     try {
