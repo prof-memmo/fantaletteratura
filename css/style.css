@@ -893,6 +893,7 @@ h1, h2, h3, h4 {
         display: none !important;
     }
     
+    body.no-sidebar .top-nav,
     body.no-sidebar main {
         margin-left: 0 !important;
         width: 100% !important;

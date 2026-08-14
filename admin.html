@@ -9,7 +9,7 @@
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="no-sidebar">
     <div id="app-container" style="display:none;">
         <!-- Top Navigation -->
         <header class="top-nav glass" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px;">
@@ -55,7 +55,6 @@
                 <button class="btn admin-tab-btn" data-target="admin-view-locandine" style="background: linear-gradient(135deg, #e67e22, #d35400) !important; color: #fff !important; font-weight: 800; border: none; box-shadow: 0 4px 10px rgba(230, 126, 34, 0.35);"><i class="fa-solid fa-image"></i> Locandine</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-attestati" style="background: linear-gradient(135deg, #f1c40f, #f39c12) !important; color: #fff !important; font-weight: 800; border: none; box-shadow: 0 4px 10px rgba(241, 196, 15, 0.35);"><i class="fa-solid fa-certificate"></i> Attestati</button>
                 <button class="btn" style="background: linear-gradient(135deg, #9b59b6, #8e44ad) !important; color: #fff !important; font-weight: 800; border: none; box-shadow: 0 4px 10px rgba(155, 89, 182, 0.35);" onclick="window.open('assets/locandine/Segnalibri.pdf', '_blank')"><i class="fa-solid fa-bookmark"></i> Segnalibri</button>
-                <button class="btn" onclick="window.open('../prof-memmo-admin-gestione-generale/index.html', '_blank')" style="background: rgba(99, 102, 241, 0.15); color: #a5b4fc; border: 1px solid #6366f1; margin-left: auto;"><i class="fa-solid fa-gauge-high"></i> Hub Utenti &amp; Analytics</button>
             </div>
 
             <section id="admin-view-autori" class="admin-view active">
@@ -400,6 +399,38 @@
             </section>
 
         </main>
+
+        <!-- Bottom Navigation Tabs (Floating Dock on PC) -->
+        <nav class="bottom-bar">
+            <a href="index.html" class="tab-item" data-tooltip="Torna alla Home">
+                <i class="fa-solid fa-house"></i>
+                <span>Home</span>
+            </a>
+            <a href="index.html#regolamento" class="tab-item" data-tooltip="Leggi il Regolamento">
+                <i class="fa-solid fa-scale-balanced"></i>
+                <span>Regolamento</span>
+            </a>
+            <a href="index.html#classifiche" class="tab-item" data-tooltip="Guarda le Classifiche">
+                <i class="fa-solid fa-trophy"></i>
+                <span>Classifiche</span>
+            </a>
+            <a href="index.html#schede" class="tab-item" data-tooltip="Esplora le Schede Autore">
+                <i class="fa-solid fa-file-lines"></i>
+                <span>Schede</span>
+            </a>
+            <a href="index.html#contatti" class="tab-item" data-tooltip="Inviaci un Messaggio">
+                <i class="fa-solid fa-envelope"></i>
+                <span>Contatti</span>
+            </a>
+            <a href="admin.html" class="tab-item active" id="tab-item-admin" data-tooltip="Pannello Gestione Admin">
+                <i class="fa-solid fa-lock"></i>
+                <span>Admin</span>
+            </a>
+            <a href="#" class="tab-item" id="btn-toggle-music-popup" onclick="window.MusicPlayer && window.MusicPlayer.togglePopup(); return false;" data-tooltip="Lettore Musicale">
+                <i class="fa-solid fa-music"></i>
+                <span>Musica</span>
+            </a>
+        </nav>
     </div>
 
 
