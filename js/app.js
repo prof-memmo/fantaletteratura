@@ -1009,12 +1009,8 @@ function checkLoginSession() {
             if (window.location.pathname.includes('admin.html')) {
                 alert("Devi effettuare l'accesso per visualizzare il pannello admin.");
                 window.location.href = 'https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html?redirect=fantaletteratura';
-            } else if (pendingInitialView) {
-                // Se c'è una vista specifica richiesta (es: una scheda pubblica che può esser vista da sloggato?), andiamo a quella. 
-                // Ma per sicurezza del single sign-on forziamo il redirect alla portal:
-                window.location.href = 'https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html?redirect=fantaletteratura';
             } else {
-                window.location.href = 'https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html?redirect=fantaletteratura';
+                navigateTo('view-welcome', false);
             }
         }
     });
