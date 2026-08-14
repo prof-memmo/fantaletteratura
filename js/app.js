@@ -1372,8 +1372,12 @@ function setLoggedIn(email, role = '') {
             const teamCode = localStorage.getItem('fanta_active_team_code') || '';
             loggedInNormalContent.innerHTML = `
                 <h3 class="text-center mb-1 text-primary">Area Studente</h3>
-                <p class="text-center" style="font-size: 0.9rem; margin-bottom:20px;">Hai effettuato l'accesso come studente.${teamCode ? `<br>Codice Squadra attivo: <b>${teamCode}</b>` : ''}</p>
+                <p class="text-center" style="font-size: 0.9rem; margin-bottom:20px;">
+                    Hai effettuato l'accesso come studente.
+                    ${teamCode ? `<br>Codice Squadra attivo: <b style="color:var(--accent-gold);">${teamCode}</b> <a href="#" onclick="navigateTo('view-studenti')" style="font-size:0.8rem; color:var(--primary-color); margin-left:6px;">(Cambia)</a>` : `<br><span style="color:#fbbf24;">Nessun codice squadra associato.</span>`}
+                </p>
                 <div style="display:flex; flex-direction:column; gap:10px;">
+                    ${!teamCode ? `<button class="btn" style="width:100%; background:var(--primary-color);" onclick="navigateTo('view-studenti')"><i class="fa-solid fa-key"></i> Inserisci Codice Squadra</button>` : ''}
                     <button class="btn" style="width:100%;" onclick="navigateTo('view-classifiche')">Vedi le Classifiche</button>
                     <button class="btn btn-secondary" style="width:100%; border-width:2px;" onclick="navigateTo('view-schede')">Esplora le Schede Autore</button>
                 </div>
