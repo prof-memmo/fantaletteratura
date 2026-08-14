@@ -13,9 +13,13 @@
     <div id="app-container" style="display:none;">
         <!-- Top Navigation -->
         <header class="top-nav glass" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <button class="menu-btn" id="open-menu" style="margin: 0;"><i class="fa-solid fa-bars"></i></button>
-                <div class="page-title" id="page-title" style="margin: 0;">Pannello Admin</div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <a href="index.html" class="btn btn-secondary" style="margin: 0; padding: 6px 14px; font-size: 0.85rem; text-decoration: none; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; font-weight: 600;">
+                    <i class="fa-solid fa-house"></i> <span class="hide-mobile">Home Gioco</span>
+                </a>
+                <div class="page-title" id="page-title" style="margin: 0; font-weight: 800; font-size: 1.1rem; color: var(--accent-gold);">
+                    <i class="fa-solid fa-shield-halved"></i> Pannello Admin
+                </div>
             </div>
             
             <div style="display: flex; align-items: center; gap: 8px;">
@@ -36,35 +40,6 @@
                 </button>
             </div>
         </header>
-
-        <!-- Side Drawer Menu -->
-        <div class="menu-overlay" id="menu-overlay"></div>
-        <nav class="side-menu" id="side-menu">
-            <div class="menu-header" style="display: flex; flex-direction: column; align-items: center;">
-                <h2 style="margin: 0;">Fantaletteratura</h2>
-                <p style="font-size: 0.8rem; margin:0;">La sfida tra capolavori</p>
-            </div>
-            <ul class="menu-items">
-                <li><a href="index.html" class="admin-link text-primary" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem;"><i class="fa-solid fa-house fa-fw"></i> Torna alla Home</a></li>
-                <li style="margin-top: 15px;"><a href="#" class="admin-tab-btn active" data-target="admin-view-autori" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-lock fa-fw"></i> Pagina Admin - gestionale</a></li>
-                <li><a href="#" class="admin-tab-btn" data-target="admin-view-profilo" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-user-gear fa-fw"></i> Mio Profilo Docente</a></li>
-                <li><a href="#" class="admin-tab-btn" data-target="admin-view-presentazioni" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-desktop fa-fw"></i> Presentazioni LIM</a></li>
-                <li><a href="#" class="admin-tab-btn" data-target="admin-view-locandine" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-image fa-fw"></i> Locandine</a></li>
-                <li><a href="#" class="admin-tab-btn" data-target="admin-view-attestati" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-certificate fa-fw"></i> Attestati</a></li>
-                
-                <div style="padding: 10px 20px; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-top: 15px; letter-spacing: 1px;">Aree Nascoste</div>
-                <li><a href="#" class="admin-tab-btn" data-target="admin-preview-prof" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-chalkboard-user fa-fw"></i> Buongiorno Prof</a></li>
-                <li><a href="#" class="admin-tab-btn" data-target="admin-preview-studenti" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-graduation-cap fa-fw"></i> Buongiorno Studenti</a></li>
-                <li><a href="#" class="admin-tab-btn" data-target="admin-preview-iscrizione" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-pen-to-square fa-fw"></i> Iscriviti a Fantalett.</a></li>
-                <li><a href="#" class="admin-tab-btn" data-target="admin-preview-squadra" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-users fa-fw"></i> Crea la tua squadra</a></li>
-                <li><a href="#" class="admin-tab-btn" data-target="admin-preview-missioni-intro" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-rocket fa-fw"></i> Introduzione Missioni</a></li>
-                <li><a href="#" class="admin-tab-btn" data-target="admin-preview-missioni-carica" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-list-check fa-fw"></i> Carica Missioni</a></li>
-                <li style="padding: 0 20px; margin-top: 10px;"><hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1);"></li>
-                <li><a href="privacy.html" class="admin-link" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-user-lock fa-fw"></i> Privacy Policy</a></li>
-                <li><a href="termini.html" class="admin-link" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:var(--text-main);"><i class="fa-solid fa-file-invoice fa-fw"></i> Termini e Condizioni</a></li>
-                <li style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);"><a href="#" class="admin-link" style="display:block; padding:15px 20px; text-decoration:none; font-size:1.1rem; color:#ff5f5f;" onclick="event.preventDefault(); logoutDocente()"><i class="fa-solid fa-right-from-bracket fa-fw"></i> Esci / Logout</a></li>
-            </ul>
-        </nav>
 
         <!-- VIEWS -->
         <main id="main-content">
@@ -815,23 +790,5 @@
     <!-- Dashboard -->
     <script src="js/dashboard/admin-logic.js"></script>
     <script src="js/app.js?v=2"></script>
-    <!-- Gestione Menu Laterale su Mobile -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const openMenuBtn = document.getElementById('open-menu');
-            const sideMenu = document.getElementById('side-menu');
-            const menuOverlay = document.getElementById('menu-overlay');
-            if (openMenuBtn && sideMenu && menuOverlay) {
-                openMenuBtn.addEventListener('click', () => {
-                    sideMenu.classList.add('active');
-                    menuOverlay.classList.add('active');
-                });
-                menuOverlay.addEventListener('click', () => {
-                    sideMenu.classList.remove('active');
-                    menuOverlay.classList.remove('active');
-                });
-            }
-        });
-    </script>
 </body>
 </html>
