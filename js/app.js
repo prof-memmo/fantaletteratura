@@ -876,18 +876,26 @@ function checkLoginSession() {
             currentUserEmail = email;
             
             // 1. Verifica sull'Hub Centrale (Single Sign-On Auth)
-            let hubRole = (email === "prof.memmo@gmail.com") ? 'docente' : 'docente';
+            let isSuperAdmin = (email === "prof.memmo@gmail.com");
+            let hubRole = isSuperAdmin ? 'docente' : 'docente';
+            
             try {
                 const hubDoc = await window.db.collection('hub_users').doc(user.uid).get();
                 if (hubDoc.exists) {
                     const hubData = hubDoc.data();
-                    if (hubData.statusAccount === 'rejected' || hubData.statusAccount === 'suspended') {
+                    if (!isSuperAdmin && hubData.statusAccount && (hubData.statusAccount === 'rejected' || hubData.statusAccount === 'suspended')) {
                         alert("Accesso negato: L'account è stato sospeso nell'Hub.");
                         window.location.href = 'https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html';
                         return;
                     }
-                    if (hubData.role) {
-                        hubRole = hubData.role;
+                    if (hubData.role === 'admin' || isSuperAdmin) {
+                        hubRole = 'docente';
+                    } else if (hubData.role === 'docente') {
+                        hubRole = 'docente';
+                    } else if (hubData.role === 'viandante' || hubData.role === 'forestiero' || hubData.role === 'fantamico') {
+                        hubRole = 'fantamico';
+                    } else {
+                        hubRole = 'studente';
                     }
                 }
             } catch (err) {
@@ -896,113 +904,59 @@ function checkLoginSession() {
 
             // 2. Protezione pannello admin locale
             if (window.location.pathname.includes('admin.html')) {
-                if (email !== "prof.memmo@gmail.com") {
+                if (!isSuperAdmin) {
                     alert("Accesso negato. Solo l'amministratore può accedere al pannello di controllo.");
                     window.location.href = 'index.html';
                     return;
                 }
             }
 
-            // 3. Prof Memmo ha accesso diretto
-            if (email === "prof.memmo@gmail.com") {
-                currentUserRole = 'docente';
-                setLoggedIn(email, 'docente');
-                
-                // Forza visualizzazione container nel pannello admin dopo la verifica
-                if (window.location.pathname.includes('admin.html')) {
-                    const _c = document.getElementById('app-container');
-                    if (_c) _c.style.display = 'block';
-                    
-                    if(typeof window.renderAdminAutori === 'function') window.renderAdminAutori();
-                    if(typeof window.renderAdminRichieste === 'function') window.renderAdminRichieste();
-                    if(typeof renderNotifiche === 'function') renderNotifiche();
-                }
+            // 3. Sincronizzazione profilo FantaLetteratura
+            currentUserRole = isSuperAdmin ? 'docente' : hubRole;
+            setLoggedIn(email, currentUserRole);
 
-                const adminMenuItem = document.getElementById('menu-admin-item');
-                if (adminMenuItem) adminMenuItem.style.display = 'block';
-                
-                if (!window.location.pathname.includes('admin.html')) {
-                    if (pendingInitialView) {
-                        const target = pendingInitialView;
-                        pendingInitialView = null;
-                        navigateTo(target, false);
-                    } else if (window.location.hash === '#view-welcome' || window.location.hash === '') {
-                        navigateTo('view-welcome');
-                    }
-                }
-                
-                window.selfHealMissionsCount();
-                return;
-            }
-            
-            // Verifica ruolo su Firestore
             try {
-                const doc = await window.db.collection('fanta_users').doc(email).get();
-                
-                if (doc.exists && doc.data().role) {
-                    const userData = doc.data();
-                    if (userData.status === 'archived' && userData.role === 'studente') {
-                        const newTeamCode = prompt("Il tuo account è stato archiviato. Inserisci il nuovo Codice Squadra per l'anno in corso per riattivarti:");
-                        if (newTeamCode) {
-                            const team = await fanta_db.getTeamByCode(newTeamCode);
-                            if (team) {
-                                await window.db.collection('fanta_users').doc(email).update({
-                                    status: 'active',
-                                    teamId: team.id,
-                                    teamCode: newTeamCode
-                                });
-                                alert("Bentornato! Sei stato riattivato.");
-                                window.location.reload();
-                                return;
-                            } else {
-                                alert("Codice squadra non valido.");
-                                fanta_db.logout();
-                                return;
-                            }
-                        } else {
-                            alert("Codice necessario per riattivare l'account.");
-                            fanta_db.logout();
-                            return;
-                        }
-                    }
+                await window.db.collection('fanta_users').doc(email).set({
+                    email: email,
+                    role: currentUserRole,
+                    name: user.displayName || email.split('@')[0],
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+            } catch (saveErr) {
+                console.warn("Aggiornamento fanta_users:", saveErr);
+            }
 
-                    // Utente approvato e ha un ruolo
-                    const role = doc.data().role;
-                    currentUserRole = role;
-                    setLoggedIn(email, role);
-                    
-                    if (pendingInitialView) {
-                        const target = pendingInitialView;
-                        pendingInitialView = null;
-                        navigateTo(target, false);
-                    } else if (window.location.hash === '#view-welcome' || window.location.hash === '') {
-                        navigateTo('view-welcome');
-                    }
-                    
-                    // Esegui allineamento punteggi a caldo
-                    window.selfHealMissionsCount();
-                } else {
-                    // Nuovo utente o senza ruolo: mandiamo a onboarding
-                    setLoggedIn(email);
-                    if (pendingInitialView) {
-                        const target = pendingInitialView;
-                        pendingInitialView = null;
-                        navigateTo(target, false);
-                    } else {
-                        navigateTo('view-onboarding');
-                    }
-                }
-            } catch(e) {
-                console.error("Errore checkLoginSession Firestore:", e);
-                // In caso di errore (es: regole Firestore), mandiamo comunque al form onboarding
-                setLoggedIn(email);
+            // Visualizzazione admin se admin
+            if (isSuperAdmin && window.location.pathname.includes('admin.html')) {
+                const _c = document.getElementById('app-container');
+                if (_c) _c.style.display = 'block';
+                if (typeof window.renderAdminAutori === 'function') window.renderAdminAutori();
+                if (typeof window.renderAdminRichieste === 'function') window.renderAdminRichieste();
+                if (typeof renderNotifiche === 'function') renderNotifiche();
+            }
+
+            const adminMenuItem = document.getElementById('menu-admin-item');
+            if (adminMenuItem) {
+                adminMenuItem.style.display = isSuperAdmin ? 'block' : 'none';
+            }
+
+            if (!window.location.pathname.includes('admin.html')) {
                 if (pendingInitialView) {
                     const target = pendingInitialView;
                     pendingInitialView = null;
                     navigateTo(target, false);
                 } else {
-                    navigateTo('view-onboarding');
+                    const activeCode = localStorage.getItem('fanta_active_team_code');
+                    if (currentUserRole === 'studente' && !activeCode) {
+                        navigateTo('view-studenti', false);
+                    } else {
+                        navigateTo('view-welcome', false);
+                    }
                 }
+            }
+
+            if (typeof window.selfHealMissionsCount === 'function') {
+                window.selfHealMissionsCount();
             }
         } else {
             setLoggedOut();
@@ -1016,65 +970,31 @@ function checkLoginSession() {
     });
 }
 
-async function loginDocente(event) {
-    if(event) event.preventDefault();
-    
-    const checkAge = document.getElementById('welcome-check-age')?.checked;
-    const checkPrivacy = document.getElementById('welcome-check-privacy')?.checked;
-    if (!checkAge || !checkPrivacy) {
-        alert("Devi confermare l'età e accettare Privacy Policy e Termini per continuare.");
-        return;
-    }
-
-    const emailInput = document.getElementById('docente-email-input').value.trim().toLowerCase();
-    const passwordInput = document.getElementById('docente-password-input').value.trim();
-
-    if (!emailInput || !passwordInput) {
-        alert("Inserisci email e password.");
-        return;
-    }
-
-    try {
-        await fanta_db.login(emailInput, passwordInput);
-    } catch (error) {
-        console.error("Login fallito:", error);
-        alert("Accesso fallito. Verifica email e password o assicurati di essere stato approvato.");
-    }
-}
-
 window.selectOnboardingRole = async function(role) {
-    const user = window.auth.currentUser;
+    const user = window.auth ? window.auth.currentUser : null;
     if (!user) {
-        alert("Devi prima accedere con Google.");
         navigateTo('view-welcome');
         return;
     }
     const email = user.email.toLowerCase();
-    
-    if (role === 'docente' || role === 'teacher') {
-        // Ripristina flusso di iscrizione manuale per i docenti
-        localStorage.setItem('fanta_temp_email', email);
-        await fanta_db.logout();
-        navigateTo('view-iscrizione');
-    } else if (role === 'studente') {
-        if (window.FantaTimer) window.FantaTimer.startSession(email);
+    currentUserRole = role;
+    setLoggedIn(email, role);
+
+    try {
+        await window.db.collection('fanta_users').doc(email).set({
+            email: email,
+            role: role,
+            name: user.displayName || email.split('@')[0],
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+    } catch (e) {
+        console.warn("Salvataggio ruolo fanta_users:", e);
+    }
+
+    if (role === 'studente') {
         navigateTo('view-studenti');
-    } else if (role === 'fantamico' || role === 'guest') {
-        try {
-            if (window.FantaTimer) window.FantaTimer.startSession(email);
-            await window.db.collection('fanta_users').doc(email).set({
-                email: email,
-                role: role,
-                name: user.displayName || email.split('@')[0],
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            }, { merge: true });
-            
-            currentUserEmail = email;
-            navigateTo('view-welcome');
-        } catch (e) {
-            console.error("Errore salvataggio ruolo:", e);
-            alert("Si è verificato un errore durante la configurazione del tuo account. Verifica la tua connessione.");
-        }
+    } else {
+        navigateTo('view-welcome');
     }
 };
 
