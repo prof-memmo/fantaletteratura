@@ -2380,36 +2380,49 @@ h1, h2, h3, h4 {
     }
 }
 
-/* Admin navigation bar styling (for mobile horizontal scroll) */
+/* Admin navigation bar styling */
 .admin-main-nav-container {
     display: flex;
     justify-content: center;
-    gap: 10px;
+    gap: 12px;
     flex-wrap: wrap;
-    padding: 0 15px;
-    margin-bottom: 20px;
+    padding: 0 20px;
+    margin-top: 18px;
+    margin-bottom: 28px;
 }
 
 .admin-main-nav-container .btn {
-    flex: 1;
-    min-width: 150px;
-    padding: 10px 5px;
-    font-size: 0.8rem;
+    flex: 1 1 auto;
+    min-width: 140px;
+    padding: 12px 18px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 12px;
+    margin: 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-main-nav-container .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.35);
 }
 
 @media (max-width: 768px) {
     .admin-main-nav-container {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 6px;
+        gap: 8px;
         padding: 0 10px;
+        margin-top: 12px;
+        margin-bottom: 20px;
     }
     
     .admin-main-nav-container .btn {
-        min-width: 0; /* Remove 150px constraint */
+        min-width: 0;
         width: 100%;
-        padding: 8px 4px;
-        font-size: 0.65rem;
+        padding: 10px 6px;
+        font-size: 0.72rem;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -2421,6 +2434,6 @@ h1, h2, h3, h4 {
     
     .admin-main-nav-container .btn i {
         margin-bottom: 4px;
-        font-size: 1.1rem;
+        font-size: 1.15rem;
     }
 }

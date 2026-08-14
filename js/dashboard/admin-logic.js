@@ -962,10 +962,7 @@ async function setupAdminPanel() {
             if (targetId === 'admin-view-missioni') { window.renderAdminMissioni(); window.renderAdminMissioniPending(); }
             if (targetId === 'admin-view-classifica') window.renderAdminClassifica();
             if (targetId === 'admin-view-tornei') window.renderAdminTornei();
-            if (targetId === 'admin-view-profilo') window.renderAdminProfilo();
-            if (targetId === 'admin-view-presentazioni') window.initPresentazioniTab();
-            if (targetId === 'admin-view-locandine') { window.apriLocandine(); return; }
-            if (targetId === 'admin-view-attestati') { window.apriAttestati(); return; }
+            if (targetId === 'admin-view-impostazioni' || targetId === 'admin-view-profilo') window.renderAdminImpostazioni();
 
             // Mobile menu close
             const sideMenu = document.getElementById('side-menu');
@@ -984,23 +981,27 @@ async function setupAdminPanel() {
         await window.renderAdminClassifica();
         await window.renderAdminRichieste();
         await window.renderAdminTornei();
-        await window.renderAdminProfilo();
-        await window.initPresentazioniTab();
+        await window.renderAdminImpostazioni();
     }
 }
 
-window.renderAdminProfilo = async function() {
-    const sqList = document.getElementById('admin-profilo-squadre-list');
-    const trList = document.getElementById('admin-profilo-tornei-list');
-    const emailField = document.getElementById('admin-profilo-email');
-    if(!sqList || !currentUserEmail) return;
-
-    if(emailField) emailField.value = currentUserEmail;
+window.renderAdminImpostazioni = async function() {
+    const emailField = document.getElementById('admin-impostazioni-email') || document.getElementById('admin-profilo-email');
+    if (emailField && currentUserEmail) emailField.value = currentUserEmail;
 
     const masterArea = document.getElementById('admin-master-area');
+    const archivesArea = document.getElementById('admin-historical-archives-area');
     if (masterArea) {
         masterArea.style.display = (currentUserEmail === 'prof.memmo@gmail.com') ? 'block' : 'none';
     }
+    if (archivesArea) {
+        archivesArea.style.display = (currentUserEmail === 'prof.memmo@gmail.com') ? 'block' : 'none';
+        if (currentUserEmail === 'prof.memmo@gmail.com' && window.loadHistoricalArchives) {
+            await window.loadHistoricalArchives();
+        }
+    }
+};
+window.renderAdminProfilo = window.renderAdminImpostazioni;
 
     window.archiviaAnnoCorrente = async function() {
         if(currentUserEmail !== 'prof.memmo@gmail.com') return;

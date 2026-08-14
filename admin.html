@@ -50,21 +50,12 @@
                 <button class="btn admin-tab-btn" data-target="admin-view-missioni"><i class="fa-solid fa-scroll"></i> Missioni</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-tornei"><i class="fa-solid fa-trophy"></i> Tornei</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-classifica"><i class="fa-solid fa-ranking-star"></i> Classifica Globale</button>
-                <button class="btn admin-tab-btn" data-target="admin-view-profilo"><i class="fa-solid fa-user-gear"></i> Profilo</button>
-                <button class="btn admin-tab-btn" data-target="admin-view-presentazioni" style="background: #2ecc71 !important; color: #000 !important; font-weight: 800; border: 2px solid #000; box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);"><i class="fa-solid fa-desktop"></i> Presentazioni LIM</button>
-                <button class="btn admin-tab-btn" data-target="admin-view-locandine" style="background: linear-gradient(135deg, #e67e22, #d35400) !important; color: #fff !important; font-weight: 800; border: none; box-shadow: 0 4px 10px rgba(230, 126, 34, 0.35);"><i class="fa-solid fa-image"></i> Locandine</button>
-                <button class="btn admin-tab-btn" data-target="admin-view-attestati" style="background: linear-gradient(135deg, #f1c40f, #f39c12) !important; color: #fff !important; font-weight: 800; border: none; box-shadow: 0 4px 10px rgba(241, 196, 15, 0.35);"><i class="fa-solid fa-certificate"></i> Attestati</button>
-                <button class="btn" style="background: linear-gradient(135deg, #9b59b6, #8e44ad) !important; color: #fff !important; font-weight: 800; border: none; box-shadow: 0 4px 10px rgba(155, 89, 182, 0.35);" onclick="window.open('assets/locandine/Segnalibri.pdf', '_blank')"><i class="fa-solid fa-bookmark"></i> Segnalibri</button>
+                <button class="btn admin-tab-btn" data-target="admin-view-impostazioni"><i class="fa-solid fa-gear"></i> Impostazioni</button>
             </div>
 
             <section id="admin-view-autori" class="admin-view active">
-                <div style="display:flex; justify-content:space-between; align-items:center; padding: 0 15px; gap: 10px; flex-wrap: wrap;">
+                <div style="padding: 0 15px 15px 15px;">
                     <h2><i class="fa-solid fa-pen-nib"></i> Convalida Autori</h2>
-                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                        <button type="button" class="btn" style="width:auto; padding:5px 15px; font-size:0.8rem; background:#3498db;" onclick="testConnessioneAdmin()"><i class="fa-solid fa-satellite-dish"></i> Test Connessione</button>
-                        <button type="button" class="btn" style="width:auto; padding:5px 15px; font-size:0.8rem; background:var(--accent-gold); color:var(--bg-dark);" onclick="resetNotificheLette()"><i class="fa-solid fa-bell-slash"></i> Reset Notifiche</button>
-                        <button type="button" class="btn" style="width:auto; padding:5px 15px; font-size:0.8rem; background:var(--danger-color);" onclick="azzeraTutteSpunte()"><i class="fa-solid fa-rotate-left"></i> Azzera tutto</button>
-                    </div>
                 </div>
                 <div class="glass" style="padding: 15px; margin: 0 15px 20px 15px;">
                     <p style="font-size:0.85rem; margin-bottom:10px; line-height:1.4;">Seleziona la spunta per validare i punti di un autore.</p>
@@ -228,173 +219,47 @@
                 </div>
             </section>
 
-            <!-- VIEW: Admin Mio Profilo -->
-            <section id="admin-view-profilo" class="admin-view" style="display:none;">
-                <h2 style="padding: 0 15px;"><i class="fa-solid fa-user-gear"></i> Mio Profilo Docente</h2>
-                <div class="glass" style="padding: 15px; margin: 0 15px 20px 15px;">
-                    <input type="text" id="admin-profilo-email" class="input-control mb-1" value="" readonly style="background: rgba(255,255,255,0.05); color: #aaa;">
-                    
-                    <div style="display:flex; gap:10px; margin-bottom: 20px; flex-wrap:wrap;">
-                        <button type="button" class="btn" style="flex:1; min-width:140px;" onclick="window.location.href='index.html#view-missioni'"><i class="fa-solid fa-list-check"></i> Carica Missione</button>
-                        <button type="button" class="btn" style="flex:1; min-width:140px;" onclick="window.location.href='index.html#view-squadra'"><i class="fa-solid fa-plus-circle"></i> Nuova Squadra</button>
-                        <button type="button" class="btn" style="flex:1; min-width:140px; background: var(--accent-gold);" onclick="openInviteModal()"><i class="fa-solid fa-paper-plane"></i> Invita Collega</button>
+            <!-- VIEW: Admin Impostazioni & Danger Zone -->
+            <section id="admin-view-impostazioni" class="admin-view" style="display:none;">
+                <h2 style="padding: 0 15px;"><i class="fa-solid fa-gear"></i> Impostazioni &amp; Strumenti Admin</h2>
+                <div class="glass" style="padding: 20px; margin: 0 15px 20px 15px;">
+                    <div style="margin-bottom: 25px;">
+                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 6px;">Account Amministratore</label>
+                        <input type="text" id="admin-impostazioni-email" class="input-control" value="" readonly style="background: rgba(255,255,255,0.05); color: #aaa;">
                     </div>
 
-                    <div id="admin-master-area" style="display:none; margin-bottom: 20px; padding: 15px; border: 1px solid var(--danger-color); border-radius: 10px; background: rgba(231, 76, 60, 0.1);">
-                        <h3 class="text-danger"><i class="fa-solid fa-triangle-exclamation"></i> Danger Zone: Archiviazione Annuale</h3>
-                        <p style="font-size: 0.85rem; margin-bottom: 10px;">Questa opzione archivia tutte le squadre e studenti dell'anno in corso, salvandone una "fotografia" della classifica. Se necessario, l'operazione potrà essere annullata dall'Archivio Storico.</p>
-                        <button type="button" class="btn text-danger" style="background: transparent; border: 1px solid var(--danger-color);" onclick="window.archiviaAnnoCorrente()"><i class="fa-solid fa-box-archive"></i> Esegui Archiviazione Anno</button>
+                    <!-- Diagnostica e Notifiche -->
+                    <div style="margin-bottom: 25px; padding: 15px; border: 1px solid var(--glass-border); border-radius: 12px; background: rgba(255, 255, 255, 0.02);">
+                        <h3 style="color: var(--primary-color); margin-top:0; font-size: 1.05rem;"><i class="fa-solid fa-wrench"></i> Diagnostica &amp; Sistema</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Strumenti di verifica connessione e gestione avvisi dell'amministratore.</p>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <button type="button" class="btn" style="background:#3498db; width:auto; padding:8px 18px; font-size:0.85rem;" onclick="testConnessioneAdmin()"><i class="fa-solid fa-satellite-dish"></i> Test Connessione Database</button>
+                            <button type="button" class="btn" style="background:var(--accent-gold); color:var(--bg-dark); width:auto; padding:8px 18px; font-size:0.85rem;" onclick="resetNotificheLette()"><i class="fa-solid fa-bell-slash"></i> Reset Notifiche Non Lette</button>
+                        </div>
                     </div>
 
-                    <div id="admin-historical-archives-area" style="display:none; margin-bottom: 30px; padding: 15px; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; background: rgba(255, 255, 255, 0.02);">
-                        <h3 style="color: var(--accent-gold); margin-top:0;"><i class="fa-solid fa-clock-rotate-left"></i> Archivio Storico</h3>
+                    <!-- Danger Zone: Gestione Punteggi Stagionali -->
+                    <div style="margin-bottom: 25px; padding: 15px; border: 1px solid rgba(231, 76, 60, 0.3); border-radius: 12px; background: rgba(231, 76, 60, 0.05);">
+                        <h3 style="color: #e74c3c; margin-top:0; font-size: 1.05rem;"><i class="fa-solid fa-rotate-left"></i> Reset Validazioni Stagione</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Deseleziona contemporaneamente tutte le spunte di validazione degli autori mantenendo inalterate squadre e studenti.</p>
+                        <button type="button" class="btn" style="background:var(--danger-color); width:auto; padding:8px 18px; font-size:0.85rem;" onclick="azzeraTutteSpunte()"><i class="fa-solid fa-rotate-left"></i> Azzera Tutte le Spunte Autori</button>
+                    </div>
+
+                    <!-- Danger Zone: Archiviazione Annuale Classifiche -->
+                    <div id="admin-master-area" style="display:none; margin-bottom: 25px; padding: 15px; border: 1px solid var(--danger-color); border-radius: 12px; background: rgba(231, 76, 60, 0.1);">
+                        <h3 class="text-danger" style="margin-top:0; font-size: 1.05rem;"><i class="fa-solid fa-box-archive"></i> Archiviazione Annuale Fantaletteratura</h3>
+                        <p style="font-size: 0.85rem; margin-bottom: 15px;">Salva una "fotografia" della classifica finale e archivia le squadre dell'anno scolastico in corso. Potrà essere ripristinata dall'Archivio Storico in caso di necessità.</p>
+                        <button type="button" class="btn text-danger" style="background: transparent; border: 1px solid var(--danger-color); width:auto; padding:8px 18px; font-size:0.85rem;" onclick="window.archiviaAnnoCorrente()"><i class="fa-solid fa-box-archive"></i> Esegui Archiviazione Anno</button>
+                    </div>
+
+                    <!-- Archivio Storico -->
+                    <div id="admin-historical-archives-area" style="display:none; padding: 15px; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; background: rgba(255, 255, 255, 0.02);">
+                        <h3 style="color: var(--accent-gold); margin-top:0; font-size: 1.05rem;"><i class="fa-solid fa-clock-rotate-left"></i> Archivio Storico</h3>
                         <p style="font-size: 0.85rem; margin-bottom: 15px; color: var(--text-muted);">Consulta le classifiche degli anni passati o ripristina un anno archiviato per errore.</p>
                         <div id="admin-historical-archives-list">
                             <p style="font-size: 0.85rem; color: var(--text-muted);">Caricamento archivio in corso...</p>
                         </div>
                     </div>
-
-                    <h3 class="text-primary">Le tue squadre</h3>
-                    <div id="admin-profilo-squadre-list" style="margin-bottom:20px;"></div>
-
-                    <h3 class="text-primary">Tornei Interni</h3>
-                    <div id="admin-profilo-tornei-list"></div>
-                </div>
-            </section>
-
-            <!-- VIEW: Presentazioni LIM -->
-            <section id="admin-view-presentazioni" class="admin-view" style="display:none;">
-                <h2 style="padding: 0 15px;"><i class="fa-solid fa-desktop"></i> Presentazioni LIM</h2>
-                <div class="glass" style="padding: 20px; margin: 0 15px 20px 15px;">
-                    <p style="font-size:0.9rem; margin-bottom: 20px; line-height: 1.4; color: var(--text-muted);">
-                        Configura e avvia una presentazione animata a schermo intero da proiettare in classe. I dati delle classifiche e degli autori verranno caricati in tempo reale.
-                    </p>
-                    
-                    <!-- Tipo di Presentazione -->
-                    <div class="input-group">
-                        <label><i class="fa-solid fa-calendar-days"></i> 1. Tipo di Presentazione</label>
-                        <div class="pres-selection-grid">
-                            <div class="pres-card active" data-type="tipo" data-value="intermedia" onclick="window.selectPresOption(this)">
-                                <div class="pres-card-icon"><i class="fa-solid fa-circle-play"></i></div>
-                                <div class="pres-card-title">Intermedia</div>
-                                <div class="pres-card-desc">Risultati ordinari durante l'anno</div>
-                            </div>
-                            <div class="pres-card" data-type="tipo" data-value="semifinale" onclick="window.selectPresOption(this)">
-                                <div class="pres-card-icon"><i class="fa-solid fa-forward-step"></i></div>
-                                <div class="pres-card-title">Semifinale</div>
-                                <div class="pres-card-desc">Scontro per determinare i finalisti</div>
-                            </div>
-                            <div class="pres-card" data-type="tipo" data-value="finale" onclick="window.selectPresOption(this)">
-                                <div class="pres-card-icon"><i class="fa-solid fa-trophy"></i></div>
-                                <div class="pres-card-title">Finale</div>
-                                <div class="pres-card-desc">L'evento conclusivo che incorona i campioni</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Campionati -->
-                    <div class="input-group">
-                        <label><i class="fa-solid fa-map-location-dot"></i> 2. Campionati / Gironi da includere</label>
-                        <div class="pres-selection-grid">
-                            <div class="pres-card active" data-type="campionato" data-value="terze" onclick="window.togglePresOption(this)">
-                                <div class="pres-card-icon">📘</div>
-                                <div class="pres-card-title">Terze</div>
-                                <div class="pres-card-desc">Contemporanea: Autori Italiani</div>
-                            </div>
-                            <div class="pres-card active" data-type="campionato" data-value="seconde" onclick="window.togglePresOption(this)">
-                                <div class="pres-card-icon">📙</div>
-                                <div class="pres-card-title">Seconde</div>
-                                <div class="pres-card-desc">Età Moderna</div>
-                            </div>
-                            <div class="pres-card active" data-type="campionato" data-value="avanzato" onclick="window.togglePresOption(this)">
-                                <div class="pres-card-icon">📒</div>
-                                <div class="pres-card-title">Avanzato</div>
-                                <div class="pres-card-desc">Contemporanea Internazionale</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Classifiche -->
-                    <div class="input-group">
-                        <label><i class="fa-solid fa-list-ol"></i> 3. Classifiche da mostrare per ciascun girone</label>
-                        <div class="pres-selection-grid">
-                            <div class="pres-card active" data-type="classifica" data-value="autori" onclick="window.togglePresOption(this)">
-                                <div class="pres-card-icon"><i class="fa-solid fa-feather-pointed"></i></div>
-                                <div class="pres-card-title">Classifica Autori</div>
-                                <div class="pres-card-desc">Punti ottenuti solo dagli autori in squadra</div>
-                            </div>
-                            <div class="pres-card active" data-type="classifica" data-value="missioni" onclick="window.togglePresOption(this)">
-                                <div class="pres-card-icon"><i class="fa-solid fa-circle-check"></i></div>
-                                <div class="pres-card-title">Classifica Missioni</div>
-                                <div class="pres-card-desc">Punti accumulati con le missioni in classe (+5pt)</div>
-                            </div>
-                            <div class="pres-card active" data-type="classifica" data-value="globale" onclick="window.togglePresOption(this)">
-                                <div class="pres-card-icon"><i class="fa-solid fa-globe"></i></div>
-                                <div class="pres-card-title">Classifica Globale</div>
-                                <div class="pres-card-desc">Punteggio totale: Autori + Missioni</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tornei Interni (Opzionale) -->
-                    <div class="input-group" style="margin-bottom: 25px;">
-                        <label><i class="fa-solid fa-trophy"></i> 4. Tornei Interni (Opzionale)</label>
-                        <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">
-                            Mostra le classifiche dedicate ai tuoi tornei. (Seleziona i tornei che vuoi includere nella presentazione)
-                        </p>
-                        <div id="pres-tornei-container" class="pres-selection-grid" style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));">
-                            <!-- Popolato dinamicamente da app.js -->
-                            <div class="glass" style="padding:10px; text-align:center; color:var(--text-muted); grid-column:1/-1;">Caricamento tornei...</div>
-                        </div>
-                    </div>
-
-
-                    <!-- Autori in Evidenza -->
-                    <div class="input-group" style="margin-bottom: 25px;">
-                        <label><i class="fa-solid fa-feather-pointed"></i> Autori da Illustrare nella Scena 6 (Seleziona quelli studiati)</label>
-                        <div id="pres-autori-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; max-height: 200px; overflow-y: auto; padding: 10px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 8px;">
-                            <!-- Inseriti da JS in base alla modalità -->
-                        </div>
-                    </div>
-
-                    <!-- Gioco: Cantami o Diva -->
-                    <div class="input-group" style="margin-bottom: 25px;">
-                        <label><i class="fa-solid fa-microphone-lines"></i> Gioco in classe: "Cantami, o Diva"</label>
-                        <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">Interroga un alunno casuale su un autore casuale in 30 secondi.</p>
-                        <button type="button" class="btn" style="background:#8e44ad; color:#fff;" onclick="window.avviaCantamiDiva()"><i class="fa-solid fa-play"></i> Avvia "Cantami, o Diva"</button>
-                    </div>
-
-                    <!-- Sfida LIM -->
-                    <div class="input-group" style="margin-bottom: 25px;">
-                        <label><i class="fa-solid fa-gamepad"></i> Lancia Sfida LIM Casuale (Tutti gli autori)</label>
-                        <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">Avvia un minigioco visibile alla LIM che mescola domande su tutti gli autori. Verrà caricato il pacchetto generale.</p>
-                        <button type="button" class="btn btn-secondary mb-1" onclick="window.EroiMinigames.startManche('mixed')" style="width:100%; border-color:var(--accent-gold); color:var(--accent-gold);"><i class="fa-solid fa-trophy"></i> Avvia Manche Completa Casuale</button>
-                        <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
-                            <button type="button" class="btn btn-secondary" onclick="window.EroiMinigames.startMinigame('quiz', 'mixed')">Quiz</button>
-                            <button type="button" class="btn btn-secondary" onclick="window.EroiMinigames.startMinigame('impiccato', 'mixed')">Impiccato</button>
-                            <button type="button" class="btn btn-secondary" onclick="window.EroiMinigames.startMinigame('cloze', 'mixed')">Cloze</button>
-                            <button type="button" class="btn btn-secondary" onclick="window.EroiMinigames.startMinigame('puzzle', 'mixed')">Puzzle</button>
-                            <button type="button" class="btn btn-secondary" onclick="window.EroiMinigames.startMinigame('versi', 'mixed')">Versi</button>
-                        </div>
-                    </div>
-
-                    <!-- Augurio Finale -->
-                    <div class="input-group">
-                        <label><i class="fa-solid fa-wand-magic-sparkles"></i> Saluto / Augurio Finale</label>
-                        <select id="pres-augurio-select" class="input-control" onchange="window.gestisciAugurioCustom(this.value)">
-                            <option value="Buono studio e buone vacanze invernali! ❄️">Vacanze Invernali ❄️</option>
-                            <option value="Buono studio e buone vacanze pasquali! 🕊️">Vacanze Pasquali 🕊️</option>
-                            <option value="Buono studio e buone vacanze estive! ☀️">Vacanze Estive ☀️</option>
-                            <option value="Buono studio e buon fine settimana! 🕶️">Fine Settimana 🕶️</option>
-                            <option value="Buono studio e in bocca al lupo per le prossime sfide! 🚀">In bocca al lupo 🚀</option>
-                            <option value="custom">✍️ Testo Personalizzato...</option>
-                        </select>
-                        <input type="text" id="pres-augurio-custom" class="input-control mt-1" placeholder="Scrivi il tuo augurio personalizzato qui..." style="display: none;">
-                    </div>
-
-                    <button type="button" class="btn" style="margin-top: 15px; background: #2ecc71 !important; color: #000 !important; font-weight: 800; font-size: 1.1rem; border-radius: 30px; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);" onclick="window.avviaPresentazioneLIM()">
-                        <i class="fa-solid fa-play"></i> Avvia Presentazione a Schermo Intero
-                    </button>
                 </div>
             </section>
 
@@ -418,9 +283,9 @@
                 <i class="fa-solid fa-file-lines"></i>
                 <span>Schede</span>
             </a>
-            <a href="index.html#contatti" class="tab-item" data-tooltip="Inviaci un Messaggio">
-                <i class="fa-solid fa-envelope"></i>
-                <span>Contatti</span>
+            <a href="index.html#profilo" class="tab-item" id="tab-item-profilo" data-tooltip="Mio Profilo e Dashboard Docente">
+                <i class="fa-solid fa-user"></i>
+                <span>Profilo Docente</span>
             </a>
             <a href="admin.html" class="tab-item active" id="tab-item-admin" data-tooltip="Pannello Gestione Admin">
                 <i class="fa-solid fa-lock"></i>
