@@ -1141,7 +1141,7 @@ window.renderAdminProfilo = window.renderAdminImpostazioni;
             console.error("Errore caricamento archivio storico:", e);
         }
     };
-}
+
 
 window.approvaMissione = async function(mid, tid) {
     try {
