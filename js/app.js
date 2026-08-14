@@ -876,33 +876,22 @@ function checkLoginSession() {
             currentUserEmail = email;
             
             // 1. Verifica sull'Hub Centrale (Single Sign-On Auth)
+            let hubRole = (email === "prof.memmo@gmail.com") ? 'docente' : 'docente';
             try {
-                // Il database di default fanta_db E' il database Hub
                 const hubDoc = await window.db.collection('hub_users').doc(user.uid).get();
-                if (!hubDoc.exists) {
-                    alert("Profilo Hub non trovato. Completa l'onboarding nell'Hub.");
-                    window.location.href = 'https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html';
-                    return;
+                if (hubDoc.exists) {
+                    const hubData = hubDoc.data();
+                    if (hubData.statusAccount === 'rejected' || hubData.statusAccount === 'suspended') {
+                        alert("Accesso negato: L'account è stato sospeso nell'Hub.");
+                        window.location.href = 'https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html';
+                        return;
+                    }
+                    if (hubData.role) {
+                        hubRole = hubData.role;
+                    }
                 }
-                
-                const hubData = hubDoc.data();
-                if (hubData.statusAccount !== 'active') {
-                    alert("Accesso negato: L'account non è attivo nell'Hub (potrebbe essere sospeso o in attesa di approvazione).");
-                    window.location.href = 'https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html';
-                    return;
-                }
-                
-                if (!hubData.platforms || !hubData.platforms.fantaletteratura || !hubData.platforms.fantaletteratura.enabled) {
-                    alert("Accesso negato: Piattaforma FantaLetteratura non abilitata per il tuo profilo.");
-                    window.location.href = 'https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html';
-                    return;
-                }
-                
             } catch (err) {
-                console.error("Errore verifica Hub:", err);
-                alert("Errore di sicurezza Hub. Riprova.");
-                window.location.href = '../prof-memmo-admin-gestione-generale/portal.html';
-                return;
+                console.warn("Verifica Hub (fallback):", err);
             }
 
             // 2. Protezione pannello admin locale
