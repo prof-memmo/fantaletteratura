@@ -599,7 +599,15 @@
             return;
         }
         
-        const qData = this.quizState.questions[this.quizState.current];
+        let qData = this.quizState.questions[this.quizState.current];
+        const missionKey = `quiz_${currentMissionId || 'general'}_q${this.quizState.current}`;
+        if (window.LiveEditor && typeof window.LiveEditor.apply === 'function') {
+            qData = window.LiveEditor.apply(missionKey, qData);
+        }
+        const editBtn = (window.LiveEditor && typeof window.LiveEditor.renderBtn === 'function')
+            ? window.LiveEditor.renderBtn(missionKey, { q: qData.q })
+            : '';
+
         const progress = `Domanda ${this.quizState.current + 1} di ${this.quizState.questions.length}`;
         
         const optionsHtml = qData.o.map((opt, idx) => `
@@ -608,7 +616,7 @@
         
         container.innerHTML = `
             <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:15px; text-transform:uppercase; letter-spacing:1px; font-weight:bold;">${progress}</div>
-            <h3 style="color:#fff; font-size:1.2rem; margin-bottom:20px; line-height:1.4;">${qData.q}</h3>
+            <h3 style="color:#fff; font-size:1.2rem; margin-bottom:20px; line-height:1.4;">${qData.q} ${editBtn}</h3>
             <div>${optionsHtml}</div>
         `;
     },
@@ -709,8 +717,9 @@
             <div style="margin-top:6px;font-size:0.8rem;color:var(--text-muted);">Errori: ${s.wrongGuesses}/${s.maxWrong}</div>
           </div>
           <div>
-            <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(212,175,55,0.2);border-radius:8px;padding:10px;margin-bottom:12px;font-size:0.84rem;color:var(--text-muted);">
-              💡 <em>${s.hint}</em>
+            <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(212,175,55,0.2);border-radius:8px;padding:10px;margin-bottom:12px;font-size:0.84rem;color:var(--text-muted);display:flex;justify-content:space-between;align-items:center;">
+              <div>💡 <em>${s.hint}</em></div>
+              ${(window.LiveEditor && typeof window.LiveEditor.renderBtn === 'function') ? window.LiveEditor.renderBtn(`impiccato_${currentMissionId || 'general'}`, { word: s.word, hint: s.hint, text: s.hint }) : ''}
             </div>
             <div style="text-align:center;padding:14px 0;letter-spacing:6px;">${wordDisplay}</div>
             ${wrongLetters.length ? `<div style="font-size:0.8rem;color:#ef4444;margin-bottom:6px;">Lettere sbagliate: ${wrongLetters.join(', ')}</div>` : ''}
@@ -767,7 +776,10 @@
         </div>` : '';
 
       container.innerHTML = `
-        <div style="font-size:0.87rem;color:var(--text-muted);margin-bottom:10px;">📖 <em>${s.ex.source}</em></div>
+        <div style="font-size:0.87rem;color:var(--text-muted);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
+          <div>📖 <em>${s.ex.source}</em></div>
+          ${(window.LiveEditor && typeof window.LiveEditor.renderBtn === 'function') ? window.LiveEditor.renderBtn(`puzzle_${currentMissionId || 'general'}`, { text: s.ex.solution }) : ''}
+        </div>
         <div style="min-height:55px;border:1.5px dashed rgba(212,175,55,0.3);border-radius:8px;padding:10px;margin-bottom:14px;background:rgba(0,0,0,0.2);">${sel}</div>
         <div style="margin-bottom:8px;font-size:0.84rem;color:var(--text-muted);">Parole disponibili:</div>
         <div style="min-height:55px;">${rem}</div>
@@ -820,7 +832,10 @@
 
       container.innerHTML = `
         <div style="background:rgba(0,0,0,0.3);border:1.5px solid rgba(212,175,55,0.2);border-radius:10px;padding:18px;margin-bottom:16px;">
-          <div style="font-size:0.84rem;color:var(--text-muted);margin-bottom:10px;">📖 <em>${s.ex.source}</em></div>
+          <div style="font-size:0.84rem;color:var(--text-muted);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
+            <div>📖 <em>${s.ex.source}</em></div>
+            ${(window.LiveEditor && typeof window.LiveEditor.renderBtn === 'function') ? window.LiveEditor.renderBtn(`cloze_${currentMissionId || 'general'}`, { text: s.ex.text }) : ''}
+          </div>
           <div style="font-size:1.05rem;line-height:2.4;color:var(--text-light);font-weight:500;">${textHtml}</div>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
