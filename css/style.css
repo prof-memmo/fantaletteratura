@@ -2380,60 +2380,75 @@ h1, h2, h3, h4 {
     }
 }
 
-/* Admin navigation bar styling */
+/* Admin navigation bar styling (pulsanti compatti e affiancati) */
 .admin-main-nav-container {
     display: flex;
     justify-content: center;
-    gap: 12px;
+    align-items: center;
+    gap: 8px;
     flex-wrap: wrap;
-    padding: 0 20px;
-    margin-top: 18px;
-    margin-bottom: 28px;
+    padding: 0 15px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .admin-main-nav-container .btn {
-    flex: 1 1 auto;
-    min-width: 140px;
-    padding: 12px 18px;
-    font-size: 0.9rem;
+    flex: 0 1 auto;
+    padding: 9px 16px;
+    font-size: 0.85rem;
     font-weight: 600;
-    border-radius: 12px;
+    border-radius: 20px;
     margin: 0;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: all 0.2s ease;
+}
+
+.admin-main-nav-container .btn i {
+    font-size: 0.95rem;
 }
 
 .admin-main-nav-container .btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
 @media (max-width: 768px) {
     .admin-main-nav-container {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
-        padding: 0 10px;
-        margin-top: 12px;
-        margin-bottom: 20px;
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 4px 15px 10px 15px;
+        margin-top: 6px;
+        margin-bottom: 15px;
+    }
+    
+    .admin-main-nav-container::-webkit-scrollbar {
+        display: none;
     }
     
     .admin-main-nav-container .btn {
-        min-width: 0;
-        width: 100%;
-        padding: 10px 6px;
-        font-size: 0.72rem;
-        display: flex;
-        flex-direction: column;
+        flex: 0 0 auto;
+        padding: 7px 13px;
+        font-size: 0.8rem;
+        border-radius: 18px;
+        display: inline-flex;
+        flex-direction: row;
         align-items: center;
-        justify-content: center;
-        text-align: center;
-        white-space: normal;
-        line-height: 1.2;
+        gap: 5px;
     }
     
     .admin-main-nav-container .btn i {
-        margin-bottom: 4px;
-        font-size: 1.15rem;
+        margin-bottom: 0;
+        font-size: 0.85rem;
     }
 }
