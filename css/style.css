@@ -2380,7 +2380,7 @@ h1, h2, h3, h4 {
     }
 }
 
-/* Admin navigation bar styling (pulsanti compatti e affiancati) */
+/* Admin navigation bar styling (pulsanti compatti affiancati grandi quanto il testo) */
 .admin-main-nav-container {
     display: flex;
     justify-content: center;
@@ -2389,66 +2389,63 @@ h1, h2, h3, h4 {
     flex-wrap: wrap;
     padding: 0 15px;
     margin-top: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 22px;
     max-width: 1000px;
     margin-left: auto;
     margin-right: auto;
 }
 
-.admin-main-nav-container .btn {
-    flex: 0 1 auto;
-    padding: 9px 16px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    border-radius: 20px;
-    margin: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-    white-space: nowrap;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    transition: all 0.2s ease;
+.admin-main-nav-container .btn,
+.admin-tab-btn {
+    width: auto !important;
+    min-width: 0 !important;
+    flex: 0 0 auto !important;
+    padding: 7px 14px !important;
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+    border-radius: 8px !important;
+    margin: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    white-space: nowrap !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2) !important;
+    transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease !important;
 }
 
-.admin-main-nav-container .btn i {
-    font-size: 0.95rem;
+.admin-main-nav-container .btn i,
+.admin-tab-btn i {
+    font-size: 0.9rem !important;
+    margin: 0 !important;
 }
 
-.admin-main-nav-container .btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+.admin-main-nav-container .btn:hover,
+.admin-tab-btn:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
 }
 
 @media (max-width: 768px) {
     .admin-main-nav-container {
-        justify-content: flex-start;
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-        padding: 4px 15px 10px 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 0 10px;
         margin-top: 6px;
-        margin-bottom: 15px;
+        margin-bottom: 16px;
     }
     
-    .admin-main-nav-container::-webkit-scrollbar {
-        display: none;
+    .admin-main-nav-container .btn,
+    .admin-tab-btn {
+        padding: 6px 11px !important;
+        font-size: 0.78rem !important;
+        border-radius: 6px !important;
+        gap: 4px !important;
     }
     
-    .admin-main-nav-container .btn {
-        flex: 0 0 auto;
-        padding: 7px 13px;
-        font-size: 0.8rem;
-        border-radius: 18px;
-        display: inline-flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 5px;
-    }
-    
-    .admin-main-nav-container .btn i {
-        margin-bottom: 0;
-        font-size: 0.85rem;
+    .admin-main-nav-container .btn i,
+    .admin-tab-btn i {
+        font-size: 0.8rem !important;
     }
 }
