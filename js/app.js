@@ -679,10 +679,19 @@ async function showLeaderboard(type) {
 window.openAuthorSchedaModal = function(authorId, modeKey = null) {
     const mode = modeKey || currentTeamMode || 'terze';
     const pool = (GAME_MODES[mode] && GAME_MODES[mode].authors) ? GAME_MODES[mode].authors : AUTHORS;
-    const author = pool.find(a => a.id === authorId);
+    let author = pool.find(a => a.id === authorId);
     
     if (!author || !author.schedaHTML) return;
-    document.getElementById('scheda-autore-title').innerHTML = `Scheda di <strong>${author.name}</strong>`;
+
+    if (window.LiveEditor && typeof window.LiveEditor.apply === 'function') {
+        author = window.LiveEditor.apply(`author_${author.id}`, author);
+    }
+
+    const editBtn = (window.LiveEditor && typeof window.LiveEditor.renderBtn === 'function')
+        ? window.LiveEditor.renderBtn(`author_${author.id}`, { name: author.name, schedaHTML: author.schedaHTML })
+        : '';
+
+    document.getElementById('scheda-autore-title').innerHTML = `Scheda di <strong>${author.name}</strong> ${editBtn}`;
     document.getElementById('scheda-autore-content').innerHTML = `
         <div style="text-align:center; margin-bottom:15px;">
             <img src="${author.image}" onclick="if(window.openImageModal) window.openImageModal('${author.image}')" style="width:80px; height:80px; border-radius:50%; object-fit:cover; background:#fff; cursor:pointer; border: 2px solid var(--accent-gold); box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Clicca per ingrandire">
