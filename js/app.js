@@ -947,8 +947,14 @@ function checkLoginSession() {
                     navigateTo(target, false);
                 } else {
                     const activeCode = localStorage.getItem('fanta_active_team_code');
-                    if (currentUserRole === 'studente' && !activeCode) {
-                        navigateTo('view-studenti', false);
+                    if (currentUserRole === 'studente') {
+                        if (!activeCode) {
+                            navigateTo('view-studenti', false);
+                        } else {
+                            navigateTo('view-classifiche', false);
+                        }
+                    } else if (currentUserRole === 'docente' || currentUserRole === 'fantamico' || isSuperAdmin) {
+                        navigateTo('view-profilo', false);
                     } else {
                         navigateTo('view-welcome', false);
                     }
