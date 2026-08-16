@@ -21,7 +21,11 @@
     --bottom-bar-height: 80px;
     
     --font-heading: 'Julius Sans One', sans-serif;
-    --font-body: 'Outfit', sans-serif;
+    --font-body: 'Julius Sans One', sans-serif;
+}
+
+* {
+    font-family: 'Julius Sans One', sans-serif;
 }
 
 /* Consent Checkbox Custom Styling */
