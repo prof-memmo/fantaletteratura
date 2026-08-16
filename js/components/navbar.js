@@ -14,10 +14,13 @@ function setupNavigation() {
 }
 
 function navigateTo(viewId, pushHistory = true) {
-    if (!viewId) return;
+    if (viewId === 'view-contatti') {
+        window.open('https://prof-memmo.github.io/games/contatti.html', '_blank');
+        return;
+    }
 
     // ACCESSO E PROTEZIONE NAVIGAZIONE
-    const isPublicView = ['view-welcome', 'view-onboarding', 'view-iscrizione', 'view-regolamento', 'view-contatti'].includes(viewId);
+    const isPublicView = ['view-welcome', 'view-onboarding', 'view-iscrizione', 'view-regolamento'].includes(viewId);
     const hasStudentCode = localStorage.getItem('fanta_active_team_code');
     const isDocente = !!currentUserEmail;
 
