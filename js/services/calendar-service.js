@@ -168,6 +168,38 @@ window.CalendarService = {
         }
     },
 
+    async generateScheduleForSchoolYear(startDateStr) {
+        if (!startDateStr) throw new Error("Data di inizio non valida.");
+        
+        const baseReleases = typeof CALENDAR_RELEASES !== 'undefined' ? CALENDAR_RELEASES : [];
+        if (baseReleases.length === 0) throw new Error("Nessuna uscita configurata.");
+
+        const startParts = startDateStr.split('-').map(Number);
+        let curDate = new Date(startParts[0], startParts[1] - 1, startParts[2], 12, 0, 0);
+
+        const newOverrides = {};
+
+        baseReleases.forEach((rel, index) => {
+            const y = curDate.getFullYear();
+            const m = String(curDate.getMonth() + 1).padStart(2, '0');
+            const d = String(curDate.getDate()).padStart(2, '0');
+            const dateFormatted = `${y}-${m}-${d}`;
+
+            newOverrides[rel.id] = {
+                date: dateFormatted,
+                forced: false,
+                blocked: false
+            };
+
+            // Avanza di 14 giorni per la prossima uscita bisettimanale
+            curDate.setDate(curDate.getDate() + 14);
+        });
+
+        this._overrides = newOverrides;
+        await this._saveOverrides();
+        return this.getReleases();
+    },
+
     async _saveOverrides() {
         try {
             localStorage.setItem('fanta_calendar_overrides', JSON.stringify(this._overrides));

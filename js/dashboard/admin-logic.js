@@ -991,6 +991,74 @@ async function setupAdminPanel() {
 // GESTIONE CALENDARIO USCITE & AUTO-VALIDAZIONI ADMIN
 // =========================================================
 window.currentCalendarFilter = 'all';
+window.calendarViewMode = 'grid'; // 'grid' | 'list'
+window.calendarCurrentYear = 2026;
+window.calendarCurrentMonth = 8; // Settembre (0-indexed)
+
+const CALENDAR_MONTH_NAMES = [
+    'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
+    'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
+];
+
+window.switchCalendarView = function(viewMode) {
+    window.calendarViewMode = viewMode;
+    const btnGrid = document.getElementById('btn-view-cal-grid');
+    const btnList = document.getElementById('btn-view-cal-list');
+    const monthWrapper = document.getElementById('admin-calendar-month-wrapper');
+    const listWrapper = document.getElementById('admin-calendar-releases-list');
+
+    if (viewMode === 'grid') {
+        if (btnGrid) {
+            btnGrid.classList.add('active');
+            btnGrid.style.background = 'var(--primary-color)';
+            btnGrid.style.color = 'var(--bg-dark)';
+            btnGrid.style.fontWeight = 'bold';
+        }
+        if (btnList) {
+            btnList.classList.remove('active');
+            btnList.style.background = 'transparent';
+            btnList.style.color = '#fff';
+            btnList.style.fontWeight = 'normal';
+        }
+        if (monthWrapper) monthWrapper.style.display = 'block';
+        if (listWrapper) listWrapper.style.display = 'none';
+        window.renderMonthlyCalendar();
+    } else {
+        if (btnList) {
+            btnList.classList.add('active');
+            btnList.style.background = 'var(--primary-color)';
+            btnList.style.color = 'var(--bg-dark)';
+            btnList.style.fontWeight = 'bold';
+        }
+        if (btnGrid) {
+            btnGrid.classList.remove('active');
+            btnGrid.style.background = 'transparent';
+            btnGrid.style.color = '#fff';
+            btnGrid.style.fontWeight = 'normal';
+        }
+        if (monthWrapper) monthWrapper.style.display = 'none';
+        if (listWrapper) listWrapper.style.display = 'flex';
+        window.renderAdminCalendarioList();
+    }
+};
+
+window.prevCalendarMonth = function() {
+    window.calendarCurrentMonth--;
+    if (window.calendarCurrentMonth < 0) {
+        window.calendarCurrentMonth = 11;
+        window.calendarCurrentYear--;
+    }
+    window.renderMonthlyCalendar();
+};
+
+window.nextCalendarMonth = function() {
+    window.calendarCurrentMonth++;
+    if (window.calendarCurrentMonth > 11) {
+        window.calendarCurrentMonth = 0;
+        window.calendarCurrentYear++;
+    }
+    window.renderMonthlyCalendar();
+};
 
 window.filterCalendarView = function(modeFilter) {
     window.currentCalendarFilter = modeFilter || 'all';
@@ -999,10 +1067,149 @@ window.filterCalendarView = function(modeFilter) {
     });
     const activeBtn = document.querySelector(`#admin-view-calendario .admin-mode-filter-btn[onclick*="'${window.currentCalendarFilter}'"]`);
     if (activeBtn) activeBtn.classList.add('active');
-    window.renderAdminCalendario();
+    
+    if (window.calendarViewMode === 'grid') {
+        window.renderMonthlyCalendar();
+    } else {
+        window.renderAdminCalendarioList();
+    }
+};
+
+window.renderMonthlyCalendar = function() {
+    const gridEl = document.getElementById('admin-calendar-month-grid');
+    const titleEl = document.getElementById('admin-calendar-month-title');
+    if (!gridEl) return;
+
+    const year = window.calendarCurrentYear;
+    const month = window.calendarCurrentMonth;
+
+    if (titleEl) {
+        titleEl.innerText = `${CALENDAR_MONTH_NAMES[month]} ${year}`;
+    }
+
+    if (!window.CalendarService) return;
+
+    const allReleases = window.CalendarService.getReleases();
+    const filter = window.currentCalendarFilter || 'all';
+
+    const filteredReleases = allReleases.filter(r => {
+        if (filter === 'all') return true;
+        if (filter === 'seconde') return r.mode === 'seconde';
+        if (filter === 'terze_avanzato') return r.mode === 'terze_avanzato' || r.mode === 'terze' || r.mode === 'avanzato';
+        return true;
+    });
+
+    // Mappa uscite per data: 'YYYY-MM-DD' -> [releases]
+    const releasesByDate = {};
+    filteredReleases.forEach(r => {
+        if (!releasesByDate[r.effectiveDate]) releasesByDate[r.effectiveDate] = [];
+        releasesByDate[r.effectiveDate].push(r);
+    });
+
+    const firstDayOfMonth = new Date(year, month, 1);
+    const lastDayOfMonth = new Date(year, month + 1, 0);
+
+    // Giorno della settimana dell'1 del mese (0=Dom, 1=Lun, ..., 6=Sab)
+    // Convertiamo a 0=Lun, ..., 6=Dom
+    let startDayOfWeek = firstDayOfMonth.getDay() - 1;
+    if (startDayOfWeek < 0) startDayOfWeek = 6;
+
+    const totalDays = lastDayOfMonth.getDate();
+
+    // Data odierna in stringa
+    const todayStr = window.CalendarService.getTodayDateString();
+
+    let gridHtml = '';
+
+    // Giorni del mese precedente per riempire la prima settimana
+    const prevMonthLastDay = new Date(year, month, 0).getDate();
+    for (let i = startDayOfWeek - 1; i >= 0; i--) {
+        const d = prevMonthLastDay - i;
+        gridHtml += `
+            <div class="admin-cal-day-cell other-month">
+                <div class="admin-cal-day-header">
+                    <span class="admin-cal-day-num">${d}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    // Giorni del mese corrente
+    for (let day = 1; day <= totalDays; day++) {
+        const monthStr = String(month + 1).padStart(2, '0');
+        const dayStr = String(day).padStart(2, '0');
+        const dateKey = `${year}-${monthStr}-${dayStr}`;
+
+        const isToday = dateKey === todayStr;
+        const dayEvents = releasesByDate[dateKey] || [];
+        const hasEvent = dayEvents.length > 0;
+
+        let eventsHtml = '';
+        dayEvents.forEach(rel => {
+            const isOrange = rel.mode === 'seconde';
+            const colorClass = isOrange ? 'mode-orange' : 'mode-green';
+            const iconEmoji = isOrange ? '📙' : '📘';
+
+            let statusIcon = '⏳';
+            if (rel.status === 'released') statusIcon = '🟢';
+            else if (rel.status === 'forced') statusIcon = '⚡';
+            else if (rel.status === 'blocked') statusIcon = '🔒';
+
+            eventsHtml += `
+                <div class="admin-cal-event-pill ${colorClass}" onclick="window.openCalendarEventDetails('${rel.id}')" title="${rel.title} - Clicca per dettagli">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span>${iconEmoji} ${rel.groupTitle.split(':')[0]}</span>
+                        <span>${statusIcon}</span>
+                    </div>
+                    <div style="font-size:0.68rem; opacity:0.95; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                        ${rel.groupTitle.split(':')[1] || rel.title}
+                    </div>
+                    <div class="admin-cal-event-status">
+                        <span>${rel.authorIds ? rel.authorIds.length : 0} Autori</span> &bull; 
+                        <span>${rel.isReleased ? 'Sbloccato' : 'In attesa'}</span>
+                    </div>
+                </div>
+            `;
+        });
+
+        gridHtml += `
+            <div class="admin-cal-day-cell ${isToday ? 'today' : ''} ${hasEvent ? 'has-event' : ''}">
+                <div class="admin-cal-day-header">
+                    <span class="admin-cal-day-num">${day}</span>
+                    ${hasEvent ? `<span style="font-size:0.65rem; color:var(--accent-gold); font-weight:bold;">${dayEvents.length} Reel</span>` : ''}
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px; overflow-y:auto;">
+                    ${eventsHtml}
+                </div>
+            </div>
+        `;
+    }
+
+    // Giorni del mese successivo per completare la griglia a multiplo di 7
+    const totalRendered = startDayOfWeek + totalDays;
+    const remaining = (7 - (totalRendered % 7)) % 7;
+    for (let nextDay = 1; nextDay <= remaining; nextDay++) {
+        gridHtml += `
+            <div class="admin-cal-day-cell other-month">
+                <div class="admin-cal-day-header">
+                    <span class="admin-cal-day-num">${nextDay}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    gridEl.innerHTML = gridHtml;
 };
 
 window.renderAdminCalendario = function() {
+    if (window.calendarViewMode === 'grid') {
+        window.renderMonthlyCalendar();
+    } else {
+        window.renderAdminCalendarioList();
+    }
+};
+
+window.renderAdminCalendarioList = function() {
     const listContainer = document.getElementById('admin-calendar-releases-list');
     if (!listContainer) return;
 
@@ -1124,6 +1331,54 @@ window.renderAdminCalendario = function() {
             </div>
         `;
     }).join('');
+};
+
+window.openCalendarEventDetails = function(releaseId) {
+    // Switch rapido alla vista elenco posizionandosi sull'evento o aprendo il dettaglio
+    window.switchCalendarView('list');
+    setTimeout(() => {
+        const element = document.querySelector(`input[onchange*="'${releaseId}'"]`);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            const card = element.closest('.glass');
+            if (card) {
+                card.style.outline = '2px solid var(--accent-gold)';
+                setTimeout(() => { card.style.outline = 'none'; }, 2000);
+            }
+        }
+    }, 100);
+};
+
+window.generaCalendarioNuovoAnno = async function() {
+    const inputDate = document.getElementById('input-smart-calendar-start');
+    if (!inputDate || !inputDate.value) {
+        alert("Inserisci la data del primo martedì di avvio del nuovo anno scolastico.");
+        return;
+    }
+
+    const startDate = inputDate.value;
+    if (!confirm(`Sei sicuro di voler rigenerare tutte le 18 uscite del Calendario a partire da Martedì ${startDate}?\nLe date verranno aggiornate a cascata ogni 14 giorni per tutte le classi.`)) {
+        return;
+    }
+
+    try {
+        if (!window.CalendarService) throw new Error("Servizio Calendario non disponibile.");
+        await window.CalendarService.generateScheduleForSchoolYear(startDate);
+
+        // Imposta il mese del calendario visualizzato sul mese di inizio
+        const startParts = startDate.split('-').map(Number);
+        window.calendarCurrentYear = startParts[0];
+        window.calendarCurrentMonth = startParts[1] - 1;
+
+        alert(`✅ Calendario del Nuovo Anno Scolastico generato con successo a partire dal ${startDate}!`);
+        
+        // Se siamo in admin, aggiorna e naviga al tab calendario
+        const calTab = document.querySelector('.admin-tab-btn[data-target="admin-view-calendario"]');
+        if (calTab) calTab.click();
+    } catch (e) {
+        console.error("Errore generazione calendario:", e);
+        alert("Errore generazione calendario: " + e.message);
+    }
 };
 
 window.updateCalendarReleaseDate = async function(releaseId, newDate) {

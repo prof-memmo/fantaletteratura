@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Fantaletteratura - Admin</title>
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=12">
+    <link rel="stylesheet" href="css/style.css?v=20">
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -58,20 +58,59 @@
             <section id="admin-view-calendario" class="admin-view" style="display:none;">
                 <div style="padding: 0 15px 15px 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                     <div>
-                        <h2 style="margin: 0;"><i class="fa-solid fa-calendar-days" style="color: var(--accent-gold);"></i> Calendario Uscite</h2>
+                        <h2 style="margin: 0;"><i class="fa-solid fa-calendar-days" style="color: var(--accent-gold);"></i> Calendario</h2>
                         <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">Le schede e i punteggi degli autori si validano automaticamente alle date previste per ogni Reel. Puoi modificare le date o forzare/bloccare le uscite.</p>
                     </div>
                     <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 14px; border-radius: 12px;" onclick="window.renderAdminCalendario()"><i class="fa-solid fa-rotate"></i> Ricarica</button>
                 </div>
                 <div class="glass" style="padding: 15px; margin: 0 15px 20px 15px;">
-                    <!-- Filtro modalità calendario -->
-                    <div class="admin-mode-filter" style="margin-bottom: 15px;">
-                        <button class="admin-mode-filter-btn f-all active" onclick="window.filterCalendarView('all')">📅 Tutte le Uscite (18)</button>
-                        <button class="admin-mode-filter-btn f-orange" onclick="window.filterCalendarView('seconde')">📙 Età Medievale e Moderna (9)</button>
-                        <button class="admin-mode-filter-btn f-green" onclick="window.filterCalendarView('terze_avanzato')">📘 Contemporanea &amp; Internazionali (9)</button>
+                    <!-- Barra Superiore: Toggle Vista & Filtri -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
+                        <!-- Switcher Vista: Mensile / Elenco -->
+                        <div style="display: flex; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15);">
+                            <button class="btn admin-cal-view-btn active" id="btn-view-cal-grid" onclick="window.switchCalendarView('grid')" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 8px; margin: 0; background: var(--primary-color); color: var(--bg-dark); font-weight: bold; border: none; cursor: pointer;">
+                                <i class="fa-solid fa-calendar-days"></i> Calendario Mensile
+                            </button>
+                            <button class="btn admin-cal-view-btn" id="btn-view-cal-list" onclick="window.switchCalendarView('list')" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 8px; margin: 0; background: transparent; color: #fff; border: none; cursor: pointer;">
+                                <i class="fa-solid fa-list-ul"></i> Elenco Uscite
+                            </button>
+                        </div>
+
+                        <!-- Filtro modalità calendario -->
+                        <div class="admin-mode-filter" style="margin: 0;">
+                            <button class="admin-mode-filter-btn f-all active" onclick="window.filterCalendarView('all')">📅 Tutte le Uscite (18)</button>
+                            <button class="admin-mode-filter-btn f-orange" onclick="window.filterCalendarView('seconde')">📙 Età Medievale e Moderna (9)</button>
+                            <button class="admin-mode-filter-btn f-green" onclick="window.filterCalendarView('terze_avanzato')">📘 Contemporanea &amp; Internazionali (9)</button>
+                        </div>
                     </div>
-                    <div id="admin-calendar-releases-list" style="display: flex; flex-direction: column; gap: 12px;">
-                        <!-- Inseriti da JS -->
+
+                    <!-- VISTA 1: CALENDARIO MENSILE SOCIAL / GOOGLE CALENDAR -->
+                    <div id="admin-calendar-month-wrapper">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; background: rgba(255,255,255,0.03); padding: 8px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+                            <button class="btn btn-secondary" style="width: auto; padding: 6px 14px; font-size: 0.82rem; margin: 0;" onclick="window.prevCalendarMonth()"><i class="fa-solid fa-chevron-left"></i> Mese Prec.</button>
+                            <div id="admin-calendar-month-title" style="font-size: 1.15rem; font-weight: 800; color: var(--accent-gold); letter-spacing: 0.5px; text-transform: capitalize;">Settembre 2026</div>
+                            <button class="btn btn-secondary" style="width: auto; padding: 6px 14px; font-size: 0.82rem; margin: 0;" onclick="window.nextCalendarMonth()">Mese Succ. <i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+
+                        <div class="admin-cal-grid-wrapper">
+                            <div class="admin-cal-weekdays">
+                                <div class="admin-cal-weekday">Lun</div>
+                                <div class="admin-cal-weekday" style="color: var(--accent-gold); font-weight: 800;">Mar (Uscite)</div>
+                                <div class="admin-cal-weekday">Mer</div>
+                                <div class="admin-cal-weekday">Gio</div>
+                                <div class="admin-cal-weekday">Ven</div>
+                                <div class="admin-cal-weekday">Sab</div>
+                                <div class="admin-cal-weekday">Dom</div>
+                            </div>
+                            <div id="admin-calendar-month-grid" class="admin-cal-days-grid">
+                                <!-- Popolato da JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VISTA 2: ELENCO CRONOLOGICO DETTAGLIATO -->
+                    <div id="admin-calendar-releases-list" style="display: none; flex-direction: column; gap: 12px;">
+                        <!-- Popolato da JS -->
                     </div>
                 </div>
             </section>
@@ -261,6 +300,23 @@
                         <div style="display:flex; gap:10px; flex-wrap:wrap;">
                             <button type="button" class="btn" style="background:#3498db; width:auto; padding:8px 18px; font-size:0.85rem;" onclick="testConnessioneAdmin()"><i class="fa-solid fa-satellite-dish"></i> Test Connessione Database</button>
                             <button type="button" class="btn" style="background:var(--accent-gold); color:var(--bg-dark); width:auto; padding:8px 18px; font-size:0.85rem;" onclick="resetNotificheLette()"><i class="fa-solid fa-bell-slash"></i> Reset Notifiche Non Lette</button>
+                        </div>
+                    </div>
+
+                    <!-- Configura Calendario per Nuovo Anno Scolastico -->
+                    <div style="margin-bottom: 25px; padding: 18px; border: 1px solid var(--accent-gold); border-radius: 12px; background: rgba(212, 175, 55, 0.06);">
+                        <h3 style="color: var(--accent-gold); margin-top:0; font-size: 1.05rem;"><i class="fa-solid fa-calendar-plus"></i> Calendario Smart: Nuovo Anno Scolastico</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; line-height: 1.4;">
+                            Quando ricomincia l'anno scolastico, genera in automatico tutte le 18 uscite bisettimanali a martedì alternati selezionando solo la data del primo martedì di avvio.
+                        </p>
+                        <div style="display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap;">
+                            <div>
+                                <label style="font-size: 0.78rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Data Primo Martedì di Avvio:</label>
+                                <input type="date" id="input-smart-calendar-start" class="input-control" value="2026-09-29" style="width: auto; font-family: monospace; padding: 7px 12px;">
+                            </div>
+                            <button type="button" class="btn" style="background: var(--accent-gold); color: var(--bg-dark); font-weight: bold; width: auto; padding: 9px 18px; font-size: 0.85rem; border: none; cursor: pointer; border-radius: 8px;" onclick="window.generaCalendarioNuovoAnno()">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Genera Calendario Nuovo Anno
+                            </button>
                         </div>
                     </div>
 
@@ -703,17 +759,17 @@
     </div>
 
     <!-- Scripts -->
-    <script src="js/data.js?v=19"></script>
-    <script src="js/services/calendar-service.js?v=19"></script>
-    <script src="js/music.js?v=19"></script>
-    <script src="js/minigames.js?v=19"></script>
+    <script src="js/data.js?v=20"></script>
+    <script src="js/services/calendar-service.js?v=20"></script>
+    <script src="js/music.js?v=20"></script>
+    <script src="js/minigames.js?v=20"></script>
     <!-- Components -->
-    <script src="js/components/navbar.js?v=19"></script>
-    <script src="js/components/modals.js?v=19"></script>
+    <script src="js/components/navbar.js?v=20"></script>
+    <script src="js/components/modals.js?v=20"></script>
     <!-- Dashboard -->
-    <script src="js/dashboard/admin-logic.js?v=19"></script>
+    <script src="js/dashboard/admin-logic.js?v=20"></script>
     <!-- Live Editor -->
-    <script src="js/live-editor.js?v=19"></script>
-    <script src="js/app.js?v=19"></script>
+    <script src="js/live-editor.js?v=20"></script>
+    <script src="js/app.js?v=20"></script>
 </body>
 </html>
