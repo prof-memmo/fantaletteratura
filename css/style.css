@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Julius+Sans+One&family=Outfit:wght@300;400;600;700&display=swap');
 
 :root {
     --bg-dark: #0f1108; /* Deep ink / moss dark */
@@ -20,7 +20,7 @@
     --nav-height: 70px;
     --bottom-bar-height: 80px;
     
-    --font-heading: 'Cormorant Garamond', serif;
+    --font-heading: 'Julius Sans One', sans-serif;
     --font-body: 'Outfit', sans-serif;
 }
 
