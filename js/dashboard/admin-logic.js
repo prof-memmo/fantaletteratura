@@ -989,6 +989,11 @@ window.renderAdminImpostazioni = async function() {
     const emailField = document.getElementById('admin-impostazioni-email') || document.getElementById('admin-profilo-email');
     if (emailField && currentUserEmail) emailField.value = currentUserEmail;
 
+    // Renderizza pannello Live Editor Didattico
+    if (window.LiveEditor && typeof window.LiveEditor.renderAdminPanel === 'function') {
+        window.LiveEditor.renderAdminPanel('admin-live-editor-container');
+    }
+
     const masterArea = document.getElementById('admin-master-area');
     const archivesArea = document.getElementById('admin-historical-archives-area');
     if (masterArea) {
