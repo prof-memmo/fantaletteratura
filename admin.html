@@ -46,6 +46,7 @@
             <!-- Admin Navigation -->
             <div class="admin-main-nav-container" id="admin-main-nav">
                 <button class="btn admin-tab-btn active" data-target="admin-view-autori"><i class="fa-solid fa-feather"></i> Autori</button>
+                <button class="btn admin-tab-btn" data-target="admin-view-calendario"><i class="fa-solid fa-calendar-days"></i> Calendario</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-squadre"><i class="fa-solid fa-users-rectangle"></i> Squadre</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-missioni"><i class="fa-solid fa-scroll"></i> Missioni</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-tornei"><i class="fa-solid fa-trophy"></i> Tornei</button>
@@ -53,17 +54,39 @@
                 <button class="btn admin-tab-btn" data-target="admin-view-impostazioni"><i class="fa-solid fa-gear"></i> Impostazioni</button>
             </div>
 
+            <!-- VIEW: Pannello Admin - Calendario Uscite -->
+            <section id="admin-view-calendario" class="admin-view" style="display:none;">
+                <div style="padding: 0 15px 15px 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <h2 style="margin: 0;"><i class="fa-solid fa-calendar-days" style="color: var(--accent-gold);"></i> Calendario Uscite</h2>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">Le schede e i punteggi degli autori si validano automaticamente alle date previste per ogni Reel. Puoi modificare le date o forzare/bloccare le uscite.</p>
+                    </div>
+                    <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 14px; border-radius: 12px;" onclick="window.renderAdminCalendario()"><i class="fa-solid fa-rotate"></i> Ricarica</button>
+                </div>
+                <div class="glass" style="padding: 15px; margin: 0 15px 20px 15px;">
+                    <!-- Filtro modalità calendario -->
+                    <div class="admin-mode-filter" style="margin-bottom: 15px;">
+                        <button class="admin-mode-filter-btn f-all active" onclick="window.filterCalendarView('all')">📅 Tutte le Uscite (18)</button>
+                        <button class="admin-mode-filter-btn f-orange" onclick="window.filterCalendarView('seconde')">📙 Età Moderna e Contemporanea (9)</button>
+                        <button class="admin-mode-filter-btn f-green" onclick="window.filterCalendarView('terze_avanzato')">📘 Contemporanea &amp; Internazionali (9)</button>
+                    </div>
+                    <div id="admin-calendar-releases-list" style="display: flex; flex-direction: column; gap: 12px;">
+                        <!-- Inseriti da JS -->
+                    </div>
+                </div>
+            </section>
+
             <section id="admin-view-autori" class="admin-view active">
                 <div style="padding: 0 15px 15px 15px;">
                     <h2><i class="fa-solid fa-pen-nib"></i> Convalida Autori</h2>
                 </div>
                 <div class="glass" style="padding: 15px; margin: 0 15px 20px 15px;">
-                    <p style="font-size:0.85rem; margin-bottom:10px; line-height:1.4;">Seleziona la spunta per validare i punti di un autore.</p>
+                    <p style="font-size:0.85rem; margin-bottom:10px; line-height:1.4;">Seleziona la spunta per validare i punti o la scheda di un autore. <em>(Nota: gli autori con data raggiunta nel Calendario sono già validati automaticamente).</em></p>
                     <!-- Filtro modalità -->
                     <div class="admin-mode-filter" style="margin-bottom:15px;">
                         <button class="admin-mode-filter-btn f-all" onclick="window.renderAdminAutori('all')">📚 Tutte le modalità</button>
                         <button class="admin-mode-filter-btn f-green" onclick="window.renderAdminAutori('terze')">📘 Contemporanea: Autori Italiani</button>
-                        <button class="admin-mode-filter-btn f-orange" onclick="window.renderAdminAutori('seconde')">📙 Età Moderna</button>
+                        <button class="admin-mode-filter-btn f-orange" onclick="window.renderAdminAutori('seconde')">📙 Età Moderna e Contemporanea</button>
                         <button class="admin-mode-filter-btn f-gold" onclick="window.renderAdminAutori('avanzato')">📒 Contemporanea: Autori Italiani e Internazionali</button>
                     </div>
                     <div id="admin-autori-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px;">
@@ -85,7 +108,7 @@
                     <div class="admin-mode-filter" style="margin-bottom:15px;">
                         <button class="admin-mode-filter-btn f-all" onclick="window.renderAdminSquadre('all')">Tutte le modalità</button>
                         <button class="admin-mode-filter-btn f-green" onclick="window.renderAdminSquadre('terze')">📘 Contemporanea: Autori Italiani</button>
-                        <button class="admin-mode-filter-btn f-orange" onclick="window.renderAdminSquadre('seconde')">📙 Età Moderna</button>
+                        <button class="admin-mode-filter-btn f-orange" onclick="window.renderAdminSquadre('seconde')">📙 Età Moderna e Contemporanea</button>
                         <button class="admin-mode-filter-btn f-gold" onclick="window.renderAdminSquadre('avanzato')">📒 Contemporanea: Autori Italiani e Internazionali</button>
                     </div>
 
@@ -146,7 +169,7 @@
                     <div class="admin-mode-filter" style="margin-bottom:15px;">
                         <button class="admin-mode-filter-btn f-all" onclick="window.renderAdminClassifica('all')">Tutte le modalità</button>
                         <button class="admin-mode-filter-btn f-green" onclick="window.renderAdminClassifica('terze')">📘 Contemporanea: Autori Italiani</button>
-                        <button class="admin-mode-filter-btn f-orange" onclick="window.renderAdminClassifica('seconde')">📙 Età Moderna</button>
+                        <button class="admin-mode-filter-btn f-orange" onclick="window.renderAdminClassifica('seconde')">📙 Età Moderna e Contemporanea</button>
                         <button class="admin-mode-filter-btn f-gold" onclick="window.renderAdminClassifica('avanzato')">📒 Contemporanea: Autori Italiani e Internazionali</button>
                     </div>
                     <div id="admin-classifica-list"></div>
@@ -564,7 +587,7 @@
                             <select id="attestato-campionato" class="input-control" onchange="window.aggiornaAnteprimaAttestato()">
                                 <option value="">Nessuno (Lascia spazio vuoto)</option>
                                 <option value="Contemporanea: Autori Italiani">📘 Contemporanea: Autori Italiani</option>
-                                <option value="Età Moderna">📙 Età Moderna</option>
+                                <option value="Campionato Età Moderna e Contemporanea">📙 Età Moderna e Contemporanea</option>
                                 <option value="Contemporanea: Autori Italiani e Internazionali">📒 Contemporanea: Autori Italiani e Internazionali</option>
                             </select>
                         </div>
@@ -680,16 +703,17 @@
     </div>
 
     <!-- Scripts -->
-    <script src="js/data.js?v=10"></script>
-    <script src="js/music.js?v=10"></script>
-    <script src="js/minigames.js?v=10"></script>
+    <script src="js/data.js?v=18"></script>
+    <script src="js/services/calendar-service.js?v=18"></script>
+    <script src="js/music.js?v=18"></script>
+    <script src="js/minigames.js?v=18"></script>
     <!-- Components -->
-    <script src="js/components/navbar.js?v=10"></script>
-    <script src="js/components/modals.js?v=10"></script>
+    <script src="js/components/navbar.js?v=18"></script>
+    <script src="js/components/modals.js?v=18"></script>
     <!-- Dashboard -->
-    <script src="js/dashboard/admin-logic.js?v=10"></script>
+    <script src="js/dashboard/admin-logic.js?v=18"></script>
     <!-- Live Editor -->
-    <script src="js/live-editor.js?v=17"></script>
-    <script src="js/app.js?v=17"></script>
+    <script src="js/live-editor.js?v=18"></script>
+    <script src="js/app.js?v=18"></script>
 </body>
 </html>

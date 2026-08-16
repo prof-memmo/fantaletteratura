@@ -1286,8 +1286,8 @@ const AUTHORS_AVANZATO = [...AUTHORS, ...AUTHORS_INTERNAZIONALI];
 const GAME_MODES = {
     terze: {
         id: 'terze',
-        label: 'Contemporanea: Autori Italiani',
-        shortLabel: 'Contemporanea: Autori Italiani',
+        label: 'Campionato Età Contemporanea — Autori Italiani',
+        shortLabel: 'Età Contemporanea',
         emoji: '📘',
         description: "Autori italiani dell'Ottocento e del Novecento",
         colorPrimary: '#8da03f',
@@ -1300,8 +1300,8 @@ const GAME_MODES = {
     },
     seconde: {
         id: 'seconde',
-        label: 'Età Moderna',
-        shortLabel: 'Moderna',
+        label: 'Campionato Età Moderna e Contemporanea',
+        shortLabel: 'Età Moderna e Contemporanea',
         emoji: '📙',
         description: 'Autori dalle origini della letteratura italiana fino al Settecento',
         colorPrimary: '#d4721a',
@@ -1314,8 +1314,8 @@ const GAME_MODES = {
     },
     avanzato: {
         id: 'avanzato',
-        label: 'Contemporanea: Autori Italiani e Internazionali',
-        shortLabel: 'Contemporanea: Autori Italiani e Internazionali',
+        label: 'Campionato Età Contemporanea — Autori Italiani e Internazionali',
+        shortLabel: 'Contemporanea: Internazionali',
         emoji: '📒',
         description: 'Autori italiani e internazionali',
         colorPrimary: '#c9a227',
@@ -1328,10 +1328,268 @@ const GAME_MODES = {
     }
 };
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// GRUPPI AUTORI PER CAMPIONATO (9 GRUPPI CIASCUNO)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const AUTHOR_GROUPS = {
+    seconde: [
+        { group: 1, title: 'Gruppo 1: Le Origini', authorIds: ['primi-documenti', 'francesco-assisi'] },
+        { group: 2, title: 'Gruppo 2: La Poesia del Duecento', authorIds: ['scuola-siciliana', 'iacopone-todi'] },
+        { group: 3, title: 'Gruppo 3: Il Dolce Stil Novo e le Origini Toscane', authorIds: ['cecco-angiolieri', 'dante-alighieri-sec'] },
+        { group: 4, title: 'Gruppo 4: Il Trecento Letterario', authorIds: ['francesco-petrarca', 'giovanni-boccaccio'] },
+        { group: 5, title: 'Gruppo 5: L\'Umanesimo e il Primo Rinascimento', authorIds: ['lorenzo-medici', 'niccolo-machiavelli'] },
+        { group: 6, title: 'Gruppo 6: Il Pieno Rinascimento', authorIds: ['ludovico-ariosto', 'torquato-tasso'] },
+        { group: 7, title: 'Gruppo 7: La Controriforma e la Scienza', authorIds: ['commedia-arte', 'galileo-galilei'] },
+        { group: 8, title: 'Gruppo 8: L\'Illuminismo e la Poesia', authorIds: ['carlo-goldoni', 'giuseppe-parini'] },
+        { group: 9, title: 'Gruppo 9: L\'Illuminismo Civile', authorIds: ['cesare-beccaria'] }
+    ],
+    terze: [
+        { group: 1, title: 'Gruppo 1: Neoclassicismo e Primo Romanticismo', authorIds: ['a1', 'a3', 'a2'] },
+        { group: 2, title: 'Gruppo 2: Ottocento Risorgimentale e Post-Unitario', authorIds: ['a6', 'a13', 'a4'] },
+        { group: 3, title: 'Gruppo 3: Verismo e Decadentismo', authorIds: ['a5', 'a7', 'a8'] },
+        { group: 4, title: 'Gruppo 4: Primo Novecento e Avanguardie', authorIds: ['a9', 'a24', 'a10'] },
+        { group: 5, title: 'Gruppo 5: La Grande Poesia del Novecento', authorIds: ['a11', 'a12', 'a18'] },
+        { group: 6, title: 'Gruppo 6: La Prosa tra le Due Guerre', authorIds: ['a17', 'a15', 'a21'] },
+        { group: 7, title: 'Gruppo 7: Il Secondo Dopoguerra', authorIds: ['a16', 'a22', 'a20'] },
+        { group: 8, title: 'Gruppo 8: Il Neorealismo e il Calvino Combinatorio', authorIds: ['a19', 'a14'] },
+        { group: 9, title: 'Gruppo 9: Verso il Tardo Novecento', authorIds: ['a23'] }
+    ],
+    avanzato: [
+        { group: 1, title: 'Gruppo 1: Il Settecento e l\'Alba dell\'Ottocento', authorIds: ['johann-wolfgang-goethe', 'jane-austen', 'a1', 'a3', 'a2', 'victor-hugo'] },
+        { group: 2, title: 'Gruppo 2: Il Romanticismo e il Realismo Ottocentesco', authorIds: ['edgar-allan-poe', 'charles-dickens', 'herman-melville', 'fedor-dostoevskij', 'henrik-ibsen', 'lev-tolstoj'] },
+        { group: 3, title: 'Gruppo 3: Metà Ottocento tra Poesia e Grande Romanzo', authorIds: ['emily-dickinson', 'a4', 'mark-twain', 'a5', 'emile-zola', 'oscar-wilde'] },
+        { group: 4, title: 'Gruppo 4: Tra Fine Ottocento e Primo Novecento', authorIds: ['a6', 'sigmund-freud', 'anton-cechov', 'a13', 'a7', 'a8'] },
+        { group: 5, title: 'Gruppo 5: Il Modernismo e le Grandi Voci Europee', authorIds: ['marcel-proust', 'rainer-maria-rilke', 'a9', 'hermann-hesse', 'virginia-woolf', 'james-joyce'] },
+        { group: 6, title: 'Gruppo 6: Gli Anni \'80 dell\'Ottocento', authorIds: ['a24', 'franz-kafka', 'a10', 'agatha-christie', 'a11', 'ernest-hemingway'] },
+        { group: 7, title: 'Gruppo 7: La Generazione del Primo Novecento', authorIds: ['antoine-saint-exupery', 'a12', 'george-orwell', 'a18', 'a17', 'a15'] },
+        { group: 8, title: 'Gruppo 8: Gli Anni Dieci e Venti del Novecento', authorIds: ['albert-camus', 'a21', 'a16', 'a22', 'a20', 'a19'] },
+        { group: 9, title: 'Gruppo 9: Dal Secondo Novecento ai Giorni Nostri', authorIds: ['a14', 'gabriel-garcia-marquez', 'a23', 'stephen-king', 'paulo-coelho', 'haruki-murakami', 'jk-rowling'] }
+    ]
+};
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// CALENDARIO USCITE REEL & VALIDAZIONI AUTOMATICHE (2026-2027)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const CALENDAR_RELEASES = [
+    {
+        id: 'rel_1',
+        date: '2026-09-29',
+        displayDate: '29 SET 2026',
+        dayOfWeek: 'MAR',
+        title: 'Reel Fantaletteratura Campionato Età Moderna e Contemporanea',
+        mode: 'seconde',
+        groupNumber: 1,
+        groupTitle: 'Gruppo 1: Le Origini',
+        authorIds: ['primi-documenti', 'francesco-assisi'],
+        notes: 'Tutto il giorno'
+    },
+    {
+        id: 'rel_2',
+        date: '2026-10-13',
+        displayDate: '13 OTT 2026',
+        dayOfWeek: 'MAR',
+        title: 'Reel Fantaletteratura Campionato Età Contemporanea & Internazionali',
+        mode: 'terze_avanzato',
+        groupNumber: 1,
+        groupTitle: 'Gruppo 1: Neoclassicismo e Primo Romanticismo / Settecento e Alba Ottocento',
+        authorIds: ['a1', 'a3', 'a2', 'johann-wolfgang-goethe', 'jane-austen', 'victor-hugo'],
+        notes: 'Tutto il giorno'
+    },
+    {
+        id: 'rel_3',
+        date: '2026-10-27',
+        displayDate: '27 OTT 2026',
+        dayOfWeek: 'MAR',
+        title: 'Reel Fantaletteratura Campionato Età Moderna e Contemporanea',
+        mode: 'seconde',
+        groupNumber: 2,
+        groupTitle: 'Gruppo 2: La Poesia del Duecento',
+        authorIds: ['scuola-siciliana', 'iacopone-todi'],
+        notes: 'Tutto il giorno'
+    },
+    {
+        id: 'rel_4',
+        date: '2026-11-10',
+        displayDate: '10 NOV 2026',
+        dayOfWeek: 'MAR',
+        title: 'Reel Fantaletteratura Campionato Età Contemporanea & Internazionali',
+        mode: 'terze_avanzato',
+        groupNumber: 2,
+        groupTitle: 'Gruppo 2: Ottocento Risorgimentale / Romanticismo e Realismo',
+        authorIds: ['a6', 'a13', 'a4', 'edgar-allan-poe', 'charles-dickens', 'herman-melville', 'fedor-dostoevskij', 'henrik-ibsen', 'lev-tolstoj'],
+        notes: 'Tutto il giorno'
+    },
+    {
+        id: 'rel_5',
+        date: '2026-11-24',
+        displayDate: '24 NOV 2026',
+        dayOfWeek: 'MAR',
+        title: 'Reel Fantaletteratura Campionato Età Moderna e Contemporanea',
+        mode: 'seconde',
+        groupNumber: 3,
+        groupTitle: 'Gruppo 3: Il Dolce Stil Novo e le Origini Toscane',
+        authorIds: ['cecco-angiolieri', 'dante-alighieri-sec'],
+        notes: 'Tutto il giorno'
+    },
+    {
+        id: 'rel_6',
+        date: '2026-12-08',
+        displayDate: '08 DIC 2026',
+        dayOfWeek: 'MAR',
+        title: 'Reel Fantaletteratura Campionato Età Contemporanea & Internazionali',
+        mode: 'terze_avanzato',
+        groupNumber: 3,
+        groupTitle: 'Gruppo 3: Verismo e Decadentismo / Metà Ottocento',
+        authorIds: ['a5', 'a7', 'a8', 'emily-dickinson', 'mark-twain', 'emile-zola', 'oscar-wilde'],
+        notes: 'Tutto il giorno'
+    },
+    {
+        id: 'rel_7',
+        date: '2026-12-29',
+        displayDate: '29 DIC 2026',
+        dayOfWeek: 'MAR',
+        title: 'Reel Fantaletteratura Campionato Età Moderna e Contemporanea',
+        mode: 'seconde',
+        groupNumber: 4,
+        groupTitle: 'Gruppo 4: Il Trecento Letterario',
+        authorIds: ['francesco-petrarca', 'giovanni-boccaccio'],
+        notes: 'Tutto il giorno'
+    },
+    {
+        id: 'rel_8',
+        date: '2027-01-12',
+        displayDate: '12 GEN 2027',
+        dayOfWeek: 'MAR',
+        title: 'Reel Fantaletteratura Campionato Età Contemporanea & Internazionali',
+        mode: 'terze_avanzato',
+        groupNumber: 4,
+        groupTitle: 'Gruppo 4: Primo Novecento e Avanguardie / Fine Ottocento',
+        authorIds: ['a9', 'a24', 'a10', 'sigmund-freud', 'anton-cechov'],
+        notes: 'Tutto il giorno'
+    },
+    {
+        id: 'rel_9',
+        date: '2027-01-26',
+        displayDate: '26 GEN 2027',
+        dayOfWeek: 'MAR',
+        title: 'Reel Fantaletteratura Campionato Età Moderna e Contemporanea',
+        mode: 'seconde',
+        groupNumber: 5,
+        groupTitle: 'Gruppo 5: L\'Umanesimo e il Primo Rinascimento',
+        authorIds: ['lorenzo-medici', 'niccolo-machiavelli'],
+        notes: 'Tutto il giorno'
+    },
+    {
+        id: 'rel_10',
+        date: '2027-02-09',
+        displayDate: '09 FEB 2027',
+        dayOfWeek: 'MAR',
+        title: 'Reel Fantaletteratura Campionato Età Contemporanea & Internazionali',
+        mode: 'terze_avanzato',
+        groupNumber: 5,
+        groupTitle: 'Gruppo 5: La Grande Poesia del Novecento / Modernismo',
+        authorIds: ['a11', 'a12', 'a18', 'marcel-proust', 'rainer-maria-rilke', 'hermann-hesse', 'virginia-woolf', 'james-joyce'],
+        notes: 'Tutto il giorno'
+    },
+    {
+        id: 'rel_11',
+        date: '2027-02-23',
+        displayDate: '23 FEB 2027',
+        dayOfWeek: 'MAR',
+        title: 'Reel Fantaletteratura Campionato Età Moderna e Contemporanea',
+        mode: 'seconde',
+        groupNumber: 6,
+        groupTitle: 'Gruppo 6: Il Pieno Rinascimento',
+        authorIds: ['ludovico-ariosto', 'torquato-tasso'],
+        notes: 'Tutto il giorno'
+    },
+    {
+        id: 'rel_12',
+        date: '2027-03-09',
+        displayDate: '09 MAR 2027',
+        dayOfWeek: 'MAR',
+        title: 'Reel Fantaletteratura Campionato Età Contemporanea & Internazionali',
+        mode: 'terze_avanzato',
+        groupNumber: 6,
+        groupTitle: 'Gruppo 6: La Prosa tra le Due Guerre / Anni \'80 Ottocento',
+        authorIds: ['a17', 'a15', 'a21', 'franz-kafka', 'agatha-christie', 'ernest-hemingway'],
+        notes: 'Tutto il giorno'
+    },
+    {
+        id: 'rel_13',
+        date: '2027-03-30',
+        displayDate: '30 MAR 2027',
+        dayOfWeek: 'MAR',
+        title: 'Reel Fantaletteratura Campionato Età Moderna e Contemporanea',
+        mode: 'seconde',
+        groupNumber: 7,
+        groupTitle: 'Gruppo 7: La Controriforma e la Scienza',
+        authorIds: ['commedia-arte', 'galileo-galilei'],
+        notes: 'Tutto il giorno'
+    },
+    {
+        id: 'rel_14',
+        date: '2027-04-13',
+        displayDate: '13 APR 2027',
+        dayOfWeek: 'MAR',
+        title: 'Reel Fantaletteratura Campionato Età Contemporanea & Internazionali',
+        mode: 'terze_avanzato',
+        groupNumber: 7,
+        groupTitle: 'Gruppo 7: Il Secondo Dopoguerra / Generazione Primo Novecento',
+        authorIds: ['a16', 'a22', 'a20', 'antoine-saint-exupery', 'george-orwell'],
+        notes: 'Tutto il giorno'
+    },
+    {
+        id: 'rel_15',
+        date: '2027-04-27',
+        displayDate: '27 APR 2027',
+        dayOfWeek: 'MAR',
+        title: 'Reel Fantaletteratura Campionato Età Moderna e Contemporanea',
+        mode: 'seconde',
+        groupNumber: 8,
+        groupTitle: 'Gruppo 8: L\'Illuminismo e la Poesia',
+        authorIds: ['carlo-goldoni', 'giuseppe-parini'],
+        notes: 'Tutto il giorno'
+    },
+    {
+        id: 'rel_16',
+        date: '2027-05-11',
+        displayDate: '11 MAG 2027',
+        dayOfWeek: 'MAR',
+        title: 'Reel Fantaletteratura Campionato Età Contemporanea & Internazionali',
+        mode: 'terze_avanzato',
+        groupNumber: 8,
+        groupTitle: 'Gruppo 8: Il Neorealismo e Calvino / Anni Dieci e Venti',
+        authorIds: ['a19', 'a14', 'albert-camus'],
+        notes: 'Tutto il giorno'
+    },
+    {
+        id: 'rel_17',
+        date: '2027-05-25',
+        displayDate: '25 MAG 2027',
+        dayOfWeek: 'MAR',
+        title: 'Reel Fantaletteratura Campionato Età Moderna e Contemporanea',
+        mode: 'seconde',
+        groupNumber: 9,
+        groupTitle: 'Gruppo 9: L\'Illuminismo Civile',
+        authorIds: ['cesare-beccaria'],
+        notes: 'Tutto il giorno'
+    },
+    {
+        id: 'rel_18',
+        date: '2027-06-08',
+        displayDate: '08 GIU 2027',
+        dayOfWeek: 'MAR',
+        title: 'Reel Fantaletteratura Campionato Età Contemporanea & Internazionali',
+        mode: 'terze_avanzato',
+        groupNumber: 9,
+        groupTitle: 'Gruppo 9: Verso il Tardo Novecento / Dal Secondo Novecento a Oggi',
+        authorIds: ['a23', 'gabriel-garcia-marquez', 'stephen-king', 'paulo-coelho', 'haruki-murakami', 'jk-rowling'],
+        notes: 'Tutto il giorno'
+    }
+];
+
 const MOCK_DOCENTI = [];
-
-// Mock database squadre iscritte (futuro: Firebase)
 const MOCK_TEAMS = [];
-
 let MOCK_SCHEDE = [];
 const MISSIONS = [];

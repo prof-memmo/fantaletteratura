@@ -956,6 +956,7 @@ async function setupAdminPanel() {
 
             // Specific renders
             if (targetId === 'admin-view-autori') window.renderAdminAutori();
+            if (targetId === 'admin-view-calendario') window.renderAdminCalendario();
             if (targetId === 'admin-view-requests') window.renderAdminRichieste();
             if (targetId === 'admin-view-docenti') window.renderAdminDocenti();
             if (targetId === 'admin-view-squadre') window.renderAdminSquadre();
@@ -974,6 +975,7 @@ async function setupAdminPanel() {
     // --- INITIAL STARTUP ---
     if (window.location.pathname.includes('admin.html')) {
         await window.renderAdminAutori();
+        await window.renderAdminCalendario();
         await window.renderAdminDocenti();
         await window.renderAdminSquadre();
         await window.renderAdminMissioni();
@@ -984,6 +986,165 @@ async function setupAdminPanel() {
         await window.renderAdminImpostazioni();
     }
 }
+
+// =========================================================
+// GESTIONE CALENDARIO USCITE & AUTO-VALIDAZIONI ADMIN
+// =========================================================
+window.currentCalendarFilter = 'all';
+
+window.filterCalendarView = function(modeFilter) {
+    window.currentCalendarFilter = modeFilter || 'all';
+    document.querySelectorAll('#admin-view-calendario .admin-mode-filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    const activeBtn = document.querySelector(`#admin-view-calendario .admin-mode-filter-btn[onclick*="'${window.currentCalendarFilter}'"]`);
+    if (activeBtn) activeBtn.classList.add('active');
+    window.renderAdminCalendario();
+};
+
+window.renderAdminCalendario = function() {
+    const listContainer = document.getElementById('admin-calendar-releases-list');
+    if (!listContainer) return;
+
+    if (!window.CalendarService) {
+        listContainer.innerHTML = '<p class="text-muted" style="text-align:center;">Servizio Calendario in caricamento...</p>';
+        return;
+    }
+
+    const allReleases = window.CalendarService.getReleases();
+    const filter = window.currentCalendarFilter || 'all';
+
+    const filtered = allReleases.filter(r => {
+        if (filter === 'all') return true;
+        if (filter === 'seconde') return r.mode === 'seconde';
+        if (filter === 'terze_avanzato') return r.mode === 'terze_avanzato' || r.mode === 'terze' || r.mode === 'avanzato';
+        return true;
+    });
+
+    if (filtered.length === 0) {
+        listContainer.innerHTML = '<p class="text-muted" style="text-align:center;">Nessuna uscita trovata per questo filtro.</p>';
+        return;
+    }
+
+    const allAuthorsMap = {};
+    const collectAuthors = (list) => {
+        if (Array.isArray(list)) {
+            list.forEach(a => { allAuthorsMap[a.id] = a; });
+        }
+    };
+    if (typeof AUTHORS !== 'undefined') collectAuthors(AUTHORS);
+    if (typeof AUTHORS_SECONDE !== 'undefined') collectAuthors(AUTHORS_SECONDE);
+    if (typeof AUTHORS_INTERNAZIONALI !== 'undefined') collectAuthors(AUTHORS_INTERNAZIONALI);
+
+    listContainer.innerHTML = filtered.map(rel => {
+        let statusBadge = '';
+        let borderStyle = '1px solid rgba(255,255,255,0.1)';
+        let bgStyle = 'rgba(255,255,255,0.03)';
+
+        if (rel.status === 'released') {
+            statusBadge = `<span style="background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; display: inline-flex; align-items: center; gap: 5px;"><i class="fa-solid fa-circle-check"></i> Validato (Data Raggiunta)</span>`;
+            borderStyle = '1px solid rgba(34, 197, 94, 0.4)';
+        } else if (rel.status === 'forced') {
+            statusBadge = `<span style="background: rgba(234, 179, 8, 0.2); color: #fde047; border: 1px solid #eab308; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; display: inline-flex; align-items: center; gap: 5px;"><i class="fa-solid fa-bolt"></i> Forzato Manualmente</span>`;
+            borderStyle = '1px solid rgba(234, 179, 8, 0.4)';
+        } else if (rel.status === 'blocked') {
+            statusBadge = `<span style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; display: inline-flex; align-items: center; gap: 5px;"><i class="fa-solid fa-lock"></i> Bloccato dall'Admin</span>`;
+            borderStyle = '1px solid rgba(239, 68, 68, 0.4)';
+        } else {
+            statusBadge = `<span style="background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid #3b82f6; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; display: inline-flex; align-items: center; gap: 5px;"><i class="fa-solid fa-clock"></i> Programmato (${rel.effectiveDate})</span>`;
+        }
+
+        const modeBadge = rel.mode === 'seconde'
+            ? `<span style="background: rgba(212, 114, 26, 0.2); color: #fb923c; border: 1px solid #d4721a; padding: 3px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold;">📙 Età Moderna e Contemporanea</span>`
+            : `<span style="background: rgba(141, 160, 63, 0.2); color: #bef264; border: 1px solid #8da03f; padding: 3px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold;">📘 Contemporanea &amp; Internazionali</span>`;
+
+        // Render lista autori nel gruppo
+        const authorsHtml = (rel.authorIds || []).map(aid => {
+            const author = allAuthorsMap[aid] || { id: aid, name: aid, image: 'avatar_autori/default.png' };
+            const isVal = rel.isReleased;
+            return `
+                <div style="display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.25); padding: 5px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+                    <img src="${author.image || 'avatar_autori/default.png'}" style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover; background: #fff;">
+                    <span style="font-size: 0.8rem; font-weight: 600; color: #fff;">${author.name}</span>
+                    <span style="font-size: 0.7rem; color: ${isVal ? '#4ade80' : '#94a3b8'}; margin-left: auto;">${isVal ? '✅ Sbloccato' : '⏳ In attesa'}</span>
+                </div>
+            `;
+        }).join('');
+
+        return `
+            <div class="glass" style="padding: 16px; border-radius: 14px; border: ${borderStyle}; background: ${bgStyle};">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px;">
+                            ${modeBadge}
+                            ${statusBadge}
+                        </div>
+                        <h3 style="margin: 0; font-size: 1.05rem; color: var(--accent-gold);">${rel.title}</h3>
+                        <p style="margin: 3px 0 0 0; font-size: 0.85rem; color: var(--text-light); font-weight: bold;">${rel.groupTitle}</p>
+                    </div>
+
+                    <!-- Controlli Data e Azioni Rapide -->
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);">
+                            <label style="font-size: 0.75rem; color: var(--text-muted);"><i class="fa-solid fa-calendar"></i> Data:</label>
+                            <input type="date" value="${rel.effectiveDate}" style="background: transparent; border: none; color: #fff; font-size: 0.85rem; font-family: monospace; outline: none; cursor: pointer;" onchange="window.updateCalendarReleaseDate('${rel.id}', this.value)">
+                        </div>
+
+                        ${rel.isForced ? `
+                            <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 6px 10px; border-radius: 8px;" onclick="window.resetCalendarRelease('${rel.id}')" title="Ripristina al controllo automatico per data">
+                                <i class="fa-solid fa-rotate-left"></i> Ripristina Auto
+                            </button>
+                        ` : `
+                            <button class="btn" style="background: #eab308; color: #000; font-weight: bold; font-size: 0.75rem; padding: 6px 10px; border-radius: 8px; border: none; cursor: pointer;" onclick="window.toggleForceCalendarRelease('${rel.id}', true)" title="Sblocca e valida subito gli autori del gruppo">
+                                <i class="fa-solid fa-bolt"></i> Sblocca Ora
+                            </button>
+                        `}
+
+                        ${rel.isBlocked ? `
+                            <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 6px 10px; border-radius: 8px;" onclick="window.toggleBlockCalendarRelease('${rel.id}', false)" title="Rimuovi blocco">
+                                <i class="fa-solid fa-lock-open"></i> Sblocca
+                            </button>
+                        ` : `
+                            <button class="btn" style="background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid #ef4444; font-size: 0.75rem; padding: 6px 10px; border-radius: 8px; cursor: pointer;" onclick="window.toggleBlockCalendarRelease('${rel.id}', true)" title="Blocca e nascondi validazione">
+                                <i class="fa-solid fa-lock"></i> Blocca
+                            </button>
+                        `}
+                    </div>
+                </div>
+
+                <!-- Autori inclusi -->
+                <div style="margin-top: 10px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px;">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">
+                        Autori Coinvolti (${(rel.authorIds || []).length}):
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 6px;">
+                        ${authorsHtml}
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+};
+
+window.updateCalendarReleaseDate = async function(releaseId, newDate) {
+    if (!newDate || !window.CalendarService) return;
+    await window.CalendarService.updateReleaseDate(releaseId, newDate);
+};
+
+window.toggleForceCalendarRelease = async function(releaseId, forceState) {
+    if (!window.CalendarService) return;
+    await window.CalendarService.forceRelease(releaseId, forceState);
+};
+
+window.toggleBlockCalendarRelease = async function(releaseId, blockState) {
+    if (!window.CalendarService) return;
+    await window.CalendarService.blockRelease(releaseId, blockState);
+};
+
+window.resetCalendarRelease = async function(releaseId) {
+    if (!window.CalendarService) return;
+    await window.CalendarService.resetRelease(releaseId);
+};
 
 window.renderAdminImpostazioni = async function() {
     const emailField = document.getElementById('admin-impostazioni-email') || document.getElementById('admin-profilo-email');

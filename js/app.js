@@ -38,13 +38,18 @@ function processState(state, mode) {
             a.isSchedaRevealed = false;
         });
 
-        // Applica pointsRevealed
+        // Applica validazioni automatiche da Calendario Uscite
+        if (window.CalendarService && typeof window.CalendarService.applyCalendarValidations === 'function') {
+            window.CalendarService.applyCalendarValidations();
+        }
+
+        // Applica pointsRevealed manuali
         if(state.pointsRevealed) {
             pool.forEach(a => {
                 if(state.pointsRevealed.includes(a.id)) a.isPointsRevealed = true;
             });
         }
-        // Applica schedaRevealed
+        // Applica schedaRevealed manuali
         if(state.schedaRevealed) {
             pool.forEach(a => {
                 if(state.schedaRevealed.includes(a.id)) a.isSchedaRevealed = true;
