@@ -114,8 +114,8 @@
         scanAndInjectPencils: function() {
             if (!this.isAdmin()) return;
             // Inietta matite su schede autore
-            document.querySelectorAll('.author-card, .scheda-autore-card, .scheda-card').forEach(card => {
-                const titleEl = card.querySelector('.author-name, .scheda-title, h3, h4');
+            document.querySelectorAll('.author-card, .scheda-autore-card, .scheda-card, .author-detail-box').forEach(card => {
+                const titleEl = card.querySelector('.author-name, .scheda-title, h2, h3, h4');
                 if (titleEl && !titleEl.querySelector('.live-edit-quick-btn')) {
                     const authorName = card.getAttribute('data-author') || titleEl.textContent.trim();
                     const btn = document.createElement('button');
@@ -126,6 +126,24 @@
                     btn.onclick = (e) => {
                         e.stopPropagation();
                         window.LiveEditor.openModal(`author_${authorName.toLowerCase().replace(/[^a-z0-9]/g, '_')}`, '');
+                    };
+                    titleEl.appendChild(btn);
+                }
+            });
+
+            // Inietta matite su minigiochi, quiz e sfide
+            document.querySelectorAll('.minigame-card, .quiz-card, .quiz-box, .game-item, .mission-card, .sfida-box').forEach((game, idx) => {
+                const titleEl = game.querySelector('.minigame-title, .quiz-question, h3, h4, .mission-title');
+                if (titleEl && !titleEl.querySelector('.live-edit-quick-btn')) {
+                    const gId = game.getAttribute('data-game-id') || game.getAttribute('data-id') || `minigame_${idx}`;
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'live-edit-quick-btn';
+                    btn.innerHTML = '✏️';
+                    btn.title = 'Modifica testo di questo minigioco/sfida';
+                    btn.onclick = (e) => {
+                        e.stopPropagation();
+                        window.LiveEditor.openModal(`game_${gId}`, '');
                     };
                     titleEl.appendChild(btn);
                 }
