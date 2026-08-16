@@ -1055,7 +1055,7 @@ window.renderAdminCalendario = function() {
         }
 
         const modeBadge = rel.mode === 'seconde'
-            ? `<span style="background: rgba(212, 114, 26, 0.2); color: #fb923c; border: 1px solid #d4721a; padding: 3px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold;">📙 Età Moderna e Contemporanea</span>`
+            ? `<span style="background: rgba(212, 114, 26, 0.2); color: #fb923c; border: 1px solid #d4721a; padding: 3px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold;">📙 Età Medievale e Moderna</span>`
             : `<span style="background: rgba(141, 160, 63, 0.2); color: #bef264; border: 1px solid #8da03f; padding: 3px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold;">📘 Contemporanea &amp; Internazionali</span>`;
 
         // Render lista autori nel gruppo
