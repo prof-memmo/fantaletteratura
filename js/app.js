@@ -3869,6 +3869,7 @@ window.renderMinigamesHistory = async function() {
     }
 };
 
+window.selectedFantaAvatar = 'assets/avatars/6.png';
 window.openEditProfileModal = async function() {
     const user = window.auth ? window.auth.currentUser : null;
     const modal = document.getElementById('edit-profile-modal');
@@ -3877,10 +3878,13 @@ window.openEditProfileModal = async function() {
     const nameInput = document.getElementById('edit-profile-name');
     const schoolGroup = document.getElementById('edit-profile-school-group');
     const schoolInput = document.getElementById('edit-profile-school');
+    const avatarGrid = document.getElementById('fanta-edit-avatar-grid');
     
     if (nameInput) nameInput.value = user ? (user.displayName || user.email.split('@')[0]) : '';
     if (schoolInput) schoolInput.value = '';
     
+    let currentAvatar = 'assets/avatars/6.png';
+
     if (user && window.db) {
         try {
             const doc = await window.db.collection('fanta_users').doc(user.email.toLowerCase()).get();
@@ -3890,17 +3894,44 @@ window.openEditProfileModal = async function() {
                 if (schoolGroup) schoolGroup.style.display = isTeacher ? 'block' : 'none';
                 if (schoolInput) schoolInput.value = userData.school || userData.scuola || '';
                 if (nameInput && userData.name) nameInput.value = userData.name;
+                if (userData.avatar) currentAvatar = userData.avatar;
             }
         } catch (err) {
             console.warn("Errore fetch profilo:", err);
         }
     }
+
+    window.selectedFantaAvatar = currentAvatar;
+
+    if (avatarGrid) {
+        avatarGrid.innerHTML = [6,7,8,9,10,11,12,13,14,15,16].map(num => `
+            <div class="fanta-avatar-opt ${currentAvatar === `assets/avatars/${num}.png` ? 'active' : ''}" 
+                 onclick="window.selectFantaAvatar(this, 'assets/avatars/${num}.png')"
+                 style="width:46px; height:46px; border-radius:50%; border:3px solid ${currentAvatar === `assets/avatars/${num}.png` ? 'var(--accent-gold)' : 'transparent'}; cursor:pointer; overflow:hidden; transition:transform 0.2s; box-shadow:0 2px 6px rgba(0,0,0,0.3);">
+                <img src="assets/avatars/${num}.png" alt="Avatar ${num}" style="width:100%; height:100%; object-fit:cover;">
+            </div>
+        `).join('');
+    }
     
     modal.style.display = 'block';
 };
 
+window.selectFantaAvatar = function(el, avatarPath) {
+    window.selectedFantaAvatar = avatarPath;
+    document.querySelectorAll('.fanta-avatar-opt').forEach(opt => {
+        opt.classList.remove('active');
+        opt.style.borderColor = 'transparent';
+        opt.style.transform = 'scale(1)';
+    });
+    if (el) {
+        el.classList.add('active');
+        el.style.borderColor = 'var(--accent-gold)';
+        el.style.transform = 'scale(1.1)';
+    }
+};
+
 window.saveProfileData = async function() {
-    const user = window.auth.currentUser;
+    const user = window.auth ? window.auth.currentUser : null;
     if (!user) return;
     
     const nameInput = document.getElementById('edit-profile-name').value.trim();
@@ -3917,17 +3948,20 @@ window.saveProfileData = async function() {
         const userData = doc.exists ? doc.data() : {};
         
         const isTeacher = (userData.role === 'docente' || userData.role === 'teacher' || userData.role === 'admin' || user.email === 'prof.memmo@gmail.com');
-        const updateData = { name: nameInput };
+        const updateData = { 
+            name: nameInput,
+            avatar: window.selectedFantaAvatar || 'assets/avatars/6.png'
+        };
         if (isTeacher) {
             updateData.school = schoolInput;
         }
         
-        await docRef.update(updateData);
-        alert('Profilo aggiornato con successo!');
+        await docRef.set(updateData, { merge: true });
+        alert('Profilo e avatar aggiornati con successo!');
         document.getElementById('edit-profile-modal').style.display = 'none';
         
     } catch (err) {
         console.error(err);
-        alert('Errore durante il salvataggio.');
+        alert('Errore durante il salvataggio: ' + err.message);
     }
 };
