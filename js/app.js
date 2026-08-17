@@ -3870,33 +3870,33 @@ window.renderMinigamesHistory = async function() {
 };
 
 window.openEditProfileModal = async function() {
-    const user = window.auth.currentUser;
-    if (!user) return;
-    
+    const user = window.auth ? window.auth.currentUser : null;
     const modal = document.getElementById('edit-profile-modal');
+    if (!modal) return;
+    
     const nameInput = document.getElementById('edit-profile-name');
     const schoolGroup = document.getElementById('edit-profile-school-group');
     const schoolInput = document.getElementById('edit-profile-school');
     
-    try {
-        const doc = await window.db.collection('fanta_users').doc(user.email.toLowerCase()).get();
-        if (!doc.exists) return;
-        
-        const userData = doc.data();
-        const isTeacher = (userData.role === 'docente' || userData.role === 'teacher' || userData.role === 'admin' || user.email === 'prof.memmo@gmail.com');
-        
-        if (isTeacher) {
-            schoolGroup.style.display = 'block';
-            schoolInput.value = userData.school || '';
-        } else {
-            schoolGroup.style.display = 'none';
+    if (nameInput) nameInput.value = user ? (user.displayName || user.email.split('@')[0]) : '';
+    if (schoolInput) schoolInput.value = '';
+    
+    if (user && window.db) {
+        try {
+            const doc = await window.db.collection('fanta_users').doc(user.email.toLowerCase()).get();
+            if (doc.exists) {
+                const userData = doc.data();
+                const isTeacher = (userData.role === 'docente' || userData.role === 'teacher' || userData.role === 'admin' || user.email === 'prof.memmo@gmail.com');
+                if (schoolGroup) schoolGroup.style.display = isTeacher ? 'block' : 'none';
+                if (schoolInput) schoolInput.value = userData.school || userData.scuola || '';
+                if (nameInput && userData.name) nameInput.value = userData.name;
+            }
+        } catch (err) {
+            console.warn("Errore fetch profilo:", err);
         }
-        
-        nameInput.value = userData.name || user.displayName || '';
-        modal.style.display = 'block';
-    } catch (err) {
-        console.error(err);
     }
+    
+    modal.style.display = 'block';
 };
 
 window.saveProfileData = async function() {

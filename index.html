@@ -462,13 +462,9 @@
                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; flex-wrap: wrap;">
                       <h2>Pannello Docente</h2>
                       <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                          <!-- Profilo Globale Ecosistema -->
-                          <a href="https://prof-memmo.github.io/games/profilo.html" target="_blank" class="btn" style="width: auto; padding: 8px 14px; border-radius: 20px; font-size: 0.8rem; background: rgba(212,175,55,0.15); color: var(--accent-gold); border: 1px solid var(--accent-gold); font-weight: 600; margin: 0; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
-                              <i class="fa-solid fa-globe"></i> <span class="hide-mobile">Profilo Globale</span>
-                          </a>
                           <!-- Modifica Profilo -->
-                          <button class="btn" style="width: auto; padding: 8px 14px; border-radius: 20px; font-size: 0.8rem; background: var(--bg-dark); color: var(--accent-gold); border: 1px solid var(--accent-gold); font-weight: 600; margin: 0; display: flex; align-items: center; gap: 6px;" onclick="window.openEditProfileModal()">
-                              <i class="fa-solid fa-user-edit"></i> <span class="hide-mobile">Modifica Profilo</span>
+                          <button class="btn" style="width: auto; padding: 8px 14px; border-radius: 20px; font-size: 0.8rem; background: var(--bg-dark); color: var(--accent-gold); border: 1px solid var(--accent-gold); font-weight: 600; margin: 0; display: flex; align-items: center; gap: 6px; cursor: pointer;" onclick="window.openEditProfileModal()">
+                              <i class="fa-solid fa-user-gear"></i> <span class="hide-mobile">Modifica Profilo</span>
                           </button>
                           
                           <!-- Invita un collega -->
@@ -1232,28 +1228,34 @@
     </div>
 
     <!-- Edit Profile Modal -->
-    <div id="edit-profile-modal" class="modal-wip modal-fullscreen" style="z-index: 5000; overflow-y:auto;" onclick="if(event.target===this) { this.style.display='none'; }">
-        <div class="modal-wip-content glass" style="padding: 20px; max-width: 450px; margin: 40px auto; position: relative;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 14px;">
-              <h3 style="font-family: var(--font-heading); color: var(--accent-gold); font-size: 1.2rem; margin:0;"><i class="fa-solid fa-user-edit"></i> Modifica Profilo</h3>
-              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="document.getElementById('edit-profile-modal').style.display='none'">
+    <div id="edit-profile-modal" class="modal-wip modal-fullscreen" style="z-index: 99999; display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); overflow-y:auto;" onclick="if(event.target===this) { this.style.display='none'; }">
+        <div class="modal-wip-content glass" style="padding: 25px; max-width: 480px; margin: 60px auto; position: relative; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 14px;">
+              <h3 style="font-family: var(--font-heading); color: var(--accent-gold); font-size: 1.25rem; margin:0;"><i class="fa-solid fa-user-gear"></i> Modifica Profilo</h3>
+              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem; cursor: pointer;" onclick="document.getElementById('edit-profile-modal').style.display='none'">
                 <i class="fa-solid fa-xmark"></i>
               </button>
             </div>
             <form id="form-edit-profile" onsubmit="event.preventDefault(); window.saveProfileData();">
-                <div style="margin-bottom: 1.5rem; text-align: left;">
-                    <label style="display: block; font-weight: 800; color: var(--accent-gold); margin-bottom: 0.5rem; font-size: 0.9rem;">Nome e Cognome / Nickname:</label>
-                    <input type="text" id="edit-profile-name" required class="input-control" style="width: 100%;">
+                <div style="margin-bottom: 1.2rem; text-align: left;">
+                    <label style="display: block; font-weight: 800; color: var(--accent-gold); margin-bottom: 0.5rem; font-size: 0.85rem;">Nome e Cognome / Nickname:</label>
+                    <input type="text" id="edit-profile-name" required class="input-control" style="width: 100%; padding: 10px 14px; border-radius: 10px;">
                 </div>
-                <div style="margin-bottom: 1.5rem; text-align: left;" id="edit-profile-school-group" style="display:none;">
-                    <label style="display: block; font-weight: 800; color: var(--accent-gold); margin-bottom: 0.5rem; font-size: 0.9rem;">Scuola:</label>
-                    <input type="text" id="edit-profile-school" class="input-control" style="width: 100%;">
+                <div style="margin-bottom: 1.5rem; text-align: left;" id="edit-profile-school-group">
+                    <label style="display: block; font-weight: 800; color: var(--accent-gold); margin-bottom: 0.5rem; font-size: 0.85rem;">Scuola / Istituto:</label>
+                    <input type="text" id="edit-profile-school" class="input-control" placeholder="Es. IC Manzoni" style="width: 100%; padding: 10px 14px; border-radius: 10px;">
                 </div>
-                <button type="submit" class="btn" style="width: 100%; padding: 1rem; border-radius: 30px; font-weight: 800;">Salva Modifiche</button>
+                <button type="submit" class="btn" style="width: 100%; padding: 12px; border-radius: 30px; font-weight: 800; background: var(--accent-gold); color: #000; border: none; cursor: pointer;">Salva Modifiche</button>
             </form>
-            <div style="margin-top: 1.2rem; padding-top: 1.2rem; border-top: 1px solid rgba(212,175,55,0.3); text-align: center;">
-                <a href="https://prof-memmo.github.io/games/profilo.html" target="_blank" class="btn btn-secondary" style="width: 100%; border-radius: 30px; font-weight: 800; font-size: 0.9rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; padding: 0.8rem 1rem;">
-                    <i class="fa-solid fa-globe"></i> 🌐 Profilo Utente Ecosistema (Sito Vetrina)
+
+            <!-- Box Profilo Globale Ecosistema integrato -->
+            <div style="margin-top: 1.5rem; padding: 15px; border-radius: 14px; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); text-align: left;">
+                <div style="font-weight: 800; font-size: 0.85rem; color: #818cf8; margin-bottom: 4px;">
+                    <i class="fa-solid fa-globe"></i> Profilo Globale Ecosistema
+                </div>
+                <p style="font-size: 0.75rem; color: #cbd5e1; margin: 0 0 10px 0;">Il tuo account è sincronizzato con l'Ecosistema Prof. Memmo. Gestisci abbonamenti e impostazioni generali dall'Hub.</p>
+                <a href="https://prof-memmo.github.io/games/profilo.html" target="_blank" class="btn" style="width: 100%; border-radius: 20px; font-weight: 700; font-size: 0.8rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; padding: 8px 12px; background: #6366f1; color: white;">
+                    Gestisci Profilo Globale <i class="fa-solid fa-arrow-up-right-from-square"></i>
                 </a>
             </div>
         </div>
