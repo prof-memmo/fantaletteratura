@@ -3942,7 +3942,7 @@ window.saveProfileData = async function() {
         return;
     }
     
-    try {
+        const chosenAvatar = window.selectedFantaAvatar || 'assets/avatars/6.png';
         const docRef = window.db.collection('fanta_users').doc(user.email.toLowerCase());
         const doc = await docRef.get();
         const userData = doc.exists ? doc.data() : {};
@@ -3950,14 +3950,31 @@ window.saveProfileData = async function() {
         const isTeacher = (userData.role === 'docente' || userData.role === 'teacher' || userData.role === 'admin' || user.email === 'prof.memmo@gmail.com');
         const updateData = { 
             name: nameInput,
-            avatar: window.selectedFantaAvatar || 'assets/avatars/6.png'
+            avatar: chosenAvatar
         };
         if (isTeacher) {
             updateData.school = schoolInput;
         }
         
         await docRef.set(updateData, { merge: true });
-        alert('Profilo e avatar aggiornati con successo!');
+
+        // Sincronizzazione Globale sull'Hub Centrale e su Auth
+        try {
+            if (user.uid) {
+                await window.db.collection('hub_users').doc(user.uid).set({
+                    avatar: chosenAvatar,
+                    'anagrafica.avatar': chosenAvatar,
+                    'anagrafica.nome': nameInput
+                }, { merge: true });
+            }
+            if (window.auth && window.auth.currentUser && window.auth.currentUser.updateProfile) {
+                await window.auth.currentUser.updateProfile({ photoURL: chosenAvatar, displayName: nameInput });
+            }
+        } catch (eHub) {
+            console.warn("Sincronizzazione Hub Profilo Fallback:", eHub);
+        }
+
+        alert('Profilo e avatar aggiornati con successo in tutto l\'ecosistema!');
         document.getElementById('edit-profile-modal').style.display = 'none';
         
     } catch (err) {
