@@ -3942,6 +3942,7 @@ window.saveProfileData = async function() {
         return;
     }
     
+    try {
         const chosenAvatar = window.selectedFantaAvatar || 'assets/avatars/6.png';
         const docRef = window.db.collection('fanta_users').doc(user.email.toLowerCase());
         const doc = await docRef.get();
