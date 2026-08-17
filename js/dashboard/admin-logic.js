@@ -276,13 +276,20 @@ async function setupAdminPanel() {
         
         // Fetch all users to get counts
         const snapshotAll = await window.db.collection('fanta_users').get();
-        const allUsers = snapshotAll.docs.map(doc => doc.data());
+        const allUsers = snapshotAll.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         
+        const scuoleSet = new Set();
+        allUsers.forEach(u => {
+            let sc = (u.school || u.scuola || '').trim();
+            if (sc && sc.toUpperCase() !== 'N/A' && sc.toUpperCase() !== 'N/D') scuoleSet.add(sc.toLowerCase());
+        });
+
         const counts = {
             tutti: allUsers.length,
-            teacher: allUsers.filter(u => u.role === 'teacher').length,
+            teacher: allUsers.filter(u => u.role === 'teacher' || u.role === 'docente' || u.role === 'admin').length,
+            student: allUsers.filter(u => u.role !== 'teacher' && u.role !== 'docente' && u.role !== 'admin' && u.role !== 'guest').length,
             guest: allUsers.filter(u => u.role === 'guest').length,
-            student: allUsers.filter(u => u.role !== 'teacher' && u.role !== 'guest').length
+            scuole: scuoleSet.size
         };
         
         if (statsContainer) {
@@ -303,6 +310,10 @@ async function setupAdminPanel() {
                     <div class="stat-value">${counts.guest}</div>
                     <div class="stat-label">FANTAMICI</div>
                 </div>
+                <div class="admin-stat-card ${currentAdminDocentiFilter === 'scuole' ? 'active' : ''}" onclick="window.setAdminDocentiFilter('scuole')">
+                    <div class="stat-value" style="color: #ec4899;">${counts.scuole}</div>
+                    <div class="stat-label">SCUOLE ATTIVE</div>
+                </div>
             `;
         }
 
@@ -311,20 +322,27 @@ async function setupAdminPanel() {
         let users = allUsers;
         if (currentAdminDocentiFilter !== 'tutti') {
             if (currentAdminDocentiFilter === 'student') {
-                users = allUsers.filter(u => u.role !== 'teacher' && u.role !== 'guest');
-            } else {
-                users = allUsers.filter(u => u.role === currentAdminDocentiFilter);
+                users = allUsers.filter(u => u.role !== 'teacher' && u.role !== 'docente' && u.role !== 'admin' && u.role !== 'guest');
+            } else if (currentAdminDocentiFilter === 'teacher') {
+                users = allUsers.filter(u => u.role === 'teacher' || u.role === 'docente' || u.role === 'admin');
+            } else if (currentAdminDocentiFilter === 'guest') {
+                users = allUsers.filter(u => u.role === 'guest');
+            } else if (currentAdminDocentiFilter === 'scuole') {
+                users = allUsers.filter(u => {
+                    let sc = (u.school || u.scuola || '').trim();
+                    return sc && sc.toUpperCase() !== 'N/A' && sc.toUpperCase() !== 'N/D';
+                });
             }
         }
         
         list.innerHTML = '';
         let filteredUsers = users.filter(u => {
             const q = filterText.toLowerCase();
-            return (u.email || '').toLowerCase().includes(q) || (u.name || '').toLowerCase().includes(q);
+            return (u.email || '').toLowerCase().includes(q) || (u.name || '').toLowerCase().includes(q) || (u.school || u.scuola || '').toLowerCase().includes(q);
         });
 
         if (filteredUsers.length === 0) {
-            list.innerHTML = '<i>Nessun iscritto trovato.</i>';
+            list.innerHTML = '<p style="text-align: center; color: #888; padding: 20px;">Nessun iscritto trovato per questo filtro.</p>';
             return;
         }
 
@@ -358,33 +376,54 @@ async function setupAdminPanel() {
         `;
 
         filteredUsers.forEach(u => {
-            let roleLabel = '';
-            if (u.role === 'teacher') roleLabel = '<span style="color:#3498db; font-size:0.7rem; font-weight:800; text-transform:uppercase;">[Docente]</span>';
-            else if (u.role === 'guest') roleLabel = '<span style="color:#e67e22; font-size:0.7rem; font-weight:800; text-transform:uppercase;">[Fantamico]</span>';
-            else roleLabel = '<span style="color:#2ecc71; font-size:0.7rem; font-weight:800; text-transform:uppercase;">[Studente]</span>';
-            
-            let log = u.approvedAt ? `<br><small class="text-muted">Approvato: ${u.approvedAt.toDate ? u.approvedAt.toDate().toLocaleString() : u.approvedAt}</small>` : '';
             let dataIsc = u.createdAt || u.joinedAt;
             let dataStr = dataIsc ? (dataIsc.toDate ? dataIsc.toDate().toLocaleDateString() : new Date(dataIsc).toLocaleDateString()) : 'N/D';
+            const userEmail = (u.email || u.id || '').toLowerCase();
+            const schoolBadge = (u.school || u.scuola) ? `<span style="font-size:0.7rem; color:#888; display:block;"><i class="fa-solid fa-school"></i> ${u.school || u.scuola}</span>` : '';
 
-            list.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid rgba(255,255,255,0.05);">
+            list.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:12px 10px; border-bottom:1px solid rgba(255,255,255,0.05);">
                 <div style="display:flex; gap:15px; width:100%; align-items:center;">
-                    <div style="flex: 1;">${roleLabel}</div>
-                    <div style="flex: 2;"><span>${u.email}</span> &mdash; <strong>${u.name || 'Senza Nome'}</strong>${log}</div>
+                    <div style="flex: 1;">
+                        <select class="input-field" style="padding: 4px 8px; font-size: 0.75rem; border-radius: 8px; background: rgba(0,0,0,0.4); color: #fff; border: 1px solid rgba(255,255,255,0.2);" onchange="window.cambiaRuoloFantaUser('${userEmail}', this.value)" ${userEmail === 'prof.memmo@gmail.com' ? 'disabled' : ''}>
+                            <option value="student" ${u.role !== 'teacher' && u.role !== 'docente' && u.role !== 'admin' && u.role !== 'guest' ? 'selected' : ''}>Studente</option>
+                            <option value="teacher" ${u.role === 'teacher' || u.role === 'docente' || u.role === 'admin' ? 'selected' : ''}>Docente</option>
+                            <option value="guest" ${u.role === 'guest' ? 'selected' : ''}>Fantamico</option>
+                        </select>
+                    </div>
+                    <div style="flex: 2;">
+                        <span style="font-weight: 700; color: #fff;">${u.name || 'Senza Nome'}</span>
+                        <div style="font-size:0.8rem; color:#aaa;">${userEmail}</div>
+                        ${schoolBadge}
+                    </div>
                     <div style="flex: 1;"><span style="font-size:0.75rem; color:#888;"><i class="fa-solid fa-calendar-days"></i> ${dataStr}</span></div>
                     <div style="display:flex; align-items:center; gap:10px; flex: 1; justify-content:flex-end;">
-                        <a href="mailto:${u.email}" title="Scrivi a ${u.name || 'Senza Nome'}" style="color:var(--accent-gold); text-decoration:none;"><i class="fa-solid fa-envelope"></i></a>
-                        <button class="btn btn-secondary text-danger" style="padding:4px 8px; font-size:0.75rem; width:auto; background:var(--bg-card); border-color:var(--danger-color);" onclick="eliminaDocente('${u.email}')"><i class="fa-solid fa-trash"></i></button>
+                        <a href="mailto:${userEmail}" title="Scrivi a ${u.name || 'Senza Nome'}" style="color:var(--accent-gold); text-decoration:none; font-size: 1rem;"><i class="fa-solid fa-envelope"></i></a>
+                        ${userEmail !== 'prof.memmo@gmail.com' ? `
+                            <button class="btn btn-secondary text-danger" style="padding:4px 8px; font-size:0.75rem; width:auto; background:var(--bg-card); border-color:var(--danger-color); cursor:pointer;" onclick="eliminaDocente('${userEmail}')" title="Elimina Utente"><i class="fa-solid fa-trash"></i></button>
+                        ` : ''}
                     </div>
                 </div>
             </div>`;
         });
     };
 
-    window.eliminaDocente = async function(email) {
-        if(!confirm('Eliminare account?')) return;
+    window.cambiaRuoloFantaUser = async function(email, newRole) {
         try {
-            await fanta_db.deleteUser(email);
+            await window.db.collection('fanta_users').doc(email.toLowerCase()).update({
+                role: newRole,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            window.renderAdminDocenti();
+        } catch(e) {
+            console.error("Errore cambio ruolo:", e);
+            alert("Errore durante l'aggiornamento del ruolo.");
+        }
+    };
+
+    window.eliminaDocente = async function(email) {
+        if(!confirm(`Sei sicuro di voler eliminare l'account ${email}?`)) return;
+        try {
+            await window.db.collection('fanta_users').doc(email.toLowerCase()).delete();
             window.renderAdminDocenti();
         } catch (e) {
             console.error(e);

@@ -47,12 +47,39 @@
             <div class="admin-main-nav-container" id="admin-main-nav">
                 <button class="btn admin-tab-btn active" data-target="admin-view-autori"><i class="fa-solid fa-feather"></i> Autori</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-calendario"><i class="fa-solid fa-calendar-days"></i> Calendario</button>
+                <button class="btn admin-tab-btn" data-target="admin-view-docenti"><i class="fa-solid fa-users"></i> Gestione Utenti e Classi</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-squadre"><i class="fa-solid fa-users-rectangle"></i> Squadre</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-missioni"><i class="fa-solid fa-scroll"></i> Missioni</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-tornei"><i class="fa-solid fa-trophy"></i> Tornei</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-classifica"><i class="fa-solid fa-ranking-star"></i> Classifica Globale</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-impostazioni"><i class="fa-solid fa-gear"></i> Impostazioni</button>
             </div>
+
+            <!-- VIEW: Pannello Admin - Gestione Utenti e Classi -->
+            <section id="admin-view-docenti" class="admin-view" style="display:none;">
+                <div style="padding: 0 15px 15px 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <h2 style="margin: 0;"><i class="fa-solid fa-users" style="color: var(--accent-gold);"></i> Gestione Utenti e Classi</h2>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">Pannello di controllo iscritti, ruoli didattici, classi e autorizzazioni di Fantaletteratura.</p>
+                    </div>
+                    <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 14px; border-radius: 12px;" onclick="window.renderAdminDocenti()"><i class="fa-solid fa-rotate"></i> Ricarica</button>
+                </div>
+                <div class="glass" style="padding: 15px; margin: 0 15px 20px 15px;">
+                    <!-- Interactive Docenti Stat Cards -->
+                    <div id="admin-docenti-stats" class="admin-stats-grid" style="margin-bottom: 20px;">
+                        <!-- Rendered by JS -->
+                    </div>
+
+                    <!-- Search Input -->
+                    <div style="margin-bottom: 15px;">
+                        <input type="text" class="input-field" placeholder="🔍 Cerca utente per nome o email..." oninput="window.renderAdminDocenti(this.value)" style="width: 100%; padding: 12px 18px; border-radius: 50px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); color: #fff;">
+                    </div>
+
+                    <div id="admin-docenti-list" style="overflow-x: auto;">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+            </section>
 
             <!-- VIEW: Pannello Admin - Calendario Uscite -->
             <section id="admin-view-calendario" class="admin-view" style="display:none;">
