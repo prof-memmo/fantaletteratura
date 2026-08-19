@@ -1522,6 +1522,19 @@ function setupTeamSave() {
 
 async function renderProfilo() {
     if(!currentUserEmail) return;
+
+    const profAvatarImg = document.getElementById('profilo-avatar-img');
+    if (profAvatarImg) {
+        profAvatarImg.src = window.selectedFantaAvatar || 'assets/avatars/6.png';
+        if (currentUserEmail && window.db) {
+            window.db.collection('fanta_users').doc(currentUserEmail.toLowerCase()).get().then(d => {
+                if (d.exists && d.data().avatar) {
+                    profAvatarImg.src = d.data().avatar;
+                    window.selectedFantaAvatar = d.data().avatar;
+                }
+            }).catch(() => {});
+        }
+    }
     
     const allTeams = await getAllTeams();
     const myTeams = allTeams.filter(t => t.ownerEmail === currentUserEmail);
@@ -3974,6 +3987,10 @@ window.saveProfileData = async function() {
         } catch (eHub) {
             console.warn("Sincronizzazione Hub Profilo Fallback:", eHub);
         }
+
+        window.selectedFantaAvatar = chosenAvatar;
+        const profAvatarImg = document.getElementById('profilo-avatar-img');
+        if (profAvatarImg) profAvatarImg.src = chosenAvatar;
 
         alert('Profilo e avatar aggiornati con successo in tutto l\'ecosistema!');
         document.getElementById('edit-profile-modal').style.display = 'none';
