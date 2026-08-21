@@ -1,18 +1,5 @@
 window.fanta_db = window.fanta_db || {};
 
-// --- TEACHER REQUESTS ---
-window.fanta_db.saveTeacherRequest = async (requestData) => {
-    await window.db.collection('fanta_pending_requests').add({
-        ...requestData,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-};
-
-window.fanta_db.getTeacherRequests = async () => {
-    const snapshot = await window.db.collection('fanta_pending_requests').get();
-    return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-};
-
 // --- USERS / STUDENTS ---
 window.fanta_db.deleteUser = async (email) => {
     await window.db.collection('fanta_users').doc(email).delete();

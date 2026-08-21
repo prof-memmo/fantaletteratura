@@ -945,7 +945,6 @@ function checkLoginSession() {
                 const _c = document.getElementById('app-container');
                 if (_c) _c.style.display = 'block';
                 if (typeof window.renderAdminAutori === 'function') window.renderAdminAutori();
-                if (typeof window.renderAdminRichieste === 'function') window.renderAdminRichieste();
                 if (typeof renderNotifiche === 'function') renderNotifiche();
             }
 
@@ -1041,50 +1040,6 @@ async function loginGoogle() {
         } else {
             alert("Attendi qualche istante o ricarica la pagina. Se sei su Instagram, apri il sito in Safari/Chrome.");
         }
-    }
-}
-
-async function inviaRichiestaIscrizione(event) {
-    if(event) event.preventDefault();
-    const email = (localStorage.getItem('fanta_temp_email') || document.querySelector('#docente-email-input')?.value || "").toLowerCase();
-    const name = (document.getElementById('iscrizione-nome')?.value || "").trim();
-    const school = (document.getElementById('iscrizione-scuola')?.value || "").trim();
-    const city = (document.getElementById('iscrizione-citta')?.value || "").trim();
-
-    if (!name || !school || !city || !email) {
-        alert("Completa tutti i campi (e inserisci l'email nella home se necessario).");
-        return;
-    }
-
-    try {
-        const requests = await fanta_db.getTeacherRequests();
-        if (requests.some(r => r.email.toLowerCase() === email)) {
-            alert("Hai già inviato una richiesta di iscrizione con questa email. Attendi l'approvazione.");
-            return;
-        }
-
-        const now = new Date();
-        const timestamp = now.toLocaleDateString('it-IT') + ' ' + now.toLocaleTimeString('it-IT');
-
-        const requestData = {
-            email,
-            name,
-            school,
-            city,
-            status: 'pending',
-            createdAt: timestamp,
-            isDocente: true
-        };
-
-        await fanta_db.saveTeacherRequest(requestData);
-        alert("Account creato e richiesta inviata con successo! Potrai accedere non appena il Game Master avrà approvato il tuo profilo.");
-        
-        await fanta_db.logout(); 
-        navigateTo('view-welcome');
-        if(document.getElementById('form-iscrizione')) document.getElementById('form-iscrizione').reset();
-    } catch (err) {
-        console.error("Errore registrazione:", err);
-        alert("Errore durante la registrazione: " + (err.message || "riprova più tardi."));
     }
 }
 
@@ -2520,7 +2475,6 @@ async function inviaInvitoTorneo(event) {
     const isGeneral = !tourId;
     
     try {
-        const requests = await fanta_db.getTeacherRequests();
         const snapshotUsers = await window.db.collection('fanta_users').where("email", "==", targetEmail).get();
         const isRegistered = !snapshotUsers.empty;
 

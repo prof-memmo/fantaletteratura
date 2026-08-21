@@ -117,139 +117,6 @@ async function setupAdminPanel() {
         }
     };
 
-    window.renderAdminRichieste = async function() {
-        const list = document.getElementById('admin-requests-list');
-        if (!list) return;
-        list.innerHTML = '<p class="text-center">Caricamento richieste...</p>';
-        
-        let requests = await fanta_db.getTeacherRequests();
-        list.innerHTML = '';
-        if (requests.length === 0) {
-            list.innerHTML = '<i>Nessuna richiesta in sospeso.</i>';
-        } else {
-            requests.forEach(req => {
-                let consentLog = req.createdAt ? `<div style="font-size:0.7rem; color:var(--accent-gold); margin-top:5px;"><i class="fa-solid fa-clock"></i> Ricevuta: ${req.createdAt.toDate ? req.createdAt.toDate().toLocaleString() : req.createdAt}</div>` : '';
-                list.innerHTML += `
-                    <div class="glass" style="padding:15px; margin-bottom:10px; border-left:4px solid var(--accent-gold);">
-                        <div style="font-weight:bold; color:var(--primary-color); font-size:1.1rem;">${req.name}</div>
-                        <div style="font-size:0.85rem; margin-top:5px; color:var(--text-muted);">${req.email} | ${req.school} (${req.city})</div>
-                        ${consentLog}
-                        <div style="display:flex; gap:10px; margin-top:15px;">
-                            <button class="btn" style="flex:1; padding:8px; font-size:0.8rem;" onclick="approvaRichiesta('${req.email}')">Approva</button>
-                            <button class="btn btn-secondary" style="flex:1; padding:8px; font-size:0.8rem; color: #ff5f5f; border-color: #ff5f5f;" onclick="rifiutaRichiesta('${req.id}')">Rifiuta</button>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-    };
-
-    window.approvaRichiesta = async function(email) {
-        let requests = await fanta_db.getTeacherRequests();
-        let req = requests.find(r => r.email === email);
-        if(!req) return;
-
-        // Aggiungiamo alla collezione 'users' su Firestore
-        await window.db.collection('fanta_users').doc(email).set({
-            email: email,
-            name: req.name,
-            school: req.school,
-            city: req.city,
-            role: 'teacher',
-            approvedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        // Rimuoviamo dalla collezione 'pending_requests'
-        await window.db.collection('fanta_pending_requests').doc(req.id).delete();
-        
-        alert("Docente approvato con successo! Invio della mail in corso...");
-        const appUrl = window.location.origin + window.location.pathname.replace('admin.html', 'index.html');
-        const emailBody = encodeURIComponent(
-            `Ciao ${nomeDocente}!\n\n` +
-            `La tua richiesta di iscrizione a Fantaletteratura è stata APPROVATA. 🎉\n` +
-            `Da adesso puoi accedere alla piattaforma con la tua email: ${email}\n\n` +
-            `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-            `📚 CHE COS'È FANTALETTERATURA?\n` +
-            `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
-            `Fantaletteratura è un gioco didattico ispirato al Fantasanremo che trasforma lo studio della letteratura in una sfida a squadre creativa, cooperativa e coinvolgente.\n\n` +
-            `Ogni classe forma una o più SQUADRE. Ogni squadra sceglie 5 AUTORI letterari rispettando un budget iniziale di 20.000 lire (unità di misura del gioco). ` +
-            `Gli autori accumulano punti in base alle loro schede segrete — bonus e malus legati alla loro vita e alle loro opere.\n\n` +
-            `Le squadre possono guadagnare punti extra completando MISSIONI DIDATTICHE: attività di classe, letture, performance, approfondimenti e scoperte letterarie ` +
-            `(ogni missione vale 5 punti).\n\n` +
-            `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-            `🏆 LE CLASSIFICHE\n` +
-            `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
-            `Esistono tre classifiche:\n` +
-            `• Classifica Autori — basata sui punti accumulati dagli autori scelti\n` +
-            `• Classifica Missioni — basata sui bonus dinamici delle attività svolte\n` +
-            `• Classifica Globale — la somma di entrambe\n\n` +
-            `I punteggi vengono aggiornati periodicamente dal Game Master (il prof referente).\n\n` +
-            `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-            `🎯 COSA PUOI FARE COME DOCENTE\n` +
-            `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
-            `• Creare e gestire le squadre della tua classe\n` +
-            `• Caricare le missioni completate dagli studenti\n` +
-            `• Consultare le classifiche in tempo reale\n` +
-            `• Invitare colleghi a partecipare con le loro classi\n` +
-            `• Creare tornei privati tra classi o scuole diverse\n\n` +
-            `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-            `🔗 ACCEDI ORA\n` +
-            `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
-            `Puoi effettuare il login da qui:\n${appUrl}\n\n` +
-            `Buon divertimento e che la letteratura sia con te!\n` +
-            `Il team di Prof. Memmo`
-        );
-
-        // --- INTEGRAZIONE HUB ---
-        try {
-            const configHub = {
-                apiKey: "AIzaSyD-n2m-kYEuzGXPMKclZTggf4Y5Zm8_cdM",
-                authDomain: "prof-memmo-hub.firebaseapp.com",
-                projectId: "prof-memmo-hub",
-                storageBucket: "prof-memmo-hub.firebasestorage.app",
-                messagingSenderId: "839149485689",
-                appId: "1:839149485689:web:531776ce3cf495a6f23697"
-            };
-            let hubApp;
-            if (!firebase.apps.find(a => a.name === 'Hub')) {
-                hubApp = firebase.initializeApp(configHub, 'Hub');
-            } else {
-                hubApp = firebase.app('Hub');
-            }
-            await hubApp.firestore().collection("hub_posta_inviata").add({
-                destinatarioEmail: email,
-                destinatarioNome: nomeDocente,
-                gioco: 'Fantaletteratura',
-                oggetto: '✅ Benvenuto in Fantaletteratura!',
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
-        } catch(e) {
-            console.warn("Errore salvataggio log nell'Hub:", e);
-        }
-
-        // Lancia il client di posta
-        window.location.href = `mailto:${email}?subject=${emailSubject}&body=${emailBody}`;
-        
-        // Ricarica la tabella dopo un breve delay
-        setTimeout(() => {
-            loadTeacherRequests();
-        }, 1500);
-        
-        await window.renderAdminRichieste();
-        await window.renderAdminDocenti();
-    };
-
-    window.rifiutaRichiesta = async function(id) {
-        if(!confirm("Cancellare richiesta?")) return;
-        try {
-            await window.db.collection('fanta_pending_requests').doc(id).delete();
-            await window.renderAdminRichieste();
-        } catch(e) {
-            console.error(e);
-            alert("Errore durante la cancellazione.");
-        }
-    };
-
     let currentAdminDocentiFilter = 'tutti';
     window.setAdminDocentiFilter = function(f) {
         currentAdminDocentiFilter = f;
@@ -428,33 +295,6 @@ async function setupAdminPanel() {
         } catch (e) {
             console.error(e);
             alert("Errore durante l'eliminazione del docente.");
-        }
-    };
-
-    window.renderAdminRichieste = async function() {
-        const list = document.getElementById('admin-requests-list');
-        if (!list) return;
-        list.innerHTML = '<p class="text-center">Caricamento richieste...</p>';
-        
-        let requests = await fanta_db.getTeacherRequests();
-        list.innerHTML = '';
-        if (requests.length === 0) {
-            list.innerHTML = '<i>Nessuna richiesta in sospeso.</i>';
-        } else {
-            requests.forEach(req => {
-                let consentLog = req.createdAt ? `<div style="font-size:0.7rem; color:var(--accent-gold); margin-top:5px;"><i class="fa-solid fa-clock"></i> Ricevuta: ${req.createdAt.toDate ? req.createdAt.toDate().toLocaleString() : req.createdAt}</div>` : '';
-                list.innerHTML += `
-                    <div class="glass" style="padding:15px; margin-bottom:10px; border-left:4px solid var(--accent-gold);">
-                        <div style="font-weight:bold; color:var(--primary-color); font-size:1.1rem;">${req.name}</div>
-                        <div style="font-size:0.85rem; margin-top:5px; color:var(--text-muted);">${req.email} | ${req.school} (${req.city})</div>
-                        ${consentLog}
-                        <div style="display:flex; gap:10px; margin-top:15px;">
-                            <button class="btn" style="flex:1; padding:8px; font-size:0.8rem;" onclick="approvaRichiesta('${req.email}')">Approva</button>
-                            <button class="btn btn-secondary" style="flex:1; padding:8px; font-size:0.8rem; color: #ff5f5f; border-color: #ff5f5f;" onclick="rifiutaRichiesta('${req.id}')">Rifiuta</button>
-                        </div>
-                    </div>
-                `;
-            });
         }
     };
 
@@ -996,7 +836,6 @@ async function setupAdminPanel() {
             // Specific renders
             if (targetId === 'admin-view-autori') window.renderAdminAutori();
             if (targetId === 'admin-view-calendario') window.renderAdminCalendario();
-            if (targetId === 'admin-view-requests') window.renderAdminRichieste();
             if (targetId === 'admin-view-docenti') window.renderAdminDocenti();
             if (targetId === 'admin-view-squadre') window.renderAdminSquadre();
             if (targetId === 'admin-view-missioni') { window.renderAdminMissioni(); window.renderAdminMissioniPending(); }
@@ -1020,7 +859,6 @@ async function setupAdminPanel() {
         await window.renderAdminMissioni();
         await window.renderAdminMissioniPending();
         await window.renderAdminClassifica();
-        await window.renderAdminRichieste();
         await window.renderAdminTornei();
         await window.renderAdminImpostazioni();
     }

@@ -20,7 +20,7 @@ function navigateTo(viewId, pushHistory = true) {
     }
 
     // ACCESSO E PROTEZIONE NAVIGAZIONE
-    const isPublicView = ['view-welcome', 'view-onboarding', 'view-iscrizione', 'view-regolamento'].includes(viewId);
+    const isPublicView = ['view-welcome', 'view-onboarding', 'view-regolamento'].includes(viewId);
     const hasStudentCode = localStorage.getItem('fanta_active_team_code');
     const isDocente = !!currentUserEmail;
 
