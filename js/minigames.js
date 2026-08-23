@@ -8721,15 +8721,23 @@
       currentMissionId = missionId || null;
       const data = getData(missionId);
 
+      // Chiudi eventuali modali intermedi rimasti aperti
+      const authorModal = document.getElementById('scheda-autore-modal');
+      if (authorModal) authorModal.style.display = 'none';
+      const teamSelector = document.getElementById('team-selector-modal');
+      if (teamSelector) teamSelector.style.display = 'none';
+
       const container = document.getElementById('minigame-container');
       const content = document.getElementById('minigame-content');
       const title = document.getElementById('minigame-title');
       if (!container || !content) return;
 
+      // Blocca lo scroll della pagina sottostante
+      document.body.style.overflow = 'hidden';
+
       content.innerHTML = '';
       container.style.display = 'flex';
       currentMinigame = type;
-      container.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
       // Label del topic
       const topicBadge = data.topic ? `<span style="font-size:0.75rem; background:rgba(141,160,63,0.15); border:1px solid rgba(141,160,63,0.4); padding:3px 10px; border-radius:6px; color:#f5c53c; font-weight:600; text-transform:none;">${data.topic}</span>` : '';
@@ -8767,8 +8775,8 @@
         const content = document.getElementById('minigame-content');
         if (content) {
             content.innerHTML = `
-                <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:25px; padding: 25px 15px; text-align:center;">
-                    <img src="assets/maestro.png" alt="Il Maestro" style="max-height:220px; object-fit:contain; filter:drop-shadow(0 10px 20px rgba(0,0,0,0.6));">
+                <div class="minigame-maestro-layout" style="padding: 15px; text-align:center;">
+                    <img src="assets/maestro.png" alt="Il Maestro" class="minigame-maestro-img">
                     <div style="max-width:450px;">
                         <h2 style="color:#f5c53c; font-size:1.8rem; margin-bottom:10px; font-family:var(--font-heading);">🎉 MANCHE COMPLETATA!</h2>
                         <p style="font-size:1.05rem; color:#f5f5f0; line-height:1.4; margin-bottom:15px;">Congratulazioni! Hai completato tutte le prove letterarie di questa manche.</p>
@@ -8866,6 +8874,9 @@
       const banner = document.getElementById('minigame-turn-banner');
       if (banner) banner.style.display = 'none';
       
+      // Sblocca lo scroll della pagina
+      document.body.style.overflow = '';
+      
       currentMinigame = null;
       this.isMancheMode = false;
       this.gameQueue = [];
@@ -8915,11 +8926,9 @@
         `).join('');
         
         container.innerHTML = `
-            <div style="display:flex; flex-wrap:wrap; gap:25px; align-items:center; justify-content:center; max-width:900px; margin:0 auto;">
-                <div style="text-align:center; min-width:140px; max-width:180px; flex-shrink:0;">
-                    <img src="assets/maestro.png" alt="Il Maestro" style="max-height:240px; width:auto; object-fit:contain; filter:drop-shadow(0 10px 20px rgba(0,0,0,0.6));">
-                </div>
-                <div style="flex:1; min-width:280px;">
+            <div class="minigame-maestro-layout">
+                <img src="assets/maestro.png" alt="Il Maestro" class="minigame-maestro-img">
+                <div class="minigame-maestro-content">
                     <div style="font-size:0.8rem; color:#f5c53c; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px; font-weight:bold;">${progress}</div>
                     <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(141,160,63,0.2); border-radius:12px; padding:16px; margin-bottom:16px;">
                         <h3 style="color:#fff; font-size:1.15rem; margin:0; line-height:1.45; font-family:var(--font-heading);">${qData.q} ${editBtn}</h3>
@@ -8946,8 +8955,8 @@
         if (this.isMancheMode) points = Math.round((correct / total) * 5); // up to 5 points for manche
         
         container.innerHTML = `
-            <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:25px; padding:20px; text-align:center;">
-                <img src="assets/maestro.png" alt="Il Maestro" style="max-height:220px; object-fit:contain; filter:drop-shadow(0 10px 20px rgba(0,0,0,0.6));">
+            <div class="minigame-maestro-layout" style="padding:15px; text-align:center;">
+                <img src="assets/maestro.png" alt="Il Maestro" class="minigame-maestro-img">
                 <div style="max-width:400px;">
                     <h3 style="color:#f5c53c; font-size:1.6rem; margin-bottom:10px; font-family:var(--font-heading);">Quiz Terminato!</h3>
                     <p style="font-size:1.1rem; color:#fff; margin-bottom:15px;">Hai risposto correttamente a <strong>${correct}</strong> domande su ${total}.</p>
@@ -9024,18 +9033,18 @@
       }
 
       container.innerHTML = `
-        <div style="display:grid; grid-template-columns: minmax(160px, 200px) 1fr; gap:20px; align-items:center;">
-          <div style="text-align:center; background:rgba(0,0,0,0.4); border-radius:12px; padding:15px; border:1px solid rgba(141,160,63,0.3);">
-            <svg width="150" height="150" viewBox="0 0 150 150" style="display:block; margin:0 auto;">${svg}</svg>
-            <div style="margin-top:10px; font-size:0.85rem; font-weight:bold; color:${s.wrongGuesses >= 5 ? '#ef4444' : '#f5c53c'};">Errori: ${s.wrongGuesses}/${s.maxWrong}</div>
+        <div class="minigame-impiccato-grid">
+          <div class="minigame-gallows-box">
+            <svg width="140" height="140" viewBox="0 0 150 150" style="display:block; margin:0 auto;">${svg}</svg>
+            <div style="margin-top:8px; font-size:0.85rem; font-weight:bold; color:${s.wrongGuesses >= 5 ? '#ef4444' : '#f5c53c'};">Errori: ${s.wrongGuesses}/${s.maxWrong}</div>
           </div>
           <div>
-            <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(141,160,63,0.3); border-radius:10px; padding:12px 16px; margin-bottom:15px; font-size:0.9rem; color:#f5f5f0; display:flex; justify-content:space-between; align-items:center;">
+            <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(141,160,63,0.3); border-radius:10px; padding:10px 14px; margin-bottom:12px; font-size:0.9rem; color:#f5f5f0; display:flex; justify-content:space-between; align-items:center;">
               <div>💡 Indizio: <em>${s.hint}</em></div>
               ${(window.LiveEditor && typeof window.LiveEditor.renderBtn === 'function') ? window.LiveEditor.renderBtn(`impiccato_${currentMissionId || 'general'}`, { word: s.word, hint: s.hint, text: s.hint }) : ''}
             </div>
-            <div style="text-align:center; padding:16px 0; letter-spacing:4px; margin-bottom:8px;">${wordDisplay}</div>
-            ${wrongLetters.length ? `<div style="font-size:0.82rem; color:#ef4444; margin-bottom:8px; text-align:center; font-weight:600;">Lettere errate: ${wrongLetters.join(', ')}</div>` : ''}
+            <div style="text-align:center; padding:12px 0; letter-spacing:4px; margin-bottom:6px;">${wordDisplay}</div>
+            ${wrongLetters.length ? `<div style="font-size:0.82rem; color:#ef4444; margin-bottom:6px; text-align:center; font-weight:600;">Lettere errate: ${wrongLetters.join(', ')}</div>` : ''}
             ${kb}
           </div>
         </div>
@@ -9089,11 +9098,9 @@
         </div>` : '';
 
       container.innerHTML = `
-        <div style="display:flex; flex-wrap:wrap; gap:25px; align-items:center; justify-content:center;">
-          <div style="text-align:center; min-width:140px; max-width:180px; flex-shrink:0;">
-            <img src="assets/maestro.png" alt="Il Maestro" style="max-height:240px; width:auto; object-fit:contain; filter:drop-shadow(0 10px 20px rgba(0,0,0,0.6));">
-          </div>
-          <div style="flex:1; min-width:280px;">
+        <div class="minigame-maestro-layout">
+          <img src="assets/maestro.png" alt="Il Maestro" class="minigame-maestro-img">
+          <div class="minigame-maestro-content">
             <div style="font-size:0.88rem; color:#f5c53c; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; font-weight:bold;">
               <div>📖 <em>${s.ex.source || 'Citazione'}</em></div>
               ${(window.LiveEditor && typeof window.LiveEditor.renderBtn === 'function') ? window.LiveEditor.renderBtn(`puzzle_${currentMissionId || 'general'}`, { text: s.ex.solution }) : ''}
@@ -9152,11 +9159,9 @@
       });
 
       container.innerHTML = `
-        <div style="display:flex; flex-wrap:wrap; gap:25px; align-items:center; justify-content:center;">
-          <div style="text-align:center; min-width:140px; max-width:180px; flex-shrink:0;">
-            <img src="assets/maestro.png" alt="Il Maestro" style="max-height:240px; width:auto; object-fit:contain; filter:drop-shadow(0 10px 20px rgba(0,0,0,0.6));">
-          </div>
-          <div style="flex:1; min-width:280px;">
+        <div class="minigame-maestro-layout">
+          <img src="assets/maestro.png" alt="Il Maestro" class="minigame-maestro-img">
+          <div class="minigame-maestro-content">
             <div style="background:rgba(0,0,0,0.35); border:1.5px solid rgba(141,160,63,0.3); border-radius:12px; padding:18px; margin-bottom:16px;">
               <div style="font-size:0.85rem; color:#f5c53c; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; font-weight:bold;">
                 <div>📖 <em>${s.ex.source || 'Testo'}</em></div>
@@ -9275,7 +9280,7 @@
           <div style="font-weight:bold; color:#f5c53c; margin-bottom:4px; font-family:var(--font-heading);">📜 ${s.ex.title || 'Opera Poetica'}</div>
           <div style="font-size:0.85rem; color:#f5f5f0;">💡 ${s.ex.hint || 'Riordina i versi per completare la poesia.'}</div>
         </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px;">
+        <div class="minigame-versi-grid">
           <div>
             <div style="font-size:0.82rem; color:var(--text-muted); margin-bottom:8px; font-weight:600;">🔢 Il tuo ordine <span style="opacity:0.6;">(clicca per rimuovere)</span>:</div>
             <div style="min-height:160px; border:1.5px dashed rgba(141,160,63,0.4); border-radius:10px; padding:10px; background:rgba(0,0,0,0.3);">${orderedHtml}</div>

@@ -2332,26 +2332,196 @@ h1, h2, h3, h4 {
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   MODAL FULLSCREEN — Per i Minigiochi
+   MODAL MINIGIOCHI & RESPONSIVE LAYOUTS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-.modal-fullscreen {
-    padding: 0 !important;
+.minigame-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(8, 10, 5, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+    overflow-y: auto;
 }
 
-.modal-fullscreen .modal-wip-content {
-    max-width: 100% !important;
-    width: 100% !important;
-    height: 100% !important;
-    margin: 0 !important;
-    border-radius: 0 !important;
-    border: none !important;
+.minigame-modal-card {
+    background: rgba(15, 18, 10, 0.98);
+    border: 1px solid rgba(141, 160, 63, 0.4);
+    border-radius: 18px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(141, 160, 63, 0.15);
+    max-width: 900px;
+    width: 100%;
+    max-height: 92vh;
     display: flex;
     flex-direction: column;
+    box-sizing: border-box;
+    overflow: hidden;
+    margin: auto;
+    position: relative;
 }
 
-.modal-fullscreen #minigame-content {
+.minigame-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 22px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(25, 28, 15, 0.6);
+    flex-shrink: 0;
+    gap: 12px;
+}
+
+.minigame-modal-title {
+    font-family: var(--font-heading);
+    color: #f5c53c;
+    font-size: 1.25rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-weight: 700;
+}
+
+.minigame-close-btn {
+    width: auto !important;
+    flex-shrink: 0;
+    padding: 6px 14px !important;
+    font-size: 0.85rem !important;
+    border-radius: 8px !important;
+    margin: 0 !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #f5f5f0 !important;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.minigame-close-btn:hover {
+    background: rgba(239, 68, 68, 0.2) !important;
+    border-color: #ef4444 !important;
+    color: #ef4444 !important;
+}
+
+.minigame-modal-body {
     flex: 1;
     overflow-y: auto;
+    padding: 20px 24px;
+    box-sizing: border-box;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Turn Banner */
+.minigame-turn-banner {
+    background: rgba(141, 160, 63, 0.15);
+    border: 1px solid #8da03f;
+    border-radius: 10px;
+    padding: 8px 14px;
+    text-align: center;
+    margin: 12px 20px 0 20px;
+    flex-shrink: 0;
+}
+.minigame-turn-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+}
+.minigame-turn-name {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    color: #f5c53c;
+    font-weight: bold;
+}
+
+/* Specific Minigame Layouts */
+.minigame-maestro-layout {
+    display: flex;
+    flex-direction: row;
+    gap: 22px;
+    align-items: center;
+    justify-content: center;
+}
+
+.minigame-maestro-img {
+    max-height: 200px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6));
+    flex-shrink: 0;
+}
+
+.minigame-maestro-content {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Impiccato Grid */
+.minigame-impiccato-grid {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 20px;
+    align-items: center;
+}
+
+.minigame-gallows-box {
+    text-align: center;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid rgba(141, 160, 63, 0.3);
+}
+
+/* Versi Grid */
+.minigame-versi-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* Responsive Media Queries (Mobile & Small Viewports) */
+@media (max-width: 768px), (max-height: 650px) {
+    .minigame-modal-overlay {
+        padding: 8px;
+    }
+    .minigame-modal-card {
+        max-height: 96vh;
+        border-radius: 14px;
+    }
+    .minigame-modal-header {
+        padding: 12px 16px;
+    }
+    .minigame-modal-body {
+        padding: 14px 16px;
+    }
+    .minigame-maestro-layout {
+        flex-direction: column;
+        gap: 12px;
+    }
+    .minigame-maestro-img {
+        max-height: 110px;
+    }
+    .minigame-impiccato-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+    .minigame-gallows-box {
+        max-width: 160px;
+        margin: 0 auto;
+        padding: 8px;
+    }
+    .minigame-versi-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
 }
 
 /* ==========================================
