@@ -493,6 +493,7 @@
       const title = document.getElementById('minigame-title');
       if (!container || !content) return;
 
+      content.innerHTML = '';
       container.style.display = 'flex';
       currentMinigame = type;
       container.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -531,16 +532,18 @@
         const xp = Math.min(20, this.mancheScore);
         
         const content = document.getElementById('minigame-content');
-        content.innerHTML = `
-            <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:25px; padding: 25px 15px; text-align:center;">
-                <img src="assets/maestro.png" alt="Il Maestro" style="max-height:220px; object-fit:contain; filter:drop-shadow(0 10px 20px rgba(0,0,0,0.6));">
-                <div style="max-width:450px;">
-                    <h2 style="color:#f5c53c; font-size:1.8rem; margin-bottom:10px; font-family:var(--font-heading);">🎉 MANCHE COMPLETATA!</h2>
-                    <p style="font-size:1.05rem; color:#f5f5f0; line-height:1.4; margin-bottom:15px;">Congratulazioni! Hai completato tutte le prove letterarie di questa manche.</p>
-                    <div style="font-size:2.6rem; font-weight:bold; color:#16a34a; margin:15px 0;">+${xp} PUNTI</div>
-                    <button class="btn" style="background:#16a34a !important; color:#fff !important; width:auto; padding:10px 24px; border-radius:10px;" onclick="EroiMinigames.finalizeMancheReward(${xp})">Riscuoti Punti Squadra</button>
-                </div>
-            </div>`;
+        if (content) {
+            content.innerHTML = `
+                <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:25px; padding: 25px 15px; text-align:center;">
+                    <img src="assets/maestro.png" alt="Il Maestro" style="max-height:220px; object-fit:contain; filter:drop-shadow(0 10px 20px rgba(0,0,0,0.6));">
+                    <div style="max-width:450px;">
+                        <h2 style="color:#f5c53c; font-size:1.8rem; margin-bottom:10px; font-family:var(--font-heading);">🎉 MANCHE COMPLETATA!</h2>
+                        <p style="font-size:1.05rem; color:#f5f5f0; line-height:1.4; margin-bottom:15px;">Congratulazioni! Hai completato tutte le prove letterarie di questa manche.</p>
+                        <div style="font-size:2.6rem; font-weight:bold; color:#16a34a; margin:15px 0;">+${xp} PUNTI</div>
+                        <button class="btn" style="background:#16a34a !important; color:#fff !important; width:auto; padding:10px 24px; border-radius:10px;" onclick="EroiMinigames.finalizeMancheReward(${xp})">Riscuoti Punti Squadra</button>
+                    </div>
+                </div>`;
+        }
         return;
       }
       const nextGame = this.mancheGames.shift();
@@ -625,6 +628,8 @@
     closeMinigame: function() {
       const container = document.getElementById('minigame-container');
       if (container) container.style.display = 'none';
+      const content = document.getElementById('minigame-content');
+      if (content) content.innerHTML = '';
       const banner = document.getElementById('minigame-turn-banner');
       if (banner) banner.style.display = 'none';
       
