@@ -1076,6 +1076,15 @@ async function checkStudentConsent() {
             return;
         }
 
+        // Verifica Piano Abbonamento del Docente proprietario tramite HubSubscriptionGuard
+        if (window.HubSubscriptionGuard && typeof window.HubSubscriptionGuard.validateStudentAccess === 'function') {
+            const guardCheck = await window.HubSubscriptionGuard.validateStudentAccess(codeInput);
+            if (!guardCheck.allowed) {
+                alert(guardCheck.reason || "La classe associata a questo codice appartiene a un docente il cui piano attuale non include questo gioco. Contatta il tuo insegnante.");
+                return;
+            }
+        }
+
         // Verifica capienza massima di 5 studenti per squadra
         const user = window.auth ? window.auth.currentUser : null;
         const userEmail = user ? user.email.toLowerCase() : '';

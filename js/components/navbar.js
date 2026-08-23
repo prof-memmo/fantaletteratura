@@ -24,6 +24,18 @@ function navigateTo(viewId, pushHistory = true) {
     const hasStudentCode = localStorage.getItem('fanta_active_team_code');
     const isDocente = !!currentUserEmail;
 
+    // Controllo Centralizzato HubSubscriptionGuard
+    if (window.HubSubscriptionGuard && typeof window.HubSubscriptionGuard.verifyAccess === 'function') {
+        const currentUser = window.auth ? window.auth.currentUser : null;
+        const currentRole = (typeof currentUserRole !== 'undefined' ? currentUserRole : '') || localStorage.getItem('fanta_user_role') || (hasStudentCode && !isDocente ? 'studente' : '');
+        window.HubSubscriptionGuard.verifyAccess({
+            user: currentUser,
+            role: currentRole,
+            teamCode: hasStudentCode,
+            isPublicView: isPublicView
+        });
+    }
+
     // Restrizioni per Studenti
     const isRestrictedForStudents = ['view-profilo', 'view-squadra', 'view-missioni'].includes(viewId);
     const userRole = (typeof currentUserRole !== 'undefined' ? currentUserRole : '') || localStorage.getItem('fanta_user_role') || (hasStudentCode && !isDocente ? 'studente' : '');
