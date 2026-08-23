@@ -522,7 +522,7 @@ async function setupAdminPanel() {
                                 <div style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase;">Autori</div>
                             </div>
                             <div style="font-size: 0.8rem; text-align: center; min-width: 45px;">
-                                <div style="font-weight: bold; color: var(--accent-gold);">${studentiDiQuesta.length}</div>
+                                <div style="font-weight: bold; color: var(--accent-gold);">${studentiDiQuesta.length}/5</div>
                                 <div style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase;">Studenti</div>
                             </div>
                             <div style="display: flex; gap: 4px;">
@@ -550,7 +550,7 @@ async function setupAdminPanel() {
                             </div>
                             <div>
                                 <h4 style="font-size: 0.8rem; color: var(--accent-gold); margin-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 3px;">
-                                    <i class="fa-solid fa-users"></i> Studenti Iscritti (${studentiDiQuesta.length})
+                                    <i class="fa-solid fa-users"></i> Studenti Iscritti (${studentiDiQuesta.length}/5)
                                 </h4>
                                 ${studentiHtml}
                             </div>

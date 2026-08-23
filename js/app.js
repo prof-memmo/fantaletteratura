@@ -504,6 +504,12 @@ window.confermaSposta = async function() {
     if (!newTeamId) { alert('Seleziona una squadra di destinazione.'); return; }
 
     try {
+        const destMembers = await fanta_db.getStudentsInTeam(newTeamId);
+        if (destMembers.length >= 5) {
+            alert(`Impossibile spostare lo studente: la squadra di destinazione ha già raggiunto la capienza massima (${destMembers.length}/5).`);
+            return;
+        }
+
         await fanta_db.moveStudent(email, newTeamId, newTeamCode);
         document.getElementById('modal-sposta-studente').style.display = 'none';
         alert('Studente spostato con successo!');
@@ -1070,8 +1076,18 @@ async function checkStudentConsent() {
             return;
         }
 
+        // Verifica capienza massima di 5 studenti per squadra
+        const user = window.auth ? window.auth.currentUser : null;
+        const userEmail = user ? user.email.toLowerCase() : '';
+        const currentMembers = await fanta_db.getStudentsInTeam(team.id);
+        const isAlreadyMember = currentMembers.some(m => (m.email || '').toLowerCase() === userEmail || (m.id || '').toLowerCase() === userEmail);
+
+        if (!isAlreadyMember && currentMembers.length >= 5) {
+            alert(`Questa squadra ha già raggiunto il limite massimo di 5 componenti (${currentMembers.length}/5). Contatta il tuo docente.`);
+            return;
+        }
+
         // Salviamo il ruolo per i futuri login, se l'utente è autenticato tramite Google
-        const user = window.auth.currentUser;
         if (user) {
             try {
                 await window.db.collection('fanta_users').doc(user.email.toLowerCase()).set({
@@ -1252,12 +1268,12 @@ function setLoggedIn(email, role = '') {
     const loggedInNormalContent = document.getElementById('logged-in-normal-content');
     
     const isTeacher = currentUserRole === 'docente' || currentUserRole === 'teacher' || email === 'prof.memmo@gmail.com';
-    const isFantamico = currentUserRole === 'fantamico' || currentUserRole === 'guest';
+    const isFantamico = currentUserRole === 'fantamico' || currentUserRole === 'viandante' || currentUserRole === 'guest';
     const isStudent = currentUserRole === 'studente';
     
     if (loggedWelc) {
         if (isTeacher) loggedWelc.textContent = "Bentornato, Prof!";
-        else if (isFantamico) loggedWelc.textContent = "Ciao, Fantamico!";
+        else if (isFantamico) loggedWelc.textContent = "Ciao, Viandante!";
         else if (isStudent) loggedWelc.textContent = "Ciao, Studente!";
         else loggedWelc.textContent = "Benvenuto!";
     }
@@ -1279,8 +1295,8 @@ function setLoggedIn(email, role = '') {
             `;
         } else if (isFantamico) {
             loggedInNormalContent.innerHTML = `
-                <h3 class="text-center mb-1 text-primary">Ciao, Fantamico!</h3>
-                <p class="text-center" style="font-size: 0.9rem; margin-bottom:20px;">Hai effettuato l'accesso all'area personale Fantamico.</p>
+                <h3 class="text-center mb-1 text-primary">Ciao, Viandante!</h3>
+                <p class="text-center" style="font-size: 0.9rem; margin-bottom:20px;">Hai effettuato l'accesso all'area personale Viandante.</p>
                 <div style="display:flex; flex-direction:column; gap:10px;">
                     <button class="btn" style="width:100%;" onclick="navigateTo('view-profilo')">Vai al tuo Profilo / Squadre</button>
                     <button class="btn btn-secondary" style="width:100%; border-width:2px;" onclick="navigateTo('view-squadra')">Crea una Nuova Squadra</button>
@@ -1635,110 +1651,130 @@ async function renderProfilo() {
             `;
         }
 
-        // Docenti di questa squadra (Proprietario + Collaboratori)
-        const docentiArr = [];
-        if (team.ownerEmail) {
-            docentiArr.push({ email: team.ownerEmail, role: 'Proprietario' });
-        }
-        if (team.collaboratori && team.collaboratori.length > 0) {
-            team.collaboratori.forEach(email => {
-                docentiArr.push({ email: email, role: 'Collaboratore' });
-            });
-        }
-
+        const isDocente = currentUserRole === 'docente' || currentUserRole === 'teacher' || currentUserEmail === 'prof.memmo@gmail.com';
+        
         let docentiSection = '';
-        if (docentiArr.length > 0) {
-            const docentiRows = docentiArr.map(d => {
-                const isOwner = d.role === 'Proprietario';
-                const roleBadge = isOwner 
-                    ? `<span style="font-size:0.65rem; background:rgba(245, 197, 60, 0.15); color:#f5c53c; border: 1px solid rgba(245, 197, 60, 0.25); border-radius:6px; padding:1px 6px; font-weight:600;">Proprietario</span>`
-                    : `<span style="font-size:0.65rem; background:rgba(141,160,63,0.15); color:var(--primary-color); border: 1px solid rgba(141,160,63,0.25); border-radius:6px; padding:1px 6px; font-weight:600;">Collaboratore</span>`;
-                
-                return `
-                    <div style="display:flex; align-items:center; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.03);">
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <i class="fa-solid fa-chalkboard-user" style="color:var(--text-muted); font-size:0.8rem;"></i>
-                            <span style="font-size:0.8rem; font-weight:500; color:var(--text-main);">${d.email}</span>
+        let studentiSection = '';
+        let codiceSection = '';
+        let azioniSection = '';
+
+        if (isDocente) {
+            // Docenti di questa squadra (Proprietario + Collaboratori)
+            const docentiArr = [];
+            if (team.ownerEmail) {
+                docentiArr.push({ email: team.ownerEmail, role: 'Proprietario' });
+            }
+            if (team.collaboratori && team.collaboratori.length > 0) {
+                team.collaboratori.forEach(email => {
+                    docentiArr.push({ email: email, role: 'Collaboratore' });
+                });
+            }
+
+            if (docentiArr.length > 0) {
+                const docentiRows = docentiArr.map(d => {
+                    const isOwner = d.role === 'Proprietario';
+                    const roleBadge = isOwner 
+                        ? `<span style="font-size:0.65rem; background:rgba(245, 197, 60, 0.15); color:#f5c53c; border: 1px solid rgba(245, 197, 60, 0.25); border-radius:6px; padding:1px 6px; font-weight:600;">Proprietario</span>`
+                        : `<span style="font-size:0.65rem; background:rgba(141,160,63,0.15); color:var(--primary-color); border: 1px solid rgba(141,160,63,0.25); border-radius:6px; padding:1px 6px; font-weight:600;">Collaboratore</span>`;
+                    
+                    return `
+                        <div style="display:flex; align-items:center; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.03);">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <i class="fa-solid fa-chalkboard-user" style="color:var(--text-muted); font-size:0.8rem;"></i>
+                                <span style="font-size:0.8rem; font-weight:500; color:var(--text-main);">${d.email}</span>
+                            </div>
+                            ${roleBadge}
                         </div>
-                        ${roleBadge}
+                    `;
+                }).join('');
+
+                docentiSection = `
+                    <details style="margin-top:6px; margin-bottom:6px; width:100%; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px;">
+                        <summary style="font-size:0.78rem; cursor:pointer; color:var(--primary-color); font-weight:600; user-select:none; margin-bottom:6px; display:flex; align-items:center; gap:5px;">
+                            <i class="fa-solid fa-user-tie"></i> Docenti Gestori (${docentiArr.length})
+                        </summary>
+                        <div style="padding-left:4px; max-height: 150px; overflow-y: auto;">
+                            ${docentiRows}
+                        </div>
+                    </details>
+                `;
+            }
+
+            // Studenti iscritti a questa squadra
+            const studentiArr = allStudentsMap[team.id] || [];
+            if (studentiArr.length > 0) {
+                const studentiRows = studentiArr.map(s => `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.03);">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <i class="fa-solid fa-graduation-cap" style="color:var(--text-muted); font-size:0.8rem;"></i>
+                            <span style="font-size:0.8rem; font-weight:500; color:var(--text-main);">${s.email}</span>
+                        </div>
+                        <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.7rem; width:auto; border-radius:10px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1);"
+                            onclick="profiloSpostaStudente('${s.email}', '${team.id}', '${team.name}')">
+                            <i class="fa-solid fa-right-left"></i> Sposta
+                        </button>
+                    </div>`).join('');
+
+                studentiSection = `
+                    <details style="margin-top:6px; margin-bottom:6px; width:100%; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px;">
+                        <summary style="font-size:0.78rem; cursor:pointer; color:var(--primary-color); font-weight:600; user-select:none; margin-bottom:6px; display:flex; align-items:center; gap:5px;">
+                            <i class="fa-solid fa-users"></i> Studenti Iscritti (${studentiArr.length}/5)
+                        </summary>
+                        <div style="padding-left:4px; max-height: 200px; overflow-y: auto;">
+                            ${studentiRows}
+                        </div>
+                    </details>
+                `;
+            } else {
+                studentiSection = `
+                    <div style="font-size:0.75rem; color:var(--text-muted); padding:8px 0; border-top:1px solid rgba(255,255,255,0.05); width:100%;">
+                        <i class="fa-solid fa-circle-info"></i> Nessuno studente ancora iscritto (0/5).
                     </div>
                 `;
-            }).join('');
+            }
 
-            docentiSection = `
-                <details style="margin-top:6px; margin-bottom:6px; width:100%; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px;">
-                    <summary style="font-size:0.78rem; cursor:pointer; color:var(--primary-color); font-weight:600; user-select:none; margin-bottom:6px; display:flex; align-items:center; gap:5px;">
-                        <i class="fa-solid fa-user-tie"></i> Docenti Gestori (${docentiArr.length})
-                    </summary>
-                    <div style="padding-left:4px; max-height: 150px; overflow-y: auto;">
-                        ${docentiRows}
+            // Sezione codice (mostrata per docenti)
+            codiceSection = `
+                <div style="width:100%; margin-bottom:8px; padding:8px 10px; border-radius:8px; background:rgba(141, 160, 63, 0.04); border:1px dashed rgba(141, 160, 63, 0.3); display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                    <div style="display:flex; flex-direction:column; gap:4px; flex-grow:1;">
+                        <span style="font-size:0.68rem; text-transform:uppercase; color:var(--text-muted); font-weight:600; letter-spacing:0.5px;">Codice Studenti</span>
+                        <span class="join-code-badge" style="margin:0; font-size:1rem; padding:3px 8px; width:fit-content; text-align:center; font-weight:bold;">${team.joinCode || '---'}</span>
                     </div>
-                </details>
-            `;
-        }
-
-        // Studenti iscritti a questa squadra
-        const studentiArr = allStudentsMap[team.id] || [];
-        let studentiSection = '';
-        if (studentiArr.length > 0) {
-            const studentiRows = studentiArr.map(s => `
-                <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.03);">
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <i class="fa-solid fa-graduation-cap" style="color:var(--text-muted); font-size:0.8rem;"></i>
-                        <span style="font-size:0.8rem; font-weight:500; color:var(--text-main);">${s.email}</span>
-                    </div>
-                    <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.7rem; width:auto; border-radius:10px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1);"
-                        onclick="profiloSpostaStudente('${s.email}', '${team.id}', '${team.name}')">
-                        <i class="fa-solid fa-right-left"></i> Sposta
+                    <button class="btn" style="width:auto; padding:6px 12px; font-size:0.75rem; border-radius:12px; height:fit-content;" onclick="shareInvite({type:'student', code:'${team.joinCode}', teamName:'${team.name.replace(/'/g, "\\'")}'})">
+                        <i class="fa-solid fa-share-nodes"></i> Condividi
                     </button>
-                </div>`).join('');
+                </div>`;
 
-            studentiSection = `
-                <details style="margin-top:6px; margin-bottom:6px; width:100%; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px;">
-                    <summary style="font-size:0.78rem; cursor:pointer; color:var(--primary-color); font-weight:600; user-select:none; margin-bottom:6px; display:flex; align-items:center; gap:5px;">
-                        <i class="fa-solid fa-users"></i> Studenti Iscritti (${studentiArr.length})
-                    </summary>
-                    <div style="padding-left:4px; max-height: 200px; overflow-y: auto;">
-                        ${studentiRows}
-                    </div>
-                </details>
-            `;
+            // Sezione Azioni Docente
+            azioniSection = `
+                <div style="display:flex; flex-wrap:wrap; gap:8px; width:100%; margin-top:4px; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px;">
+                    <button class="btn btn-secondary" style="flex:1; min-width:80px; padding:5px 8px; font-size:0.72rem; border-radius:8px; background:rgba(255,255,255,0.03);" 
+                        onclick="docenteModificaSquadra('${team.id}', '${team.name.replace(/'/g, "\\'")}', '${(team.classe || '').replace(/'/g, "\\'")}')">
+                        <i class="fa-solid fa-pen-to-square"></i> Modifica
+                    </button>
+                    <button class="btn btn-secondary" style="flex:1.2; min-width:110px; padding:5px 8px; font-size:0.72rem; border-radius:8px; background:rgba(141,160,63,0.15); border-color:var(--primary-color);"
+                        onclick="window.apriCollaboratori('${team.id}', '${team.name.replace(/'/g, "\\'")}')">
+                        <i class="fa-solid fa-user-plus"></i> Collaboratori
+                    </button>
+                    <button class="btn btn-danger" style="flex:1; min-width:80px; padding:5px 8px; font-size:0.72rem; border-radius:8px; background:rgba(230, 57, 70, 0.1); border:1px solid rgba(230, 57, 70, 0.2); color:#e63946;" 
+                        onclick="docenteEliminaSquadra('${team.id}', '${team.name.replace(/'/g, "\\'")}')">
+                        <i class="fa-solid fa-trash-can"></i> Elimina
+                    </button>
+                </div>`;
         } else {
-            studentiSection = `
-                <div style="font-size:0.75rem; color:var(--text-muted); padding:8px 0; border-top:1px solid rgba(255,255,255,0.05); width:100%;">
-                    <i class="fa-solid fa-circle-info"></i> Nessuno studente ancora iscritto a questa squadra.
-                </div>
-            `;
+            // Per il Viandante / Giocatore Singolo: interfaccia pulita senza codici studenti né collaboratori
+            azioniSection = `
+                <div style="display:flex; flex-wrap:wrap; gap:8px; width:100%; margin-top:4px; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px;">
+                    <button class="btn btn-secondary" style="flex:1; min-width:80px; padding:5px 8px; font-size:0.72rem; border-radius:8px; background:rgba(255,255,255,0.03);" 
+                        onclick="docenteModificaSquadra('${team.id}', '${team.name.replace(/'/g, "\\'")}', '${(team.classe || '').replace(/'/g, "\\'")}')">
+                        <i class="fa-solid fa-pen-to-square"></i> Modifica
+                    </button>
+                    <button class="btn btn-danger" style="flex:1; min-width:80px; padding:5px 8px; font-size:0.72rem; border-radius:8px; background:rgba(230, 57, 70, 0.1); border:1px solid rgba(230, 57, 70, 0.2); color:#e63946;" 
+                        onclick="docenteEliminaSquadra('${team.id}', '${team.name.replace(/'/g, "\\'")}')">
+                        <i class="fa-solid fa-trash-can"></i> Elimina
+                    </button>
+                </div>`;
         }
-
-        // Sezione codice (mostrata sia per proprietario che per collaboratore)
-        const codiceSection = `
-            <div style="width:100%; margin-bottom:8px; padding:8px 10px; border-radius:8px; background:rgba(141, 160, 63, 0.04); border:1px dashed rgba(141, 160, 63, 0.3); display:flex; justify-content:space-between; align-items:center; gap:10px;">
-                <div style="display:flex; flex-direction:column; gap:4px; flex-grow:1;">
-                    <span style="font-size:0.68rem; text-transform:uppercase; color:var(--text-muted); font-weight:600; letter-spacing:0.5px;">Codice Studenti</span>
-                    <span class="join-code-badge" style="margin:0; font-size:1rem; padding:3px 8px; width:fit-content; text-align:center; font-weight:bold;">${team.joinCode || '---'}</span>
-                </div>
-                <button class="btn" style="width:auto; padding:6px 12px; font-size:0.75rem; border-radius:12px; height:fit-content;" onclick="shareInvite({type:'student', code:'${team.joinCode}', teamName:'${team.name.replace(/'/g, "\\'")}'})">
-                    <i class="fa-solid fa-share-nodes"></i> Condividi
-                </button>
-            </div>`;
-
-        // Sezione Azioni (Modifica / Collaboratori / Elimina)
-        const azioniSection = `
-            <div style="display:flex; flex-wrap:wrap; gap:8px; width:100%; margin-top:4px; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px;">
-                <button class="btn btn-secondary" style="flex:1; min-width:80px; padding:5px 8px; font-size:0.72rem; border-radius:8px; background:rgba(255,255,255,0.03);" 
-                    onclick="docenteModificaSquadra('${team.id}', '${team.name.replace(/'/g, "\\'")}', '${(team.classe || '').replace(/'/g, "\\'")}')">
-                    <i class="fa-solid fa-pen-to-square"></i> Modifica
-                </button>
-                <button class="btn btn-secondary" style="flex:1.2; min-width:110px; padding:5px 8px; font-size:0.72rem; border-radius:8px; background:rgba(141,160,63,0.15); border-color:var(--primary-color);"
-                    onclick="window.apriCollaboratori('${team.id}', '${team.name.replace(/'/g, "\\'")}')">
-                    <i class="fa-solid fa-user-plus"></i> Collaboratori
-                </button>
-                <button class="btn btn-danger" style="flex:1; min-width:80px; padding:5px 8px; font-size:0.72rem; border-radius:8px; background:rgba(230, 57, 70, 0.1); border:1px solid rgba(230, 57, 70, 0.2); color:#e63946;" 
-                    onclick="docenteEliminaSquadra('${team.id}', '${team.name.replace(/'/g, "\\'")}')">
-                    <i class="fa-solid fa-trash-can"></i> Elimina
-                </button>
-            </div>`;
 
         return `
             <div class="card" style="margin:0; padding:12px; flex-direction:column; align-items:flex-start; gap:8px; width:100%;">
@@ -1927,6 +1963,12 @@ window.profiloSpostaStudente = async function(studentEmail, currentTeamId, curre
     if (isNaN(idx) || idx < 0 || idx >= altre.length) { alert('Scelta non valida.'); return; }
     const dest = altre[idx];
     try {
+        const destMembers = await fanta_db.getStudentsInTeam(dest.id);
+        if (destMembers.length >= 5) {
+            alert(`Impossibile spostare lo studente: "${dest.name}" ha già raggiunto la capienza massima (${destMembers.length}/5).`);
+            return;
+        }
+
         await fanta_db.moveStudent(studentEmail, dest.id, dest.joinCode || '');
         alert(`Studente spostato in "${dest.name}"!`);
         renderProfilo();
