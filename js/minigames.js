@@ -6347,6 +6347,2129 @@
                 }
           ]
     },
+    'emile-zola': {
+          "topic": "Émile Zola",
+          "impiccato": [
+                {
+                      "word": "GERMINAL",
+                      "hint": "Il drammatico romanzo sullo sciopero dei minatori"
+                },
+                {
+                      "word": "NATURALISMO",
+                      "hint": "La corrente letteraria francese del romanzo sperimentale"
+                },
+                {
+                      "word": "JACCUSE",
+                      "hint": "La celebre lettera aperta in difesa del capitano Dreyfus"
+                },
+                {
+                      "word": "NANA",
+                      "hint": "Il romanzo sulla cortigiana simbolo della decadenza parigina"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "La",
+                            "verità",
+                            "è",
+                            "in",
+                            "marcia",
+                            "e",
+                            "nulla",
+                            "la",
+                            "fermerà"
+                      ],
+                      "solution": "La verità è in marcia e nulla la fermerà",
+                      "source": "J'accuse"
+                },
+                {
+                      "words": [
+                            "Germinal",
+                            "racconta",
+                            "la",
+                            "lotta",
+                            "disperata",
+                            "dei",
+                            "minatori",
+                            "del",
+                            "carbone"
+                      ],
+                      "solution": "Germinal racconta la lotta disperata dei minatori del carbone",
+                      "source": "Germinal"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Émile Zola pubblica su L'Aurore il famoso articolo 'J' ___ !' denunciando l'ingiusta condanna per antisemitismo del capitano Alfred Dreyfus.",
+                      "blanks": [
+                            "accuse"
+                      ],
+                      "source": "J'accuse (1898)"
+                },
+                {
+                      "text": "Il ciclo dei Rougon-Macquart è composto da venti romanzi che applicano il metodo ___ alla società francese.",
+                      "blanks": [
+                            "scientifico"
+                      ],
+                      "source": "Il romanzo sperimentale"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "J'accuse (Lettera al Presidente della Repubblica)",
+                      "lines": [
+                            "Io accuso il generale Billot d'aver avuto fra le mani",
+                            "le prove certe dell'innocenza di Dreyfus e d'averle soffocate.",
+                            "Io non ho che una passione, quella della luce,",
+                            "in nome dell'umanità che ha tanto sofferto e che ha diritto alla felicità."
+                      ],
+                      "hint": "Il celebre atto di coraggio civile e giornalistico che ha segnato la storia europea."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Quale celebre articolo giornalistico Zola scrisse in difesa del capitano ebreo Alfred Dreyfus?",
+                      "o": [
+                            "J'accuse...!",
+                            "La Liberté",
+                            "Germinal",
+                            "L'Aurore"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "A quale corrente letteraria francese dell'Ottocento appartiene Émile Zola?",
+                      "o": [
+                            "Naturalismo",
+                            "Simbolismo",
+                            "Surrealismo",
+                            "Illuminismo"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Come si intitola il celebre romanzo di Zola ambientato nelle miniere di carbone di Montsou?",
+                      "o": [
+                            "Germinal",
+                            "L'Assommoir",
+                            "Nanà",
+                            "La bestia umana"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "In quale romanzo Zola descrive la piaga dell'alcolismo tra gli operai parigini attraverso la storia di Gervaise?",
+                      "o": [
+                            "L'Assommoir (L'ammazzatoio)",
+                            "Germinal",
+                            "Thérèse Raquin",
+                            "La terra"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Cosa intendeva Zola per 'romanzo sperimentale'?",
+                      "o": [
+                            "Un romanzo scritto a quattro mani",
+                            "Un romanzo che studia i comportamenti umani con il rigore di un esperimento scientifico e medico",
+                            "Un romanzo di sole poesie",
+                            "Un'opera teatrale"
+                      ],
+                      "a": 1
+                }
+          ]
+    },
+    'james-joyce': {
+          "topic": "James Joyce",
+          "impiccato": [
+                {
+                      "word": "ULISSE",
+                      "hint": "Il capolavoro ambientato il 16 giugno 1904 a Dublino"
+                },
+                {
+                      "word": "DUBLINO",
+                      "hint": "La città natale sfondo di tutte le sue opere"
+                },
+                {
+                      "word": "BLOOM",
+                      "hint": "Leopold... il moderno Ulisse che vaga per la città"
+                },
+                {
+                      "word": "EPIFANIA",
+                      "hint": "L'improvvisa illuminazione spirituale rivelata da un dettaglio"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "I",
+                            "morti",
+                            "cadono",
+                            "dolcemente",
+                            "su",
+                            "tutta",
+                            "l'Irlanda"
+                      ],
+                      "solution": "I morti cadono dolcemente su tutta l'Irlanda",
+                      "source": "Gente di Dublino (I Morti)"
+                },
+                {
+                      "words": [
+                            "Sì",
+                            "ho",
+                            "detto",
+                            "sì",
+                            "voglio",
+                            "Sì"
+                      ],
+                      "solution": "Sì ho detto sì voglio Sì",
+                      "source": "Ulisse (Monologo di Molly Bloom)"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Il 16 giugno 1904 è il giorno in cui si svolgono tutte le vicende del romanzo Ulisse a Dublino, celebrato ogni anno come ___ Day.",
+                      "blanks": [
+                            "Bloomsday"
+                      ],
+                      "source": "Ulisse"
+                },
+                {
+                      "text": "La raccolta Gente di Dublino contiene quindici racconti che culminano con il celebre capolavoro intitolato I ___ .",
+                      "blanks": [
+                            "Morti"
+                      ],
+                      "source": "Gente di Dublino"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "I Morti (The Dead - Finale)",
+                      "lines": [
+                            "La neve cadeva su tutta l'Irlanda.",
+                            "Cadeva languidamente su tutto l'universo,",
+                            "e languidamente scendeva,",
+                            "come la discesa della loro ultima fine, su tutti i vivi e su tutti i morti."
+                      ],
+                      "hint": "Il celeberrimo finale lirico sulla caducità della memoria e dell'esistenza umana."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "In quale città europea visse a lungo Joyce insegnando inglese e stringendo amicizia con Italo Svevo?",
+                      "o": [
+                            "Parigi",
+                            "Trieste",
+                            "Roma",
+                            "Zurigo"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "In quale arco temporale si svolgono le vicende dell' 'Ulisse' di Joyce?",
+                      "o": [
+                            "In una sola giornata (il 16 giugno 1904)",
+                            "In dieci anni",
+                            "In un mese",
+                            "In un secolo"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Qual è il titolo del lungo monologo interiore senza punteggiatura che chiude l'Ulisse?",
+                      "o": [
+                            "Il monologo di Molly Bloom",
+                            "Il discorso di Dedalus",
+                            "La veglia di Finnegan",
+                            "Il canto di Dublino"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Come definisce Joyce il momento in cui un oggetto comune rivela all'improvviso il senso segreto della vita?",
+                      "o": [
+                            "Epifania",
+                            "Catarsi",
+                            "Metamorfosi",
+                            "Dejà-vu"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Qual è il titolo della prima opera autobiografica che segue la crescita del giovane Stephen Dedalus?",
+                      "o": [
+                            "Ritratto dell'artista da giovane (Dedalus)",
+                            "Gente di Dublino",
+                            "Musica da camera",
+                            "Finnegans Wake"
+                      ],
+                      "a": 0
+                }
+          ]
+    },
+    'mark-twain': {
+          "topic": "Mark Twain",
+          "impiccato": [
+                {
+                      "word": "SAWYER",
+                      "hint": "Le avventure di Tom... e dell'amico Huckleberry Finn"
+                },
+                {
+                      "word": "HUCKLEBERRY",
+                      "hint": "... Finn, il ragazzo libero in fuga sul fiume"
+                },
+                {
+                      "word": "MISSISSIPPI",
+                      "hint": "Il grande fiume americano arteria dei battelli a vapore"
+                },
+                {
+                      "word": "PILOTA",
+                      "hint": "La sua professione sui battelli da cui trasse lo pseudonimo"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Il",
+                            "segreto",
+                            "per",
+                            "andare",
+                            "avanti",
+                            "è",
+                            "iniziare"
+                      ],
+                      "solution": "Il segreto per andare avanti è iniziare",
+                      "source": "Aforismi"
+                },
+                {
+                      "words": [
+                            "Un",
+                            "classico",
+                            "è",
+                            "qualcosa",
+                            "che",
+                            "tutti",
+                            "vorrebbero",
+                            "aver",
+                            "letto",
+                            "ma",
+                            "nessuno",
+                            "vuole",
+                            "leggere"
+                      ],
+                      "solution": "Un classico è qualcosa che tutti vorrebbero aver letto ma nessuno vuole leggere",
+                      "source": "Aforismi"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Tom Sawyer e l'amico Huckleberry Finn navigano su una zattera lungo il fiume ___ in cerca di libertà.",
+                      "blanks": [
+                            "Mississippi"
+                      ],
+                      "source": "Le avventure di Huckleberry Finn"
+                },
+                {
+                      "text": "Il principe e il ___ è il celebre romanzo sullo scambio d'identità tra il principino Edoardo e il piccolo povero Tom Canty.",
+                      "blanks": [
+                            "povero"
+                      ],
+                      "source": "Il principe e il povero"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Le avventure di Huckleberry Finn (La libertà sul fiume)",
+                      "lines": [
+                            "Non c'è niente di meglio di una zattera,",
+                            "altrove ci si sente tutti stretti e soffocati,",
+                            "ma su una zattera non è così. Sei libero,",
+                            "e tranquillo e comodo sopra l'acqua del grande fiume."
+                      ],
+                      "hint": "La celebrazione della natura e della libertà contro le costrizioni della società civile."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Qual era il vero nome all'anagrafe di Mark Twain?",
+                      "o": [
+                            "Samuel Langhorne Clemens",
+                            "Francis Scott Fitzgerald",
+                            "Jack London",
+                            "Herman Melville"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Cosa significava l'espressione fluviale 'Mark Twain' usata dai battellieri del Mississippi?",
+                      "o": [
+                            "Due braccia di profondità (acque sicure per navigare)",
+                            "Tempesta in arrivo",
+                            "Fiume in secca",
+                            "Piena del fiume"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Chi è lo schiavo fuggitivo che accompagna Huck Finn nel suo viaggio sulla zattera verso la libertà?",
+                      "o": [
+                            "Jim",
+                            "Tom",
+                            "Joe",
+                            "Ben"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "In quale romanzo un contemporaneo americano si risveglia alla corte medievale di Re Artù?",
+                      "o": [
+                            "Un americano alla corte di Re Artù",
+                            "Il principe e il povero",
+                            "Vita sul Mississippi",
+                            "I pionieri"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Come convince Tom Sawyer gli amici a dipingere la staccionata al posto suo?",
+                      "o": [
+                            "Facendo finta che sia un grandissimo e raro privilegio divertente",
+                            "Pagandoli",
+                            "Minacciandoli",
+                            "Con una sfida a carte"
+                      ],
+                      "a": 0
+                }
+          ]
+    },
+    'anton-cechov': {
+          "topic": "Anton Čechov",
+          "impiccato": [
+                {
+                      "word": "CILIEGI",
+                      "hint": "Il giardino dei... commedia sul tramonto della nobiltà"
+                },
+                {
+                      "word": "VANJA",
+                      "hint": "Zio... il dramma della vita sprecata e del rimpianto"
+                },
+                {
+                      "word": "GABBIANO",
+                      "hint": "Il... celebre dramma teatrale a San Pietroburgo"
+                },
+                {
+                      "word": "MEDICO",
+                      "hint": "La sua professione: 'La medicina è la mia moglie legittima, la letteratura l'amante'"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "La",
+                            "brevità",
+                            "è",
+                            "sorella",
+                            "del",
+                            "talento"
+                      ],
+                      "solution": "La brevità è sorella del talento",
+                      "source": "Lettere e aforismi"
+                },
+                {
+                      "words": [
+                            "Bisogna",
+                            "lavorare",
+                            "e",
+                            "sopportare",
+                            "con",
+                            "pazienza",
+                            "le",
+                            "nostre",
+                            "pene"
+                      ],
+                      "solution": "Bisogna lavorare e sopportare con pazienza le nostre pene",
+                      "source": "Zio Vanja"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Nel dramma Il giardino dei ciliegi, la nobildonna Ranevskaja perde la proprietà che viene acquistata all'asta dal mercante ___ .",
+                      "blanks": [
+                            "Lopachin"
+                      ],
+                      "source": "Il giardino dei ciliegi"
+                },
+                {
+                      "text": "Le tre sorelle Olga, Maša e Irina sognano per tutta la vita di abbandonare la noiosa provincia per trasferirsi a ___ .",
+                      "blanks": [
+                            "Mosca"
+                      ],
+                      "source": "Tre sorelle"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Zio Vanja (Monologo finale di Sonja)",
+                      "lines": [
+                            "Che possiamo farci? Bisogna vivere!",
+                            "Noi vivremo, caro zio Vanja. Vivremo una lunga fila di giorni.",
+                            "Sopporteremo pazientemente le prove che ci manderà il destino;",
+                            "e quando verrà la nostra ora, moriremo senza lamento e riposeremo."
+                      ],
+                      "hint": "Il toccante finale sulla rassegnazione e la dignità del lavoro umile quotidiano."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Quale celebre regola teatrale attribuita a Čechov riguarda la presenza di una pistola in scena?",
+                      "o": [
+                            "Se nel primo atto c'è una pistola appesa al muro, nel terzo atto deve sparare",
+                            "Non bisogna mai mostrare armi",
+                            "La pistola serve solo per far rumore",
+                            "Le armi sono vietate a teatro"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale professione scientifica esercitò per tutta la vita Anton Čechov aiutando gratuitamente i contadini poveri?",
+                      "o": [
+                            "Medico",
+                            "Avvocato",
+                            "Ingegnere",
+                            "Chimico"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale commedia racconta la vendita all'asta di una magnifica tenuta nobiliare per pagare i debiti?",
+                      "o": [
+                            "Il giardino dei ciliegi",
+                            "Zio Vanja",
+                            "Tre sorelle",
+                            "Il gabbiano"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Qual è la meta desiderata e mai raggiunta dalle protagoniste del dramma 'Tre sorelle'?",
+                      "o": [
+                            "A Mosca!",
+                            "A Parigi!",
+                            "A Roma!",
+                            "A Londra!"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "A quale isola penitenziaria remota della Siberia Čechov compì un viaggio d'inchiesta nel 1890 descrivendo le condizioni dei detenuti?",
+                      "o": [
+                            "Isola di Sachalin",
+                            "Kamčatka",
+                            "Crimea",
+                            "Caucaso"
+                      ],
+                      "a": 0
+                }
+          ]
+    },
+    'henrik-ibsen': {
+          "topic": "Henrik Ibsen",
+          "impiccato": [
+                {
+                      "word": "BAMBOLA",
+                      "hint": "Casa di... il dramma della ribellione di Nora"
+                },
+                {
+                      "word": "NORA",
+                      "hint": "La protagonista che sbatte la porta per cercare la propria dignità"
+                },
+                {
+                      "word": "SPETTRI",
+                      "hint": "Il dramma sulle ipocrisie e i segreti familiari"
+                },
+                {
+                      "word": "NORVEGIA",
+                      "hint": "La patria del padre della drammaturgia moderna"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Prima",
+                            "di",
+                            "essere",
+                            "moglie",
+                            "e",
+                            "madre",
+                            "sono",
+                            "un",
+                            "essere",
+                            "umano"
+                      ],
+                      "solution": "Prima di essere moglie e madre sono un essere umano",
+                      "source": "Casa di bambola (Nora)"
+                },
+                {
+                      "words": [
+                            "L'uomo",
+                            "più",
+                            "forte",
+                            "al",
+                            "mondo",
+                            "è",
+                            "quello",
+                            "che",
+                            "è",
+                            "più",
+                            "solo"
+                      ],
+                      "solution": "L'uomo più forte al mondo è quello che è più solo",
+                      "source": "Un nemico del popolo"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "In Casa di bambola, Nora decide di lasciare il marito Torvald Helmer capendo di essere stata trattata per anni solo come una ___ .",
+                      "blanks": [
+                            "bambola"
+                      ],
+                      "source": "Casa di bambola"
+                },
+                {
+                      "text": "Nel dramma Un nemico del popolo, il dottor Stockmann scopre che le acque delle terme cittadine sono ___ ma nessuno vuole ascoltarlo.",
+                      "blanks": [
+                            "inquinate"
+                      ],
+                      "source": "Un nemico del popolo"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Casa di bambola (Atto III - L'addio di Nora)",
+                      "lines": [
+                            "«Devo badare a me stessa.",
+                            "Devo cercare di diventare un essere umano anch'io,",
+                            "o perlomeno devo tentare di diventarlo.",
+                            "Credo che prima di tutto io sia un essere umano, al pari di te.»"
+                      ],
+                      "hint": "Il dialogo rivoluzionario che segna la nascita della coscienza moderna e dei diritti delle donne a teatro (1879)."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Qual è il gesto finale rivoluzionario di Nora che chiude 'Casa di bambola'?",
+                      "o": [
+                            "Sbatte la porta di casa andandosene via per sempre",
+                            "Abbraccia il marito",
+                            "Si addormenta",
+                            "Scrive una poesia"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "In quale Paese scandinavo è nato Henrik Ibsen?",
+                      "o": [
+                            "Norvegia (Skien)",
+                            "Svezia",
+                            "Danimarca",
+                            "Finlandia"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale dramma in versi racconta le avventure del sognatore e bugiardo Peer Gynt sulle musiche di Edvard Grieg?",
+                      "o": [
+                            "Peer Gynt",
+                            "Brand",
+                            "Hedda Gabler",
+                            "Il costruttore Solness"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale tema scottante affronta 'Un nemico del popolo'?",
+                      "o": [
+                            "La corruzione politica ed economica che mette a tacere la verità scientifica sulla salute pubblica",
+                            "Una guerra navale",
+                            "La vita monastica",
+                            "Una caccia al tesoro"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Come viene considerato Henrik Ibsen nella storia del teatro mondiale?",
+                      "o": [
+                            "Il padre della drammaturgia moderna e del teatro borghese realistico",
+                            "Un cantastorie medievale",
+                            "Un mimo",
+                            "Un coreografo"
+                      ],
+                      "a": 0
+                }
+          ]
+    },
+    'rainer-maria-rilke': {
+          "topic": "Rainer Maria Rilke",
+          "impiccato": [
+                {
+                      "word": "DUINO",
+                      "hint": "Le Elegie di... composte nel castello sul golfo di Trieste"
+                },
+                {
+                      "word": "ANGELO",
+                      "hint": "La figura terribile e sublime delle Elegie"
+                },
+                {
+                      "word": "PANTERA",
+                      "hint": "La celebre poesia della fiera chiusa dietro le sbarre a Parigi"
+                },
+                {
+                      "word": "ORFEO",
+                      "hint": "I Sonetti a... dedicati al dio della poesia e della musica"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Ogni",
+                            "angelo",
+                            "è",
+                            "terribile"
+                      ],
+                      "solution": "Ogni angelo è terribile",
+                      "source": "Elegie duinesi (Elegia I)"
+                },
+                {
+                      "words": [
+                            "La",
+                            "bellezza",
+                            "è",
+                            "solo",
+                            "l'inizio",
+                            "del",
+                            "terrore",
+                            "che",
+                            "possiamo",
+                            "sopportare"
+                      ],
+                      "solution": "La bellezza è solo l'inizio del terrore che possiamo sopportare",
+                      "source": "Elegie duinesi"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Chi, se io gridassi, mi udrebbe dalle schiere degli ___ ? E se anche uno mi stringesse al cuore, morirei per la sua soverchia presenza.",
+                      "blanks": [
+                            "angeli"
+                      ],
+                      "source": "Elegie duinesi"
+                },
+                {
+                      "text": "Nelle Lettere a un giovane ___ , Rilke consiglia di guardare dentro di sé per capire se la scrittura sia necessaria quanto respirare.",
+                      "blanks": [
+                            "poeta"
+                      ],
+                      "source": "Lettere a un giovane poeta"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "La Pantera (Jardin des Plantes - Parigi)",
+                      "lines": [
+                            "Il suo sguardo dal passare delle sbarre",
+                            "è così stanco che più nulla trattiene.",
+                            "Gli sembra che vi siano mille sbarre",
+                            "e dietro mille sbarre nessun mondo."
+                      ],
+                      "hint": "I versi celeberrimi sull'animale prigioniero e il senso di vuoto dell'anima."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "In quale suggestivo castello a picco sul mare vicino a Trieste Rilke iniziò a comporre le sue famose 'Elegie'?",
+                      "o": [
+                            "Castello di Duino",
+                            "Castello di Miramare",
+                            "Castello di San Giusto",
+                            "Castel Sant'Angelo"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Qual è il titolo del celebre saggio epistolare contenente consigli preziosi per chi desidera scrivere?",
+                      "o": [
+                            "Lettere a un giovane poeta",
+                            "Diario fiorentino",
+                            "Il libro d'ore",
+                            "Canti d'amore"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale sommo scultore francese fu ammirato da Rilke, che gli fece da segretario a Parigi?",
+                      "o": [
+                            "Auguste Rodin",
+                            "Camille Claudel",
+                            "Canova",
+                            "Bernini"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "In quale città della Boemia nacque Rainer Maria Rilke nel 1875?",
+                      "o": [
+                            "Praga",
+                            "Vienna",
+                            "Monaco",
+                            "Salisburgo"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "A quale mitico cantore greco sono intitolati i 55 sonetti composti nel 1922?",
+                      "o": [
+                            "Orfeo (Sonetti a Orfeo)",
+                            "Ulisse",
+                            "Achille",
+                            "Apollo"
+                      ],
+                      "a": 0
+                }
+          ]
+    },
+    'hermann-hesse': {
+          "topic": "Hermann Hesse",
+          "impiccato": [
+                {
+                      "word": "SIDDHARTHA",
+                      "hint": "Il romanzo del viaggio spirituale in India verso l'illuminazione"
+                },
+                {
+                      "word": "STEPPA",
+                      "hint": "Il lupo della... la crisi esistenziale di Harry Haller"
+                },
+                {
+                      "word": "BOCCADORO",
+                      "hint": "Narciso e... l'amicizia tra lo spirito e l'arte"
+                },
+                {
+                      "word": "NOBEL",
+                      "hint": "Premio per la letteratura vinto nel 1946"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "La",
+                            "saggezza",
+                            "non",
+                            "si",
+                            "può",
+                            "trasmettere",
+                            "si",
+                            "può",
+                            "soltanto",
+                            "vivere"
+                      ],
+                      "solution": "La saggezza non si può trasmettere si può soltanto vivere",
+                      "source": "Siddhartha"
+                },
+                {
+                      "words": [
+                            "Volevo",
+                            "soltanto",
+                            "vivere",
+                            "secondo",
+                            "i",
+                            "miei",
+                            "impulsi",
+                            "autentici"
+                      ],
+                      "solution": "Volevo soltanto vivere secondo i miei impulsi autentici",
+                      "source": "Demian"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Siddhartha impara il segreto della saggezza e dell'armonia ascoltando la voce del ___ insieme al barcaiolo Vasudeva.",
+                      "blanks": [
+                            "fiume"
+                      ],
+                      "source": "Siddhartha"
+                },
+                {
+                      "text": "Nel romanzo Narciso e Boccadoro, Narciso sceglie la vita monastica e contemplativa mentre Boccadoro sceglie il viaggio e l' ___ .",
+                      "blanks": [
+                            "arte"
+                      ],
+                      "source": "Narciso e Boccadoro"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Siddhartha (Il canto del Fiume)",
+                      "lines": [
+                            "Ascoltava estatico il canto dell'acqua.",
+                            "Il fiume cantava con molte voci, mille voci intrecciate insieme,",
+                            "e quando non distingueva più le singole voci, il dolore dal piacere,",
+                            "tutte le voci insieme formavano una sola parola: l'Om, la perfezione."
+                      ],
+                      "hint": "Il momento culminante dell'illuminazione spirituale e dell'unione con il cosmo."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "In quale Paese asiatico è ambientata la ricerca spirituale del giovane 'Siddhartha'?",
+                      "o": [
+                            "In India",
+                            "In Giappone",
+                            "In Cina",
+                            "In Egitto"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "In quale anno Hermann Hesse ricevette il Premio Nobel per la Letteratura?",
+                      "o": [
+                            "1946",
+                            "1950",
+                            "1930",
+                            "1960"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Qual è l'animale simbolico associato alla solitudine selvaggia del protagonista Harry Haller?",
+                      "o": [
+                            "Il lupo (Il lupo della steppa)",
+                            "L'aquila",
+                            "Il leone",
+                            "L'orso"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale capolavoro monumentale descrive l'ordine dei monaci-studiosi di Castalia e il gioco simbolico delle conoscenze?",
+                      "o": [
+                            "Il giuoco delle perle di vetro",
+                            "Demian",
+                            "Peter Camenzind",
+                            "Sotto la ruota"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "In quale cantone della Svizzera italiana (a Montagnola) Hesse visse per oltre quarant'anni fino alla morte?",
+                      "o": [
+                            "Canton Ticino",
+                            "Ginevra",
+                            "Zurigo",
+                            "Berna"
+                      ],
+                      "a": 0
+                }
+          ]
+    },
+    'sigmund-freud': {
+          "topic": "Sigmund Freud",
+          "impiccato": [
+                {
+                      "word": "INCONSCIO",
+                      "hint": "La parte sommersa e nascosta della nostra psiche"
+                },
+                {
+                      "word": "SOGNI",
+                      "hint": "L'interpretazione dei... (1899), la via regia per l'inconscio"
+                },
+                {
+                      "word": "PSICOANALISI",
+                      "hint": "La scienza rivoluzionaria della mente fondata a Vienna"
+                },
+                {
+                      "word": "EDIPO",
+                      "hint": "Il complesso psicologico teorizzato sulla tragedia greca"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "L'Io",
+                            "non",
+                            "è",
+                            "padrone",
+                            "in",
+                            "casa",
+                            "propria"
+                      ],
+                      "solution": "L'Io non è padrone in casa propria",
+                      "source": "Introduzione alla psicoanalisi"
+                },
+                {
+                      "words": [
+                            "L'interpretazione",
+                            "dei",
+                            "sogni",
+                            "è",
+                            "la",
+                            "via",
+                            "regia",
+                            "per",
+                            "l'inconscio"
+                      ],
+                      "solution": "L'interpretazione dei sogni è la via regia per l'inconscio",
+                      "source": "L'interpretazione dei sogni"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Secondo Freud, la psiche è composta da tre istanze fondamentali: l'Es (istinti), l'Io (coscienza) e il ___ (morale e divieti).",
+                      "blanks": [
+                            "Super-io"
+                      ],
+                      "source": "L'Io e l'Es"
+                },
+                {
+                      "text": "Il lapsus ___ è un atto mancato involontario che rivela un pensiero o desiderio nascosto dell'inconscio.",
+                      "blanks": [
+                            "freudiano"
+                      ],
+                      "source": "Psicopatologia della vita quotidiana"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "L'interpretazione dei sogni (Epigrafe)",
+                      "lines": [
+                            "Flectere si nequeo superos,",
+                            "Acheronta movebo.",
+                            "Se non posso piegare gli dèi del cielo,",
+                            "smuoverò le forze dell'Acheronte e dell'Inconscio."
+                      ],
+                      "hint": "La citazione virgiliana scelta da Freud per inaugurare l'esplorazione degli abissi della mente."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Qual è l'opera fondamentale pubblicata nel 1899 considerata la nascita ufficiale della Psicoanalisi?",
+                      "o": [
+                            "L'interpretazione dei sogni",
+                            "Totem e tabù",
+                            "Il disagio della civiltà",
+                            "L'Io e l'Es"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "In quale capitale europea visse e operò Sigmund Freud prima di fuggire a Londra nel 1938 per le leggi razziali?",
+                      "o": [
+                            "Vienna",
+                            "Berlino",
+                            "Parigi",
+                            "Praga"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Come definisce Freud la famosa metafora della mente umana paragonata al mare?",
+                      "o": [
+                            "La metafora dell'iceberg (la parte cosciente emersa è minima rispetto all'inconscio sommerso)",
+                            "La metafora del vulcano",
+                            "La nave nella tempesta",
+                            "L'orologio"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale celebre 'complesso' infantile prende il nome dal re tragico greco che sposò la madre Giocasta?",
+                      "o": [
+                            "Complesso di Edipo",
+                            "Complesso di Narciso",
+                            "Complesso di Elettra",
+                            "Complesso di Telemaco"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Cosa sono i 'lapsus' e gli 'atti mancati' nella vita di tutti i giorni?",
+                      "o": [
+                            "Errori casuali privi di senso",
+                            "Segnali spontanei attraverso cui l'inconscio rivela desideri o timori rimossi",
+                            "Semplice stanchezza",
+                            "Difetti di pronuncia"
+                      ],
+                      "a": 1
+                }
+          ]
+    },
+    'johann-wolfgang-goethe': {
+          "topic": "Johann Wolfgang von Goethe",
+          "impiccato": [
+                {
+                      "word": "FAUST",
+                      "hint": "Il dramma dello scienziato che stringe un patto con Mefistofele"
+                },
+                {
+                      "word": "WERTHER",
+                      "hint": "I dolori del giovane... capolavoro del Romanticismo"
+                },
+                {
+                      "word": "MEFISTOFELE",
+                      "hint": "Il diavolo tentatore che promette l'eterna conoscenza"
+                },
+                {
+                      "word": "WEIMAR",
+                      "hint": "La corte ducale dove fu ministro e consigliere"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Fermati",
+                            "attimo",
+                            "sei",
+                            "così",
+                            "bello"
+                      ],
+                      "solution": "Fermati attimo sei così bello",
+                      "source": "Faust"
+                },
+                {
+                      "words": [
+                            "Conosci",
+                            "tu",
+                            "il",
+                            "paese",
+                            "dove",
+                            "fioriscono",
+                            "i",
+                            "limoni"
+                      ],
+                      "solution": "Conosci tu il paese dove fioriscono i limoni",
+                      "source": "Viaggio in Italia (Mignon)"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Il dottor Faust vende la propria anima al diavolo ___ in cambio della giovinezza, dell'amore di Margherita e della conoscenza assoluta.",
+                      "blanks": [
+                            "Mefistofele"
+                      ],
+                      "source": "Faust"
+                },
+                {
+                      "text": "Il giovane Werther si innamora perdutamente della bella ___ , che è però già promessa sposa ad Albert.",
+                      "blanks": [
+                            "Lotte"
+                      ],
+                      "source": "I dolori del giovane Werther"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Faust (Il patto con Mefistofele)",
+                      "lines": [
+                            "Se mai dirò all'attimo:",
+                            "«Fermati, sei così bello!»",
+                            "allora tu potrai gettarmi in catene,",
+                            "allora accetterò di perire per sempre!"
+                      ],
+                      "hint": "La celebre scommessa di Faust sulla continua ricerca e l'insoddisfazione umana."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Quale grandioso poema drammatico in due parti racconta la vicenda del sapiente Faust e del diavolo Mefistofele?",
+                      "o": [
+                            "Faust",
+                            "I dolori del giovane Werther",
+                            "Torquato Tasso",
+                            "Elegie romane"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale romanzo epistolare giovanile del 1774 scatenò una vera e propria moda e passione in tutta Europa?",
+                      "o": [
+                            "I dolori del giovane Werther",
+                            "Le affinità elettive",
+                            "Gli anni di apprendistato di Wilhelm Meister",
+                            "Reineke la volpe"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "In quale celebre diario di viaggio Goethe descrive con entusiasmo l'arte, il paesaggio e la luce della penisola italiana?",
+                      "o": [
+                            "Viaggio in Italia (Italienische Reise)",
+                            "Lettere da Roma",
+                            "Canti d'Italia",
+                            "Memorie di viaggio"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale movimento letterario e culturale preromantico tedesco 'Tempesta e Impeto' ebbe Goethe tra i suoi capifila?",
+                      "o": [
+                            "Sturm und Drang",
+                            "Aufklärung",
+                            "Biedermeier",
+                            "Espressionismo"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "In quale città della Turingia Goethe visse per oltre cinquant'anni fino alla morte nel 1832?",
+                      "o": [
+                            "Weimar",
+                            "Francoforte",
+                            "Berlino",
+                            "Lipsia"
+                      ],
+                      "a": 0
+                }
+          ]
+    },
+    'albert-camus': {
+          "topic": "Albert Camus",
+          "impiccato": [
+                {
+                      "word": "STRANIERO",
+                      "hint": "Lo... con il protagonista indifferente Meursault"
+                },
+                {
+                      "word": "PESTE",
+                      "hint": "La... romanzo allegorico sulla resistenza al male nella città di Orano"
+                },
+                {
+                      "word": "SISIFO",
+                      "hint": "Il mito di... e la filosofia dell'assurdo"
+                },
+                {
+                      "word": "ALGERIA",
+                      "hint": "La terra natale solare e aspra dove nacque lo scrittore"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Bisogna",
+                            "immaginare",
+                            "Sisifo",
+                            "felice"
+                      ],
+                      "solution": "Bisogna immaginare Sisifo felice",
+                      "source": "Il mito di Sisifo"
+                },
+                {
+                      "words": [
+                            "Oggi",
+                            "la",
+                            "mamma",
+                            "è",
+                            "morta",
+                            "o",
+                            "forse",
+                            "ieri",
+                            "non",
+                            "so"
+                      ],
+                      "solution": "Oggi la mamma è morta o forse ieri non so",
+                      "source": "Lo Straniero (Incipit)"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Nel romanzo La Peste, il dottor Bernard ___ cura instancabilmente i malati nella città algerina di Orano colpita dall'epidemia.",
+                      "blanks": [
+                            "Rieux"
+                      ],
+                      "source": "La Peste"
+                },
+                {
+                      "text": "Meursault spara a un arabo sulla spiaggia accecato dal sole cocente nel romanzo Lo ___ .",
+                      "blanks": [
+                            "Straniero"
+                      ],
+                      "source": "Lo Straniero"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Il mito di Sisifo (Finale)",
+                      "lines": [
+                            "Lascio Sisifo ai piedi della montagna.",
+                            "Si ritrova sempre il proprio fardello.",
+                            "Anche la lotta verso la cima basta a riempire il cuore di un uomo.",
+                            "Bisogna immaginare Sisifo felice."
+                      ],
+                      "hint": "La risposta esistenzialista all'assurdo: dare senso alla vita attraverso la rivolta e la dignità."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Quale famoso incipit introduce l'indifferenza del protagonista de 'Lo Straniero'?",
+                      "o": [
+                            "Oggi la mamma è morta. O forse ieri, non so.",
+                            "Chiamatemi Ismaele",
+                            "Nel mezzo del cammin",
+                            "C'era una volta un re"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "In quale città algerina è ambientata la quarantena e la lotta contro l'epidemia ne 'La Peste'?",
+                      "o": [
+                            "Orano",
+                            "Algeri",
+                            "Costantina",
+                            "Tunisi"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "In quale anno Albert Camus ricevette il Premio Nobel per la Letteratura a soli 44 anni?",
+                      "o": [
+                            "1957",
+                            "1945",
+                            "1968",
+                            "1938"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale figura mitologica condannata a spingere in eterno un macigno sulla cima della montagna simboleggia la condizione umana?",
+                      "o": [
+                            "Sisifo",
+                            "Prometeo",
+                            "Tantalo",
+                            "Icaro"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale saggio politico del 1951 riflette sulla rivoluzione e sul rifiuto della tirannia totalitaria?",
+                      "o": [
+                            "L'uomo in rivolta",
+                            "Il mito di Sisifo",
+                            "Riflessioni sulla ghigliottina",
+                            "L'estate"
+                      ],
+                      "a": 0
+                }
+          ]
+    },
+    'jk-rowling': {
+          "topic": "J.K. Rowling",
+          "impiccato": [
+                {
+                      "word": "POTTER",
+                      "hint": "Harry... il maghetto con la cicatrice a forma di saetta"
+                },
+                {
+                      "word": "HOGWARTS",
+                      "hint": "La celebre scuola di magia e stregoneria"
+                },
+                {
+                      "word": "GRIFONDORO",
+                      "hint": "La casa dei coraggiosi guidata dalla professoressa McGranitt"
+                },
+                {
+                      "word": "VOLDEMORT",
+                      "hint": "Il Signore Oscuro 'Colui-Che-Non-Deve-Essere-Nominato'"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Non",
+                            "esiste",
+                            "bene",
+                            "e",
+                            "male",
+                            "esiste",
+                            "solo",
+                            "il",
+                            "potere"
+                      ],
+                      "solution": "Non esiste bene e male esiste solo il potere",
+                      "source": "Harry Potter e la pietra filosofale"
+                },
+                {
+                      "words": [
+                            "Sono",
+                            "le",
+                            "nostre",
+                            "scelte",
+                            "che",
+                            "dimostrano",
+                            "chi",
+                            "siamo",
+                            "davvero"
+                      ],
+                      "solution": "Sono le nostre scelte che dimostrano chi siamo davvero",
+                      "source": "Harry Potter e la camera dei segreti (Silente)"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Harry Potter scopre all'età di undici anni di essere un mago grazie al guardiacaccia Rubeus ___ .",
+                      "blanks": [
+                            "Hagrid"
+                      ],
+                      "source": "La pietra filosofale"
+                },
+                {
+                      "text": "Il preside di Hogwarts Albus ___ guida la resistenza contro Lord Voldemort e i Mangiamorte.",
+                      "blanks": [
+                            "Silente"
+                      ],
+                      "source": "Harry Potter"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Harry Potter e i Doni della Morte (La Storia dei Tre Fratelli)",
+                      "lines": [
+                            "C'erano una volta tre fratelli che viaggiavano lungo una strada deserta.",
+                            "Giunsero a un fiume profondo e la Morte si sentì derubata.",
+                            "Donò loro tre oggetti magici:",
+                            "la Bacchetta di Sambuco, la Pietra della Resurrezione e il Mantello dell'Invisibilità."
+                      ],
+                      "hint": "La celebre favola di Beda il Bardo sui Doni della Morte."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Quanti romanzi compongono l'intera saga letteraria di Harry Potter?",
+                      "o": [
+                            "7 romanzi",
+                            "5",
+                            "8",
+                            "10"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Qual è il nome della stazione londinese da cui parte il treno Espresso per Hogwarts dal Binario 9 ¾?",
+                      "o": [
+                            "King's Cross",
+                            "Paddington",
+                            "Waterloo",
+                            "Victoria"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale sport magico su manici di scopa viene praticato dai maghi con la Pluffa e il Boccino d'Oro?",
+                      "o": [
+                            "Il Quidditch",
+                            "Il Gobbiglie",
+                            "Gli Scacchi dei Maghi",
+                            "Il Volo Libero"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Chi sono i due inseparabili migliori amici di Harry Potter a Hogwarts?",
+                      "o": [
+                            "Ron Weasley e Hermione Granger",
+                            "Draco Malfoy e Neville",
+                            "Fred e George",
+                            "Cedric e Luna"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale creatura alata maestosa metà cavallo e metà aquila Harry impara a cavalcare con Hagrid?",
+                      "o": [
+                            "L'Ippogrifo (Fierobecco)",
+                            "La Fenice (Fanny)",
+                            "Il Dragone Ungaro",
+                            "Il Thestral"
+                      ],
+                      "a": 0
+                }
+          ]
+    },
+    'stephen-king': {
+          "topic": "Stephen King",
+          "impiccato": [
+                {
+                      "word": "SHINING",
+                      "hint": "Il capolavoro dell'Overlook Hotel con Jack Torrance"
+                },
+                {
+                      "word": "PENNYWISE",
+                      "hint": "Il clown mutaforma terrore dei bambini di Derry (IT)"
+                },
+                {
+                      "word": "MISERY",
+                      "hint": "Il romanzo dello scrittore prigioniero dell'infermiera Annie Wilkes"
+                },
+                {
+                      "word": "MAINE",
+                      "hint": "Lo stato americano dove sono ambientate quasi tutte le sue storie"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "I",
+                            "mostri",
+                            "sono",
+                            "reali",
+                            "e",
+                            "vivono",
+                            "dentro",
+                            "di",
+                            "noi"
+                      ],
+                      "solution": "I mostri sono reali e vivono dentro di noi",
+                      "source": "Shining"
+                },
+                {
+                      "words": [
+                            "Galleggiano",
+                            "tutti",
+                            "qui",
+                            "sotto",
+                            "e",
+                            "galleggerai",
+                            "anche",
+                            "tu"
+                      ],
+                      "solution": "Galleggiano tutti qui sotto e galleggerai anche tu",
+                      "source": "IT (Pennywise)"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Nel romanzo IT, il Club dei Perdenti affronta la malefica entità che si manifesta nelle fogne della cittadina di ___ .",
+                      "blanks": [
+                            "Derry"
+                      ],
+                      "source": "IT"
+                },
+                {
+                      "text": "Il piccolo Danny Torrance possiede la 'luccicanza', un potere telepatico speciale, nel romanzo ___ .",
+                      "blanks": [
+                            "Shining"
+                      ],
+                      "source": "Shining"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "IT (L'incontro nella fognatura)",
+                      "lines": [
+                            "La pioggia scrosciava nei tombini della strada deserta.",
+                            "Dall'oscurità della grata spuntavano due occhi gialli e luminosi.",
+                            "«Vuoi un palloncino, Georgie?», chiese il clown con un sorriso.",
+                            "«Galleggiano, Georgie... galleggiano tutti qui sotto!»"
+                      ],
+                      "hint": "La celebre scena iniziale con la barchetta di carta che segna l'inizio del capolavoro horror."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Come viene universalmente soprannominato Stephen King dai suoi milioni di lettori?",
+                      "o": [
+                            "Il Re del Brivido (The King of Horror)",
+                            "Il Maestro del Giallo",
+                            "Il Poeta della Notte",
+                            "Il Mago di Bangor"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Qual è il titolo del suo primo romanzo pubblicato nel 1974 sulla ragazza dotata di poteri telecinetici?",
+                      "o": [
+                            "Carrie",
+                            "Le notti di Salem",
+                            "Shining",
+                            "Cujo"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "In quale isolato albergo di montagna sulle Montagne Rocciose è ambientato 'Shining'?",
+                      "o": [
+                            "Overlook Hotel",
+                            "Bates Motel",
+                            "Grand Hotel",
+                            "Hotel California"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale romanzo narra la prigionia dello scrittore Paul Sheldon sequestrato dalla sua fanatica lettrice numero uno Annie Wilkes?",
+                      "o": [
+                            "Misery",
+                            "Christine",
+                            "L'ombra dello scorpione",
+                            "Pet Sematary"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale celebre racconto carcerario di King ha ispirato il pluripremiato film 'Le ali della libertà'?",
+                      "o": [
+                            "Rita Hayworth e la redenzione di Shawshank",
+                            "Il miglio verde",
+                            "Stand by Me",
+                            "I figli del grano"
+                      ],
+                      "a": 0
+                }
+          ]
+    },
+    'haruki-murakami': {
+          "topic": "Haruki Murakami",
+          "impiccato": [
+                {
+                      "word": "NORWEGIAN",
+                      "hint": "... Wood, il romanzo della nostalgia e della giovinezza"
+                },
+                {
+                      "word": "KAFKA",
+                      "hint": "... sulla spiaggia, con il ragazzo in fuga e i gatti parlanti"
+                },
+                {
+                      "word": "JAZZ",
+                      "hint": "La grande passione musicale che gestì anche come gestore di club a Tokyo"
+                },
+                {
+                      "word": "SURREALE",
+                      "hint": "L'atmosfera sospesa tra realtà e mondi paralleli"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Se",
+                            "leggi",
+                            "solo",
+                            "libri",
+                            "che",
+                            "tutti",
+                            "leggono",
+                            "penserai",
+                            "come",
+                            "tutti"
+                      ],
+                      "solution": "Se leggi solo libri che tutti leggono penserai come tutti",
+                      "source": "Norwegian Wood"
+                },
+                {
+                      "words": [
+                            "Il",
+                            "destino",
+                            "è",
+                            "come",
+                            "una",
+                            "tempesta",
+                            "di",
+                            "sabbia",
+                            "che",
+                            "muta",
+                            "incessantemente"
+                      ],
+                      "solution": "Il destino è come una tempesta di sabbia che muta incessantemente",
+                      "source": "Kafka sulla spiaggia"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Toru Watanabe ricorda gli amori giovanili per Naoko e Midori sulle note della canzone dei Beatles intitolata Norwegian ___ .",
+                      "blanks": [
+                            "Wood"
+                      ],
+                      "source": "Norwegian Wood"
+                },
+                {
+                      "text": "Nel romanzo Kafka sulla spiaggia, il vecchio Nakata ha la straordinaria capacità di parlare con i ___ .",
+                      "blanks": [
+                            "gatti"
+                      ],
+                      "source": "Kafka sulla spiaggia"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Kafka sulla spiaggia (La tempesta)",
+                      "lines": [
+                            "A volte il destino somiglia a una tempesta di sabbia che muta continuamente direzione.",
+                            "E una volta che la tempesta sarà finita,",
+                            "probabilmente non saprai neanche tu come hai fatto ad attraversarla e a uscirne vivo.",
+                            "Ma su un punto non c'è dubbio: sarai una persona diversa."
+                      ],
+                      "hint": "La potente riflessione sulla crescita interiore e le prove della vita."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Quale celebre canzone dei Beatles dà il titolo al romanzo più famoso di Haruki Murakami?",
+                      "o": [
+                            "Norwegian Wood",
+                            "Yesterday",
+                            "Hey Jude",
+                            "Let It Be"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "In quale metropoli giapponese sono ambientati gran parte dei romanzi di Murakami?",
+                      "o": [
+                            "Tokyo",
+                            "Kyoto",
+                            "Osaka",
+                            "Hiroshima"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale sport di resistenza Murakami pratica costantemente e ha raccontato nel libro 'L'arte di correre'?",
+                      "o": [
+                            "La maratona e il mezzofondo",
+                            "Il nuoto",
+                            "Il ciclismo",
+                            "Il karate"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale monumentale trilogia ambientata in un 1984 parallelo con due lune in cielo è stata pubblicata nel 2009?",
+                      "o": [
+                            "1Q84",
+                            "L'assassinio del commendatore",
+                            "Dance Dance Dance",
+                            "Nel segno della pecora"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale locale gestiva Murakami a Tokyo con la moglie prima di diventare uno scrittore a tempo pieno?",
+                      "o": [
+                            "Un jazz bar (Peter Cat)",
+                            "Una libreria antiquaria",
+                            "Una pasticceria",
+                            "Un cinema"
+                      ],
+                      "a": 0
+                }
+          ]
+    },
+    'paulo-coelho': {
+          "topic": "Paulo Coelho",
+          "impiccato": [
+                {
+                      "word": "ALCHIMISTA",
+                      "hint": "Il romanzo del pastorello Santiago alla ricerca del tesoro"
+                },
+                {
+                      "word": "LEGGENDA",
+                      "hint": "La... personale che ciascun uomo è chiamato a compiere"
+                },
+                {
+                      "word": "PIRAMIDI",
+                      "hint": "Il luogo sognato in Egitto dove si trova il tesoro"
+                },
+                {
+                      "word": "SANTIAGO",
+                      "hint": "Il pastorello andaluso protagonista del viaggio"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Quando",
+                            "desideri",
+                            "davvero",
+                            "qualcosa",
+                            "tutto",
+                            "l'universo",
+                            "cospira",
+                            "per",
+                            "aiutarti"
+                      ],
+                      "solution": "Quando desideri davvero qualcosa tutto l'universo cospira per aiutarti",
+                      "source": "L'Alchimista"
+                },
+                {
+                      "words": [
+                            "C'è",
+                            "una",
+                            "sola",
+                            "cosa",
+                            "che",
+                            "rende",
+                            "un",
+                            "sogno",
+                            "impossibile",
+                            "la",
+                            "paura",
+                            "di",
+                            "fallire"
+                      ],
+                      "solution": "C'è una sola cosa che rende un sogno impossibile la paura di fallire",
+                      "source": "L'Alchimista"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Quando desideri qualcosa, tutto l'universo cospira affinché tu realizzi il tuo ___ : il messaggio centrale de L'Alchimista.",
+                      "blanks": [
+                            "desiderio"
+                      ],
+                      "source": "L'Alchimista"
+                },
+                {
+                      "text": "Il pastore andaluso Santiago attraversa il deserto del Sahara guidato dal saggio re di Salem e dall' ___ .",
+                      "blanks": [
+                            "Alchimista"
+                      ],
+                      "source": "L'Alchimista"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "L'Alchimista (Il linguaggio del Mondo)",
+                      "lines": [
+                            "«Il segreto della felicità consiste nel guardare tutte le meraviglie del mondo",
+                            "senza mai dimenticare le due gocce d'olio sul cucchiaio.»",
+                            "Ascolta il tuo cuore.",
+                            "Esso conosce tutte le cose, perché è nato dall'Anima del Mondo."
+                      ],
+                      "hint": "L'insegnamento universale sull'equilibrio tra l'esplorazione del mondo e la propria identità."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "In quale Paese sudamericano è nato lo scrittore Paulo Coelho?",
+                      "o": [
+                            "Brasile (Rio de Janeiro)",
+                            "Argentina",
+                            "Portogallo",
+                            "Cile"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Qual è il mestiere iniziale del protagonista Santiago all'inizio de 'L'Alchimista'?",
+                      "o": [
+                            "Pastore di pecore in Andalusia",
+                            "Marinaio",
+                            "Fabbro",
+                            "Monaco"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Dove si trova alla fine il vero tesoro cercato per tutto il mondo da Santiago?",
+                      "o": [
+                            "Sotto le radici del sicomoro della vecchia chiesa abbandonata da dove era partito",
+                            "Dentro la Grande Piramide",
+                            "In fondo al mare",
+                            "Nel palazzo del re"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale celebre cammino di pellegrinaggio spirituale in Spagna ispirò il suo primo fortunato libro nel 1987?",
+                      "o": [
+                            "Il Cammino di Santiago di Compostela",
+                            "La Via Francigena",
+                            "Il Cammino di San Francesco",
+                            "La Via della Seta"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Cosa intende Coelho con il concetto di 'Leggenda Personale'?",
+                      "o": [
+                            "Il destino autentico e il sogno che ciascuno è chiamato a realizzare nella vita",
+                            "Una favola per bambini",
+                            "Un albero genealogico",
+                            "Una medaglia al valore"
+                      ],
+                      "a": 0
+                }
+          ]
+    },
+    'agatha-christie': {
+          "topic": "Agatha Christie",
+          "impiccato": [
+                {
+                      "word": "POIROT",
+                      "hint": "Hercule... il geniale investigatore belga dalle cellule grigie"
+                },
+                {
+                      "word": "MARPLE",
+                      "hint": "Miss... l'anziana e arzilla zitella di St. Mary Mead"
+                },
+                {
+                      "word": "ORIENT",
+                      "hint": "Assassinio sull'... Express sul celebre treno bloccato dalla neve"
+                },
+                {
+                      "word": "INDIANI",
+                      "hint": "Dieci piccoli... il giallo perfetto a Nigger Island"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Un",
+                            "indizio",
+                            "è",
+                            "un",
+                            "indizio",
+                            "due",
+                            "sono",
+                            "una",
+                            "coincidenza",
+                            "tre",
+                            "sono",
+                            "una",
+                            "prova"
+                      ],
+                      "solution": "Un indizio è un indizio due sono una coincidenza tre sono una prova",
+                      "source": "Poirot a Styles Court"
+                },
+                {
+                      "words": [
+                            "Le",
+                            "cellule",
+                            "grigie",
+                            "del",
+                            "mio",
+                            "cervello",
+                            "risolvono",
+                            "ogni",
+                            "mistero"
+                      ],
+                      "solution": "Le cellule grigie del mio cervello risolvono ogni mistero",
+                      "source": "Hercule Poirot"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Nel capolavoro Dieci piccoli indiani, dieci persone isolate su un'isola vengono uccise una dopo l'altra seguendo una filastrocca per ___ .",
+                      "blanks": [
+                            "bambini"
+                      ],
+                      "source": "Dieci piccoli indiani"
+                },
+                {
+                      "text": "Hercule Poirot risolve il caso dell'assassinio del ricco Ratchett a bordo del treno Orient ___ .",
+                      "blanks": [
+                            "Express"
+                      ],
+                      "source": "Assassinio sull'Orient Express"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Dieci piccoli indiani (La filastrocca)",
+                      "lines": [
+                            "Dieci poveri negretti se ne andarono a cenar:",
+                            "uno si strozzò, e rimasero in nove.",
+                            "Nove poveri negretti fino a tardi vegliaron:",
+                            "uno cadde addormentato, e otto ne restaron."
+                      ],
+                      "hint": "La macabra filastrocca che scandisce gli omicidi nell'isola senza via di fuga."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Come viene universalmente definita Agatha Christie nella storia della letteratura mondiale?",
+                      "o": [
+                            "La Regina del Giallo (The Queen of Crime)",
+                            "La Dama Nera",
+                            "La Signora del Thriller",
+                            "La Contessa del Brivido"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Di quale nazionalità è il celebre detective dai baffi curatissimi Hercule Poirot?",
+                      "o": [
+                            "Belga",
+                            "Francese",
+                            "Inglese",
+                            "Svizzero"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale geniale commedia teatrale di Agatha Christie detiene il record mondiale assoluto di repliche ininterrotte a Londra dal 1952?",
+                      "o": [
+                            "Trappola per topi (The Mousetrap)",
+                            "Testimone d'accusa",
+                            "Caffè nero",
+                            "Delitto sul Nilo"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Qual è il nome del tranquillo villaggio di campagna inglese dove vive Miss Jane Marple?",
+                      "o": [
+                            "St. Mary Mead",
+                            "Baker Street",
+                            "Derry",
+                            "Hogsmeade"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Chi è l'assassino nel celebre romanzo 'Assassinio sull'Orient Express'?",
+                      "o": [
+                            "Tutti i dodici passeggeri del vagone insieme",
+                            "Il controllore",
+                            "Il cuoco",
+                            "Nessuno (fu un suicidio)"
+                      ],
+                      "a": 0
+                }
+          ]
+    },
+    'emily-dickinson': {
+          "topic": "Emily Dickinson",
+          "impiccato": [
+                {
+                      "word": "AMHERST",
+                      "hint": "Il paese del Massachusetts dove visse sempre reclusa nella sua stanza"
+                },
+                {
+                      "word": "SPERANZA",
+                      "hint": "La... è quella cosa con le piume che si posa sull'anima"
+                },
+                {
+                      "word": "BIANCO",
+                      "hint": "Il colore dell'abito che indossava sempre negli ultimi anni"
+                },
+                {
+                      "word": "NATURA",
+                      "hint": "Il tema dei fiori, degli uccelli e dell'infinito interiore"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "La",
+                            "speranza",
+                            "è",
+                            "quella",
+                            "cosa",
+                            "con",
+                            "le",
+                            "piume"
+                      ],
+                      "solution": "La speranza è quella cosa con le piume",
+                      "source": "Poesie"
+                },
+                {
+                      "words": [
+                            "Non",
+                            "c'è",
+                            "un",
+                            "vascello",
+                            "veloce",
+                            "come",
+                            "un",
+                            "libro",
+                            "per",
+                            "portarci",
+                            "in",
+                            "terre",
+                            "lontane"
+                      ],
+                      "solution": "Non c'è un vascello veloce come un libro per portarci in terre lontane",
+                      "source": "Poesie"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "La speranza è quella cosa piumata che si posa sull' ___ e canta melodie senza parole e non si ferma mai.",
+                      "blanks": [
+                            "anima"
+                      ],
+                      "source": "Poesie"
+                },
+                {
+                      "text": "Emily Dickinson visse quasi tutta la vita nella casa paterna di Amherst vestita di ___ , affidando le sue poesie a piccoli fascicoli cuciti a mano.",
+                      "blanks": [
+                            "bianco"
+                      ],
+                      "source": "Biografia"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "La speranza è quella cosa con le piume",
+                      "lines": [
+                            "La Speranza è quella cosa piumata",
+                            "che si posa sull'anima,",
+                            "e canta melodie senza parole,",
+                            "e non si zittisce mai."
+                      ],
+                      "hint": "Una delle poesie più luminose e amate della poetessa americana."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "In quale stato americano della Nuova Inghilterra Emily Dickinson visse quasi sempre ritirata nella sua stanza?",
+                      "o": [
+                            "Massachusetts (Amherst)",
+                            "New York",
+                            "California",
+                            "Texas"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quante poesie scrisse in segreto la Dickinson, scoperte dalla sorella Lavinia solo dopo la sua morte?",
+                      "o": [
+                            "Circa 1800 componimenti",
+                            "100",
+                            "50",
+                            "300"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale caratteristico segno di interpunzione ritmico ricorre costantemente nei manoscritti della Dickinson?",
+                      "o": [
+                            "Il trattino (—)",
+                            "Il punto esclamativo",
+                            "Le parentesi tonde",
+                            "I punti di sospensione"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale abito di colore simbolico Emily scelse di indossare negli ultimi decenni della sua vita solitaria?",
+                      "o": [
+                            "Un abito completamente bianco",
+                            "Un abito nero",
+                            "Un mantello rosso",
+                            "Un vestito verde"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "A cosa paragona un libro in una celeberrima poesia sulla magia della lettura?",
+                      "o": [
+                            "A un vascello veloce che porta in terre lontane senza pagare il passaggio",
+                            "A una chiave d'oro",
+                            "A una lanterna magica",
+                            "A un cavallo alato"
+                      ],
+                      "a": 0
+                }
+          ]
+    },
     'mixed': {
       topic: "Sfida Casuale Mista",
       impiccato: [],
