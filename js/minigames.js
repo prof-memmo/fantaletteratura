@@ -910,6 +910,5443 @@
         { q: "In quale località sul litorale romano avvenne la tragica scomparsa di Pasolini nel 1975?", o: ["Fregene", "Idroscalo di Ostia", "Anzio", "Civitavecchia"], a: 1 }
       ]
     },
+    'a21': {
+          "topic": "Natalia Ginzburg",
+          "impiccato": [
+                {
+                      "word": "LESSICO",
+                      "hint": "Il celebre romanzo '... famigliare' vincitore dello Strega"
+                },
+                {
+                      "word": "LEVI",
+                      "hint": "Cognome da nubile della scrittrice torinese"
+                },
+                {
+                      "word": "FAMIGLIA",
+                      "hint": "Il nucleo centrale di memorie, frasi e legami"
+                },
+                {
+                      "word": "EINAUDI",
+                      "hint": "La casa editrice con cui collaborò attivamente"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Basta",
+                            "una",
+                            "parola",
+                            "per",
+                            "riconoscersi",
+                            "subito",
+                            "tra",
+                            "fratelli"
+                      ],
+                      "solution": "Basta una parola per riconoscerisi subito tra fratelli",
+                      "source": "Lessico famigliare"
+                },
+                {
+                      "words": [
+                            "Le",
+                            "cose",
+                            "che",
+                            "abbiamo",
+                            "vissuto",
+                            "non",
+                            "si",
+                            "cancellano"
+                      ],
+                      "solution": "Le cose che abbiamo vissuto non si cancellano",
+                      "source": "Le piccole virtù"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "In Lessico famigliare, le frasi e i modi di dire ripetuti dal padre Giuseppe diventano il filo conduttore della memoria della famiglia ___ .",
+                      "blanks": [
+                            "Levi"
+                      ],
+                      "source": "Lessico famigliare"
+                },
+                {
+                      "text": "Ai nostri figli dobbiamo insegnare non le piccole virtù, ma le ___ come l'amore per il vero e per la giustizia.",
+                      "blanks": [
+                            "grandi"
+                      ],
+                      "source": "Le piccole virtù"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Lessico famigliare (Riflessione)",
+                      "lines": [
+                            "Noi siamo cinque fratelli.",
+                            "Abitiamo in città diverse,",
+                            "ma basta una parola, una frase di casa,",
+                            "per ritrovare all'istante la nostra infanzia."
+                      ],
+                      "hint": "Il valore delle parole e delle abitudini familiari condivise nel tempo."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Quale romanzo di Natalia Ginzburg vinse il Premio Strega nel 1963?",
+                      "o": [
+                            "Le voci della sera",
+                            "Lessico famigliare",
+                            "Caro Michele",
+                            "Tutti i nostri ieri"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quale grande intellettuale e antifascista fu marito di Natalia Ginzburg?",
+                      "o": [
+                            "Cesare Pavese",
+                            "Leone Ginzburg",
+                            "Italo Calvino",
+                            "Alberto Moravia"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Di cosa parla principalmente 'Lessico famigliare'?",
+                      "o": [
+                            "Di un viaggio in America",
+                            "Delle memorie della famiglia Levi attraverso i loro modi di dire",
+                            "Di un giallo ambientato a Roma",
+                            "Della guerra del Risorgimento"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "In quale città piemontese visse a lungo Natalia Ginzburg lavorando per Einaudi?",
+                      "o": [
+                            "Torino",
+                            "Genova",
+                            "Asti",
+                            "Milano"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale saggio pedagogico e morale raccoglie le riflessioni di Natalia sull'educazione?",
+                      "o": [
+                            "Le piccole virtù",
+                            "La città e la casa",
+                            "Mai devi domandarmi",
+                            "Serena Cruz"
+                      ],
+                      "a": 0
+                }
+          ]
+    },
+    'a22': {
+          "topic": "Leonardo Sciascia",
+          "impiccato": [
+                {
+                      "word": "CIVETTA",
+                      "hint": "Il giorno della... celebre romanzo d'inchiesta"
+                },
+                {
+                      "word": "BELLODI",
+                      "hint": "Il capitano dei carabinieri protagonista"
+                },
+                {
+                      "word": "RACALMUTO",
+                      "hint": "Città natale dello scrittore in Sicilia"
+                },
+                {
+                      "word": "GIALLO",
+                      "hint": "Genere investigativo usato come strumento di denuncia"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "La",
+                            "verità",
+                            "è",
+                            "nel",
+                            "fondo",
+                            "di",
+                            "un",
+                            "pozzo"
+                      ],
+                      "solution": "La verità è nel fondo di un pozzo",
+                      "source": "Il giorno della civetta"
+                },
+                {
+                      "words": [
+                            "Io",
+                            "ho",
+                            "una",
+                            "certa",
+                            "pratica",
+                            "del",
+                            "mondo"
+                      ],
+                      "solution": "Io ho una certa pratica del mondo",
+                      "source": "Il giorno della civetta (Don Mariano)"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Il capitano ___ indaga sull'omicidio dell'appaltatore Colasberna sfidando l'omertà mafiosa in Sicilia.",
+                      "blanks": [
+                            "Bellodi"
+                      ],
+                      "source": "Il giorno della civetta"
+                },
+                {
+                      "text": "A ciascuno il ___ è un romanzo d'indagine in cui il professor Laurana cerca la verità su un duplice omicidio.",
+                      "blanks": [
+                            "suo"
+                      ],
+                      "source": "A ciascuno il suo"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Il giorno della civetta (Epigrafe)",
+                      "lines": [
+                            "...come la civetta",
+                            "quando di giorno compare",
+                            "e tutti gli uccelli la beffeggiano,",
+                            "così la mafia esce alla luce del sole."
+                      ],
+                      "hint": "La celebre citazione shakespeariana che apre il romanzo di Sciascia."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Qual è il primo celebre romanzo di Sciascia a denunciare apertamente la mafia?",
+                      "o": [
+                            "Todo modo",
+                            "Il giorno della civetta",
+                            "Candido",
+                            "Il cavaliere e la morte"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quale capitano dei carabinieri guida le indagini ne 'Il giorno della civetta'?",
+                      "o": [
+                            "Capitano Bellodi",
+                            "Capitano De Bellis",
+                            "Maresciallo Cecchini",
+                            "Ispettore Laurana"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "In quale provincia siciliana nacque Leonardo Sciascia?",
+                      "o": [
+                            "Palermo",
+                            "Agrigento (Racalmuto)",
+                            "Catania",
+                            "Siracusa"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Come usava il genere poliziesco ('giallo') Leonardo Sciascia?",
+                      "o": [
+                            "Come semplice passatempo",
+                            "Come strumento critico per indagare il potere e la giustizia",
+                            "Per scrivere fiabe per bambini",
+                            "Per fare propaganda militare"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quale libro di Sciascia analizza il drammatico rapimento di Aldo Moro?",
+                      "o": [
+                            "La scomparsa di Majorana",
+                            "L'affaire Moro",
+                            "Porte aperte",
+                            "Dalle parti degli infedeli"
+                      ],
+                      "a": 1
+                }
+          ]
+    },
+    'a23': {
+          "topic": "Alda Merini",
+          "impiccato": [
+                {
+                      "word": "NAVIGLI",
+                      "hint": "La zona caratteristica di Milano dove ha sempre vissuto"
+                },
+                {
+                      "word": "MANICOMIO",
+                      "hint": "L'esperienza dolorosa dell'internamento durata anni"
+                },
+                {
+                      "word": "POESIA",
+                      "hint": "L'amore viscerale e la sorgente della sua vita"
+                },
+                {
+                      "word": "TERRA",
+                      "hint": "... Santa (sua celebre raccolta poetica)"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Sono",
+                            "nata",
+                            "il",
+                            "ventuno",
+                            "a",
+                            "primavera"
+                      ],
+                      "solution": "Sono nata il ventuno a primavera",
+                      "source": "Vuoto d'amore"
+                },
+                {
+                      "words": [
+                            "La",
+                            "poesia",
+                            "è",
+                            "la",
+                            "pelle",
+                            "del",
+                            "mio",
+                            "cuore"
+                      ],
+                      "solution": "La poesia è la pelle del mio cuore",
+                      "source": "Aforismi"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Sono nata il ventuno a ___ ma non sapevo che nascere folle, aprire le zolle potesse scatenar ___.",
+                      "blanks": [
+                            "primavera",
+                            "tempesta"
+                      ],
+                      "source": "Sono nata il ventuno a primavera"
+                },
+                {
+                      "text": "La terra ___ è la drammatica e luminosa testimonianza in versi dell'esperienza del manicomio.",
+                      "blanks": [
+                            "santa"
+                      ],
+                      "source": "La Terra Santa"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Sono nata il ventuno a primavera",
+                      "lines": [
+                            "Sono nata il ventuno a primavera",
+                            "ma non sapevo che nascere folle,",
+                            "aprire le zolle",
+                            "potesse scatenar tempesta."
+                      ],
+                      "hint": "I quattro versi iconici della poetessa milanese sulla sua nascita e la sua sensibilità."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "In quale giorno simbolico dell'anno nacque Alda Merini?",
+                      "o": [
+                            "Il 25 dicembre",
+                            "Il 21 marzo (primo giorno di primavera)",
+                            "Il 1° maggio",
+                            "Il 15 agosto"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "In quale famoso quartiere di Milano si trovava la casa di Alda Merini?",
+                      "o": [
+                            "Brera",
+                            "Sui Navigli",
+                            "Isola",
+                            "San Siro"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quale raccolta valse alla Merini il Premio Librex Montale nel 1993?",
+                      "o": [
+                            "La Terra Santa",
+                            "La presenza di Orfeo",
+                            "Testamento",
+                            "Ballate non pagate"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale celebre romanzo autobiografico in prosa racconta la sua follia e rinascita?",
+                      "o": [
+                            "L'altra verità. Diario di una diversa",
+                            "Lessico famigliare",
+                            "Menzogna e sortilegio",
+                            "La Storia"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Come scriveva spesso Alda Merini i suoi celebri aforismi e versi?",
+                      "o": [
+                            "Al computer",
+                            "Dettando al telefono o con la macchina da scrivere",
+                            "In latino su pergamena",
+                            "In tipografia"
+                      ],
+                      "a": 1
+                }
+          ]
+    },
+    'a24': {
+          "topic": "Umberto Saba",
+          "impiccato": [
+                {
+                      "word": "CANZONIERE",
+                      "hint": "La monumentale raccolta di tutta la sua vita poetica"
+                },
+                {
+                      "word": "TRIESTE",
+                      "hint": "La città amata 'dall'aria strana e tormentosa'"
+                },
+                {
+                      "word": "LINA",
+                      "hint": "La moglie amatissima celebrata nelle poesie"
+                },
+                {
+                      "word": "ONESTA",
+                      "hint": "La poesia '... e chiara' teorizzata da Saba"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Ho",
+                            "attraversato",
+                            "tutta",
+                            "la",
+                            "città",
+                            "poi",
+                            "ho",
+                            "salita",
+                            "un'erta"
+                      ],
+                      "solution": "Ho attraversato tutta la città poi ho salita un'erta",
+                      "source": "Trieste"
+                },
+                {
+                      "words": [
+                            "Tu",
+                            "sei",
+                            "come",
+                            "una",
+                            "giovane",
+                            "una",
+                            "bianca",
+                            "pollastra"
+                      ],
+                      "solution": "Tu sei come una giovane una bianca pollastra",
+                      "source": "A mia moglie"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Trieste ha un'ascosa grazia. Se piace, è come un ragazzaccio aspro e vorace, con gli occhi ___ e mani troppo grandi per regalare un fiore.",
+                      "blanks": [
+                            "azzurri"
+                      ],
+                      "source": "Trieste"
+                },
+                {
+                      "text": "La città ___ di Trieste è il luogo dove il poeta ritrova l'infinito nell'umiltà della vita popolare.",
+                      "blanks": [
+                            "vecchia"
+                      ],
+                      "source": "Città vecchia"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Trieste",
+                      "lines": [
+                            "Ho attraversato tutta la città.",
+                            "Poi ho salita un'erta,",
+                            "popolosa in principio, in là deserta,",
+                            "chiusa da un muricciolo:"
+                      ],
+                      "hint": "I primi versi della lirica che ritrae Trieste come una creatura viva e aspra."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "In quale città di frontiera nacque e visse Umberto Saba?",
+                      "o": [
+                            "Venezia",
+                            "Trieste",
+                            "Udine",
+                            "Trento"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Qual è il titolo unico che raccoglie l'intera produzione poetica di Saba?",
+                      "o": [
+                            "I Canti",
+                            "Il Canzoniere",
+                            "Ossi di seppia",
+                            "Myricae"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quale negozio storico gestiva Umberto Saba a Trieste?",
+                      "o": [
+                            "Una farmacia",
+                            "Una libreria antiquaria",
+                            "Un caffè letterario",
+                            "Una tipografia"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "A chi paragona la moglie nella celebre poesia 'A mia moglie'?",
+                      "o": [
+                            "Alle dee greche",
+                            "Agli animali umili della fattoria (la pollastra, la cagna, la giovenca)",
+                            "Ai fiori rari",
+                            "Alle stelle del cielo"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Cosa intendeva Saba per 'poesia onesta'?",
+                      "o": [
+                            "Poesie senza guadagno",
+                            "Una poesia sincera, chiara, che cerca la verità dei sentimenti",
+                            "Poesie religiose",
+                            "Poesie in latino"
+                      ],
+                      "a": 1
+                }
+          ]
+    },
+    'primi-documenti': {
+          "topic": "I Primi Documenti in Volgare",
+          "impiccato": [
+                {
+                      "word": "PLACITO",
+                      "hint": "Il Placito Capuano del 960 d.C."
+                },
+                {
+                      "word": "CAPUA",
+                      "hint": "La città campana del primo documento ufficiale"
+                },
+                {
+                      "word": "VOLGARE",
+                      "hint": "La lingua parlata dal popolo che sostituisce il latino"
+                },
+                {
+                      "word": "INDOVINELLO",
+                      "hint": "L'antico testo Veronese sul lavoro dello scrivano"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Sao",
+                            "ko",
+                            "kelle",
+                            "terre",
+                            "per",
+                            "kelle",
+                            "fini",
+                            "que",
+                            "ki",
+                            "contene"
+                      ],
+                      "solution": "Sao ko kelle terre per kelle fini que ki contene",
+                      "source": "Placito Capuano (960 d.C.)"
+                },
+                {
+                      "words": [
+                            "Se",
+                            "pareba",
+                            "boves",
+                            "alba",
+                            "pratalia",
+                            "araba"
+                      ],
+                      "solution": "Se pareba boves alba pratalia araba",
+                      "source": "Indovinello Veronese"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Sao ko kelle terre, per kelle fini que ki contene, trenta anni le possette parte Sancti ___ .",
+                      "blanks": [
+                            "Benedicti"
+                      ],
+                      "source": "Placito Capuano"
+                },
+                {
+                      "text": "L'Indovinello Veronese paragona le dita della mano ai buoi e la penna all' ___ che ara la pagina bianca.",
+                      "blanks": [
+                            "aratro"
+                      ],
+                      "source": "Indovinello Veronese"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Placito Capuano (960 d.C.)",
+                      "lines": [
+                            "Sao ko kelle terre,",
+                            "per kelle fini que ki contene,",
+                            "trenta anni le possette",
+                            "parte Sancti Benedicti."
+                      ],
+                      "hint": "La prima formula giuridica in volgare italiano giunta fino a noi."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Qual è considerato l'atto di nascita ufficiale della lingua italiana scritta?",
+                      "o": [
+                            "La Divina Commedia",
+                            "Il Placito Capuano del 960",
+                            "Il Cantico delle Creature",
+                            "Il Decameron"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "A cosa allude la metafora dei 'buoi' e del 'prato bianco' nell'Indovinello Veronese?",
+                      "o": [
+                            "Al lavoro dei contadini",
+                            "Al lavoro di scrittura dello scrivano sulla pergamena",
+                            "A una leggenda longobarda",
+                            "A una fiera di paese"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quale ordine religioso era proprietario delle terre contese nel Placito Capuano?",
+                      "o": [
+                            "I Francescani",
+                            "I Benedettini di Montecassino",
+                            "I Domenicani",
+                            "I Gesuiti"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Da quale antica lingua derivano l'italiano e le altre lingue romanze?",
+                      "o": [
+                            "Dal greco antico",
+                            "Dal latino volgare parlato",
+                            "Dal tedesco medievale",
+                            "Dall'arabo"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Cosa significa il termine 'volgare' nel contesto medievale?",
+                      "o": [
+                            "Offensivo e sgarbato",
+                            "Lingua parlata dal popolo (vulgus)",
+                            "Lingua dei nobili",
+                            "Lingua straniera"
+                      ],
+                      "a": 1
+                }
+          ]
+    },
+    'scuola-siciliana': {
+          "topic": "La Scuola Siciliana",
+          "impiccato": [
+                {
+                      "word": "SONETTO",
+                      "hint": "La forma metrica di 14 versi inventata da Giacomo da Lentini"
+                },
+                {
+                      "word": "FEDERICO",
+                      "hint": "L'imperatore svevo mecenate della corte a Palermo"
+                },
+                {
+                      "word": "NOTARO",
+                      "hint": "Soprannome di Giacomo da Lentini"
+                },
+                {
+                      "word": "CORTE",
+                      "hint": "La Magna Curia imperiale dove nasce la lirica"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Amor",
+                            "è",
+                            "un",
+                            "desio",
+                            "che",
+                            "ven",
+                            "da",
+                            "core"
+                      ],
+                      "solution": "Amor è un desio che ven da core",
+                      "source": "Giacomo da Lentini"
+                },
+                {
+                      "words": [
+                            "Meravigliosamente",
+                            "un",
+                            "amor",
+                            "mi",
+                            "distringe"
+                      ],
+                      "solution": "Meravigliosamente un amor mi distringe",
+                      "source": "Giacomo da Lentini"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Giacomo da Lentini, detto il Notaro, è considerato l'inventore del ___ , composto da 14 endecasillabi.",
+                      "blanks": [
+                            "sonetto"
+                      ],
+                      "source": "Scuola Siciliana"
+                },
+                {
+                      "text": "Amor è un desio che ven da core per abondanza di gran ___ ; e li occhi prima generan l'amore e lo core li dà nutricamento.",
+                      "blanks": [
+                            "piacimento"
+                      ],
+                      "source": "Giacomo da Lentini"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Amor è un desio che ven da core",
+                      "lines": [
+                            "Amor è un desio che ven da core",
+                            "per abondanza di gran piacimento;",
+                            "e li occhi prima generan l'amore",
+                            "e lo core li dà nutricamento."
+                      ],
+                      "hint": "La prima quartina del sonetto teorico sulla nascita dell'amore attraverso la vista."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Chi è storicamente riconosciuto come l'inventore del sonetto?",
+                      "o": [
+                            "Dante Alighieri",
+                            "Giacomo da Lentini (Il Notaro)",
+                            "Francesco Petrarca",
+                            "Guido Cavalcanti"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Presso quale corte imperiale fiorì la Scuola Poetica Siciliana?",
+                      "o": [
+                            "Alla corte di Carlo Magno",
+                            "Alla corte di Federico II di Svevia",
+                            "A Firenze con i Medici",
+                            "A Roma con il Papa"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Qual era la professione principale dei poeti della Scuola Siciliana?",
+                      "o": [
+                            "Giullari e cantastorie",
+                            "Funzionari, notai e magistrati della Magna Curia",
+                            "Monaci amanuensi",
+                            "Cavalieri mercenari"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Qual è il tema quasi esclusivo delle poesie della Scuola Siciliana?",
+                      "o": [
+                            "Le battaglie cavalleresche",
+                            "L'amore cortese",
+                            "La politica cittadina",
+                            "I miracoli dei santi"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quanti versi compongono la struttura metrica classica di un sonetto?",
+                      "o": [
+                            "Dodici",
+                            "Quattordici (due quartine e due terzine)",
+                            "Sedici",
+                            "Venti"
+                      ],
+                      "a": 1
+                }
+          ]
+    },
+    'francesco-assisi': {
+          "topic": "Francesco d'Assisi",
+          "impiccato": [
+                {
+                      "word": "CANTICO",
+                      "hint": "Il... delle creature (o di Frate Sole)"
+                },
+                {
+                      "word": "POVERTA",
+                      "hint": "La 'Madonna Povertà' scelta come regola di vita"
+                },
+                {
+                      "word": "ASSISI",
+                      "hint": "La città umbra del Poverello"
+                },
+                {
+                      "word": "CREATURE",
+                      "hint": "Fratello Sole, Sorella Luna e tutte le opere del Creato"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Laudato",
+                            "sie",
+                            "mi",
+                            "Signore",
+                            "cum",
+                            "tutte",
+                            "le",
+                            "tue",
+                            "creature"
+                      ],
+                      "solution": "Laudato sie mi Signore cum tutte le tue creature",
+                      "source": "Cantico delle Creature"
+                },
+                {
+                      "words": [
+                            "Laudato",
+                            "si",
+                            "mi",
+                            "Signore",
+                            "per",
+                            "sora",
+                            "nostra",
+                            "morte",
+                            "corporale"
+                      ],
+                      "solution": "Laudato si mi Signore per sora nostra morte corporale",
+                      "source": "Cantico delle Creature"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Altissimu, onnipotente, bon Signore, tue so' le laude, la gloria e l'onore et onne ___ .",
+                      "blanks": [
+                            "benedictioni"
+                      ],
+                      "source": "Cantico delle Creature"
+                },
+                {
+                      "text": "Laudato sie, mi' Signore, per sora nostra matre ___ , la quale ne sustenta e governa.",
+                      "blanks": [
+                            "terra"
+                      ],
+                      "source": "Cantico delle Creature"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Cantico delle Creature (Incipit)",
+                      "lines": [
+                            "Altissimu, onnipotente, bon Signore,",
+                            "tue so' le laude, la gloria e l'honore et onne benedictione.",
+                            "Ad te solo, Altissimo, se konfano,",
+                            "et nullu homo ène dignu te mentovare."
+                      ],
+                      "hint": "La solenne lode introduttiva a Dio del primo capolavoro in volgare umbro (1224)."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "In quale anno fu composto il 'Cantico delle creature'?",
+                      "o": [
+                            "1000",
+                            "1224",
+                            "1300",
+                            "1492"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "In quale volgare regionale è scritto il Cantico di Frate Sole?",
+                      "o": [
+                            "Volgare toscano",
+                            "Volgare umbro",
+                            "Volgare siciliano",
+                            "Latino ecclesiastico"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quale elemento del creato è chiamato 'utile et humile et pretiosa et casta'?",
+                      "o": [
+                            "Il fuoco",
+                            "L'acqua (Sorella Acqua)",
+                            "La terra",
+                            "Il vento"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Cosa fece Francesco nella piazza di Assisi davanti al vescovo per cambiare vita?",
+                      "o": [
+                            "Si fece incoronare cavaliere",
+                            "Si spogliò di tutti i suoi ricchi abiti restituendoli al padre",
+                            "Partì per le Crociate",
+                            "Costruì un castello"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quale animale feroce secondo la tradizione fu ammansito da Francesco a Gubbio?",
+                      "o": [
+                            "Un orso",
+                            "Un lupo",
+                            "Un leone",
+                            "Un cinghiale"
+                      ],
+                      "a": 1
+                }
+          ]
+    },
+    'dante-alighieri-sec': {
+          "topic": "Dante Alighieri",
+          "impiccato": [
+                {
+                      "word": "COMMEDIA",
+                      "hint": "La Divina Commedia, il capolavoro dell'oltretomba"
+                },
+                {
+                      "word": "BEATRICE",
+                      "hint": "La donna amata guida nel Paradiso"
+                },
+                {
+                      "word": "VIRGILIO",
+                      "hint": "Il poeta latino maestro e guida nell'Inferno"
+                },
+                {
+                      "word": "SELVA",
+                      "hint": "La... oscura dove Dante si ritrova smarrito"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Nel",
+                            "mezzo",
+                            "del",
+                            "cammin",
+                            "di",
+                            "nostra",
+                            "vita"
+                      ],
+                      "solution": "Nel mezzo del cammin di nostra vita",
+                      "source": "Inferno (Canto I)"
+                },
+                {
+                      "words": [
+                            "L'amor",
+                            "che",
+                            "move",
+                            "il",
+                            "sole",
+                            "e",
+                            "l'altre",
+                            "stelle"
+                      ],
+                      "solution": "L'amor che move il sole e l'altre stelle",
+                      "source": "Paradiso (Canto XXXIII)"
+                },
+                {
+                      "words": [
+                            "Fatti",
+                            "non",
+                            "foste",
+                            "a",
+                            "viver",
+                            "come",
+                            "bruti"
+                      ],
+                      "solution": "Fatti non foste a viver come bruti",
+                      "source": "Inferno (Ulisse, Canto XXVI)"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Nel mezzo del cammin di nostra vita mi ritrovai per una selva ___ , ché la diritta via era smarrita.",
+                      "blanks": [
+                            "oscura"
+                      ],
+                      "source": "Inferno, Canto I"
+                },
+                {
+                      "text": "Fatti non foste a viver come bruti, ma per seguir virtute e ___ .",
+                      "blanks": [
+                            "canoscenza"
+                      ],
+                      "source": "Inferno, Canto XXVI (Ulisse)"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Inferno - Canto I (Incipit)",
+                      "lines": [
+                            "Nel mezzo del cammin di nostra vita",
+                            "mi ritrovai per una selva oscura,",
+                            "ché la diritta via era smarrita.",
+                            "Ahi quanto a dir qual era è cosa dura"
+                      ],
+                      "hint": "I celeberrimi primi versi in terzine incatenate dell'inizio del viaggio nell'Oltretomba."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Quale aggettivo fu aggiunto per primo da Giovanni Boccaccio al titolo 'Commedia'?",
+                      "o": [
+                            "Sublime",
+                            "Divina",
+                            "Eterna",
+                            "Sacra"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quanti canti compongono complessivamente la Divina Commedia?",
+                      "o": [
+                            "33",
+                            "99",
+                            "100 (1 proemiale + 33 per cantica)",
+                            "150"
+                      ],
+                      "a": 2
+                },
+                {
+                      "q": "Chi guida Dante attraverso l'Inferno e il Purgatorio?",
+                      "o": [
+                            "Beatrice",
+                            "Virgilio",
+                            "San Bernardo",
+                            "Omero"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "In quale fazione politica militava Dante a Firenze prima dell'esilio nel 1301?",
+                      "o": [
+                            "Ghibellini",
+                            "Guelfi Bianchi",
+                            "Guelfi Neri",
+                            "Popolo minuto"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Qual è l'ultima parola che chiude tutte e tre le cantiche (Inferno, Purgatorio, Paradiso)?",
+                      "o": [
+                            "Amore",
+                            "Luce",
+                            "Stelle",
+                            "Dio"
+                      ],
+                      "a": 2
+                }
+          ]
+    },
+    'francesco-petrarca': {
+          "topic": "Francesco Petrarca",
+          "impiccato": [
+                {
+                      "word": "CANZONIERE",
+                      "hint": "Le 366 rime sparse dedicate a Laura"
+                },
+                {
+                      "word": "LAURA",
+                      "hint": "La donna amata incontrata il 6 aprile ad Avignone"
+                },
+                {
+                      "word": "VALCHIUSA",
+                      "hint": "Il rifugio solitario in Provenza amato dal poeta"
+                },
+                {
+                      "word": "LAURO",
+                      "hint": "La pianta d'alloro simbolo di gloria poetica"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Voi",
+                            "ch'ascoltate",
+                            "in",
+                            "rime",
+                            "sparse",
+                            "il",
+                            "suono"
+                      ],
+                      "solution": "Voi ch'ascoltate in rime sparse il suono",
+                      "source": "Canzoniere (Sonetto I)"
+                },
+                {
+                      "words": [
+                            "Chiare",
+                            "fresche",
+                            "et",
+                            "dolci",
+                            "acque"
+                      ],
+                      "solution": "Chiare fresche et dolci acque",
+                      "source": "Canzoniere (Canzone 126)"
+                },
+                {
+                      "words": [
+                            "Solo",
+                            "et",
+                            "pensoso",
+                            "i",
+                            "più",
+                            "deserti",
+                            "campi",
+                            "vo",
+                            "misurando"
+                      ],
+                      "solution": "Solo et pensoso i più deserti campi vo misurando",
+                      "source": "Canzoniere (Sonetto 35)"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Voi ch'ascoltate in rime sparse il suono di quei sospiri ond'io nudriva 'l ___ in sul mio primo giovenile errore...",
+                      "blanks": [
+                            "core"
+                      ],
+                      "source": "Canzoniere"
+                },
+                {
+                      "text": "Chiare, fresche et dolci ___ , ove le belle membra pose colei che sola a me par donna...",
+                      "blanks": [
+                            "acque"
+                      ],
+                      "source": "Canzoniere"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Voi ch'ascoltate in rime sparse (Sonetto I)",
+                      "lines": [
+                            "Voi ch'ascoltate in rime sparse il suono",
+                            "di quei sospiri ond'io nudriva 'l core",
+                            "in sul mio primo giovenile errore",
+                            "quand'era in parte altr'uom da quel ch'i' sono,"
+                      ],
+                      "hint": "La quartina introduttiva dell'opera rivolta al lettore con pentimento e consapevolezza."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Quanti componimenti poetici contiene complessivamente il Canzoniere di Petrarca?",
+                      "o": [
+                            "100",
+                            "300",
+                            "366 (uno per ogni giorno dell'anno più l'introduttivo)",
+                            "500"
+                      ],
+                      "a": 2
+                },
+                {
+                      "q": "In quale città europea Petrarca fu solennemente incoronato poeta con la corona d'alloro nel 1341?",
+                      "o": [
+                            "Parigi",
+                            "Roma (in Campidoglio)",
+                            "Firenze",
+                            "Avignone"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Qual è il nome della donna cantata e idealizzata da Petrarca per tutta la vita?",
+                      "o": [
+                            "Beatrice",
+                            "Laura",
+                            "Silvia",
+                            "Fiammetta"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quale celebre monte provenzale Petrarca scalò descrivendo la salita in una famosa lettera?",
+                      "o": [
+                            "Monte Bianco",
+                            "Monte Ventoux",
+                            "Gran Sasso",
+                            "Etna"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Perché Petrarca è considerato il 'Padre dell'Umanesimo'?",
+                      "o": [
+                            "Perché ha fondato una scuola",
+                            "Per la riscoperta filologica dei manoscritti latini classici e l'esplorazione dell'interiorità umana",
+                            "Perché dipingeva ritratti",
+                            "Perché era un banchiere"
+                      ],
+                      "a": 1
+                }
+          ]
+    },
+    'giovanni-boccaccio': {
+          "topic": "Giovanni Boccaccio",
+          "impiccato": [
+                {
+                      "word": "DECAMERON",
+                      "hint": "Le cento novelle raccontate in dieci giorni"
+                },
+                {
+                      "word": "PESTE",
+                      "hint": "La tragica epidemia di Firenze del 1348 da cui fuggono i giovani"
+                },
+                {
+                      "word": "BRIGATA",
+                      "hint": "Il gruppo di sette ragazze e tre ragazzi narratori"
+                },
+                {
+                      "word": "CALANDRINO",
+                      "hint": "Il sempliciotto beffato da Bruno e Buffalmacco"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Umana",
+                            "cosa",
+                            "è",
+                            "aver",
+                            "compassione",
+                            "degli",
+                            "afflitti"
+                      ],
+                      "solution": "Umana cosa è aver compassione degli afflitti",
+                      "source": "Decameron (Proemio)"
+                },
+                {
+                      "words": [
+                            "La",
+                            "fortuna",
+                            "spesso",
+                            "aiuta",
+                            "gli",
+                            "audaci",
+                            "e",
+                            "gli",
+                            "ingegnosi"
+                      ],
+                      "solution": "La fortuna spesso aiuta gli audaci e gli ingegnosi",
+                      "source": "Decameron"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Nel 1348 a Firenze scoppia la terribile peste e una brigata di ___ giovani decide di rifugiarsi in campagna per raccontare novelle.",
+                      "blanks": [
+                            "dieci"
+                      ],
+                      "source": "Decameron"
+                },
+                {
+                      "text": "Andreuccio da ___ va a comprare cavalli a Napoli e vive una notte di straordinarie disavventure e beffe.",
+                      "blanks": [
+                            "Perugia"
+                      ],
+                      "source": "Decameron"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Decameron (Proemio)",
+                      "lines": [
+                            "Umana cosa è aver compassione degli afflitti:",
+                            "e come che a ciascuna persona stia bene,",
+                            "a coloro è massimamente richesto",
+                            "i quali già hanno di conforto avuto mestiere."
+                      ],
+                      "hint": "L'esordio etico del capolavoro della prosa italiana in volgare dedicato a chi soffre per amore."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Quante novelle compongono complessivamente il Decameron di Boccaccio?",
+                      "o": [
+                            "50",
+                            "100",
+                            "120",
+                            "366"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Da quanti giovani è composta la brigata narratrice nel Decameron?",
+                      "o": [
+                            "Dieci (7 donne e 3 uomini)",
+                            "Dodici",
+                            "Cinque",
+                            "Sette"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale tragico evento storico del 1348 fa da cornice all'opera?",
+                      "o": [
+                            "La battaglia di Montaperti",
+                            "La Peste Nera a Firenze",
+                            "L'incendio di Roma",
+                            "L'invasione dei barbari"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quale giovane nobile sacrifica il suo adorato falcone per offrire un pranzo alla donna amata?",
+                      "o": [
+                            "Federigo degli Alberighi",
+                            "Andreuccio da Perugia",
+                            "Calandrino",
+                            "Chichibio"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Chi è il cuoco veneziano che convince il padrone Currado con una battuta sulle gru con una sola zampa?",
+                      "o": [
+                            "Chichibio",
+                            "Frate Cipolla",
+                            "Lisabetta da Messina",
+                            "Nastagio degli Onesti"
+                      ],
+                      "a": 0
+                }
+          ]
+    },
+    'lorenzo-medici': {
+          "topic": "Lorenzo de' Medici",
+          "impiccato": [
+                {
+                      "word": "MAGNIFICO",
+                      "hint": "Il celebre appellativo di Lorenzo"
+                },
+                {
+                      "word": "GIOVINEZZA",
+                      "hint": "Quant'è bella... che si fugge tuttavia!"
+                },
+                {
+                      "word": "MECENATE",
+                      "hint": "Protettore e finanziatore dei massimi geni rinascimentali"
+                },
+                {
+                      "word": "FIRENZE",
+                      "hint": "La culla del Rinascimento da lui governata"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Quant'è",
+                            "bella",
+                            "giovinezza",
+                            "che",
+                            "si",
+                            "fugge",
+                            "tuttavia"
+                      ],
+                      "solution": "Quant'è bella giovinezza che si fugge tuttavia",
+                      "source": "Trionfo di Bacco e Arianna"
+                },
+                {
+                      "words": [
+                            "Chi",
+                            "vuol",
+                            "esser",
+                            "lieto",
+                            "sia",
+                            "di",
+                            "doman",
+                            "non",
+                            "c'è",
+                            "certezza"
+                      ],
+                      "solution": "Chi vuol esser lieto sia di doman non c'è certezza",
+                      "source": "Trionfo di Bacco e Arianna"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Quant'è bella giovinezza, che si fugge tuttavia! Chi vuol esser lieto, sia: di doman non c'è ___ .",
+                      "blanks": [
+                            "certezza"
+                      ],
+                      "source": "Trionfo di Bacco e Arianna"
+                },
+                {
+                      "text": "Lorenzo il Magnifico fu detto l'ago della ___ per la sua abile capacità diplomatica nel mantenere la pace tra gli stati italiani.",
+                      "blanks": [
+                            "bilancia"
+                      ],
+                      "source": "Canzone a ballo"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Trionfo di Bacco e Arianna",
+                      "lines": [
+                            "Quant'è bella giovinezza,",
+                            "che si fugge tuttavia!",
+                            "Chi vuol esser lieto, sia:",
+                            "di doman non c'è certezza."
+                      ],
+                      "hint": "La celeberrima ripresa del canto carnascialesco che invita a godere il presente."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Quale famosa congiura del 1478 minacciò la vita di Lorenzo de' Medici nel Duomo di Firenze?",
+                      "o": [
+                            "La Congiura dei Pazzi",
+                            "La Congiura di Catilina",
+                            "La Congiura delle Polveri",
+                            "La Congiura dei Baroni"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Qual è il ritornello immortale del 'Trionfo di Bacco e Arianna'?",
+                      "o": [
+                            "L'amor che move il sole",
+                            "Quant'è bella giovinezza / che si fugge tuttavia",
+                            "Sempre caro mi fu quest'ermo colle",
+                            "Chi non lavora non fa l'amore"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quale sommo artista scultore e pittore fu accolto giovinetto a vivere nel palazzo di Lorenzo?",
+                      "o": [
+                            "Michelangelo Buonarroti",
+                            "Caravaggio",
+                            "Giotto",
+                            "Bernini"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Come veniva definito Lorenzo per il suo ruolo di garante dell'equilibrio tra le potenze d'Italia?",
+                      "o": [
+                            "L'Ago della bilancia",
+                            "Il Principe del mare",
+                            "La Spada di Roma",
+                            "Il Doge dei saggi"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "In quale secolo visse e operò Lorenzo il Magnifico a Firenze?",
+                      "o": [
+                            "Duecento",
+                            "Trecento",
+                            "Quattrocento (XV secolo)",
+                            "Seicento"
+                      ],
+                      "a": 2
+                }
+          ]
+    },
+    'ludovico-ariosto': {
+          "topic": "Ludovico Ariosto",
+          "impiccato": [
+                {
+                      "word": "FURIOSO",
+                      "hint": "Orlando... reso pazzo per amore"
+                },
+                {
+                      "word": "ANGELICA",
+                      "hint": "La principessa del Catai amata da Orlando"
+                },
+                {
+                      "word": "IPPOGRIFO",
+                      "hint": "La mitica creatura alata su cui vola Astolfo"
+                },
+                {
+                      "word": "LUNA",
+                      "hint": "Il luogo dove si raccolgono tutte le cose perdute sulla terra"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Le",
+                            "donne",
+                            "i",
+                            "cavalier",
+                            "l'arme",
+                            "gli",
+                            "amori"
+                      ],
+                      "solution": "Le donne i cavalier l'arme gli amori",
+                      "source": "Orlando Furioso (Incipit)"
+                },
+                {
+                      "words": [
+                            "Le",
+                            "cortesie",
+                            "l'audaci",
+                            "imprese",
+                            "io",
+                            "canto"
+                      ],
+                      "solution": "Le cortesie l'audaci imprese io canto",
+                      "source": "Orlando Furioso"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Le donne, i cavalier, l'arme, gli amori, le cortesie, le audaci imprese io canto, che furo al tempo che passaro i ___ d'Africa il mare...",
+                      "blanks": [
+                            "Mori"
+                      ],
+                      "source": "Orlando Furioso"
+                },
+                {
+                      "text": "Il cavaliere Astolfo vola fino alla ___ per recuperare il senno perduto del paladino Orlando.",
+                      "blanks": [
+                            "Luna"
+                      ],
+                      "source": "Orlando Furioso"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Orlando Furioso (Incipit - Canto I)",
+                      "lines": [
+                            "Le donne, i cavalier, l'arme, gli amori,",
+                            "le cortesie, l'audaci imprese io canto,",
+                            "che furo al tempo che passaro i Mori",
+                            "d'Africa il mare, e in Francia nocquer tanto,"
+                      ],
+                      "hint": "L'indimenticabile ottava di apertura che intreccia il ciclo carolingio e quello bretone."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Presso quale illustre corte ducale visse e lavorò Ludovico Ariosto?",
+                      "o": [
+                            "Alla corte estense di Ferrara",
+                            "Alla corte dei Gonzaga a Mantova",
+                            "A Milano con gli Sforza",
+                            "A Urbino con i Montefeltro"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Per quale motivo il valoroso paladino Orlando perde il senno e diventa 'furioso'?",
+                      "o": [
+                            "Per una sconfitta militare",
+                            "Perché scopre che Angelica ama il giovane fante saraceno Medoro",
+                            "Per un incantesimo di Atlante",
+                            "Perché gli rubano la spada"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quale fantastica creatura alata cavalca Astolfo nel suo viaggio magico?",
+                      "o": [
+                            "Il Pegaso",
+                            "L'Ippogrifo (metà aquila e metà cavallo)",
+                            "Il Drago alato",
+                            "La Fenice"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Cosa si trova sulla Luna secondo il celebre episodio dell'Orlando Furioso?",
+                      "o": [
+                            "Miniere d'oro",
+                            "Tutto ciò che gli uomini perdono sulla Terra (il senno, il tempo, i voti non mantenuti)",
+                            "I mostri dell'oltretomba",
+                            "Le anime dei guerrieri"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Qual è la struttura metrica in cui è scritto tutto l'Orlando Furioso?",
+                      "o": [
+                            "Terzina dantesca",
+                            "Ottava rima (strofe di 8 endecasillabi)",
+                            "Sonetto",
+                            "Verso sciolto"
+                      ],
+                      "a": 1
+                }
+          ]
+    },
+    'niccolo-machiavelli': {
+          "topic": "Niccolò Machiavelli",
+          "impiccato": [
+                {
+                      "word": "PRINCIPE",
+                      "hint": "Il trattato politico fondatore della scienza moderna"
+                },
+                {
+                      "word": "VOLPE",
+                      "hint": "L'astuzia necessaria al sovrano insieme alla forza del leone"
+                },
+                {
+                      "word": "FORTUNA",
+                      "hint": "L'arbitra di metà delle nostre azioni umane"
+                },
+                {
+                      "word": "VIRTU",
+                      "hint": "La capacità dell'uomo di arginare la sorte avversa"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Il",
+                            "fine",
+                            "giustifica",
+                            "i",
+                            "mezzi"
+                      ],
+                      "solution": "Il fine giustifica i mezzi",
+                      "source": "Massima attribuita a Il Principe"
+                },
+                {
+                      "words": [
+                            "Uno",
+                            "principe",
+                            "debbe",
+                            "sapere",
+                            "usare",
+                            "la",
+                            "bestia",
+                            "e",
+                            "l'uomo"
+                      ],
+                      "solution": "Uno principe debbe sapere usare la bestia e l'uomo",
+                      "source": "Il Principe (Capitolo XVIII)"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Bisogna essere ___ per conoscere i lacci e leone per sbigottire i lupi.",
+                      "blanks": [
+                            "volpe"
+                      ],
+                      "source": "Il Principe, Cap. XVIII"
+                },
+                {
+                      "text": "La fortuna è donna, ed è necessario, volendola tenere sotto, batterla e ___ .",
+                      "blanks": [
+                            "urtarla"
+                      ],
+                      "source": "Il Principe, Cap. XXV"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Il Principe - Capitolo XVIII",
+                      "lines": [
+                            "Dovete adunque sapere come sono dua generazioni di combattere:",
+                            "l'uno con le leggi, l'altro con la forza:",
+                            "quel primo è proprio dell'uomo, quel secondo è delle bestie:",
+                            "pertanto a uno principe è necessario sapere bene usare la bestia e l'uomo."
+                      ],
+                      "hint": "La lucida analisi sulla necessità politica di combinare legalità e forza (il centauro Chirone)."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "In quale anno Machiavelli scrisse il trattato 'Il Principe' durante il suo confino all'Albergaccio?",
+                      "o": [
+                            "1492",
+                            "1513",
+                            "1550",
+                            "1600"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quali due animali il principe ideale deve saper imitare secondo Machiavelli?",
+                      "o": [
+                            "L'aquila e il serpente",
+                            "La volpe (astuzia) e il leone (forza)",
+                            "Il lupo e l'agnello",
+                            "Il falco e il cavallo"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "A quale figura storica reale Machiavelli si ispirò per descrivere l'uomo d'azione determinato?",
+                      "o": [
+                            "Cesare Borgia (detto il Valentino)",
+                            "Lorenzo il Magnifico",
+                            "Giulio Cesare",
+                            "Napoleone"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Qual è la celeberrima commedia teatrale satirica scritta da Niccolò Machiavelli?",
+                      "o": [
+                            "La Mandragola",
+                            "La Locandiera",
+                            "L'Avaro",
+                            "La Calandra"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Cosa separa Machiavelli per la prima volta nella storia della cultura occidentale?",
+                      "o": [
+                            "L'arte dalla scienza",
+                            "La politica dalla morale e dalla religione",
+                            "Il latino dal greco",
+                            "La musica dal teatro"
+                      ],
+                      "a": 1
+                }
+          ]
+    },
+    'torquato-tasso': {
+          "topic": "Torquato Tasso",
+          "impiccato": [
+                {
+                      "word": "LIBERATA",
+                      "hint": "La Gerusalemme... poema epico della prima crociata"
+                },
+                {
+                      "word": "CLORINDA",
+                      "hint": "La guerriera musulmana battezzata in punto di morte da Tancredi"
+                },
+                {
+                      "word": "TANCREDI",
+                      "hint": "Il valoroso cavaliere cristiano innamorato"
+                },
+                {
+                      "word": "ARMINDA",
+                      "hint": "La maga seduttrice che incanta i crociati"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Canto",
+                            "l'arme",
+                            "pietose",
+                            "e",
+                            "il",
+                            "capitano",
+                            "che",
+                            "'l",
+                            "gran",
+                            "sepolcro",
+                            "liberò",
+                            "di",
+                            "Cristo"
+                      ],
+                      "solution": "Canto l'arme pietose e il capitano che 'l gran sepolcro liberò di Cristo",
+                      "source": "Gerusalemme Liberata (Incipit)"
+                },
+                {
+                      "words": [
+                            "Amico",
+                            "hai",
+                            "vinto",
+                            "io",
+                            "ti",
+                            "perdon",
+                            "perdona",
+                            "tu",
+                            "ancora"
+                      ],
+                      "solution": "Amico hai vinto io ti perdon perdona tu ancora",
+                      "source": "Gerusalemme Liberata (Morte di Clorinda)"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Canto l'arme pietose e 'l capitano che 'l gran sepolcro liberò di Cristo: Goffredo di ___ .",
+                      "blanks": [
+                            "Buglione"
+                      ],
+                      "source": "Gerusalemme Liberata"
+                },
+                {
+                      "text": "Erminia fugge tra i ___ e trova la pace semplice della natura lontana dagli orrori della guerra.",
+                      "blanks": [
+                            "pastori"
+                      ],
+                      "source": "Gerusalemme Liberata"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Gerusalemme Liberata (Incipit)",
+                      "lines": [
+                            "Canto l'arme pietose e 'l capitano",
+                            "che 'l gran sepolcro liberò di Cristo.",
+                            "Molto egli oprò co 'l senno e con la mano,",
+                            "molto soffrì nel glorioso acquisto;"
+                      ],
+                      "hint": "La prima ottava solenne con l'invocazione religiosa e l'annuncio delle imprese di Goffredo di Buglione."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Qual è il tema storico centrale della 'Gerusalemme Liberata'?",
+                      "o": [
+                            "La guerra di Troia",
+                            "La Prima Crociata e la liberazione del Santo Sepolcro",
+                            "La battaglia di Lepanto",
+                            "La spedizione dei Mille"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Chi è il condottiero cristiano a capo dell'esercito crociato nel poema?",
+                      "o": [
+                            "Tancredi",
+                            "Goffredo di Buglione",
+                            "Rinaldo",
+                            "Astolfo"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quale drammatico scontro notturno porta Tancredi a uccidere senza saperlo l'amata Clorinda?",
+                      "o": [
+                            "Il duello sotto le mura di Gerusalemme",
+                            "L'agguato nella selva di Saron",
+                            "La giostra di Damasco",
+                            "Il torneo di Ferrara"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "In quale ospedale-prigione Torquato Tasso fu rinchiuso per sette anni a Ferrara dal duca Alfonso?",
+                      "o": [
+                            "Ospedale di Sant'Anna",
+                            "Castel Sant'Angelo",
+                            "Torre di Londra",
+                            "Forte di San Leo"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Qual è il celebre dramma pastorale composto da Tasso nel 1573?",
+                      "o": [
+                            "L'Aminta",
+                            "Il Pastor Fido",
+                            "L'Orfeo",
+                            "La Favola d'Adone"
+                      ],
+                      "a": 0
+                }
+          ]
+    },
+    'galileo-galilei': {
+          "topic": "Galileo Galilei",
+          "impiccato": [
+                {
+                      "word": "TELESCOPIO",
+                      "hint": "Lo strumento ottico perfezionato per osservare i cieli"
+                },
+                {
+                      "word": "COPERNICO",
+                      "hint": "La teoria eliocentrica che pone il Sole al centro"
+                },
+                {
+                      "word": "DIALOGO",
+                      "hint": "Il... sopra i due massimi sistemi del mondo"
+                },
+                {
+                      "word": "ABIURA",
+                      "hint": "La rinuncia forzata alle proprie scoperte davanti al Tribunale dell'Inquisizione"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "E",
+                            "pur",
+                            "si",
+                            "muove"
+                      ],
+                      "solution": "E pur si muove",
+                      "source": "Celebre frase attribuita a Galileo"
+                },
+                {
+                      "words": [
+                            "Il",
+                            "libro",
+                            "della",
+                            "natura",
+                            "è",
+                            "scritto",
+                            "in",
+                            "lingua",
+                            "matematica"
+                      ],
+                      "solution": "Il libro della natura è scritto in lingua matematica",
+                      "source": "Il Saggiatore"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "La filosofia è scritta in questo grandissimo libro che continuamente ci sta aperto innanzi a gli occhi: io dico l'universo; ma non si può intendere se prima non s'impara a intender la lingua matematiche e i caratteri che sono ___ , cerchi ed altre figure geometriche.",
+                      "blanks": [
+                            "triangoli"
+                      ],
+                      "source": "Il Saggiatore"
+                },
+                {
+                      "text": "Nel Dialogo sopra i due massimi sistemi del mondo, Salviati difende il sistema copernicano, Simplicio quello aristotelico e ___ fa da moderatore.",
+                      "blanks": [
+                            "Sagredo"
+                      ],
+                      "source": "Dialogo sopra i due massimi sistemi"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Il Saggiatore (Il libro della natura)",
+                      "lines": [
+                            "La filosofia è scritta in questo grandissimo libro",
+                            "che continuamente ci sta aperto innanzi a gli occhi (io dico l'universo),",
+                            "ma non si può intendere se prima non s'impara a intender la lingua,",
+                            "e conoscer i caratteri, ne' quali è scritto. Egli è scritto in lingua matematica."
+                      ],
+                      "hint": "Il manifesto epistemologico della scienza moderna: la natura comprensibile con formule matematiche."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Quale fondamentale metodo scientifico fu fondato da Galileo Galilei?",
+                      "o": [
+                            "Il metodo deduttivo aristotelico",
+                            "Il metodo sperimentale (osservazione, ipotesi, esperimento, legge)",
+                            "L'astrologia comparata",
+                            "L'alchimia applicata"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Cosa scoprì Galileo puntando il cannocchiale verso il pianeta Giove nel 1610?",
+                      "o": [
+                            "Gli anelli di Giove",
+                            "I quattro satelliti medicei (Io, Europa, Ganimede, Callisto)",
+                            "I canali marziani",
+                            "Una cometa"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quale scelta linguistica innovativa fece Galileo per diffondere le sue opere scientifiche?",
+                      "o": [
+                            "Scrisse solo in latino aulico",
+                            "Scrisse in volgare italiano chiaro e divulgativo",
+                            "Scrisse in francese",
+                            "Scrisse in greco antico"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Chi rappresenta il difensore ottuso del vecchio sistema tolemaico nel 'Dialogo'?",
+                      "o": [
+                            "Salviati",
+                            "Sagredo",
+                            "Simplicio",
+                            "Copernico"
+                      ],
+                      "a": 2
+                },
+                {
+                      "q": "Cosa fu costretto a fare Galileo a Roma nel 1633 davanti al Tribunale del Santo Uffizio?",
+                      "o": [
+                            "Fu mandato al rogo",
+                            "Dovette pronunciare l'abiura ritrattando le proprie teorie copernicane",
+                            "Fu bandito in America",
+                            "Divenne cardinale"
+                      ],
+                      "a": 1
+                }
+          ]
+    },
+    'carlo-goldoni': {
+          "topic": "Carlo Goldoni",
+          "impiccato": [
+                {
+                      "word": "LOCANDIERA",
+                      "hint": "La brillante commedia con la protagonista Mirandolina"
+                },
+                {
+                      "word": "VENEZIA",
+                      "hint": "La patria del commediografo lagunare"
+                },
+                {
+                      "word": "RIFORMA",
+                      "hint": "L'abolizione delle maschere a favore del testo scritto e del realismo"
+                },
+                {
+                      "word": "MIRANDOLINA",
+                      "hint": "L'intelligente padrona della locanda fiorentina"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "M'importa",
+                            "del",
+                            "mio",
+                            "dovere",
+                            "e",
+                            "del",
+                            "mio",
+                            "onore"
+                      ],
+                      "solution": "M'importa del mio dovere e del mio onore",
+                      "source": "La Locandiera (Mirandolina)"
+                },
+                {
+                      "words": [
+                            "Il",
+                            "mondo",
+                            "è",
+                            "un",
+                            "bellissimo",
+                            "libro",
+                            "ma",
+                            "poco",
+                            "serve",
+                            "a",
+                            "chi",
+                            "non",
+                            "sa",
+                            "leggere"
+                      ],
+                      "solution": "Il mondo è un bellissimo libro ma poco serve a chi non sa leggere",
+                      "source": "Memorie"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Mirandolina è l'arguta padrona della locanda che riesce a far innamorare persino il Cavaliere di Ripafratta, noto nemico delle ___ .",
+                      "blanks": [
+                            "donne"
+                      ],
+                      "source": "La Locandiera"
+                },
+                {
+                      "text": "La riforma goldoniana sostituisce i vecchi canovacci della Commedia dell'Arte con un testo interamente ___ dagli attori.",
+                      "blanks": [
+                            "scritto"
+                      ],
+                      "source": "Riforma del Teatro"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "La Locandiera - Monologo di Mirandolina",
+                      "lines": [
+                            "Tratto tutti con gentilezza, ma voglio vivere a modo mio.",
+                            "L'onore è la maggior ricchezza che abbia una ragazza.",
+                            "I nobili credono che col denaro si possa comprare tutto,",
+                            "ma a me piace vederli sospirare e servire."
+                      ],
+                      "hint": "Il celebre monologo in cui Mirandolina afferma la propria autonomia femminile e intelligenza borghese."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Qual è la grande innovazione introdotta dalla Riforma teatrale di Goldoni?",
+                      "o": [
+                            "L'uso di fuochi d'artificio sul palco",
+                            "La sostituzione del canovaccio improvvisato con il copione scritto e la caratterizzazione psicologica dei personaggi",
+                            "L'eliminazione delle donne dalle scene",
+                            "Il ritorno al coro tragico greco"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Qual è la professione di Mirandolina nella sua celeberrima commedia?",
+                      "o": [
+                            "Attrice",
+                            "Locandiera a Firenze",
+                            "Cameriera a Venezia",
+                            "Nobildonna"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quale nobile misogino dichiara di disprezzare le donne prima di cedere al fascino di Mirandolina?",
+                      "o": [
+                            "Il Marchese di Forlipopoli",
+                            "Il Conte d'Albafiorita",
+                            "Il Cavaliere di Ripafratta",
+                            "Fabrizio"
+                      ],
+                      "a": 2
+                },
+                {
+                      "q": "Chi sposa alla fine Mirandolina per tutelare il proprio onore e la locanda?",
+                      "o": [
+                            "Il Cavaliere",
+                            "Il cameriere Fabrizio",
+                            "Il Marchese",
+                            "Nessuno"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "In quale celebre città francese Goldoni trascorse gli ultimi anni della vita scrivendo le sue 'Mémoires'?",
+                      "o": [
+                            "Lione",
+                            "Parigi",
+                            "Marsiglia",
+                            "Nizza"
+                      ],
+                      "a": 1
+                }
+          ]
+    },
+    'commedia-arte': {
+          "topic": "La Commedia dell'Arte",
+          "impiccato": [
+                {
+                      "word": "ARLECCHINO",
+                      "hint": "La maschera bergamasca dal vestito a toppe colorate"
+                },
+                {
+                      "word": "PANTALONE",
+                      "hint": "Il vecchio mercante veneziano avaro"
+                },
+                {
+                      "word": "CANOVACCIO",
+                      "hint": "La traccia sintetica della trama su cui gli attori improvvisavano"
+                },
+                {
+                      "word": "MASCHERA",
+                      "hint": "L'elemento di cuoio sul volto che fissava il tipo comico"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Arlecchino",
+                            "servitore",
+                            "di",
+                            "due",
+                            "padroni",
+                            "per",
+                            "non",
+                            "morire",
+                            "di",
+                            "fame"
+                      ],
+                      "solution": "Arlecchino servitore di due padroni per non morire di fame",
+                      "source": "Commedia dell'Arte"
+                },
+                {
+                      "words": [
+                            "I",
+                            "lazzi",
+                            "e",
+                            "le",
+                            "acrobazie",
+                            "degli",
+                            "zanni",
+                            "sulla",
+                            "scena"
+                      ],
+                      "solution": "I lazzi e le acrobazie degli zanni sulla scena",
+                      "source": "Tradizione teatrale"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "I comici dell'Arte recitavano sui palcoscenici di tutta Europa basandosi non su un copione scritto, ma su un sintetico ___ .",
+                      "blanks": [
+                            "canovaccio"
+                      ],
+                      "source": "Commedia dell'Arte"
+                },
+                {
+                      "text": "Pantalone rappresenta l'anziano e avaro mercante di ___ , mentre il Dottor Balanzone è il presuntuoso giurista di Bologna.",
+                      "blanks": [
+                            "Venezia"
+                      ],
+                      "source": "Maschere italiane"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Trattato dei Comici dell'Arte",
+                      "lines": [
+                            "L'arte dell'attore è inventar la scena,",
+                            "con salti, motti, lazzi e gesti pronti.",
+                            "Dietro la maschera di cuoio parla il popolo,",
+                            "e la risata scioglie ogni catena."
+                      ],
+                      "hint": "La gloriosa tradizione teatrale professionistica italiana che ha conquistato le corti d'Europa nel Cinquecento e Seicento."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Cosa caratterizzava principalmente la recitazione nella Commedia dell'Arte?",
+                      "o": [
+                            "Testi recitati a memoria in latino",
+                            "L'improvvisazione guidata dal canovaccio e l'uso di maschere fisse e lazzi comici",
+                            "Il silenzio assoluto",
+                            "L'opera lirica cantata"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quale grande novità introdusse per la prima volta nella storia del teatro occidentale la Commedia dell'Arte?",
+                      "o": [
+                            "L'ingresso delle donne professioniste come attrici sulla scena",
+                            "L'illuminazione a gas",
+                            "Il biglietto a pagamento",
+                            "I costumi di scena"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Da quale città proviene la maschera astuta e furba di Brighella?",
+                      "o": [
+                            "Napoli",
+                            "Bergamo",
+                            "Roma",
+                            "Firenze"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Qual è la tipica maschera napoletana vestita di bianco dal naso adunco e carattere malinconico e ironico?",
+                      "o": [
+                            "Arlecchino",
+                            "Pulcinella",
+                            "Colombina",
+                            "Scaramuccia"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Cosa sono i 'lazzi' nella Commedia dell'Arte?",
+                      "o": [
+                            "Corde per legare la scenografia",
+                            "Scenette mimiche, battute comiche e gag acrobatiche improvvisate",
+                            "Monologhi drammatici",
+                            "Strumenti musicali"
+                      ],
+                      "a": 1
+                }
+          ]
+    },
+    'giuseppe-parini': {
+          "topic": "Giuseppe Parini",
+          "impiccato": [
+                {
+                      "word": "GIORNO",
+                      "hint": "Il poema satirico diviso in Mattino, Mezzogiorno, Vespro e Notte"
+                },
+                {
+                      "word": "GIOVIN",
+                      "hint": "Il '... signore' nobile ozioso e viziato"
+                },
+                {
+                      "word": "CUCCIA",
+                      "hint": "La 'Vergine...' episodio della cagnetta viziata della dama"
+                },
+                {
+                      "word": "MILANO",
+                      "hint": "La capitale dell'Illuminismo lombardo dove visse Parini"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Giovin",
+                            "signore",
+                            "o",
+                            "a",
+                            "te",
+                            "scenda",
+                            "per",
+                            "lungo",
+                            "ordine",
+                            "di",
+                            "avi"
+                      ],
+                      "solution": "Giovin signore o a te scenda per lungo ordine di avi",
+                      "source": "Il Giorno (Il Mattino)"
+                },
+                {
+                      "words": [
+                            "Or",
+                            "odi",
+                            "la",
+                            "pietosa",
+                            "istoria",
+                            "della",
+                            "vergine",
+                            "cuccia"
+                      ],
+                      "solution": "Or odi la pietosa istoria della vergine cuccia",
+                      "source": "Il Giorno (La vergine cuccia)"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Nel poema Il Giorno, Parini fa da precettore ironico al giovin signore, descrivendo la sua vita vuota e ___ dall'alba a notte fonda.",
+                      "blanks": [
+                            "oziosa"
+                      ],
+                      "source": "Il Giorno"
+                },
+                {
+                      "text": "Nell'episodio della vergine cuccia, un servo fedele viene licenziato per aver dato un calcio alla cagnetta della nobile ___ .",
+                      "blanks": [
+                            "dama"
+                      ],
+                      "source": "Il Giorno"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Il Giorno - Il Mattino (Incipit)",
+                      "lines": [
+                            "Giovin signore, o a te scenda per lungo",
+                            "d'antiquissimi e illustri avi legnaggio",
+                            "o in te sangue chiarissimo e sangue",
+                            "splenda d'onori e d'eccelse virtuti..."
+                      ],
+                      "hint": "I primi versi in endecasillabi sciolti in cui il poeta finge di lodare la frivola nobiltà milanese."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Qual è il bersaglio principale della satira di Giuseppe Parini ne 'Il Giorno'?",
+                      "o": [
+                            "I contadini",
+                            "La nobiltà oziosa, parassitaria e decadente del Settecento",
+                            "I commercianti",
+                            "Gli scienziati"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "In quali quattro parti ideali è suddiviso il poema 'Il Giorno'?",
+                      "o": [
+                            "Primavera, Estate, Autunno, Inverno",
+                            "Il Mattino, Il Mezzogiorno, Il Vespro, La Notte",
+                            "Terra, Aria, Fuoco, Acqua",
+                            "Infanzia, Giovinezza, Maturità, Vecchiaia"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Cosa accade nell'episodio della 'Vergine cuccia'?",
+                      "o": [
+                            "Un servo fedele da vent'anni viene cacciato in miseria per aver dato un calcio al cane della dama che lo aveva morso",
+                            "Un cane vince una gara",
+                            "Un nobile adotta un cane randagio",
+                            "Un cane salva un bambino"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale figura sociale di accompagnatore galante delle nobildonne Parini prende di mira?",
+                      "o": [
+                            "Il cavalier servente (cicisbeo)",
+                            "Il ciambellano",
+                            "Il podestà",
+                            "Il paggio"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale ruolo educativo svolse Parini a Milano presso le Scuole Palatine?",
+                      "o": [
+                            "Insegnante di Belle Lettere ed educatore illuminato",
+                            "Magistrato",
+                            "Bibliotecario a Parigi",
+                            "Medico"
+                      ],
+                      "a": 0
+                }
+          ]
+    },
+    'cesare-beccaria': {
+          "topic": "Cesare Beccaria",
+          "impiccato": [
+                {
+                      "word": "DELITTI",
+                      "hint": "Dei... e delle pene (trattato del 1764)"
+                },
+                {
+                      "word": "TORTURA",
+                      "hint": "La crudele pratica giudiziaria di cui dimostrò l'inutilità"
+                },
+                {
+                      "word": "MORTE",
+                      "hint": "La pena capitale che Beccaria propose per primo di abolire"
+                },
+                {
+                      "word": "CAFFE",
+                      "hint": "La celebre rivista illuminista dei fratelli Verri a Milano"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Non",
+                            "vi",
+                            "è",
+                            "libertà",
+                            "ogni",
+                            "qual",
+                            "volta",
+                            "le",
+                            "leggi",
+                            "permettono",
+                            "all'uomo",
+                            "di",
+                            "diventare",
+                            "schiavo"
+                      ],
+                      "solution": "Non vi è libertà ogni qual volta le leggi permettono all'uomo di diventare schiavo",
+                      "source": "Dei delitti e delle pene"
+                },
+                {
+                      "words": [
+                            "La",
+                            "pena",
+                            "di",
+                            "morte",
+                            "è",
+                            "una",
+                            "guerra",
+                            "della",
+                            "nazione",
+                            "contro",
+                            "un",
+                            "cittadino"
+                      ],
+                      "solution": "La pena di morte è una guerra della nazione contro un cittadino",
+                      "source": "Dei delitti e delle pene"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Parmi un assurdo che le leggi, che sono l'espressione della pubblica volontà, puniscano l'omicidio e ne commettano uno esse medesime ordinando la pena di ___ .",
+                      "blanks": [
+                            "morte"
+                      ],
+                      "source": "Dei delitti e delle pene"
+                },
+                {
+                      "text": "La tortura è ingiusta perché punisce un uomo prima che sia giudicato ___ ed è utile solo a far confessare i deboli innocenti.",
+                      "blanks": [
+                            "colpevole"
+                      ],
+                      "source": "Dei delitti e delle pene"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Dei delitti e delle pene (Capitolo XXVIII)",
+                      "lines": [
+                            "Questa inutile prodigalità di supplizii, che non ha mai resi migliori gli uomini,",
+                            "mi ha spinto ad esaminare se la morte sia veramente utile e giusta in un governo bene organizzato.",
+                            "Non è il terribile ma passeggiero spettacolo della morte d'uno scellerato,",
+                            "ma il lungo e stentato esempio d'un uomo privo di libertà che frena i delitti."
+                      ],
+                      "hint": "Il passo fondamentale che ha convinto i sovrani illuminati d'Europa a riformare il codice penale."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "In quale anno fu pubblicato a Livorno il trattato 'Dei delitti e delle pene'?",
+                      "o": [
+                            "1700",
+                            "1764",
+                            "1789",
+                            "1800"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quale sovrano europeo per primo abolì la pena di morte ispirandosi alle idee di Beccaria?",
+                      "o": [
+                            "Pietro Leopoldo nel Granducato di Toscana (1786)",
+                            "Luigi XIV in Francia",
+                            "Giorgio III d'Inghilterra",
+                            "Filippo II di Spagna"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Secondo Beccaria, cosa rende una pena veramente efficace per scoraggiare i crimini?",
+                      "o": [
+                            "La crudeltà estrema",
+                            "La prontezza e l'infallibilità della punizione, non la ferocia",
+                            "Il segreto delle indagini",
+                            "Il riscatto in denaro"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Di quale altro celeberrimo autore della letteratura italiana Cesare Beccaria era nonno materno?",
+                      "o": [
+                            "Giacomo Leopardi",
+                            "Alessandro Manzoni",
+                            "Ugo Foscolo",
+                            "Giosuè Carducci"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quale celebre periodico dell'Illuminismo milanese fu fondato da Beccaria insieme ai fratelli Pietro e Alessandro Verri?",
+                      "o": [
+                            "Il Caffè",
+                            "Il Conciliatore",
+                            "La Frusta Letteraria",
+                            "L'Avvenire"
+                      ],
+                      "a": 0
+                }
+          ]
+    },
+    'cecco-angiolieri': {
+          "topic": "Cecco Angiolieri",
+          "impiccato": [
+                {
+                      "word": "FOCO",
+                      "hint": "S'i' fosse... arderei 'l mondo"
+                },
+                {
+                      "word": "SIENA",
+                      "hint": "La città toscana del poeta comico-realista"
+                },
+                {
+                      "word": "BECCHINA",
+                      "hint": "La donna amata e continuamente canzonata"
+                },
+                {
+                      "word": "DONNE",
+                      "hint": "Tre cose solamente mi so' in grado: la donna, la taverna e 'l dado"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "S'i'",
+                            "fosse",
+                            "foco",
+                            "arderei",
+                            "'l",
+                            "mondo"
+                      ],
+                      "solution": "S'i' fosse foco arderei 'l mondo",
+                      "source": "Rime"
+                },
+                {
+                      "words": [
+                            "S'i'",
+                            "fosse",
+                            "imperator",
+                            "sa'",
+                            "che",
+                            "farei",
+                            "a",
+                            "tutti",
+                            "mozzarei",
+                            "lo",
+                            "capo"
+                      ],
+                      "solution": "S'i' fosse imperator sa' che farei a tutti mozzarei lo capo",
+                      "source": "Rime"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "S'i' fosse foco, arderei 'l mondo; s'i' fosse vento, lo ___ ; s'i' fosse acqua, io l'annegherei; s'i' fosse Dio, mandereil'en profondo.",
+                      "blanks": [
+                            "tempesterei"
+                      ],
+                      "source": "Sonetto"
+                },
+                {
+                      "text": "Tre cose solamente mi so' in grado, le quali posso non ben ben fornire: ciò è la donna, la ___ e 'l dado.",
+                      "blanks": [
+                            "taverna"
+                      ],
+                      "source": "Sonetto"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "S'i' fosse foco (Sonetto)",
+                      "lines": [
+                            "S'i' fosse foco, arderei 'l mondo;",
+                            "s'i' fosse vento, lo tempesterei;",
+                            "s'i' fosse acqua, io l'annegherei;",
+                            "s'i' fosse Dio, mandereil'en profondo;"
+                      ],
+                      "hint": "L'esplosivo sonetto comico-realista contro le ipocrisie del tempo e la severità dei genitori."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "A quale corrente poetica del Duecento toscano appartiene Cecco Angiolieri?",
+                      "o": [
+                            "Dolce Stil Novo",
+                            "Poesia comico-realistica e giocosa",
+                            "Scuola Siciliana",
+                            "Poesia religiosa"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Con quale grandissimo poeta suo contemporaneo Cecco scambiò sonetti polemici e canzonatori?",
+                      "o": [
+                            "Francesco Petrarca",
+                            "Dante Alighieri",
+                            "Giovanni Boccaccio",
+                            "Guido Guinizzelli"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Cosa farebbe Cecco secondo il finale del sonetto 'S'i' fosse Cecco, com'i' sono e fui'?",
+                      "o": [
+                            "Si farebbe prete",
+                            "Prenderebbe le donne giovani e leggiadre, lasciando agli altri le vecchie e laide",
+                            "Comprerebbe un castello",
+                            "Andrebbe in esilio"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Da quale città toscana proveniva Cecco Angiolieri?",
+                      "o": [
+                            "Firenze",
+                            "Siena",
+                            "Lucca",
+                            "Arezzo"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quali sono le 'tre cose' che il poeta dichiara di amare sopra ogni altra?",
+                      "o": [
+                            "I libri, la gloria e il cielo",
+                            "La donna, la taverna e il dado (il gioco d'azzardo)",
+                            "I soldi, il cavallo e la spada",
+                            "Il vino, la preghiera e l'orto"
+                      ],
+                      "a": 1
+                }
+          ]
+    },
+    'iacopone-todi': {
+          "topic": "Iacopone da Todi",
+          "impiccato": [
+                {
+                      "word": "PARADISO",
+                      "hint": "La laude 'Donna de...'"
+                },
+                {
+                      "word": "FRANCESCANO",
+                      "hint": "L'ordine dei frati Spirituali a cui apparteneva"
+                },
+                {
+                      "word": "TODI",
+                      "hint": "La cittadina umbra di nascita del frate"
+                },
+                {
+                      "word": "STABAT",
+                      "hint": "... Mater (celebre sequenza sacra medievale)"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Donna",
+                            "de",
+                            "Paradiso",
+                            "lo",
+                            "tuo",
+                            "figlio",
+                            "è",
+                            "preso"
+                      ],
+                      "solution": "Donna de Paradiso lo tuo figlio è preso",
+                      "source": "Lauda drammatica"
+                },
+                {
+                      "words": [
+                            "O",
+                            "amor",
+                            "divino",
+                            "perché",
+                            "m'hai",
+                            "ferito"
+                      ],
+                      "solution": "O amor divino perché m'hai ferito",
+                      "source": "Laude"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Donna de Paradiso, lo tuo figlio è preso, Iesu Cristo beato. Accurre, donna, e vide che la gente l' ___ ; credo che sia ferito.",
+                      "blanks": [
+                            "allide"
+                      ],
+                      "source": "Donna de Paradiso"
+                },
+                {
+                      "text": "Figlio, l'alma t'è uscita, figlio de la smarrita, figlio de la ___ , figlio, padre e signore!",
+                      "blanks": [
+                            "sconsolata"
+                      ],
+                      "source": "Donna de Paradiso"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Donna de Paradiso (Incipit)",
+                      "lines": [
+                            "«Donna de Paradiso,",
+                            "lo tuo figlio è preso",
+                            "Iesu Cristo beato.",
+                            "Accurre, donna, e vide"
+                      ],
+                      "hint": "Il messaggero annuncia alla Vergine Maria la cattura e il processo di Gesù."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Quale forma poetica e teatrale sacra fu perfezionata da Iacopone da Todi?",
+                      "o": [
+                            "Il sonetto",
+                            "La lauda drammatica dialogata",
+                            "Il poema epico",
+                            "La commedia dell'arte"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quale tragico evento spinse Iacopone a convertirsi e vestire il saio di penitente?",
+                      "o": [
+                            "La morte della giovane moglie Vanna durante una festa e la scoperta del suo cilicio",
+                            "Una condanna in tribunale",
+                            "Un naufragio",
+                            "La perdita di un feudo"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Contro quale pontefice Iacopone si scagliò duramente finendo imprigionato per anni?",
+                      "o": [
+                            "Papa Bonifacio VIII",
+                            "Papa Francesco",
+                            "Papa Gregorio IX",
+                            "Papa Innocenzo III"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Chi è la protagonista sofferente della celebre lauda 'Donna de Paradiso'?",
+                      "o": [
+                            "Maria Vergine davanti alla crocifissione del Figlio",
+                            "Santa Chiara",
+                            "Maddalena",
+                            "Santa Rita"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale celebre sequenza liturgica latina sul dolore della Madonna ai piedi della croce è tradizionalmente attribuita a Iacopone?",
+                      "o": [
+                            "Dies Irae",
+                            "Stabat Mater",
+                            "Te Deum",
+                            "Magnificat"
+                      ],
+                      "a": 1
+                }
+          ]
+    },
+    'victor-hugo': {
+          "topic": "Victor Hugo",
+          "impiccato": [
+                {
+                      "word": "MISERABILI",
+                      "hint": "Il monumentale romanzo sociale con Jean Valjean e Cosette"
+                },
+                {
+                      "word": "VALJEAN",
+                      "hint": "L'ex forzato redento dalla bontà del vescovo Myriel"
+                },
+                {
+                      "word": "NOTREDAME",
+                      "hint": "La cattedrale gotica di Parigi e la storia di Quasimodo"
+                },
+                {
+                      "word": "ROMANTICISMO",
+                      "hint": "Il movimento letterario di cui fu il gigante in Francia"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Morire",
+                            "non",
+                            "è",
+                            "nulla",
+                            "terribile",
+                            "è",
+                            "non",
+                            "vivere"
+                      ],
+                      "solution": "Morire non è nulla terribile è non vivere",
+                      "source": "I Miserabili"
+                },
+                {
+                      "words": [
+                            "C'è",
+                            "uno",
+                            "spettacolo",
+                            "più",
+                            "grandioso",
+                            "del",
+                            "mare",
+                            "ed",
+                            "è",
+                            "il",
+                            "cielo"
+                      ],
+                      "solution": "C'è uno spettacolo più grandioso del mare ed è il cielo",
+                      "source": "I Miserabili"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Jean Valjean viene condannato a diciannove anni di galera per aver rubato un pezzo di ___ per sfamare i figli di sua sorella.",
+                      "blanks": [
+                            "pane"
+                      ],
+                      "source": "I Miserabili"
+                },
+                {
+                      "text": "Il gobbo Quasimodo suona le campane della cattedrale di Notre-Dame e protegge con la vita la bella danzatrice zingara ___ .",
+                      "blanks": [
+                            "Esmeralda"
+                      ],
+                      "source": "Notre-Dame de Paris"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "I Miserabili (Riflessione)",
+                      "lines": [
+                            "Finché esisterà una dannazione sociale",
+                            "finché sulla terra vi saranno ignoranza e miseria,",
+                            "i libri di questa natura",
+                            "non potranno essere inutili."
+                      ],
+                      "hint": "La celebre prefazione morale sull'impegno per il riscatto degli oppressi."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Quale capolavoro di Victor Hugo racconta le vicende di Jean Valjean, Cosette e Javert?",
+                      "o": [
+                            "Notre-Dame de Paris",
+                            "I Miserabili",
+                            "I lavoratori del mare",
+                            "L'uomo che ride"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Chi è il campanaro deforme protagonista di 'Notre-Dame de Paris'?",
+                      "o": [
+                            "Gavroche",
+                            "Quasimodo",
+                            "Frollo",
+                            "Phoebus"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Su quale isola nel Canale della Manica visse in esilio Victor Hugo per quasi vent'anni?",
+                      "o": [
+                            "Isola di Guernsey",
+                            "Isola d'Elba",
+                            "Sant'Elena",
+                            "Corsica"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale implacabile ispettore di polizia dà la caccia a Jean Valjean per tutta la vita?",
+                      "o": [
+                            "Javert",
+                            "Poirot",
+                            "Maigret",
+                            "Dupin"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Cosa dona il vescovo Myriel a Jean Valjean per salvarlo dall'arresto e comprargli l'anima per Dio?",
+                      "o": [
+                            "Un sacco di fiorini",
+                            "Due candelieri d'argento",
+                            "Un crocifisso d'oro",
+                            "Un anello di diamanti"
+                      ],
+                      "a": 1
+                }
+          ]
+    },
+    'gabriel-garcia-marquez': {
+          "topic": "Gabriel García Márquez",
+          "impiccato": [
+                {
+                      "word": "SOLITUDINE",
+                      "hint": "Cent'anni di... la saga della famiglia Buendía"
+                },
+                {
+                      "word": "MACONDO",
+                      "hint": "Il mitico villaggio sperduto nella foresta colombiana"
+                },
+                {
+                      "word": "MAGICO",
+                      "hint": "Il Realismo... dove il meraviglioso diventa quotidiano"
+                },
+                {
+                      "word": "COLERA",
+                      "hint": "L'amore ai tempi del... tra Florentino e Fermina"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Molti",
+                            "anni",
+                            "dopo",
+                            "di",
+                            "fronte",
+                            "al",
+                            "plotone",
+                            "di",
+                            "esecuzione"
+                      ],
+                      "solution": "Molti anni dopo di fronte al plotone di esecuzione",
+                      "source": "Cent'anni di solitudine (Incipit)"
+                },
+                {
+                      "words": [
+                            "Il",
+                            "colonnello",
+                            "Aureliano",
+                            "Buendía",
+                            "si",
+                            "sarebbe",
+                            "ricordato",
+                            "di",
+                            "quel",
+                            "remoto",
+                            "pomeriggio"
+                      ],
+                      "solution": "Il colonnello Aureliano Buendía si sarebbe ricordato di quel remoto pomeriggio",
+                      "source": "Cent'anni di solitudine"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Molti anni dopo, di fronte al plotone di esecuzione, il colonnello Aureliano Buendía si sarebbe ricordato di quel remoto pomeriggio in cui suo padre lo condusse a conoscere il ___ .",
+                      "blanks": [
+                            "ghiaccio"
+                      ],
+                      "source": "Cent'anni di solitudine"
+                },
+                {
+                      "text": "Florentino Ariza aspetta per oltre cinquant'anni l'amore della sua vita Fermina Daza nel romanzo L'amore ai tempi del ___ .",
+                      "blanks": [
+                            "colera"
+                      ],
+                      "source": "L'amore ai tempi del colera"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Cent'anni di solitudine (Incipit)",
+                      "lines": [
+                            "Molti anni dopo, di fronte al plotone di esecuzione,",
+                            "il colonnello Aureliano Buendía si sarebbe ricordato",
+                            "di quel remoto pomeriggio in cui suo padre",
+                            "lo condusse a conoscere il ghiaccio."
+                      ],
+                      "hint": "Uno degli incipit più celebrati e perfetti della storia della letteratura mondiale."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "In quale Paese sudamericano nacque Gabriel García Márquez?",
+                      "o": [
+                            "Argentina",
+                            "Colombia (Aracataca)",
+                            "Messico",
+                            "Cile"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Come si chiama il villaggio immaginario fondato dalla famiglia Buendía?",
+                      "o": [
+                            "Macondo",
+                            "Comala",
+                            "Santa Maria",
+                            "Eldorado"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "In quale anno García Márquez ricevette il Premio Nobel per la Letteratura?",
+                      "o": [
+                            "1971",
+                            "1982",
+                            "1990",
+                            "2000"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quale genere letterario fonde prodigi, profezie e realtà quotidiana come naturale verità?",
+                      "o": [
+                            "Realismo Magico",
+                            "Fantascienza pura",
+                            "Romanzo storico verista",
+                            "Fiaba nordica"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Chi è la longeva e saggia matriarca della casa dei Buendía che vive per oltre un secolo?",
+                      "o": [
+                            "Ursula Iguarán",
+                            "Amaranta",
+                            "Rebeca",
+                            "Remedios la bella"
+                      ],
+                      "a": 0
+                }
+          ]
+    },
+    'edgar-allan-poe': {
+          "topic": "Edgar Allan Poe",
+          "impiccato": [
+                {
+                      "word": "CORVO",
+                      "hint": "La celebre poesia con il ritornello 'Mai più' (Nevermore)"
+                },
+                {
+                      "word": "DUPIN",
+                      "hint": "Auguste... il primo grande detective razionale della letteratura"
+                },
+                {
+                      "word": "HORROR",
+                      "hint": "Il genere del brivido e del terrore psicologico"
+                },
+                {
+                      "word": "PENDOLO",
+                      "hint": "Il pozzo e il... racconto dell'Inquisizione a Toledo"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Disse",
+                            "il",
+                            "corvo",
+                            "mai",
+                            "più"
+                      ],
+                      "solution": "Disse il corvo mai più",
+                      "source": "Il Corvo"
+                },
+                {
+                      "words": [
+                            "I",
+                            "delitti",
+                            "della",
+                            "strada",
+                            "Morgue",
+                            "inaugurarono",
+                            "il",
+                            "genere",
+                            "poliziesco"
+                      ],
+                      "solution": "I delitti della strada Morgue inaugurarono il genere poliziesco",
+                      "source": "Racconti straordinari"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "E il Corvo, non svolazzando mai, posa ancora, posa ancora sul pallido busto di Pallade, sopra la porta della mia stanza con la parola: 'Mai ___'.",
+                      "blanks": [
+                            "più"
+                      ],
+                      "source": "Il Corvo"
+                },
+                {
+                      "text": "Nel racconto Il cuore rivelatore, l'assassino viene tradito dal suono allucinante del battito del ___ nascosto sotto le assi del pavimento.",
+                      "blanks": [
+                            "cuore"
+                      ],
+                      "source": "Il cuore rivelatore"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Il Corvo (The Raven)",
+                      "lines": [
+                            "Una volta, in una fosca mezzanotte,",
+                            "mentre meditavo debole e stanco",
+                            "su molti bizzarri e curiosi volumi di scienza dimenticata,",
+                            "all'improvviso sentii un bussare alla porta."
+                      ],
+                      "hint": "L'atmosfera gotica e ossessiva della poesia più famosa della letteratura americana."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Quale genere narrativo moderno è stato inventato da Edgar Allan Poe con 'I delitti della Rue Morgue' (1841)?",
+                      "o": [
+                            "Il romanzo rosa",
+                            "Il racconto poliziesco / giallo deduttivo",
+                            "Il fumetto",
+                            "Il fantasy epico"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Qual è l'unica parola che il misterioso Corvo ripete al poeta addolorato per la perdita di Lenore?",
+                      "o": [
+                            "Sempre",
+                            "Mai più (Nevermore)",
+                            "Addio",
+                            "Morte"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Come si chiama l'acuto investigatore parigino creato da Poe che anticipa Sherlock Holmes?",
+                      "o": [
+                            "Auguste Dupin",
+                            "Hercule Poirot",
+                            "Nero Wolfe",
+                            "Sam Spade"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale animale domestico nero dagli occhi inquietanti è protagonista di un celebre racconto del terrore?",
+                      "o": [
+                            "Un gatto nero (Pluto)",
+                            "Un cane mastino",
+                            "Un corvo reale",
+                            "Un serpente"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "In quale città della costa orientale americana morì misteriosamente Poe a soli quarant'anni nel 1849?",
+                      "o": [
+                            "New York",
+                            "Boston",
+                            "Baltimora",
+                            "Philadelphia"
+                      ],
+                      "a": 2
+                }
+          ]
+    },
+    'fedor-dostoevskij': {
+          "topic": "Fëdor Dostoevskij",
+          "impiccato": [
+                {
+                      "word": "DELITTO",
+                      "hint": "... e castigo, la storia del tormento di Raskol'nikov"
+                },
+                {
+                      "word": "RASKOLNIKOV",
+                      "hint": "Il giovane studente che uccide la vecchia usuraia"
+                },
+                {
+                      "word": "KARAMAZOV",
+                      "hint": "I fratelli... Dmitri, Ivan e Alëša"
+                },
+                {
+                      "word": "IDIOTA",
+                      "hint": "Il principe Myškin incarnazione della bontà pura"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "La",
+                            "bellezza",
+                            "salverà",
+                            "il",
+                            "mondo"
+                      ],
+                      "solution": "La bellezza salverà il mondo",
+                      "source": "L'idiota (Principe Myškin)"
+                },
+                {
+                      "words": [
+                            "Se",
+                            "Dio",
+                            "non",
+                            "esiste",
+                            "allora",
+                            "tutto",
+                            "è",
+                            "permesso"
+                      ],
+                      "solution": "Se Dio non esiste allora tutto è permesso",
+                      "source": "I fratelli Karamazov"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Raskol'nikov uccide la vecchia usuraia credendosi un uomo superiore come Napoleone, ma viene travolto dal rimorso e redento dall'amore di ___ .",
+                      "blanks": [
+                            "Sonja"
+                      ],
+                      "source": "Delitto e castigo"
+                },
+                {
+                      "text": "La leggenda del Grande ___ è il celebre capitolo de I fratelli Karamazov in cui Ivan immagina il ritorno di Cristo sulla terra.",
+                      "blanks": [
+                            "Inquisitore"
+                      ],
+                      "source": "I fratelli Karamazov"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "L'idiota (Riflessione sulla bellezza)",
+                      "lines": [
+                            "È vero, principe, che voi diceste un giorno",
+                            "che il mondo sarà salvato dalla bellezza?",
+                            "Signori, gridò a tutti,",
+                            "il principe afferma che la bellezza salverà il mondo!"
+                      ],
+                      "hint": "La celeberrima frase sull'etica e l'arte pronunciata nel capolavoro dostoevskiano."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Qual è il capolavoro in cui lo studente Raskol'nikov affronta la colpa e l'espiazione?",
+                      "o": [
+                            "I fratelli Karamazov",
+                            "Delitto e castigo",
+                            "L'idiota",
+                            "Memorie dal sottosuolo"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quale terribile condanna subì Dostoevskij nel 1849 prima di ricevere la grazia dello zar?",
+                      "o": [
+                            "Condanna a morte davanti al plotone d'esecuzione, commutata in lavori forzati in Siberia",
+                            "L'esilio a Parigi",
+                            "La prigione a Mosca",
+                            "La confisca della casa"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Chi è il protagonista puro e innocente del romanzo 'L'idiota'?",
+                      "o": [
+                            "Il principe Myškin",
+                            "Raskol'nikov",
+                            "Rogožin",
+                            "Stavrogin"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Come si intitola il grandioso capitolo filosofico sui dubbi della fede ne 'I fratelli Karamazov'?",
+                      "o": [
+                            "La leggenda del Grande Inquisitore",
+                            "La confessione di Sonja",
+                            "Il sogno di un uomo ridicolo",
+                            "Notti bianche"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "In quale città russa dai canali nebbiosi sono ambientati 'Delitto e castigo' e 'Notti bianche'?",
+                      "o": [
+                            "Mosca",
+                            "San Pietroburgo",
+                            "Kiev",
+                            "Odessa"
+                      ],
+                      "a": 1
+                }
+          ]
+    },
+    'lev-tolstoj': {
+          "topic": "Lev Tolstoj",
+          "impiccato": [
+                {
+                      "word": "GUERRA",
+                      "hint": "... e pace, l'epopea delle guerre napoleoniche in Russia"
+                },
+                {
+                      "word": "KARENINA",
+                      "hint": "Anna... la tragica eroina innamorata di Vronskij"
+                },
+                {
+                      "word": "NATASA",
+                      "hint": "La giovane contessina Rostova piena di vita"
+                },
+                {
+                      "word": "NONVIOLENZA",
+                      "hint": "La dottrina pacifista che ispirò Mahatma Gandhi"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Tutte",
+                            "le",
+                            "famiglie",
+                            "felici",
+                            "si",
+                            "somigliano"
+                      ],
+                      "solution": "Tutte le famiglie felici si somigliano",
+                      "source": "Anna Karenina (Incipit)"
+                },
+                {
+                      "words": [
+                            "Ogni",
+                            "famiglia",
+                            "infelice",
+                            "è",
+                            "invece",
+                            "infelice",
+                            "a",
+                            "modo",
+                            "suo"
+                      ],
+                      "solution": "Ogni famiglia infelice è invece infelice a modo suo",
+                      "source": "Anna Karenina"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Tutte le famiglie felici si somigliano; ogni famiglia infelice è infelice a modo ___ .",
+                      "blanks": [
+                            "suo"
+                      ],
+                      "source": "Anna Karenina"
+                },
+                {
+                      "text": "Pierre Bezuchov e il principe Andrej Bolkonskij affrontano il destino e l'invasione di Napoleone in Guerra e ___ .",
+                      "blanks": [
+                            "Pace"
+                      ],
+                      "source": "Guerra e Pace"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Guerra e Pace (Andrej sul campo di Austerlitz)",
+                      "lines": [
+                            "Sopra di lui non c'era più nulla se non il cielo,",
+                            "un cielo alto, infinitamente alto,",
+                            "con nubi grigie che vi strisciavano quietamente.",
+                            "Come non avevo mai notato prima questo cielo sublime?"
+                      ],
+                      "hint": "La folgorazione spirituale del principe Andrej ferito che contempla la volta celeste."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Quale immensa epopea narra le vicende delle famiglie russe durante l'invasione di Napoleone del 1812?",
+                      "o": [
+                            "Anna Karenina",
+                            "Guerra e Pace",
+                            "Resurrezione",
+                            "I cosacchi"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quale famoso incipit introduce il romanzo 'Anna Karenina'?",
+                      "o": [
+                            "Nel mezzo del cammin",
+                            "Tutte le famiglie felici si somigliano; ogni famiglia infelice è infelice a modo suo",
+                            "Molti anni dopo",
+                            "Chiamatemi Ismaele"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "In quale tenuta di campagna Tolstoj visse lavorando la terra insieme ai contadini?",
+                      "o": [
+                            "Jasnaja Poljana",
+                            "San Pietroburgo",
+                            "Arcangelo",
+                            "Crimea"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale grande leader indiano mantenne una celebre corrispondenza epistolare con Tolstoj sulla non-violenza?",
+                      "o": [
+                            "Mahatma Gandhi",
+                            "Nehru",
+                            "Tagore",
+                            "Mandela"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Come muore tragicamente l'eroina Anna Karenina alla stazione ferroviaria?",
+                      "o": [
+                            "Gettandosi sotto un treno in corsa",
+                            "In duello",
+                            "Di malattia",
+                            "Avvelenata"
+                      ],
+                      "a": 0
+                }
+          ]
+    },
+    'george-orwell': {
+          "topic": "George Orwell",
+          "impiccato": [
+                {
+                      "word": "FRATELLO",
+                      "hint": "Il Grande... che tutto vede e controlla"
+                },
+                {
+                      "word": "FATTORIA",
+                      "hint": "La... degli animali, satira del totalitarismo"
+                },
+                {
+                      "word": "WINSTON",
+                      "hint": "Winston Smith, il protagonista ribelle di 1984"
+                },
+                {
+                      "word": "PSICOPOLIZIA",
+                      "hint": "La polizia che reprime i 'pensiericrimine' (psicoreato)"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Il",
+                            "Grande",
+                            "Fratello",
+                            "ti",
+                            "guarda"
+                      ],
+                      "solution": "Il Grande Fratello ti guarda",
+                      "source": "1984"
+                },
+                {
+                      "words": [
+                            "Tutti",
+                            "gli",
+                            "animali",
+                            "sono",
+                            "uguali",
+                            "ma",
+                            "alcuni",
+                            "sono",
+                            "più",
+                            "uguali",
+                            "degli",
+                            "altri"
+                      ],
+                      "solution": "Tutti gli animali sono uguali ma alcuni sono più uguali degli altri",
+                      "source": "La fattoria degli animali"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "La guerra è pace, la libertà è schiavitù, l'ignoranza è ___ : i tre slogan del Socing in 1984.",
+                      "blanks": [
+                            "forza"
+                      ],
+                      "source": "1984"
+                },
+                {
+                      "text": "Nella Fattoria degli Animali, i maiali capeggiati da ___ prendono il controllo tradendo gli ideali della rivoluzione.",
+                      "blanks": [
+                            "Napoleone"
+                      ],
+                      "source": "La fattoria degli animali"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "1984 (I tre slogan del Ministero della Verità)",
+                      "lines": [
+                            "LA GUERRA È PACE",
+                            "LA LIBERTÀ È SCHIAVITÙ",
+                            "L'IGNORANZA È FORZA.",
+                            "Il Grande Fratello vi guarda."
+                      ],
+                      "hint": "I dogmi del bipensiero totalitario nel mondo distopico di Oceania."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Qual era il vero nome all'anagrafe di George Orwell?",
+                      "o": [
+                            "Eric Arthur Blair",
+                            "Charles Lutwidge Dodgson",
+                            "Arthur Conan Doyle",
+                            "Samuel Clemens"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Come si chiama la lingua manipolata e ridotta all'essenziale imposta dal Partito in '1984'?",
+                      "o": [
+                            "Esperanto",
+                            "Neolingua (Newspeak)",
+                            "Volgare",
+                            "Codice morse"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quali animali prendono il potere nella celebre favola distopica e satirica di Orwell?",
+                      "o": [
+                            "I cavalli",
+                            "I maiali",
+                            "I lupi",
+                            "Le pecore"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Qual è la temutissima stanza del Ministero dell'Amore dove ciascuno affronta il proprio peggior incubo?",
+                      "o": [
+                            "Stanza 101",
+                            "Stanza 99",
+                            "Stanza 50",
+                            "Stanza 13"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "A quale conflitto storico Orwell partecipò come volontario antifascista descritto in 'Omaggio alla Catalogna'?",
+                      "o": [
+                            "Prima Guerra Mondiale",
+                            "Guerra Civile Spagnola",
+                            "Seconda Guerra Mondiale",
+                            "Guerra fredda"
+                      ],
+                      "a": 1
+                }
+          ]
+    },
+    'ernest-hemingway': {
+          "topic": "Ernest Hemingway",
+          "impiccato": [
+                {
+                      "word": "VECCHIO",
+                      "hint": "Il... e il mare, capolavoro premiato con il Nobel"
+                },
+                {
+                      "word": "SANTIAGO",
+                      "hint": "Il vecchio pescatore cubano tenace e indomito"
+                },
+                {
+                      "word": "MARLIN",
+                      "hint": "Il gigantesco pesce spada pescato nella Corrente del Golfo"
+                },
+                {
+                      "word": "ICEBERG",
+                      "hint": "La teoria dello stile essenziale: sette ottavi sotto la superficie"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "L'uomo",
+                            "non",
+                            "è",
+                            "fatto",
+                            "per",
+                            "la",
+                            "sconfitta"
+                      ],
+                      "solution": "L'uomo non è fatto per la sconfitta",
+                      "source": "Il vecchio e il mare"
+                },
+                {
+                      "words": [
+                            "Un",
+                            "uomo",
+                            "può",
+                            "essere",
+                            "distrutto",
+                            "ma",
+                            "non",
+                            "sconfitto"
+                      ],
+                      "solution": "Un uomo può essere distrutto ma non sconfitto",
+                      "source": "Il vecchio e il mare"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Un uomo può essere distrutto, ma non ___ : la celebre frase di Santiago nel romanzo Il vecchio e il mare.",
+                      "blanks": [
+                            "sconfitto"
+                      ],
+                      "source": "Il vecchio e il mare"
+                },
+                {
+                      "text": "Il giovane Manolin è il fedele ragazzo che aiuta e sostiene con affetto il vecchio pescatore ___ .",
+                      "blanks": [
+                            "Santiago"
+                      ],
+                      "source": "Il vecchio e il mare"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Il vecchio e il mare (Santiago in mezzo all'oceano)",
+                      "lines": [
+                            "Era un vecchio che pescava da solo su una barca",
+                            "nella Corrente del Golfo",
+                            "ed erano ottantaquattro giorni ormai",
+                            "che non prendeva un pesce."
+                      ],
+                      "hint": "L'esordio essenziale e solenne del romanzo che valse a Hemingway il Nobel nel 1954."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "In quale anno Ernest Hemingway fu insignito del Premio Nobel per la Letteratura?",
+                      "o": [
+                            "1929",
+                            "1940",
+                            "1954",
+                            "1961"
+                      ],
+                      "a": 2
+                },
+                {
+                      "q": "Da quanti giorni il vecchio Santiago non riusciva a pescare un pesce prima della grande cattura?",
+                      "o": [
+                            "7 giorni",
+                            "40 giorni",
+                            "84 giorni",
+                            "100 giorni"
+                      ],
+                      "a": 2
+                },
+                {
+                      "q": "Quali predatori marini divorano la carne del maestoso marlin durante il ritorno verso la costa?",
+                      "o": [
+                            "Gli squali",
+                            "Le orche",
+                            "Le balene",
+                            "I barracuda"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale celebre romanzo racconta l'amore tragico tra un giovane americano e un'infermiera sul fronte italiano nella Grande Guerra?",
+                      "o": [
+                            "Addio alle armi",
+                            "Per chi suona la campana",
+                            "Festa mobile",
+                            "Verdi colline d'Africa"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "In quale isola caraibica Hemingway visse per oltre vent'anni nella tenuta Finca Vigía?",
+                      "o": [
+                            "Giamaica",
+                            "Cuba",
+                            "Portorico",
+                            "Bahamas"
+                      ],
+                      "a": 1
+                }
+          ]
+    },
+    'charles-dickens': {
+          "topic": "Charles Dickens",
+          "impiccato": [
+                {
+                      "word": "SCROOGE",
+                      "hint": "Il vecchio e avaro protagonista del Canto di Natale"
+                },
+                {
+                      "word": "OLIVER",
+                      "hint": "... Twist, l'orfanello nella Londra ottocentesca"
+                },
+                {
+                      "word": "NATALE",
+                      "hint": "Il Canto di... e i tre spiriti del passato, presente e futuro"
+                },
+                {
+                      "word": "LONDRA",
+                      "hint": "La metropoli industriale e fumosa sfondo dei suoi romanzi"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Onorerò",
+                            "il",
+                            "Natale",
+                            "nel",
+                            "mio",
+                            "cuore",
+                            "e",
+                            "cercherò",
+                            "di",
+                            "conservarlo",
+                            "tutto",
+                            "l'anno"
+                      ],
+                      "solution": "Onorerò il Natale nel mio cuore e cercherò di conservarlo tutto l'anno",
+                      "source": "Canto di Natale"
+                },
+                {
+                      "words": [
+                            "Ti",
+                            "prego",
+                            "signore",
+                            "ne",
+                            "vorrei",
+                            "ancora",
+                            "un",
+                            "po'"
+                      ],
+                      "solution": "Ti prego signore ne vorrei ancora un po'",
+                      "source": "Oliver Twist"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Ebenezer Scrooge viene visitato la notte della vigilia da tre spiriti: il Natale del passato, del presente e del ___ .",
+                      "blanks": [
+                            "futuro"
+                      ],
+                      "source": "Canto di Natale"
+                },
+                {
+                      "text": "Oliver Twist fugge dall'orfanotrofio e finisce nella banda di piccoli ladri guidata dal vecchio ___ .",
+                      "blanks": [
+                            "Fagin"
+                      ],
+                      "source": "Oliver Twist"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Canto di Natale (La redenzione di Scrooge)",
+                      "lines": [
+                            "«Io vivrò nel Passato, nel Presente e nel Futuro!",
+                            "I tre Spiriti abiteranno dentro di me.",
+                            "Non chiuderò il mio cuore alla pietà!",
+                            "Buon Natale a tutti quanti e che Dio ci benedica!»"
+                      ],
+                      "hint": "La gioiosa trasformazione dell'avaro Scrooge dopo la visita notturna dei fantasmi."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Come si chiama l'anziano usuraio egoista protagonista di 'Canto di Natale'?",
+                      "o": [
+                            "Ebenezer Scrooge",
+                            "David Copperfield",
+                            "Bob Cratchit",
+                            "Oliver Twist"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale frase celeberrima pronuncia il piccolo orfano Oliver Twist all'orfanotrofio?",
+                      "o": [
+                            "Voglio andare a casa",
+                            "Per favore signore, ne vorrei ancora un po'",
+                            "Non ho fame",
+                            "Datemi una coperta"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quale lavoro infantile umiliante Dickens dovette fare da bambino a dodici anni quando il padre fu arrestato per debiti?",
+                      "o": [
+                            "Minatore",
+                            "Incollare etichette sui barattoli di lucido da scarpe in fabbrica",
+                            "Mozzo su una nave",
+                            "Spazzacamino"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Chi è il fedele e povero impiegato malpagato da Scrooge con un figlio malato (il piccolo Tim)?",
+                      "o": [
+                            "Bob Cratchit",
+                            "Fagin",
+                            "Artful Dodger",
+                            "Uriah Heep"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "In quale epoca storica regnava la Gran Bretagna durante la vita e le opere di Charles Dickens?",
+                      "o": [
+                            "Età Elisabettiana",
+                            "Età Vittoriana (Regina Vittoria)",
+                            "Età Georgiana",
+                            "Rinascimento"
+                      ],
+                      "a": 1
+                }
+          ]
+    },
+    'herman-melville': {
+          "topic": "Herman Melville",
+          "impiccato": [
+                {
+                      "word": "MOBY",
+                      "hint": "... Dick, la leggendaria balena bianca"
+                },
+                {
+                      "word": "ACHAB",
+                      "hint": "Il capitano con la gamba d'avorio assetato di vendetta"
+                },
+                {
+                      "word": "PEQUOD",
+                      "hint": "La nave baleniera che solca gli oceani"
+                },
+                {
+                      "word": "ISMAELE",
+                      "hint": "Il marinaio narratore unico superstite"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Chiamatemi",
+                            "Ismaele"
+                      ],
+                      "solution": "Chiamatemi Ismaele",
+                      "source": "Moby Dick (Incipit)"
+                },
+                {
+                      "words": [
+                            "Per",
+                            "inseguire",
+                            "quella",
+                            "balena",
+                            "bianca",
+                            "girerei",
+                            "intorno",
+                            "al",
+                            "mondo"
+                      ],
+                      "solution": "Per inseguire quella balena bianca girerei intorno al mondo",
+                      "source": "Moby Dick (Capitano Achab)"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Chiamatemi ___ : la celebre frase con cui si apre il romanzo Moby Dick.",
+                      "blanks": [
+                            "Ismaele"
+                      ],
+                      "source": "Moby Dick"
+                },
+                {
+                      "text": "Il capitano Achab ha perso una gamba, strappata dal morso della balena ___ , e ha giurato vendetta fino alla morte.",
+                      "blanks": [
+                            "bianca"
+                      ],
+                      "source": "Moby Dick"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Moby Dick - Incipit (Capitolo I)",
+                      "lines": [
+                            "Chiamatemi Ismaele.",
+                            "Alcuni anni fa - non importa quanti esattamente -",
+                            "avendo poco o nessun denaro in tasca,",
+                            "pensai di mettermi per mare e vedere la parte acquea del mondo."
+                      ],
+                      "hint": "Il celebre inizio dell'epopea marina e metafisica americana."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Qual è l'indimenticabile prima frase che apre il romanzo 'Moby Dick'?",
+                      "o": [
+                            "C'era una volta un capitano",
+                            "Chiamatemi Ismaele",
+                            "Il mare era calmo e scuro",
+                            "Molti anni fa a Nantucket"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Come si chiama la nave baleniera comandata dal capitano Achab?",
+                      "o": [
+                            "Pequod",
+                            "Nautilus",
+                            "Santa Maria",
+                            "Bounty"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Di quale materiale è fatta la gamba finta del capitano Achab?",
+                      "o": [
+                            "Di legno di quercia",
+                            "D'osso di mascella di capodoglio (avorio)",
+                            "Di ferro battuto",
+                            "Di bronzo"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Chi è l'amico ramponiere polinesiano tatuato che accompagna Ismaele a bordo?",
+                      "o": [
+                            "Queequeg",
+                            "Starbuck",
+                            "Pip",
+                            "Fedallah"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Qual è il celebre racconto di Melville sull'impiegato che risponde sempre 'Preferirei di no'?",
+                      "o": [
+                            "Bartleby lo scrivano",
+                            "Billy Budd",
+                            "Typee",
+                            "Omoo"
+                      ],
+                      "a": 0
+                }
+          ]
+    },
+    'franz-kafka': {
+          "topic": "Franz Kafka",
+          "impiccato": [
+                {
+                      "word": "METAMORFOSI",
+                      "hint": "La trasformazione di Gregor Samsa in insetto"
+                },
+                {
+                      "word": "PROCESSO",
+                      "hint": "Il romanzo sull'assurda burocrazia e l'arresto di Josef K."
+                },
+                {
+                      "word": "PRAGA",
+                      "hint": "La città magica e misteriosa dove visse lo scrittore"
+                },
+                {
+                      "word": "SAMSA",
+                      "hint": "Gregor... il commesso viaggiatore protagonista"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Gregor",
+                            "Samsa",
+                            "si",
+                            "risvegliò",
+                            "trasformato",
+                            "in",
+                            "un",
+                            "enorme",
+                            "insetto"
+                      ],
+                      "solution": "Gregor Samsa si risvegliò trasformato in un enorme insetto",
+                      "source": "La metamorfosi"
+                },
+                {
+                      "words": [
+                            "Qualcuno",
+                            "doveva",
+                            "aver",
+                            "calunniato",
+                            "Josef",
+                            "K.",
+                            "perché",
+                            "fu",
+                            "arrestato"
+                      ],
+                      "solution": "Qualcuno doveva aver calunniato Josef K. perché fu arrestato",
+                      "source": "Il processo"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Un mattino, svegliandosi da sogni inquieti, Gregor Samsa si trovò trasformato nel suo letto in un enorme ___ .",
+                      "blanks": [
+                            "insetto"
+                      ],
+                      "source": "La metamorfosi"
+                },
+                {
+                      "text": "Nel romanzo Il processo, Josef K. viene arrestato senza sapere di quale ___ sia accusato.",
+                      "blanks": [
+                            "reato"
+                      ],
+                      "source": "Il processo"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "La metamorfosi (Incipit)",
+                      "lines": [
+                            "Un mattino, svegliandosi da sogni inquieti,",
+                            "Gregor Samsa si trovò trasformato nel suo letto in un enorme insetto.",
+                            "Riposava sulla schiena dura come una corazza",
+                            "e vedeva il suo ventre bruno e arcuato."
+                      ],
+                      "hint": "L'allucinante inizio del capolavoro della letteratura moderna sull'alienazione umana."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "In cosa si ritrova trasformato una mattina il commesso viaggiatore Gregor Samsa?",
+                      "o": [
+                            "In un uccello",
+                            "In un enorme insetto (scarafaggio)",
+                            "In una statua di pietra",
+                            "In un lupo"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "In quale città della Boemia nacque e visse Franz Kafka?",
+                      "o": [
+                            "Vienna",
+                            "Praga",
+                            "Berlino",
+                            "Budapest"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quale caro amico di Kafka decise di non bruciare i suoi manoscritti inediti dopo la sua morte, pubblicandoli?",
+                      "o": [
+                            "Max Brod",
+                            "Walter Benjamin",
+                            "Thomas Mann",
+                            "Stefan Zweig"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Cosa si intende comunemente per atmosfera 'kafkiana'?",
+                      "o": [
+                            "Un ambiente allegro e fiabesco",
+                            "Una situazione assurda, angosciante e dominata da una burocrazia incomprensibile",
+                            "Un poema epico",
+                            "Una commedia teatrale"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "A chi è indirizzata la celebre e dolorosa 'Lettera' in cui Kafka esprime tutto il timore e l'incomprensione filiale?",
+                      "o": [
+                            "Alla madre",
+                            "Al padre (Hermann Kafka)",
+                            "Alla sorella Ottla",
+                            "Alla fidanzata Felice"
+                      ],
+                      "a": 1
+                }
+          ]
+    },
+    'william-shakespeare': {
+          "topic": "William Shakespeare",
+          "impiccato": [
+                {
+                      "word": "AMLETO",
+                      "hint": "Il principe di Danimarca: Essere o non essere"
+                },
+                {
+                      "word": "ROMEO",
+                      "hint": "... e Giulietta, i due amanti di Verona"
+                },
+                {
+                      "word": "GLOBE",
+                      "hint": "Il celebre teatro londinese in legno a cielo aperto"
+                },
+                {
+                      "word": "STRATFORD",
+                      "hint": "La cittadina natale sull'Avon"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Essere",
+                            "o",
+                            "non",
+                            "essere",
+                            "questo",
+                            "è",
+                            "il",
+                            "dilemma"
+                      ],
+                      "solution": "Essere o non essere questo è il dilemma",
+                      "source": "Amleto"
+                },
+                {
+                      "words": [
+                            "Siamo",
+                            "fatti",
+                            "della",
+                            "stessa",
+                            "sostanza",
+                            "dei",
+                            "sogni"
+                      ],
+                      "solution": "Siamo fatti della stessa sostanza dei sogni",
+                      "source": "La Tempesta"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Essere o non essere, questo è il ___ : se sia più nobile soffrire nell'animo i dardi dell'avversa fortuna o prender l'armi contro un mare di guai.",
+                      "blanks": [
+                            "dilemma"
+                      ],
+                      "source": "Amleto"
+                },
+                {
+                      "text": "Le due famiglie rivali di Verona, i Montecchi e i ___ , si scontrano mentre sboccia l'amore tra Romeo e Giulietta.",
+                      "blanks": [
+                            "Capuleti"
+                      ],
+                      "source": "Romeo e Giulietta"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Amleto - Atto III (Monologo)",
+                      "lines": [
+                            "Essere o non essere, questo è il dilemma:",
+                            "se sia più nobile soffrire nell'animo",
+                            "i colpi e i dardi dell'oltraggiosa fortuna,",
+                            "o prender l'armi contro un mare di affanni e opponendosi por loro fine."
+                      ],
+                      "hint": "Il più famoso monologo del teatro mondiale sui dubbi dell'esistenza umana."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "In quale città italiana è ambientata la tragedia 'Romeo e Giulietta'?",
+                      "o": [
+                            "Venezia",
+                            "Verona",
+                            "Firenze",
+                            "Roma"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Qual è il celebre teatro londinese fondato dalla compagnia di Shakespeare?",
+                      "o": [
+                            "The Globe Theatre",
+                            "Covent Garden",
+                            "Colosseum",
+                            "Royal Opera"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale personaggio esclama con un teschio in mano: 'Essere o non essere, questo è il dilemma'?",
+                      "o": [
+                            "Macbeth",
+                            "Il principe Amleto",
+                            "Re Lear",
+                            "Otello"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Chi è il perfido consigliere che manipola Otello con una cieca gelosia verso Desdemona?",
+                      "o": [
+                            "Iago",
+                            "Cassio",
+                            "Bruto",
+                            "Tebaldo"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale commedia magica si svolge in una foresta incantata nella notte di mezza estate?",
+                      "o": [
+                            "La dodicesima notte",
+                            "Sogno di una notte di mezza estate",
+                            "Molto rumore per nulla",
+                            "La bisbetica domata"
+                      ],
+                      "a": 1
+                }
+          ]
+    },
+    'miguel-cervantes': {
+          "topic": "Miguel de Cervantes",
+          "impiccato": [
+                {
+                      "word": "CHISCIOTTE",
+                      "hint": "Don... l'ingegnoso hidalgo cavaliere errante"
+                },
+                {
+                      "word": "SANCIO",
+                      "hint": "... Panza, il fedele e pratico scudiero"
+                },
+                {
+                      "word": "MULINI",
+                      "hint": "I giganti con le braccia rotanti contro cui combatte"
+                },
+                {
+                      "word": "DULCINEA",
+                      "hint": "La dama del Toboso idealizzata da Don Chisciotte"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "In",
+                            "un",
+                            "luogo",
+                            "della",
+                            "Mancia",
+                            "di",
+                            "cui",
+                            "non",
+                            "voglio",
+                            "ricordare",
+                            "il",
+                            "nome"
+                      ],
+                      "solution": "In un luogo della Mancia di cui non voglio ricordare il nome",
+                      "source": "Don Chisciotte (Incipit)"
+                },
+                {
+                      "words": [
+                            "Non",
+                            "sono",
+                            "giganti",
+                            "mio",
+                            "signore",
+                            "sono",
+                            "mulini",
+                            "a",
+                            "vento"
+                      ],
+                      "solution": "Non sono giganti mio signore sono mulini a vento",
+                      "source": "Don Chisciotte (Sancio Panza)"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Don Chisciotte della Mancia scambia i mulini a vento per feroci ___ con cui ingaggiare battaglia.",
+                      "blanks": [
+                            "giganti"
+                      ],
+                      "source": "Don Chisciotte"
+                },
+                {
+                      "text": "Il cavaliere errante cavalca il magro cavallo ___ e nomina scudiero il contadino Sancio Panza.",
+                      "blanks": [
+                            "Ronzinante"
+                      ],
+                      "source": "Don Chisciotte"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Don Chisciotte della Mancia (Incipit)",
+                      "lines": [
+                            "In un luogo della Mancia, di cui non voglio ricordarmi il nome,",
+                            "viveva non ha guari un cavaliere di quelli",
+                            "con lancia nella rastrelliera, scudo antico,",
+                            "magro ronzino e cane corridore."
+                      ],
+                      "hint": "L'inizio del primo grande romanzo moderno della letteratura mondiale (1605)."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Qual è considerato il primo capolavoro del romanzo moderno europeo?",
+                      "o": [
+                            "Don Chisciotte della Mancia (1605)",
+                            "Robinson Crusoe",
+                            "I viaggi di Gulliver",
+                            "Gargantua e Pantagruele"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "A quale storica battaglia navale del 1571 contro la flotta ottomana partecipò Cervantes, rimanendo ferito a una mano?",
+                      "o": [
+                            "Battaglia di Lepanto",
+                            "Battaglia di Trafalgar",
+                            "Battaglia di Waterloo",
+                            "Assedio di Vienna"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Come si chiama il fedele scudiero contadino che accompagna Don Chisciotte a cavallo di un asino?",
+                      "o": [
+                            "Sancio Panza",
+                            "Giacomo",
+                            "Pedro",
+                            "Rodrigo"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Perché Don Chisciotte decide di farsi cavaliere errante e partire per l'avventura?",
+                      "o": [
+                            "Perché ha letto troppi romanzi cavallereschi e ha perso il senno",
+                            "Per ordine del Re di Spagna",
+                            "Per cercare l'oro nelle Americhe",
+                            "Per diventare governatore"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Qual è il nome del magro cavallo di Don Chisciotte?",
+                      "o": [
+                            "Ronzinante",
+                            "Bucefalo",
+                            "Pegaso",
+                            "Tornado"
+                      ],
+                      "a": 0
+                }
+          ]
+    },
+    'jane-austen': {
+          "topic": "Jane Austen",
+          "impiccato": [
+                {
+                      "word": "ORGOGLIO",
+                      "hint": "... e pregiudizio, la storia di Elizabeth e Mr Darcy"
+                },
+                {
+                      "word": "DARCY",
+                      "hint": "Il ricco e apparentemente altero gentiluomo"
+                },
+                {
+                      "word": "ELIZABETH",
+                      "hint": "La brillante e indipendente secondogenita Bennet"
+                },
+                {
+                      "word": "RAGIONE",
+                      "hint": "... e sentimento (Sense and Sensibility)"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "È",
+                            "una",
+                            "verità",
+                            "universalmente",
+                            "riconosciuta",
+                            "che",
+                            "uno",
+                            "scapolo",
+                            "in",
+                            "possesso",
+                            "di",
+                            "un'ampia",
+                            "fortuna"
+                      ],
+                      "solution": "È una verità universalmente riconosciuta che uno scapolo in possesso di un'ampia fortuna",
+                      "source": "Orgoglio e pregiudizio (Incipit)"
+                },
+                {
+                      "words": [
+                            "debba",
+                            "essere",
+                            "in",
+                            "cerca",
+                            "di",
+                            "una",
+                            "moglie"
+                      ],
+                      "solution": "debba essere in cerca di una moglie",
+                      "source": "Orgoglio e pregiudizio"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "È una verità universalmente riconosciuta che uno scapolo in possesso di un'ampia fortuna debba essere in cerca di una ___ .",
+                      "blanks": [
+                            "moglie"
+                      ],
+                      "source": "Orgoglio e pregiudizio"
+                },
+                {
+                      "text": "Nel romanzo Ragione e sentimento, Elinor rappresenta la razionalità e Marianne la passione ___ .",
+                      "blanks": [
+                            "emotiva"
+                      ],
+                      "source": "Ragione e sentimento"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Orgoglio e pregiudizio (Incipit)",
+                      "lines": [
+                            "È una verità universalmente riconosciuta",
+                            "che uno scapolo provvisto di un cospicuo patrimonio",
+                            "non possa fare a meno di desiderare una moglie.",
+                            "Questa verità è così radicata nella mente delle famiglie vicine."
+                      ],
+                      "hint": "Uno degli incipit ironici più famosi della letteratura inglese di inizio Ottocento."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Chi è la brillante protagonista femminile di 'Orgoglio e pregiudizio'?",
+                      "o": [
+                            "Elizabeth Bennet",
+                            "Emma Woodhouse",
+                            "Jane Eyre",
+                            "Catherine Morland"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale ricco gentiluomo si innamora di Elizabeth vincendo il proprio orgoglio di classe?",
+                      "o": [
+                            "Mr. Darcy",
+                            "Mr. Bingley",
+                            "Mr. Wickham",
+                            "Mr. Collins"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale romanzo di Jane Austen ha per protagonista un'aristocratica ragazza che si diverte a combinare matrimoni per gli altri?",
+                      "o": [
+                            "Emma",
+                            "Persuasione",
+                            "Mansfield Park",
+                            "L'abbazia di Northanger"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "In quale Paese visse e ambientò tutti i suoi celebri romanzi Jane Austen?",
+                      "o": [
+                            "Nella campagna inglese (Hampshire)",
+                            "In Scozia",
+                            "Negli Stati Uniti",
+                            "A Parigi"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Con quale firma anonima vennero inizialmente pubblicati i romanzi della Austen?",
+                      "o": [
+                            "By a Lady",
+                            "Currer Bell",
+                            "Anonymous Gentleman",
+                            "George Eliot"
+                      ],
+                      "a": 0
+                }
+          ]
+    },
+    'oscar-wilde': {
+          "topic": "Oscar Wilde",
+          "impiccato": [
+                {
+                      "word": "DORIAN",
+                      "hint": "Il ritratto di... Gray che invecchia al posto suo"
+                },
+                {
+                      "word": "DANDY",
+                      "hint": "L'esteta raffinato che fa della vita un'opera d'arte"
+                },
+                {
+                      "word": "RITRATTO",
+                      "hint": "Il dipinto nascosto in soffitta che mostra i segni dei peccati"
+                },
+                {
+                      "word": "ERNESTO",
+                      "hint": "L'importanza di chiamarsi..."
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Posso",
+                            "resistere",
+                            "a",
+                            "tutto",
+                            "tranne",
+                            "che",
+                            "alle",
+                            "tentazioni"
+                      ],
+                      "solution": "Posso resistere a tutto tranne che alle tentazioni",
+                      "source": "Aforismi"
+                },
+                {
+                      "words": [
+                            "L'unico",
+                            "modo",
+                            "per",
+                            "liberarsi",
+                            "di",
+                            "una",
+                            "tentazione",
+                            "è",
+                            "cedervi"
+                      ],
+                      "solution": "L'unico modo per liberarsi di una tentazione è cedervi",
+                      "source": "Il ritratto di Dorian Gray"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Dorian Gray esprime il desiderio che il dipinto dipinto da Basil Hallward invecchi al suo posto, mantenendo per sé l'eterna ___ .",
+                      "blanks": [
+                            "giovinezza"
+                      ],
+                      "source": "Il ritratto di Dorian Gray"
+                },
+                {
+                      "text": "Lord Henry Wotton è il raffinato edonista che guida Dorian verso la ricerca del ___ estetico senza limiti morali.",
+                      "blanks": [
+                            "piacere"
+                      ],
+                      "source": "Il ritratto di Dorian Gray"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Il ritratto di Dorian Gray (Prefazione)",
+                      "lines": [
+                            "L'artista è il creatore di cose belle.",
+                            "Rivelare l'arte e nascondere l'artista è il fine dell'arte.",
+                            "Non esistono libri morali o immorali.",
+                            "I libri sono scritti bene o scritti male. Questo è tutto."
+                      ],
+                      "hint": "Il manifesto dell'Estetismo decadente britannico firmato da Oscar Wilde."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "In quale città irlandese nacque il geniale scrittore e commediografo Oscar Wilde?",
+                      "o": [
+                            "Dublino",
+                            "Belfast",
+                            "Cork",
+                            "Galway"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Cosa accade al ritratto di Dorian Gray man mano che il protagonista compie malefatte?",
+                      "o": [
+                            "Diventa invisibile",
+                            "Invecchia e si sfigura mostrando la corruzione dell'anima",
+                            "Prende fuoco",
+                            "Scompare"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Qual è la commedia teatrale satirica più famosa e brillante di Wilde basata su un doppio gioco di nomi?",
+                      "o": [
+                            "L'importanza di chiamarsi Ernesto",
+                            "Il ventaglio di Lady Windermere",
+                            "Un marito ideale",
+                            "Salomè"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Cosa scrisse Oscar Wilde durante la dolorosa prigionia nel carcere di Reading?",
+                      "o": [
+                            "De Profundis e La ballata del carcere di Reading",
+                            "Il ritratto di Dorian Gray",
+                            "I Canti di Natale",
+                            "Le confessioni"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Chi ha dipinto il magico e maledetto ritratto di Dorian?",
+                      "o": [
+                            "Il pittore Basil Hallward",
+                            "Lord Henry Wotton",
+                            "James Vane",
+                            "Alan Campbell"
+                      ],
+                      "a": 0
+                }
+          ]
+    },
+    'arthur-conan-doyle': {
+          "topic": "Arthur Conan Doyle",
+          "impiccato": [
+                {
+                      "word": "SHERLOCK",
+                      "hint": "... Holmes, il detective di Baker Street"
+                },
+                {
+                      "word": "WATSON",
+                      "hint": "Il dottor John... fedele amico e narratore delle indagini"
+                },
+                {
+                      "word": "DEDUZIONE",
+                      "hint": "Il metodo logico e scientifico per risolvere i casi"
+                },
+                {
+                      "word": "MORIARTY",
+                      "hint": "Il professor... nemico mortale di Holmes"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Elementare",
+                            "mio",
+                            "caro",
+                            "Watson"
+                      ],
+                      "solution": "Elementare mio caro Watson",
+                      "source": "Celebre frase associata a Sherlock Holmes"
+                },
+                {
+                      "words": [
+                            "Quando",
+                            "hai",
+                            "eliminato",
+                            "l'impossibile",
+                            "ciò",
+                            "che",
+                            "resta",
+                            "è",
+                            "la",
+                            "verità"
+                      ],
+                      "solution": "Quando hai eliminato l'impossibile ciò che resta è la verità",
+                      "source": "Il segno dei quattro"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Sherlock Holmes abita a Londra al celeberrimo indirizzo di ___ Baker Street.",
+                      "blanks": [
+                            "221B"
+                      ],
+                      "source": "Uno studio in rosso"
+                },
+                {
+                      "text": "Il mastino dei ___ è uno dei casi più famosi in cui Holmes indaga su una creatura mostruosa nella brughiera.",
+                      "blanks": [
+                            "Baskerville"
+                      ],
+                      "source": "Il mastino dei Baskerville"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Uno studio in rosso (Incontro con Holmes)",
+                      "lines": [
+                            "«Dalla goccia d'acqua un logico può inferire",
+                            "la possibilità dell'esistenza di un oceano Atlantico o di un Niagara.",
+                            "Tutta la vita è una grande catena,",
+                            "la cui natura ci è rivelata a ogni anello.»"
+                      ],
+                      "hint": "La teoria del metodo deduttivo e analitico applicato alla criminologia."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "A quale indirizzo londinese abita il detective Sherlock Holmes?",
+                      "o": [
+                            "10 Downing Street",
+                            "221B Baker Street",
+                            "15 Abbey Road",
+                            "4 Privet Drive"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quale strumento musicale suona Sherlock Holmes per rilassarsi e riflettere sui casi intricati?",
+                      "o": [
+                            "Il pianoforte",
+                            "Il violino",
+                            "Il flauto",
+                            "La chitarra"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Qual è il primo romanzo poliziesco in cui appare per la prima volta Sherlock Holmes nel 1887?",
+                      "o": [
+                            "Uno studio in rosso",
+                            "Il mastino dei Baskerville",
+                            "La valle della paura",
+                            "Il segno dei quattro"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Chi è l'acerrimo rivale di Holmes, definito il 'Napoleone del crimine'?",
+                      "o": [
+                            "Il professor James Moriarty",
+                            "Lupin",
+                            "Irene Adler",
+                            "Lestrade"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale professione medica esercitava Arthur Conan Doyle prima di dedicarsi alla scrittura?",
+                      "o": [
+                            "Medico oftalmologo e chirurgo",
+                            "Avvocato",
+                            "Ingegnere minerario",
+                            "Professore universitario"
+                      ],
+                      "a": 0
+                }
+          ]
+    },
+    'mary-shelley': {
+          "topic": "Mary Shelley",
+          "impiccato": [
+                {
+                      "word": "FRANKENSTEIN",
+                      "hint": "Il moderno Prometeo e la creatura generata dalla scienza"
+                },
+                {
+                      "word": "CREATURA",
+                      "hint": "Il mostro senza nome composto da membra e animato dal fulmine"
+                },
+                {
+                      "word": "VICTOR",
+                      "hint": "Lo scienziato ginevrino che oltrepassa i limiti umani"
+                },
+                {
+                      "word": "PROMETEO",
+                      "hint": "Il mito classico del titano sottotitolo del romanzo"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Attento",
+                            "perché",
+                            "io",
+                            "sono",
+                            "senza",
+                            "paura",
+                            "e",
+                            "quindi",
+                            "potente"
+                      ],
+                      "solution": "Attento perché io sono senza paura e quindi potente",
+                      "source": "Frankenstein"
+                },
+                {
+                      "words": [
+                            "Ero",
+                            "buono",
+                            "e",
+                            "benevolo",
+                            "è",
+                            "la",
+                            "miseria",
+                            "che",
+                            "mi",
+                            "ha",
+                            "reso",
+                            "un",
+                            "demone"
+                      ],
+                      "solution": "Ero buono e benevolo è la miseria che mi ha reso un demone",
+                      "source": "Frankenstein (La Creatura)"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Victor Frankenstein riesce a dare vita alla sua creatura attraverso l'elettricità e la scienza nella città di ___ .",
+                      "blanks": [
+                            "Ginevra"
+                      ],
+                      "source": "Frankenstein"
+                },
+                {
+                      "text": "Il romanzo Frankenstein reca come sottotitolo Il moderno ___ , alludendo alla sfida verso i limiti della natura.",
+                      "blanks": [
+                            "Prometeo"
+                      ],
+                      "source": "Frankenstein"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Frankenstein (Il risveglio della Creatura)",
+                      "lines": [
+                            "Era una piovosa notte di novembre quando contemplai il compimento delle mie fatiche.",
+                            "Raccolsi gli strumenti per infondere la scintilla dell'esistenza.",
+                            "All'una del mattino la pioggia batteva lugubre sui vetri;",
+                            "la mia candela era quasi spenta quando vidi aprirsi l'occhio giallo della creatura."
+                      ],
+                      "hint": "Il celeberrimo capitolo V in cui nasce il primo capolavoro della fantascienza moderna (1818)."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Quanti anni aveva Mary Shelley quando concepì la storia di Frankenstein durante l'estate del 1816 a Villa Diodati?",
+                      "o": [
+                            "A soli 18 anni",
+                            "30 anni",
+                            "40 anni",
+                            "50 anni"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Qual è il sottotitolo originale del romanzo 'Frankenstein'?",
+                      "o": [
+                            "La notte degli orrori",
+                            "Il moderno Prometeo",
+                            "L'ombra del mostro",
+                            "Il demone della scienza"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quale famoso poeta romantico inglese fu marito di Mary Shelley?",
+                      "o": [
+                            "Lord Byron",
+                            "Percy Bysshe Shelley",
+                            "John Keats",
+                            "William Wordsworth"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Come si chiama lo scienziato che crea il mostro assemblando parti di cadaveri?",
+                      "o": [
+                            "Victor Frankenstein",
+                            "Dracula",
+                            "Dottor Jekyll",
+                            "Igor"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Perché l'anno 1816 in cui fu scritto il romanzo è storicamente noto come 'l'anno senza estate'?",
+                      "o": [
+                            "Per un'eclissi solare",
+                            "Per l'eruzione del vulcano Tambora che oscurò il cielo in tutta Europa",
+                            "Per una glaciazione",
+                            "Per una guerra"
+                      ],
+                      "a": 1
+                }
+          ]
+    },
+    'jrr-tolkien': {
+          "topic": "J.R.R. Tolkien",
+          "impiccato": [
+                {
+                      "word": "ANELLO",
+                      "hint": "Il Signore degli Anelli e l'Unico Anello di Sauron"
+                },
+                {
+                      "word": "FRODO",
+                      "hint": "Lo hobbit portatore dell'Anello verso Monte Fato"
+                },
+                {
+                      "word": "GANDALF",
+                      "hint": "Il grande stregone bianco guida della Compagnia"
+                },
+                {
+                      "word": "MORDOR",
+                      "hint": "La terra oscura dominata dal Signore Oscuro"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Un",
+                            "Anello",
+                            "per",
+                            "domarli",
+                            "un",
+                            "Anello",
+                            "per",
+                            "trovarli"
+                      ],
+                      "solution": "Un Anello per domarli un Anello per trovarli",
+                      "source": "Il Signore degli Anelli"
+                },
+                {
+                      "words": [
+                            "Non",
+                            "tutto",
+                            "quel",
+                            "che",
+                            "è",
+                            "oro",
+                            "brilla",
+                            "non",
+                            "tutti",
+                            "quelli",
+                            "che",
+                            "vagano",
+                            "sono",
+                            "persi"
+                      ],
+                      "solution": "Non tutto quel che è oro brilla non tutti quelli che vagano sono persi",
+                      "source": "Il Signore degli Anelli (Aragorn)"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Un Anello per domarli, un Anello per trovarli, un Anello per ghermirli e nel buio ___ : nella Terra di Mordor, dove l'Ombra cupa scende.",
+                      "blanks": [
+                            "incatenarli"
+                      ],
+                      "source": "Il Signore degli Anelli"
+                },
+                {
+                      "text": "Frodo Baggins e il fidato compagno Samvise Gamgee partono dalla Contea per distruggere l'Anello nel fuoco di Monte ___ .",
+                      "blanks": [
+                            "Fato"
+                      ],
+                      "source": "Il Signore degli Anelli"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "La Poesia dell'Anello",
+                      "lines": [
+                            "Tre Anelli ai Re degli Elfi sotto il cielo che risplende,",
+                            "Sette ai Principi dei Nani nelle lor rocciose sale,",
+                            "Nove agli Uomini Mortali che la triste morte attende,",
+                            "Uno per l'Oscuro Sire chiuso nella reggia oscura nella Terra di Mordor."
+                      ],
+                      "hint": "I celeberrimi versi dell'epica fantasy che narrano la forgia degli Anelli del Potere."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Quale cattedra universitaria insegnò per decenni J.R.R. Tolkien a Oxford?",
+                      "o": [
+                            "Filologia germanica e lingua inglese antica (antico inglese)",
+                            "Storia romana",
+                            "Botanica",
+                            "Fisica teorica"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Qual è il romanzo pubblicato nel 1937 che introduce per la prima volta il mondo degli hobbit e Bilbo Baggins?",
+                      "o": [
+                            "Lo Hobbit",
+                            "Il Silmarillion",
+                            "I figli di Húrin",
+                            "Racconti ritrovati"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Come si chiama la creatura tormentata dall'ossessione per il 'Mio Tesssoro'?",
+                      "o": [
+                            "Gollum (Sméagol)",
+                            "Saruman",
+                            "Gimli",
+                            "Legolas"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Qual è l'unico luogo in cui l'Unico Anello può essere definitivamente distrutto?",
+                      "o": [
+                            "Nel mare profondo",
+                            "Nelle fiamme di Monte Fato a Mordor",
+                            "A Gran Burrone",
+                            "A Minas Tirith"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quanti membri compongono la Compagnia dell'Anello che parte da Gran Burrone?",
+                      "o": [
+                            "Sette",
+                            "Nove (rappresentanti di Elfi, Nani, Uomini e Hobbit)",
+                            "Dodici",
+                            "Tre"
+                      ],
+                      "a": 1
+                }
+          ]
+    },
+    'antoine-saint-exupery': {
+          "topic": "Antoine de Saint-Exupéry",
+          "impiccato": [
+                {
+                      "word": "PRINCIPE",
+                      "hint": "Il piccolo... capolavoro poetico amato nel mondo"
+                },
+                {
+                      "word": "AVIERET",
+                      "hint": "La professione di pilota e pioniere del volo postale"
+                },
+                {
+                      "word": "ROSA",
+                      "hint": "Il fiore unico e amato sul pianeta B-612"
+                },
+                {
+                      "word": "VOLPE",
+                      "hint": "L'amica che insegna il valore dell'addomesticare"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "L'essenziale",
+                            "è",
+                            "invisibile",
+                            "agli",
+                            "occhi"
+                      ],
+                      "solution": "L'essenziale è invisibile agli occhi",
+                      "source": "Il piccolo principe"
+                },
+                {
+                      "words": [
+                            "Non",
+                            "si",
+                            "vede",
+                            "bene",
+                            "che",
+                            "col",
+                            "cuore"
+                      ],
+                      "solution": "Non si vede bene che col cuore",
+                      "source": "Il piccolo principe"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Ecco il mio segreto. È molto semplice: non si vede bene che col cuore. L'essenziale è invisibile agli ___ .",
+                      "blanks": [
+                            "occhi"
+                      ],
+                      "source": "Il piccolo principe"
+                },
+                {
+                      "text": "È il tempo che hai perduto per la tua ___ che ha reso la tua rosa così importante.",
+                      "blanks": [
+                            "rosa"
+                      ],
+                      "source": "Il piccolo principe"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Il piccolo principe (Il segreto della Volpe)",
+                      "lines": [
+                            "«Addio», disse la volpe.",
+                            "«Ecco il mio segreto. È molto semplice:",
+                            "non si vede bene che col cuore.",
+                            "L'essenziale è invisibile agli occhi.»"
+                      ],
+                      "hint": "La celebre lezione sull'amore, l'amicizia e la dedizione reciproca."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Qual è il segreto svelato dalla volpe al Piccolo Principe?",
+                      "o": [
+                            "Il denaro compra tutto",
+                            "Non si vede bene che col cuore: l'essenziale è invisibile agli occhi",
+                            "Bisogna viaggiare sempre",
+                            "I grandi hanno sempre ragione"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quale professione avventurosa svolgeva Saint-Exupéry prima di scomparire in volo nel 1944?",
+                      "o": [
+                            "Pilota aviatore civile e militare",
+                            "Marinaio",
+                            "Archeologo",
+                            "Ingegnere ferroviario"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "In quale deserto precipita il pilota all'inizio del racconto prima di incontrare il bimbo biondo?",
+                      "o": [
+                            "Nel deserto del Sahara",
+                            "Nel deserto di Atacama",
+                            "Nel deserto del Gobi",
+                            "In Arizona"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Da quale minuscolo asteroide proviene il Piccolo Principe?",
+                      "o": [
+                            "Asteroide B-612",
+                            "Luna",
+                            "Marte",
+                            "Pianeta X"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Cosa chiede di disegnare il Piccolo Principe all'aviatore appena lo incontra?",
+                      "o": [
+                            "Un aeroplano",
+                            "Una pecora",
+                            "Una rosa",
+                            "Un vulcano"
+                      ],
+                      "a": 1
+                }
+          ]
+    },
+    'virginia-woolf': {
+          "topic": "Virginia Woolf",
+          "impiccato": [
+                {
+                      "word": "FARO",
+                      "hint": "Gita al... (To the Lighthouse)"
+                },
+                {
+                      "word": "DALLOWAY",
+                      "hint": "Mrs... il romanzo ambientato in una sola giornata a Londra"
+                },
+                {
+                      "word": "STANZA",
+                      "hint": "Una... tutta per sé (saggio sui diritti e la creatività femminile)"
+                },
+                {
+                      "word": "FLUSSO",
+                      "hint": "Il... di coscienza (stream of consciousness) come tecnica narrativa"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Una",
+                            "donna",
+                            "deve",
+                            "avere",
+                            "denaro",
+                            "e",
+                            "una",
+                            "stanza",
+                            "tutta",
+                            "per",
+                            "sé"
+                      ],
+                      "solution": "Una donna deve avere denaro e una stanza tutta per sé",
+                      "source": "Una stanza tutta per sé"
+                },
+                {
+                      "words": [
+                            "Mrs",
+                            "Dalloway",
+                            "disse",
+                            "che",
+                            "avrebbe",
+                            "comprato",
+                            "i",
+                            "fiori",
+                            "lei",
+                            "stessa"
+                      ],
+                      "solution": "Mrs Dalloway disse che avrebbe comprato i fiori lei stessa",
+                      "source": "Mrs Dalloway (Incipit)"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Una donna deve possedere denaro e una stanza tutta per sé se vuole scrivere romanzi e conquistare la propria ___ .",
+                      "blanks": [
+                            "indipendenza"
+                      ],
+                      "source": "Una stanza tutta per sé"
+                },
+                {
+                      "text": "Nel romanzo Gita al faro, la famiglia Ramsay e la pittrice Lily Briscoe attendono per anni il viaggio verso il ___ .",
+                      "blanks": [
+                            "faro"
+                      ],
+                      "source": "Gita al faro"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Mrs Dalloway (Incipit)",
+                      "lines": [
+                            "Mrs Dalloway disse che i fiori li avrebbe comprati lei stessa.",
+                            "Lucy ne aveva già fin sopra i capelli.",
+                            "E che mattina fresca, pareva fatta apposta per i bambini su una spiaggia.",
+                            "Che tuffo! Che fremito!"
+                      ],
+                      "hint": "L'esordio straordinario che introduce il flusso di coscienza interiore di Clarissa Dalloway."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Quale saggio pionieristico del 1929 di Virginia Woolf rivendica l'autonomia economica e intellettuale delle donne?",
+                      "o": [
+                            "Una stanza tutta per sé",
+                            "Le tre ghinee",
+                            "Orlando",
+                            "Le onde"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "In quale arco temporale si svolgono gli eventi del romanzo 'Mrs Dalloway'?",
+                      "o": [
+                            "In una sola singola giornata a Londra",
+                            "In dieci anni",
+                            "Durante un lungo viaggio per mare",
+                            "In un mese"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "A quale celebre circolo culturale e intellettuale di Londra apparteneva Virginia Woolf?",
+                      "o": [
+                            "Bloomsbury Group",
+                            "Circolo dei poeti maledetti",
+                            "Società teosofica",
+                            "Royal Society"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale romanzo di Woolf racconta la straordinaria storia di un personaggio che attraversa quattro secoli mutando da uomo a donna?",
+                      "o": [
+                            "Orlando",
+                            "Gita al faro",
+                            "Gli anni",
+                            "Notte e giorno"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Quale innovativa tecnica narrativa del modernismo inglese caratterizza i romanzi di Virginia Woolf?",
+                      "o": [
+                            "Il flusso di coscienza (Stream of consciousness)",
+                            "La rima baciata",
+                            "La cronaca giornalistica",
+                            "La fiaba didattica"
+                      ],
+                      "a": 0
+                }
+          ]
+    },
+    'marcel-proust': {
+          "topic": "Marcel Proust",
+          "impiccato": [
+                {
+                      "word": "MADELEINE",
+                      "hint": "Il dolcetto inzuppato nel tè che risveglia la memoria involontaria"
+                },
+                {
+                      "word": "RICERCA",
+                      "hint": "Alla... del tempo perduto (Recherche)"
+                },
+                {
+                      "word": "SWANN",
+                      "hint": "Dalla parte di... il primo volume del ciclo"
+                },
+                {
+                      "word": "MEMORIA",
+                      "hint": "La memoria involontaria che riporta in vita il passato"
+                }
+          ],
+          "puzzle": [
+                {
+                      "words": [
+                            "Un",
+                            "dolce",
+                            "boccone",
+                            "di",
+                            "madeleine",
+                            "inzuppata",
+                            "nel",
+                            "tè"
+                      ],
+                      "solution": "Un dolce boccone di madeleine inzuppata nel tè",
+                      "source": "Dalla parte di Swann"
+                },
+                {
+                      "words": [
+                            "Il",
+                            "vero",
+                            "viaggio",
+                            "di",
+                            "scoperta",
+                            "non",
+                            "consiste",
+                            "nel",
+                            "cercare",
+                            "nuove",
+                            "terre"
+                      ],
+                      "solution": "Il vero viaggio di scoperta non consiste nel cercare nuove terre",
+                      "source": "Alla ricerca del tempo perduto"
+                }
+          ],
+          "cloze": [
+                {
+                      "text": "Appena la madeleine inzuppata nel tiglio toccò il mio palato, un brivido mi scosse e l'intera cittadina di ___ risorse dal passato.",
+                      "blanks": [
+                            "Combray"
+                      ],
+                      "source": "Dalla parte di Swann"
+                },
+                {
+                      "text": "Alla ricerca del tempo perduto è un capolavoro monumentale diviso in ___ volumi.",
+                      "blanks": [
+                            "sette"
+                      ],
+                      "source": "Recherche"
+                }
+          ],
+          "versi": [
+                {
+                      "title": "Alla ricerca del tempo perduto (L'episodio della Madeleine)",
+                      "lines": [
+                            "E subito, macchinalmente, accorato da quella giornata cupa",
+                            "portai alle labbra un cucchiaino di tè in cui avevo lasciato inzuppare un pezzetto di madeleine.",
+                            "Ma nello stesso istante in cui quel sorso misto a briciole toccò il mio palato,",
+                            "un brivido mi scosse, colmo d'un piacere straordinario."
+                      ],
+                      "hint": "La celeberrima epifania sensoriale del gusto che resuscita il passato dell'infanzia."
+                }
+          ],
+          "quiz": [
+                {
+                      "q": "Quale dolcetto tradizionale inzuppato nel tè evoca in Proust l'improvviso risveglio dei ricordi di Combray?",
+                      "o": [
+                            "Un cornetto",
+                            "La madeleine",
+                            "Un macaron",
+                            "Un biscotto al cioccolato"
+                      ],
+                      "a": 1
+                },
+                {
+                      "q": "Quanti volumi compongono l'opera monumentale 'Alla ricerca del tempo perduto'?",
+                      "o": [
+                            "3",
+                            "5",
+                            "7 volumi",
+                            "12"
+                      ],
+                      "a": 2
+                },
+                {
+                      "q": "Come viene definita la memoria improvvisa stimolata da una sensazione fisica (gusto, profumo, suono)?",
+                      "o": [
+                            "Memoria involontaria",
+                            "Memoria a breve termine",
+                            "Memoria storica",
+                            "Amnesia"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "In quale città francese Proust trascorse gran parte della vita scrivendo a letto nella sua stanza foderata di sughero?",
+                      "o": [
+                            "Parigi",
+                            "Lione",
+                            "Bordeaux",
+                            "Strasburgo"
+                      ],
+                      "a": 0
+                },
+                {
+                      "q": "Come si intitola il primo celebre volume della 'Recherche'?",
+                      "o": [
+                            "Dalla parte di Swann",
+                            "All'ombra delle fanciulle in fiore",
+                            "Il tempo ritrovato",
+                            "Sodoma e Gomorra"
+                      ],
+                      "a": 0
+                }
+          ]
+    },
     'mixed': {
       topic: "Sfida Casuale Mista",
       impiccato: [],
