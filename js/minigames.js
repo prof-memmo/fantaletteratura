@@ -100,6 +100,96 @@
         { q: "Quale tra queste NON è un'opera di Leopardi?", o: ["Zibaldone", "Operette morali", "I Malavoglia", "Canti"], a: 2 }
       ]
     },
+    'a3': { // Manzoni
+      topic: "Alessandro Manzoni",
+      impiccato: [
+        { word: "PROMESSI", hint: "I celebri sposi Renzo e Lucia" },
+        { word: "ABBONDIO", hint: "Il curato poco coraggioso" },
+        { word: "PROVVIDENZA", hint: "La guida divina nelle vicende umane" },
+        { word: "LUCIA", hint: "La giovane sposa insidiata da Don Rodrigo" }
+      ],
+      puzzle: [
+        { words: ["Quel", "ramo", "del", "lago", "di", "Como", "che", "volge", "a", "mezzogiorno"], solution: "Quel ramo del lago di Como che volge a mezzogiorno", source: "I Promessi Sposi (Incipit)" },
+        { words: ["Il", "coraggio", "uno", "non", "se", "lo", "può", "dare"], solution: "Il coraggio uno non se lo può dare", source: "I Promessi Sposi (Don Abbondio)" },
+        { words: ["Fu", "vera", "gloria", "ai", "posteri", "l'ardua", "sentenza"], solution: "Fu vera gloria ai posteri l'ardua sentenza", source: "Il Cinque Maggio" }
+      ],
+      cloze: [
+        {
+          text: "Quel ramo del lago di ___ , che volge a mezzogiorno, tra due catene non interrotte di ___...",
+          blanks: ["Como", "monti"],
+          source: "I Promessi Sposi"
+        },
+        {
+          text: "Fu vera gloria? Ai ___ l'ardua sentenza: nui chiniam la fronte al Massimo ___.",
+          blanks: ["posteri", "Fattore"],
+          source: "Il Cinque Maggio"
+        }
+      ],
+      versi: [
+        {
+          title: "Il Cinque Maggio",
+          lines: [
+            "Ei fu. Siccome immobile,",
+            "dato il mortal sospiro,",
+            "stette la spoglia immemore",
+            "orba di tanto spiro,"
+          ],
+          hint: "La celebre ode per la scomparsa di Napoleone Bonaparte."
+        }
+      ],
+      quiz: [
+        { q: "Qual è il capolavoro narrativo di Alessandro Manzoni?", o: ["I Malavoglia", "I Promessi Sposi", "I Sepolcri", "Le Odi"], a: 1 },
+        { q: "Chi è il curato impaurito ne 'I Promessi Sposi'?", o: ["Padre Cristoforo", "Don Abbondio", "Federigo Borromeo", "Fra Galdino"], a: 1 },
+        { q: "Per la morte di quale personaggio storico fu scritta l'ode 'Il Cinque Maggio'?", o: ["Garibaldi", "Napoleone Bonaparte", "Cavour", "Vittorio Emanuele II"], a: 1 },
+        { q: "In quale città lombarda Manzoni trascorse gran parte della vita?", o: ["Venezia", "Torino", "Milano", "Bergamo"], a: 2 },
+        { q: "Quale tragedia manzoniana contiene il celebre coro 'Dagli atrii muscosi'?", o: ["Il Conte di Carmagnola", "Adelchi", "Saul", "Mirra"], a: 1 }
+      ]
+    },
+    'a4': { // Carducci
+      topic: "Giosuè Carducci",
+      impiccato: [
+        { word: "BARBARE", hint: "Le sue celebri Odi con metrica classica" },
+        { word: "MAREMMA", hint: "La terra toscana dell'infanzia aspra e selvaggia" },
+        { word: "NOBEL", hint: "Primo italiano a vincere il prestigioso premio nel 1906" },
+        { word: "BOLOGNA", hint: "La città dove fu professore per decenni" }
+      ],
+      puzzle: [
+        { words: ["L'albero", "a", "cui", "tendevi", "la", "pargoletta", "mano"], solution: "L'albero a cui tendevi la pargoletta mano", source: "Pianto antico" },
+        { words: ["La", "nebbia", "agli", "irti", "colli", "piovigginando", "sale"], solution: "La nebbia agli irti colli piovigginando sale", source: "San Martino" },
+        { words: ["Sei", "de'", "ribelli", "spirito", "prometeo"], solution: "Sei de' ribelli spirito prometeo", source: "Inno a Satana" }
+      ],
+      cloze: [
+        {
+          text: "La nebbia a gl'irti colli piovigginando ___ , e sotto il maestrale urla e biancheggia il ___.",
+          blanks: ["sale", "mare"],
+          source: "San Martino"
+        },
+        {
+          text: "Tu fior della mia pianta percossa e inaridita, tu de l'inutil vita estremo unico ___.",
+          blanks: ["fiore"],
+          source: "Pianto antico"
+        }
+      ],
+      versi: [
+        {
+          title: "San Martino",
+          lines: [
+            "La nebbia a gl'irti colli",
+            "piovigginando sale,",
+            "e sotto il maestrale",
+            "urla e biancheggia il mare;"
+          ],
+          hint: "I primi quattro versi sul borgo toscano e il ribollir dei tini in autunno."
+        }
+      ],
+      quiz: [
+        { q: "In quale anno Carducci vinse il Premio Nobel per la Letteratura?", o: ["1901", "1906", "1926", "1934"], a: 1 },
+        { q: "A chi è dedicata la dolorosa poesia 'Pianto antico'?", o: ["Alla madre", "Al piccolo figlio Dante scomparso prematuramente", "Alla moglie Elvira", "A un allievo"], a: 1 },
+        { q: "Cosa caratterizza le 'Odi barbare'?", o: ["Il verso libero", "L'imitazione dei metri greci e latini in lingua italiana", "Il dialetto toscano", "La rima baciata"], a: 1 },
+        { q: "Quale bevanda ribolle nei tini nella poesia 'San Martino'?", o: ["Il sidro", "Il vino novello", "La birra", "L'idromele"], a: 1 },
+        { q: "In quale università Carducci insegnò letteratura italiana per oltre quarant'anni?", o: ["Pisa", "Firenze", "Bologna", "Padova"], a: 2 }
+      ]
+    },
     'a5': { // Verga
       topic: "Giovanni Verga",
       impiccato: [
@@ -142,6 +232,51 @@
         { q: "Chi scrisse Rosso Malpelo?", o: ["Luigi Pirandello", "Gabriele D'Annunzio", "Giovanni Verga", "Italo Svevo"], a: 2 },
         { q: "In quale paese della Sicilia è ambientato 'I Malavoglia'?", o: ["Palermo", "Catania", "Aci Trezza", "Siracusa"], a: 2 },
         { q: "Quale tecnica narrativa è tipica di Verga?", o: ["Flusso di coscienza", "Impersonalità e regressione", "Monologo interiore", "Prosa poetica"], a: 1 }
+      ]
+    },
+    'a6': { // Pascoli
+      topic: "Giovanni Pascoli",
+      impiccato: [
+        { word: "FANCIULLINO", hint: "La teoria del fanciullo interiore che scopre la poesia" },
+        { word: "MYRICAE", hint: "La sua prima e celebre raccolta di poesie" },
+        { word: "NIDO", hint: "Il rifugio familiare simbolo di protezione" },
+        { word: "AGOSTO", hint: "La notte delle stelle cadenti (X Agosto)" }
+      ],
+      puzzle: [
+        { words: ["San", "Lorenzo", "io", "lo", "so", "perché", "tanto", "di", "stelle"], solution: "San Lorenzo io lo so perché tanto di stelle", source: "X Agosto" },
+        { words: ["C'è", "un", "fanciullino", "in", "ciascuno", "di", "noi"], solution: "C'è un fanciullino in ciascuno di noi", source: "Il fanciullino" },
+        { words: ["Nel", "campo", "mezzo", "grigio", "e", "mezzo", "nero", "resta", "un", "aratro"], solution: "Nel campo mezzo grigio e mezzo nero resta un aratro", source: "Lavandare" }
+      ],
+      cloze: [
+        {
+          text: "San Lorenzo, io lo so perché tanto di stelle per l'aria tranquilla arde e ___ , perché sì gran pianto nel concavo cielo ___.",
+          blanks: ["cade", "sfavilla"],
+          source: "X Agosto"
+        },
+        {
+          text: "Nel campo mezzo grigio e mezzo nero resta un ___ senza buoi che pare dimenticato tra il ___ leggero.",
+          blanks: ["aratro", "vapor"],
+          source: "Lavandare"
+        }
+      ],
+      versi: [
+        {
+          title: "X Agosto",
+          lines: [
+            "San Lorenzo, io lo so perché tanto",
+            "di stelle per l'aria tranquilla",
+            "arde e cade, perché sì gran pianto",
+            "nel concavo cielo sfavilla."
+          ],
+          hint: "La celebre quartina di apertura sulla notte delle stelle cadenti in ricordo del padre."
+        }
+      ],
+      quiz: [
+        { q: "Cosa rappresenta il 'fanciullino' secondo Pascoli?", o: ["Un gioco infantile", "La capacità del poeta di meravigliarsi delle piccole cose", "Uno studente delle elementari", "Un ricordo inventato"], a: 1 },
+        { q: "Quale tragico evento segnò per sempre l'infanzia di Pascoli?", o: ["Un naufragio", "L'assassinio impunito del padre Ruggero", "Un terremoto", "L'esilio forzato"], a: 1 },
+        { q: "Cosa significa il titolo della raccolta 'Myricae'?", o: ["Stelle luminose", "Tamerici (piante umili citate da Virgilio)", "Canti notturni", "Campanelle"], a: 1 },
+        { q: "Di quale animale si parla nella poesia 'La cavallina storna'?", o: ["Della cavalla che riportò il padre morente a casa", "Di un cavallo da corsa", "Di un puledro selvaggio", "Del destriero di un re"], a: 0 },
+        { q: "Quale figura retorica di suono è usatissima da Pascoli (es. 'chiù', 'fru fru', 'don don')?", o: ["Metafora", "Onomatopea", "Iperbole", "Chiasmo"], a: 1 }
       ]
     },
     'a7': { // D'Annunzio
@@ -234,6 +369,547 @@
         { q: "Quanti sono i personaggi in cerca d'autore nella famosa opera teatrale?", o: ["Due", "Quattro", "Sei", "Otto"], a: 2 }
       ]
     },
+    'a9': { // Marinetti
+      topic: "Filippo Tommaso Marinetti",
+      impiccato: [
+        { word: "FUTURISMO", hint: "Movimento d'avanguardia nato nel 1909" },
+        { word: "VELOCITA", hint: "Il culto moderno dei motori e del dinamismo" },
+        { word: "MANIFESTO", hint: "Il celebre testo programmatico uscito su Le Figaro" },
+        { word: "AUTOMOBILE", hint: "Più bella della Nike di Samotracia per i futuristi" }
+      ],
+      puzzle: [
+        { words: ["Un", "automobile", "da", "corsa", "è", "più", "bella", "della", "Vittoria", "di", "Samotracia"], solution: "Un automobile da corsa è più bella della Vittoria di Samotracia", source: "Manifesto del Futurismo" },
+        { words: ["Vogliamo", "cantare", "l'amor", "del", "pericolo", "l'abitudine", "all'energia"], solution: "Vogliamo cantare l'amor del pericolo l'abitudine all'energia", source: "Manifesto del Futurismo" },
+        { words: ["Zang", "tumb", "tumb", "parole", "in", "totale", "libertà"], solution: "Zang tumb tumb parole in totale libertà", source: "Zang Tumb Tumb" }
+      ],
+      cloze: [
+        {
+          text: "Noi affermiamo che la magnificenza del mondo si è arricchita di una bellezza nuova: la bellezza della ___ .",
+          blanks: ["velocità"],
+          source: "Manifesto del Futurismo"
+        },
+        {
+          text: "Zang Tumb Tumb: parole in ___ per distruggere la sintassi e la punteggiatura ___ .",
+          blanks: ["libertà", "tradizionale"],
+          source: "Zang Tumb Tumb"
+        }
+      ],
+      versi: [
+        {
+          title: "Manifesto del Futurismo (Punto 4)",
+          lines: [
+            "Noi affermiamo che la magnificenza del mondo",
+            "si è arricchita di una bellezza nuova:",
+            "la bellezza della velocità.",
+            "Un automobile da corsa col suo cofano adorno di grossi tubi"
+          ],
+          hint: "L'esaltazione della macchina e del dinamismo moderno contro l'arte passata."
+        }
+      ],
+      quiz: [
+        { q: "In quale anno fu pubblicato il 'Manifesto del Futurismo'?", o: ["1899", "1909", "1919", "1929"], a: 1 },
+        { q: "Su quale prestigioso quotidiano parigino apparve il primo Manifesto?", o: ["Le Monde", "Le Figaro", "Times", "Corriere della Sera"], a: 1 },
+        { q: "Cosa intendevano i futuristi con 'parole in libertà'?", o: ["Poesie recitate a memoria", "Abolizione della punteggiatura e della sintassi tradizionale", "Traduzioni in latino", "Rime baciate obbligatorie"], a: 1 },
+        { q: "Qual è il titolo dell'opera parolibera di Marinetti sulla battaglia di Adrianopoli?", o: ["Zang Tumb Tumb", "Il Piacere", "Ossi di Seppia", "L'Allegria"], a: 0 },
+        { q: "Quale celeberrima statua greca classica i futuristi consideravano inferiore a un'auto da corsa?", o: ["La Venere di Milo", "Il Discobolo", "La Nike di Samotracia", "I Bronzi di Riace"], a: 2 }
+      ]
+    },
+    'a10': { // Ungaretti
+      topic: "Giuseppe Ungaretti",
+      impiccato: [
+        { word: "ALLEGRIA", hint: "La celebre raccolta 'L'Allegria di naufragi'" },
+        { word: "ERMETISMO", hint: "Corrente poetica essenziale e simbolica" },
+        { word: "CARSO", hint: "L'altopiano delle trincee della Grande Guerra" },
+        { word: "IMMENSO", hint: "M'illumino d'..." }
+      ],
+      puzzle: [
+        { words: ["M'illumino", "d'immenso"], solution: "M'illumino d'immenso", source: "Mattina" },
+        { words: ["Si", "sta", "come", "d'autunno", "sugli", "alberi", "le", "foglie"], solution: "Si sta come d'autunno sugli alberi le foglie", source: "Soldati" },
+        { words: ["Di", "queste", "case", "non", "è", "rimasto", "che", "qualche", "brandello"], solution: "Di queste case non è rimasto che qualche brandello", source: "San Martino del Carso" }
+      ],
+      cloze: [
+        {
+          text: "M'illumino d' ___ .",
+          blanks: ["immenso"],
+          source: "Mattina"
+        },
+        {
+          text: "Si sta come d'autunno sugli alberi le ___ .",
+          blanks: ["foglie"],
+          source: "Soldati"
+        }
+      ],
+      versi: [
+        {
+          title: "Soldati",
+          lines: [
+            "Si sta",
+            "come",
+            "d'autunno",
+            "sugli alberi",
+            "le foglie."
+          ],
+          hint: "I versi essenziali che esprimono la fragilità e il pericolo costante dei soldati al fronte."
+        }
+      ],
+      quiz: [
+        { q: "In quale città egiziana nacque Giuseppe Ungaretti?", o: ["Il Cairo", "Alessandria d'Egitto", "Suez", "Giza"], a: 1 },
+        { q: "Qual è il testo completo della celeberrima poesia 'Mattina'?", o: ["Si sta come d'autunno", "M'illumino d'immenso", "Ed è subito sera", "Spesso il male di vivere"], a: 1 },
+        { q: "Dove scrisse le sue prime poesie di guerra?", o: ["Nei caffè di Parigi", "Nelle trincee del Carso su pezzetti di carta", "In biblioteca", "In Senato a Roma"], a: 1 },
+        { q: "Come si intitola il componimento che paragona il cuore del poeta a un paese devastato?", o: ["San Martino del Carso", "I fiumi", "Veglia", "Fratelli"], a: 0 },
+        { q: "Ne 'I fiumi', quali corsi d'acqua ripercorrono le tappe della vita di Ungaretti?", o: ["Po, Tevere, Arno", "Isonzo, Serchio, Nilo, Senna", "Danubio, Reno, Tamigi", "Adige, Piave, Brenta"], a: 1 }
+      ]
+    },
+    'a11': { // Montale
+      topic: "Eugenio Montale",
+      impiccato: [
+        { word: "OSSI", hint: "La raccolta '... di seppia'" },
+        { word: "LIMONI", hint: "I frutti gialli simbolo di luce e speranza" },
+        { word: "CORRELATIVO", hint: "Oggettivo: esprimere un'emozione attraverso un oggetto reale" },
+        { word: "LIGURIA", hint: "La terra natale aspra e marina" }
+      ],
+      puzzle: [
+        { words: ["Spesso", "il", "male", "di", "vivere", "ho", "incontrato"], solution: "Spesso il male di vivere ho incontrato", source: "Ossi di seppia" },
+        { words: ["Non", "chiederci", "la", "parola", "che", "squadri", "da", "ogni", "lato"], solution: "Non chiederci la parola che squadri da ogni lato", source: "Non chiederci la parola" },
+        { words: ["Meriggiare", "pallido", "e", "assorto", "presso", "un", "rovente", "muro", "d'orto"], solution: "Meriggiare pallido e assorto presso un rovente muro d'orto", source: "Meriggiare pallido e assorto" }
+      ],
+      cloze: [
+        {
+          text: "Spesso il male di vivere ho incontrato: era il rivo strozzato che gorgoglia, era l'incartocciarsi della ___ secca, era il cavallo ___.",
+          blanks: ["foglia", "stramazzato"],
+          source: "Ossi di seppia"
+        },
+        {
+          text: "Ascoltami, i poeti laureati si muovono solo fra piante dai nomi poco usati. Io amo le strade dei fossi: i ___.",
+          blanks: ["limoni"],
+          source: "I Limoni"
+        }
+      ],
+      versi: [
+        {
+          title: "Spesso il male di vivere ho incontrato",
+          lines: [
+            "Spesso il male di vivere ho incontrato:",
+            "era il rivo strozzato che gorgoglia,",
+            "era l'incartocciarsi de la foglia",
+            "secca, era il cavallo stramazzato."
+          ],
+          hint: "La prima strofa con i tre celebri correlativi oggettivi della sofferenza universale."
+        }
+      ],
+      quiz: [
+        { q: "Quale prestigioso premio internazionale vinse Montale nel 1975?", o: ["Premio Strega", "Premio Campiello", "Premio Nobel per la Letteratura", "Premio Viareggio"], a: 2 },
+        { q: "Qual è il titolo della sua prima fondamentale raccolta poetica del 1925?", o: ["Canti", "Ossi di seppia", "Le Occasioni", "La bufera e altro"], a: 1 },
+        { q: "Cosa intende Montale per 'correlativo oggettivo'?", o: ["Una rima perfetta", "Esprimere uno stato d'animo interiore attraverso oggetti concreti", "Una figura geometrica", "Un racconto in prosa"], a: 1 },
+        { q: "Quali alberi profumati simboleggiano la gioia improvvisa nella celebre poesia?", o: ["I cipressi", "I limoni", "I pini", "I salici"], a: 1 },
+        { q: "Quale celebre verso esprime il rifiuto di certezze assolute?", o: ["M'illumino d'immenso", "Non chiederci la parola", "Sempre caro mi fu quest'ermo colle", "Taci su le soglie"], a: 1 }
+      ]
+    },
+    'a12': { // Quasimodo
+      topic: "Salvatore Quasimodo",
+      impiccato: [
+        { word: "SERA", hint: "Ed è subito..." },
+        { word: "SALICI", hint: "Alle fronde dei..." },
+        { word: "MODICA", hint: "Città natale in Sicilia" },
+        { word: "NOBEL", hint: "Premio prestigioso vinto nel 1959" }
+      ],
+      puzzle: [
+        { words: ["Ognuno", "sta", "solo", "sul", "cuor", "della", "terra"], solution: "Ognuno sta solo sul cuor della terra", source: "Ed è subito sera" },
+        { words: ["E", "come", "potevamo", "noi", "cantare", "con", "il", "piede", "straniero", "sopra", "il", "cuore"], solution: "E come potevamo noi cantare con il piede straniero sopra il cuore", source: "Alle fronde dei salici" },
+        { words: ["Trafitto", "da", "un", "raggio", "di", "sole", "ed", "è", "subito", "sera"], solution: "Trafitto da un raggio di sole ed è subito sera", source: "Ed è subito sera" }
+      ],
+      cloze: [
+        {
+          text: "Ognuno sta solo sul cuor della terra trafitto da un raggio di ___ : ed è subito ___.",
+          blanks: ["sole", "sera"],
+          source: "Ed è subito sera"
+        },
+        {
+          text: "Alle fronde dei salici, per voto, anche le nostre cetre erano ___ , oscillavano lievi al triste ___.",
+          blanks: ["appese", "vento"],
+          source: "Alle fronde dei salici"
+        }
+      ],
+      versi: [
+        {
+          title: "Ed è subito sera",
+          lines: [
+            "Ognuno sta solo sul cuor della terra",
+            "trafitto da un raggio di sole:",
+            "ed è subito sera."
+          ],
+          hint: "I tre versi memorabili sulla solitudine umana, la luce effimera e la morte improvvisa."
+        }
+      ],
+      quiz: [
+        { q: "Quanti versi compongono la celeberrima poesia 'Ed è subito sera'?", o: ["Due", "Tre", "Quattro", "Cinque"], a: 1 },
+        { q: "In quale anno Quasimodo fu insignito del Premio Nobel per la Letteratura?", o: ["1906", "1934", "1959", "1975"], a: 2 },
+        { q: "Quale popolo e testi antichi Quasimodo tradusse con maestria straordinaria?", o: ["I filosofi tedeschi", "I lirici greci", "I poeti francesi", "I miti nordici"], a: 1 },
+        { q: "A cosa erano appese le cetre dei poeti durante l'occupazione della guerra?", o: ["Alle querce", "Alle fronde dei salici", "Agli ulivi", "Ai cipressi"], a: 1 },
+        { q: "In quale regione italiana nacque Quasimodo?", o: ["Calabria", "Sicilia", "Puglia", "Campania"], a: 1 }
+      ]
+    },
+    'a13': { // Svevo
+      topic: "Italo Svevo",
+      impiccato: [
+        { word: "ZENO", hint: "Il protagonista della celebre Coscienza" },
+        { word: "INETTO", hint: "L'antieroe moderno incapace di decidersi" },
+        { word: "FUMO", hint: "L'ultima sigaretta rimandata all'infinito" },
+        { word: "TRIESTE", hint: "La città cosmopolita di Svevo e Joyce" }
+      ],
+      puzzle: [
+        { words: ["Adesso", "che", "sono", "qui", "analizzato", "la", "mia", "salute", "è", "perfetta"], solution: "Adesso che sono qui analizzato la mia salute è perfetta", source: "La coscienza di Zeno" },
+        { words: ["Il", "fumo", "era", "la", "mia", "grande", "passione", "e", "la", "mia", "malattia"], solution: "Il fumo era la mia grande passione e la mia malattia", source: "La coscienza di Zeno" },
+        { words: ["La", "vita", "attuale", "è", "inquinata", "alle", "radici"], solution: "La vita attuale è inquinata alle radici", source: "La coscienza di Zeno" }
+      ],
+      cloze: [
+        {
+          text: "Zeno Cosini decide di scrivere la propria autobiografia su invito del suo psicanalista, il Dottor ___ .",
+          blanks: ["S."],
+          source: "La coscienza di Zeno"
+        },
+        {
+          text: "La sigaretta con la data e la celebre sigla ___ (Ultima Sigaretta) che non sarà mai l'ultima.",
+          blanks: ["U.S."],
+          source: "La coscienza di Zeno"
+        }
+      ],
+      versi: [
+        {
+          title: "La profezia finale di Zeno",
+          lines: [
+            "La vita attuale è inquinata alle radici.",
+            "Qualunque sforzo di darci la salute è vano.",
+            "Ci sarà un'esplosione enorme che nessuno udrà",
+            "e la terra ritornata alla forma di nebulosa errerà nei cieli."
+          ],
+          hint: "La celebre visione apocalittica che chiude il capolavoro sveviano."
+        }
+      ],
+      quiz: [
+        { q: "Qual era il vero nome all'anagrafe di Italo Svevo?", o: ["Ettore Schmitz", "Alberto Pincherle", "Giacomo Debenedetti", "Emilio Brentani"], a: 0 },
+        { q: "Quale grande scrittore irlandese fu amico di Svevo a Trieste e ne valorizzò il talento?", o: ["Oscar Wilde", "James Joyce", "Samuel Beckett", "George Orwell"], a: 1 },
+        { q: "Quale disciplina scientifico-medica innovativa influenza 'La coscienza di Zeno'?", o: ["La neurologia", "La psicanalisi freudiana", "L'omeopatia", "La fisiologia"], a: 1 },
+        { q: "Cosa indicava la sigla 'U.S.' che Zeno annotava ovunque?", o: ["Unione Sovietica", "Ultima Sigaretta", "Unico Scopo", "Uomo Sano"], a: 1 },
+        { q: "Chi sposa alla fine Zeno tra le quattro figlie di Giovanni Malfenti?", o: ["Ada, la più bella", "Augusta, la meno attraente ma devota", "Alberta", "Anna"], a: 1 }
+      ]
+    },
+    'a14': { // Calvino
+      topic: "Italo Calvino",
+      impiccato: [
+        { word: "BARONE", hint: "Cosimo Piovasco che sale sugli alberi e non scende più" },
+        { word: "INVISIBILI", hint: "Le città poetiche descritte a Kublai Khan" },
+        { word: "VIAGGIATORE", hint: "Se una notte d'inverno un..." },
+        { word: "RESISTENZA", hint: "L'esperienza partigiana ne 'Il sentiero dei nidi di ragno'" }
+      ],
+      puzzle: [
+        { words: ["Chi", "vuole", "guardare", "bene", "la", "terra", "deve", "tenersi", "alla", "distanza", "necessaria"], solution: "Chi vuole guardare bene la terra deve tenersi alla distanza necessaria", source: "Il barone rampante" },
+        { words: ["D'una", "città", "non", "godi", "le", "sette", "o", "settantasette", "meraviglie"], solution: "D'una città non godi le sette o settantasette meraviglie", source: "Le città invisibili" },
+        { words: ["La", "leggerezza", "per", "me", "si", "associa", "con", "la", "precisione"], solution: "La leggerezza per me si associa con la precisione", source: "Lezioni americane" }
+      ],
+      cloze: [
+        {
+          text: "Pin è un bambino ligure che scopre dove fanno il nido i ___ e ruba la pistola a un soldato tedesco.",
+          blanks: ["ragni"],
+          source: "Il sentiero dei nidi di ragno"
+        },
+        {
+          text: "Cosimo Piovasco di Rondò all'età di dodici anni salì su un albero di ___ e decise di non scendere mai più.",
+          blanks: ["elce"],
+          source: "Il barone rampante"
+        }
+      ],
+      versi: [
+        {
+          title: "Le città invisibili (Finale)",
+          lines: [
+            "L'inferno dei viventi non è qualcosa che sarà;",
+            "se ce n'è uno, è quello che è già qui,",
+            "l'inferno che abitiamo tutti i giorni,",
+            "cercare e saper riconoscere chi e cosa, in mezzo all'inferno, non è inferno, e farlo durare."
+          ],
+          hint: "La memorabile conclusione sul senso del vivere e riconoscere il bello nel mondo."
+        }
+      ],
+      quiz: [
+        { q: "Qual è il primo romanzo pubblicato da Italo Calvino sulla Resistenza?", o: ["Il barone rampante", "Il sentiero dei nidi di ragno", "Il visconte dimezzato", "Marcovaldo"], a: 1 },
+        { q: "Come si intitola la celebre trilogia araldica e fantastica di Calvino?", o: ["I nostri antenati", "Le città invisibili", "Cosmicomiche", "Palomar"], a: 0 },
+        { q: "Cosa decide di fare Cosimo nel romanzo 'Il barone rampante'?", o: ["Vivere per sempre sugli alberi", "Farsi monaco", "Diventare pirata", "Esplorare l'America"], a: 0 },
+        { q: "Chi dialoga ne 'Le città invisibili' raccontando città immaginarie?", o: ["Dante e Virgilio", "Marco Polo e il Gran Khan Kublai", "Ulisse e Telemaco", "Don Chisciotte e Sancho Panza"], a: 1 },
+        { q: "In quale Paese caraibico nacque Italo Calvino da genitori botanici?", o: ["Giamaica", "Cuba (Santiago de Las Vegas)", "Messico", "Portorico"], a: 1 }
+      ]
+    },
+    'a15': { // Morante
+      topic: "Elsa Morante",
+      impiccato: [
+        { word: "STORIA", hint: "Il grandioso romanzo del 1974 sulla Seconda Guerra Mondiale" },
+        { word: "ARTURO", hint: "L'isola di... ambientata a Procida" },
+        { word: "USEPPE", hint: "Il dolcissimo e fragile bambino protagonista" },
+        { word: "PROCIDA", hint: "L'isola magica dell'infanzia di Arturo" }
+      ],
+      puzzle: [
+        { words: ["Uno", "dei", "miei", "primi", "vanti", "era", "stato", "il", "mio", "nome"], solution: "Uno dei miei primi vanti era stato il mio nome", source: "L'isola di Arturo" },
+        { words: ["Tutti", "i", "semi", "sono", "falliti", "eccetto", "uno", "l'amore"], solution: "Tutti i semi sono falliti eccetto uno l'amore", source: "La Storia" },
+        { words: ["Solo", "l'amore", "può", "salvare", "il", "mondo", "dalla", "distruzione"], solution: "Solo l'amore può salvare il mondo dalla distruzione", source: "Il mondo salvato dai ragazzini" }
+      ],
+      cloze: [
+        {
+          text: "L'isola di Arturo è ambientata nella splendida e aspra isola di ___ nel golfo di Napoli.",
+          blanks: ["Procida"],
+          source: "L'isola di Arturo"
+        },
+        {
+          text: "La maestra Ida Ramundo e il piccolo ___ affrontano la miseria e i bombardamenti di Roma durante la guerra.",
+          blanks: ["Useppe"],
+          source: "La Storia"
+        }
+      ],
+      versi: [
+        {
+          title: "Il mondo salvato dai ragazzini",
+          lines: [
+            "La grazia è la luce che ride negli occhi dei bambini.",
+            "Solo chi resta fedele all'innocenza",
+            "potrà guarire la terra dalle sue ferite.",
+            "Ascoltate il canto degli umili."
+          ],
+          hint: "La visione poetica di Elsa Morante sull'innocenza come salvezza del mondo."
+        }
+      ],
+      quiz: [
+        { q: "Quale romanzo di Elsa Morante vinse il prestigioso Premio Strega nel 1957?", o: ["Menzogna e sortilegio", "L'isola di Arturo", "La Storia", "Aracoeli"], a: 1 },
+        { q: "Quale isola campana fa da sfondo alle avventure del giovane Arturo?", o: ["Capri", "Ischia", "Procida", "Ventotene"], a: 2 },
+        { q: "Chi è la protagonista femminile del capolavoro 'La Storia'?", o: ["Ida Ramundo", "Nunziata", "Silvia", "Lucia"], a: 0 },
+        { q: "Quale celebre scrittore italiano fu marito di Elsa Morante?", o: ["Cesare Pavese", "Alberto Moravia", "Italo Calvino", "Pier Paolo Pasolini"], a: 1 },
+        { q: "Quale sottotitolo provocatorio e universale accompagna il romanzo 'La Storia'?", o: ["Un dramma romano", "Uno scandalo che dura da diecimila anni", "Canti di gioventù", "La memoria degli umili"], a: 1 }
+      ]
+    },
+    'a16': { // Primo Levi
+      topic: "Primo Levi",
+      impiccato: [
+        { word: "UOMO", hint: "Se questo è un..." },
+        { word: "TREGUA", hint: "Il lungo viaggio di ritorno attraverso l'Europa" },
+        { word: "CHIMICO", hint: "La sua professione originaria a Torino" },
+        { word: "PERIODICO", hint: "Il sistema... che unisce scienza e narrazione" }
+      ],
+      puzzle: [
+        { words: ["Meditate", "che", "questo", "è", "stato", "vi", "comando", "queste", "parole"], solution: "Meditate che questo è stato vi comando queste parole", source: "Se questo è un uomo" },
+        { words: ["Se", "comprendere", "è", "impossibile", "conoscere", "è", "necessario"], solution: "Se comprendere è impossibile conoscere è necessario", source: "I sommersi e i salvati" },
+        { words: ["Il", "lavoro", "fatto", "bene", "è", "la", "dignità", "dell'uomo"], solution: "Il lavoro fatto bene è la dignità dell'uomo", source: "La chiave a stella" }
+      ],
+      cloze: [
+        {
+          text: "Considerate se questo è un ___ che lavora nel fango, che non conosce pace, che muore per un sì o per un no.",
+          blanks: ["uomo"],
+          source: "Se questo è un uomo (Shemà)"
+        },
+        {
+          text: "Il sistema ___ contiene ventuno racconti intitolati ciascuno a un elemento chimico come il Carbonio e lo Zinco.",
+          blanks: ["periodico"],
+          source: "Il sistema periodico"
+        }
+      ],
+      versi: [
+        {
+          title: "Shemà (Incipit di Se questo è un uomo)",
+          lines: [
+            "Voi che vivete sicuri",
+            "Nelle vostre tiepide case,",
+            "Voi che trovate tornando a sera",
+            "Il cibo caldo e visi amici:",
+            "Considerate se questo è un uomo."
+          ],
+          hint: "La solenne poesia-monito che apre la testimonianza del Lager di Auschwitz."
+        }
+      ],
+      quiz: [
+        { q: "Quale professione scientifica permise a Primo Levi di essere impiegato nel laboratorio del Lager?", o: ["Medico", "Chimico", "Ingegnere", "Fisico"], a: 1 },
+        { q: "In quale città italiana è nato e vissuto Primo Levi?", o: ["Milano", "Torino", "Genova", "Bologna"], a: 1 },
+        { q: "Qual è il titolo del libro che racconta la sua drammatica prigionia ad Auschwitz?", o: ["La tregua", "Se questo è un uomo", "I sommersi e i salvati", "La chiave a stella"], a: 1 },
+        { q: "Quale libro narra la lunga odissea del rientro in Italia attraverso l'Europa dell'Est?", o: ["La tregua", "Il sistema periodico", "Se non ora, quando?", "Storie naturali"], a: 0 },
+        { q: "Quale romanzo di Levi celebra la passione per il proprio mestiere con l'operaio Faussone?", o: ["La chiave a stella", "Il sistema periodico", "La tregua", "I sommersi e i salvati"], a: 0 }
+      ]
+    },
+    'a17': { // Pavese
+      topic: "Cesare Pavese",
+      impiccato: [
+        { word: "LANGHE", hint: "Le colline piemontesi della memoria e dell'infanzia" },
+        { word: "FALO", hint: "La luna e i..." },
+        { word: "MESTIERE", hint: "Il... di vivere (il suo celebre diario)" },
+        { word: "AMERICA", hint: "La letteratura d'oltreoceano che tradusse con passione" }
+      ],
+      puzzle: [
+        { words: ["Un", "paese", "vuol", "dire", "non", "essere", "soli"], solution: "Un paese vuol dire non essere soli", source: "La luna e i falò" },
+        { words: ["Lavorare", "stanca", "ma", "è", "il", "nostro", "destino"], solution: "Lavorare stanca ma è il nostro destino", source: "Lavorare stanca" },
+        { words: ["Verrà", "la", "morte", "e", "avrà", "i", "tuoi", "occhi"], solution: "Verrà la morte e avrà i tuoi occhi", source: "Verrà la morte e avrà i tuoi occhi" }
+      ],
+      cloze: [
+        {
+          text: "Un paese ci vuole, non fosse che per il gusto di andarsene via. Un paese vuol dire non essere ___ .",
+          blanks: ["soli"],
+          source: "La luna e i falò"
+        },
+        {
+          text: "Verrà la morte e avrà i tuoi ___ , questa morte che ci accompagna dal mattino alla sera.",
+          blanks: ["occhi"],
+          source: "Verrà la morte e avrà i tuoi occhi"
+        }
+      ],
+      versi: [
+        {
+          title: "Verrà la morte e avrà i tuoi occhi",
+          lines: [
+            "Verrà la morte e avrà i tuoi occhi -",
+            "questa morte che ci accompagna",
+            "dal mattino alla sera, insonne,",
+            "sorda, come un vecchio rimorso."
+          ],
+          hint: "I versi struggenti scritti nel 1950 poco prima della scomparsa del poeta a Torino."
+        }
+      ],
+      quiz: [
+        { q: "In quale suggestiva zona collinare del Piemonte è ambientata 'La luna e i falò'?", o: ["Monferrato", "Le Langhe (Santo Stefano Belbo)", "Canavese", "Val di Susa"], a: 1 },
+        { q: "Come si chiama il protagonista de 'La luna e i falò' che torna arricchito dall'America?", o: ["Nuto", "Anguilla", "Cinto", "Milton"], a: 1 },
+        { q: "Quale celebre autore americano di 'Moby Dick' Pavese tradusse in italiano?", o: ["Ernest Hemingway", "Herman Melville", "John Steinbeck", "William Faulkner"], a: 1 },
+        { q: "Qual è il titolo del diario intimo e filosofico di Cesare Pavese?", o: ["Zibaldone", "Il mestiere di vivere", "Diario postumo", "Taccuino segreto"], a: 1 },
+        { q: "Qual è la raccolta poetica di Pavese che introduce il 'verso-racconto'?", o: ["Lavorare stanca", "Ossi di seppia", "Myricae", "Canti"], a: 0 }
+      ]
+    },
+    'a18': { // Moravia
+      topic: "Alberto Moravia",
+      impiccato: [
+        { word: "INDIFFERENTI", hint: "Il suo fulmineo romanzo d'esordio del 1929" },
+        { word: "CIOCIARA", hint: "Il dramma della guerra con Cesira e Rosetta" },
+        { word: "CONFORMISTA", hint: "Il romanzo sull'adesione passiva al regime" },
+        { word: "NOIA", hint: "La condizione esistenziale del pittore Dino" }
+      ],
+      puzzle: [
+        { words: ["Tutti", "erano", "immersi", "nella", "più", "completa", "indifferenza"], solution: "Tutti erano immersi nella più completa indifferenza", source: "Gli indifferenti" },
+        { words: ["La", "noia", "è", "la", "mancanza", "di", "rapporto", "con", "le", "cose"], solution: "La noia è la mancanza di rapporto con le cose", source: "La noia" },
+        { words: ["Le", "cose", "non", "hanno", "alcun", "senso", "fuori", "di", "noi"], solution: "Le cose non hanno alcun senso fuori di noi", source: "Gli indifferenti" }
+      ],
+      cloze: [
+        {
+          text: "Michele e Carla Ardengo sono i giovani fratelli protagonisti del romanzo Gli ___ .",
+          blanks: ["indifferenti"],
+          source: "Gli indifferenti"
+        },
+        {
+          text: "La Ciociara racconta la fuga drammatica di Cesira e della figlia ___ durante i bombardamenti della guerra.",
+          blanks: ["Rosetta"],
+          source: "La Ciociara"
+        }
+      ],
+      versi: [
+        {
+          title: "Gli indifferenti (Riflessione di Michele)",
+          lines: [
+            "Io non provo nulla, non sento nulla.",
+            "Tutto mi scivola addosso senza lasciare traccia.",
+            "Vorrei avere una fede, una passione sincera,",
+            "ma sono soltanto un indifferente."
+          ],
+          hint: "Il monologo interiore che definisce la crisi morale della gioventù borghese."
+        }
+      ],
+      quiz: [
+        { q: "A che età Alberto Moravia scrisse il capolavoro 'Gli indifferenti'?", o: ["A soli 22 anni", "A 35 anni", "A 45 anni", "A 50 anni"], a: 0 },
+        { q: "In quale città è ambientata la maggior parte dei romanzi di Moravia?", o: ["Milano", "Roma", "Napoli", "Firenze"], a: 1 },
+        { q: "Quale attrice vinse l'Oscar per il film 'La ciociara' tratto dal romanzo di Moravia?", o: ["Gina Lollobrigida", "Sophia Loren", "Anna Magnani", "Claudia Cardinale"], a: 1 },
+        { q: "Qual è il tema centrale del romanzo 'La noia'?", o: ["Il gioco d'azzardo", "L'incapacità di stabilire un contatto autentico con la realtà", "La vita militare", "L'amore cortese"], a: 1 },
+        { q: "Quale rivista culturale fondò Moravia insieme ad Alberto Carocci nel 1953?", o: ["La Voce", "Nuovi Argomenti", "Il Politecnico", "Lacerba"], a: 1 }
+      ]
+    },
+    'a19': { // Fenoglio
+      topic: "Beppe Fenoglio",
+      impiccato: [
+        { word: "JOHNNY", hint: "Il partigiano protagonista del capolavoro postumo" },
+        { word: "ALBA", hint: "I ventitré giorni della città di..." },
+        { word: "MILTON", hint: "Il partigiano innamorato di Fulvia in Una questione privata" },
+        { word: "RESISTENZA", hint: "La lotta partigiana sulle colline piemontesi" }
+      ],
+      puzzle: [
+        { words: ["Over", "the", "rainbow", "canticchiava", "Johnny", "nella", "nebbia"], solution: "Over the rainbow canticchiava Johnny nella nebbia", source: "Il partigiano Johnny" },
+        { words: ["L'amore", "era", "una", "questione", "privata", "in", "mezzo", "alla", "guerra"], solution: "L'amore era una questione privata in mezzo alla guerra", source: "Una questione privata" },
+        { words: ["Partirono", "all'alba", "per", "la", "collina", "con", "il", "fucile"], solution: "Partirono all'alba per la collina con il fucile", source: "I ventitré giorni della città di Alba" }
+      ],
+      cloze: [
+        {
+          text: "I ventitré giorni della città di ___ racconta la prima liberazione della cittadina piemontese da parte dei partigiani.",
+          blanks: ["Alba"],
+          source: "I ventitré giorni della città di Alba"
+        },
+        {
+          text: "Milton corre disperato attraverso le colline delle Langhe per scoprire la verità sull'amore di ___ .",
+          blanks: ["Fulvia"],
+          source: "Una questione privata"
+        }
+      ],
+      versi: [
+        {
+          title: "Il partigiano Johnny (Incipit)",
+          lines: [
+            "Johnny era un giovane alto e magro,",
+            "innamorato della lingua inglese e della libertà.",
+            "Salì sulle colline delle Langhe",
+            "quando la scelta divenne inevitabile."
+          ],
+          hint: "L'introduzione all'epopea partigiana raccontata con stile solenne e moderno."
+        }
+      ],
+      quiz: [
+        { q: "In quale città piemontese nacque e visse Beppe Fenoglio?", o: ["Cuneo", "Alba", "Torino", "Asti"], a: 1 },
+        { q: "Quale lingua straniera Fenoglio amava profondamente e mescolava alla prosa italiana?", o: ["Il francese", "L'inglese (fenglese)", "Il tedesco", "Lo spagnolo"], a: 1 },
+        { q: "Come si chiama il protagonista di 'Una questione privata'?", o: ["Johnny", "Milton", "Giorgio", "Ivan"], a: 1 },
+        { q: "Quale celebre autore definì 'Una questione privata' il romanzo perfetto sulla Resistenza?", o: ["Eugenio Montale", "Italo Calvino", "Alberto Moravia", "Pier Paolo Pasolini"], a: 1 },
+        { q: "Quanti giorni durò la Repubblica partigiana di Alba raccontata nella sua raccolta?", o: ["Dieci giorni", "Ventitré giorni", "Cento giorni", "Un mese"], a: 1 }
+      ]
+    },
+    'a20': { // Pasolini
+      topic: "Pier Paolo Pasolini",
+      impiccato: [
+        { word: "RAGAZZI", hint: "... di vita (il romanzo del 1955 sulle borgate romane)" },
+        { word: "ACCATTONE", hint: "Il suo primo e folgorante film da regista" },
+        { word: "BORGATE", hint: "Le periferie romane teatro delle sue storie" },
+        { word: "CENERI", hint: "Le... di Gramsci (famoso poemetto civile)" }
+      ],
+      puzzle: [
+        { words: ["Il", "mondo", "delle", "borgate", "viveva", "fuori", "dalla", "storia"], solution: "Il mondo delle borgate viveva fuori dalla storia", source: "Ragazzi di vita" },
+        { words: ["Lo", "scandalo", "del", "contraddirmi", "dell'essere", "con", "te", "e", "contro", "te"], solution: "Lo scandalo del contraddirmi dell'essere con te e contro te", source: "Le ceneri di Gramsci" },
+        { words: ["La", "passione", "per", "la", "vita", "è", "più", "forte", "della", "morte"], solution: "La passione per la vita è più forte della morte", source: "Una vita violenta" }
+      ],
+      cloze: [
+        {
+          text: "Il Riccetto è il giovane protagonista che si muove tra il Tevere e le borgate romane in Ragazzi di ___ .",
+          blanks: ["vita"],
+          source: "Ragazzi di vita"
+        },
+        {
+          text: "Pasolini diresse capolavori del cinema come Accattone, Mamma Roma e Il Vangelo secondo ___ .",
+          blanks: ["Matteo"],
+          source: "Filmografia pasoliniana"
+        }
+      ],
+      versi: [
+        {
+          title: "Le ceneri di Gramsci",
+          lines: [
+            "Non è di maggio questa impura aria",
+            "che il buio giardino straniero",
+            "fa ancora più buio, o l'abbaglia",
+            "con cieche schiarite..."
+          ],
+          hint: "L'inizio del celebre poemetto civile ambientato al Cimitero Acattolico di Roma."
+        }
+      ],
+      quiz: [
+        { q: "In quale lingua o dialetto Pasolini scrisse le sue prime poesie giovanili (Poesie a Casarsa)?", o: ["Romano", "Friulano", "Veneto", "Napoletano"], a: 1 },
+        { q: "Qual è il primo celeberrimo romanzo ambientato nelle borgate romane pubblicato nel 1955?", o: ["Una vita violenta", "Ragazzi di vita", "Petrolio", "Teorema"], a: 1 },
+        { q: "Come si chiamava il giovane protagonista di 'Ragazzi di vita'?", o: ["Il Riccetto", "Tommaso Puzzilli", "Accattone", "Stracci"], a: 0 },
+        { q: "Quale film di Pasolini del 1964 fu lodato a livello mondiale per la sua fedeltà al testo sacro?", o: ["Edipo Re", "Il Vangelo secondo Matteo", "Medea", "Decameron"], a: 1 },
+        { q: "In quale località sul litorale romano avvenne la tragica scomparsa di Pasolini nel 1975?", o: ["Fregene", "Idroscalo di Ostia", "Anzio", "Civitavecchia"], a: 1 }
+      ]
+    },
     'mixed': {
       topic: "Sfida Casuale Mista",
       impiccato: [],
@@ -291,7 +967,7 @@
 
   function getData(missionId) {
       if (missionId === 'mixed') {
-          // Build mixed data dynamically from MISSION_DATA and window.revealedAuthors
+          // Build mixed data dynamically from MISSION_DATA
           let mixedData = {
               topic: "Sfida Casuale Mista",
               impiccato: [],
@@ -301,11 +977,8 @@
               quiz: []
           };
           
-          let validAuthors = window.revealedAuthors ? window.revealedAuthors.map(a => a.id) : Object.keys(MISSION_DATA);
-          if(validAuthors.length === 0) validAuthors = ['a1', 'a2', 'a3', 'a4', 'a5']; // Fallback
-          
-          for(let aid of validAuthors) {
-              if(MISSION_DATA[aid] && aid !== 'mixed') {
+          for(let aid in MISSION_DATA) {
+              if(aid !== 'mixed' && MISSION_DATA[aid]) {
                   if(MISSION_DATA[aid].impiccato) mixedData.impiccato.push(...MISSION_DATA[aid].impiccato);
                   if(MISSION_DATA[aid].puzzle) mixedData.puzzle.push(...MISSION_DATA[aid].puzzle);
                   if(MISSION_DATA[aid].cloze) mixedData.cloze.push(...MISSION_DATA[aid].cloze);
@@ -329,7 +1002,7 @@
           
           return mixedData;
       }
-      return MISSION_DATA[missionId] || MISSION_DATA['a1'];
+      return MISSION_DATA[missionId] || DEFAULT_DATA;
   }
 
   // =====================================================
