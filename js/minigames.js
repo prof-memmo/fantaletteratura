@@ -15,15 +15,24 @@
       impiccato: [
         { word: "SEPOLCRI", hint: "Famoso carme dedicato a Pindemonte" },
         { word: "ORTIS", hint: "Cognome del protagonista delle sue ultime lettere" },
-        { word: "ESILIO", hint: "Condizione in cui vive l'ultima parte della vita" }
+        { word: "ESILIO", hint: "Condizione in cui vive l'ultima parte della vita" },
+        { word: "ZACINTO", hint: "Isola greca natale del poeta" }
       ],
       puzzle: [
-        { img: "avatar_autori/Foscolo.png", title: "Ritratto di Foscolo", pieceCount: 16 }
+        { words: ["Né", "più", "mai", "toccherò", "le", "sacre", "sponde"], solution: "Né più mai toccherò le sacre sponde", source: "A Zacinto" },
+        { words: ["All'ombra", "de'", "cipressi", "e", "dentro", "l'urne", "confortate", "di", "pianto"], solution: "All'ombra de' cipressi e dentro l'urne confortate di pianto", source: "Dei Sepolcri" },
+        { words: ["Il", "sacrificio", "della", "patria", "nostra", "è", "consumato"], solution: "Il sacrificio della patria nostra è consumato", source: "Ultime lettere di Jacopo Ortis" }
       ],
       cloze: [
         {
-          text: "Né più mai toccherò le sacre _, ove il mio corpo fanciulletto _",
-          words: ["sponde", "giacque"]
+          text: "Né più mai toccherò le sacre ___ , ove il mio corpo fanciulletto ___.",
+          blanks: ["sponde", "giacque"],
+          source: "A Zacinto"
+        },
+        {
+          text: "All'ombra de' cipressi e dentro l'urne confortate di ___ è forse il sonno della ___ men duro?",
+          blanks: ["pianto", "morte"],
+          source: "Dei Sepolcri"
         }
       ],
       versi: [
@@ -32,8 +41,10 @@
           lines: [
             "Né più mai toccherò le sacre sponde",
             "ove il mio corpo fanciulletto giacque,",
-            "Zacinto mia, che te specchi nell'onde"
-          ]
+            "Zacinto mia, che te specchi nell'onde",
+            "del greco mar da cui vergine nacque"
+          ],
+          hint: "Foscolo si rivolge alla sua amata isola natale ricordando la giovinezza e la nascita di Venere."
         }
       ],
       quiz: [
@@ -49,15 +60,24 @@
       impiccato: [
         { word: "INFINITO", hint: "Sempre caro mi fu quest'ermo colle..." },
         { word: "PESSIMISMO", hint: "Visione della vita tipica del poeta" },
-        { word: "RECANATI", hint: "Città natale" }
+        { word: "RECANATI", hint: "Città natale nelle Marche" },
+        { word: "ZIBALDONE", hint: "Diario intellettuale e filosofico" }
       ],
       puzzle: [
-        { img: "avatar_autori/Leopardi.png", title: "Ritratto di Leopardi", pieceCount: 16 }
+        { words: ["Sempre", "caro", "mi", "fu", "quest'ermo", "colle"], solution: "Sempre caro mi fu quest'ermo colle", source: "L'Infinito" },
+        { words: ["E", "il", "naufragar", "m'è", "dolce", "in", "questo", "mare"], solution: "E il naufragar m'è dolce in questo mare", source: "L'Infinito" },
+        { words: ["Silvia", "rimembri", "ancora", "quel", "tempo", "della", "tua", "vita", "mortale"], solution: "Silvia rimembri ancora quel tempo della tua vita mortale", source: "A Silvia" }
       ],
       cloze: [
         {
-          text: "Sempre caro mi fu quest'ermo _, e questa _, che da tanta parte dell'ultimo _ il guardo _.",
-          words: ["colle", "siepe", "orizzonte", "esclude"]
+          text: "Sempre caro mi fu quest'ermo ___ , e questa siepe, che da tanta parte dell'ultimo ___ il guardo esclude.",
+          blanks: ["colle", "orizzonte"],
+          source: "L'Infinito"
+        },
+        {
+          text: "Silvia, rimembri ancora quel tempo della tua vita mortale, quando beltà splendea negli occhi tuoi ___ e schivi?",
+          blanks: ["ridenti"],
+          source: "A Silvia"
         }
       ],
       versi: [
@@ -66,8 +86,10 @@
           lines: [
             "Sempre caro mi fu quest'ermo colle,",
             "e questa siepe, che da tanta parte",
-            "dell'ultimo orizzonte il guardo esclude."
-          ]
+            "dell'ultimo orizzonte il guardo esclude.",
+            "Ma sedendo e mirando, interminati spazi"
+          ],
+          hint: "Leopardi contempla la siepe sull'ermo colle che stimola l'immaginazione verso gli spazi sconfinati."
         }
       ],
       quiz: [
@@ -81,27 +103,37 @@
     'a5': { // Verga
       topic: "Giovanni Verga",
       impiccato: [
-        { word: "VERISMO", hint: "Corrente letteraria italiana" },
-        { word: "MALAVOGLIA", hint: "Romanzo sulla famiglia Toscano" },
-        { word: "SICILIA", hint: "Regione in cui sono ambientate le opere" }
+        { word: "VERISMO", hint: "Corrente letteraria italiana fondata sull'impersonalità" },
+        { word: "MALAVOGLIA", hint: "Romanzo sulla famiglia Toscano di Aci Trezza" },
+        { word: "SICILIA", hint: "Regione in cui sono ambientate le opere verghiane" },
+        { word: "MALPELO", hint: "Ragazzo dai capelli rossi che lavora nella cava" }
       ],
       puzzle: [
-        { img: "avatar_autori/Verga.png", title: "Ritratto di Verga", pieceCount: 16 }
+        { words: ["Il", "mare", "non", "ha", "paese", "nemmeno", "lui"], solution: "Il mare non ha paese nemmeno lui", source: "I Malavoglia" },
+        { words: ["Malpelo", "si", "chiamava", "così", "perché", "aveva", "i", "capelli", "rossi"], solution: "Malpelo si chiamava così perché aveva i capelli rossi", source: "Rosso Malpelo" },
+        { words: ["Tutti", "quelli", "del", "paese", "vivevano", "della", "loro", "fatica"], solution: "Tutti quelli del paese vivevano della loro fatica", source: "Novelle rusticane" }
       ],
       cloze: [
         {
-          text: "I _ sono una famiglia di pescatori che vive nel paese di _.",
-          words: ["Malavoglia", "Aci Trezza"]
+          text: "I ___ sono una famiglia di pescatori che vive nel paese di ___ Trezza.",
+          blanks: ["Malavoglia", "Aci"],
+          source: "I Malavoglia"
+        },
+        {
+          text: "Malpelo lavorava nella cava di ___ e tutti lo schivavano come un cane ___.",
+          blanks: ["rena", "rognoso"],
+          source: "Rosso Malpelo"
         }
       ],
       versi: [
         {
-          title: "Rosso Malpelo",
+          title: "Rosso Malpelo (Incipit)",
           lines: [
             "Malpelo si chiamava così perché aveva i capelli rossi;",
             "ed aveva i capelli rossi perché era un ragazzo malizioso",
-            "e cattivo."
-          ]
+            "e cattivo, che prometteva di riescire un fior di birbone."
+          ],
+          hint: "L'incipit celebre di Rosso Malpelo con la visione corale popolare basata sui pregiudizi."
         }
       ],
       quiz: [
@@ -109,23 +141,32 @@
         { q: "Come si chiamava la barca dei Malavoglia?", o: ["La Provvidenza", "La Speranza", "Il Destino", "La Fortuna"], a: 0 },
         { q: "Chi scrisse Rosso Malpelo?", o: ["Luigi Pirandello", "Gabriele D'Annunzio", "Giovanni Verga", "Italo Svevo"], a: 2 },
         { q: "In quale paese della Sicilia è ambientato 'I Malavoglia'?", o: ["Palermo", "Catania", "Aci Trezza", "Siracusa"], a: 2 },
-        { q: "Quale tecnica narrativa è tipica di Verga?", o: ["Flusso di coscienza", "Straniamento", "Monologo interiore", "Prosa poetica"], a: 1 }
+        { q: "Quale tecnica narrativa è tipica di Verga?", o: ["Flusso di coscienza", "Impersonalità e regressione", "Monologo interiore", "Prosa poetica"], a: 1 }
       ]
     },
     'a7': { // D'Annunzio
       topic: "Gabriele D'Annunzio",
       impiccato: [
-        { word: "ESTETISMO", hint: "Il culto della bellezza" },
-        { word: "PIACERE", hint: "Celebre romanzo con Andrea Sperelli" },
-        { word: "VATE", hint: "Soprannome di D'Annunzio" }
+        { word: "ESTETISMO", hint: "Il culto della bellezza come regola di vita" },
+        { word: "PIACERE", hint: "Celebre romanzo con protagonista Andrea Sperelli" },
+        { word: "VATE", hint: "Soprannome con cui era chiamato D'Annunzio" },
+        { word: "PANISMO", hint: "Fusione dell'uomo con la natura circostante" }
       ],
       puzzle: [
-        { img: "avatar_autori/DAnnunzio.png", title: "Ritratto di D'Annunzio", pieceCount: 16 }
+        { words: ["Ascolta", "piove", "dalle", "nuvole", "sparse", "sui", "mirti", "divini"], solution: "Ascolta piove dalle nuvole sparse sui mirti divini", source: "La pioggia nel pineto" },
+        { words: ["Bisogna", "fare", "della", "propria", "vita", "un'opera", "d'arte"], solution: "Bisogna fare della propria vita un'opera d'arte", source: "Il Piacere" },
+        { words: ["Taci", "su", "le", "soglie", "del", "bosco", "non", "odo", "parole", "umane"], solution: "Taci su le soglie del bosco non odo parole umane", source: "La pioggia nel pineto" }
       ],
       cloze: [
         {
-          text: "Taci. Su le soglie del _, non odo parole che dici _...",
-          words: ["bosco", "umane"]
+          text: "Taci. Su le soglie del ___ , non odo parole che dici ___ ma odo parole più nuove.",
+          blanks: ["bosco", "umane"],
+          source: "La pioggia nel pineto"
+        },
+        {
+          text: "Andrea Sperelli era un giovane gentiluomo che voleva fare della propria vita un'opera d' ___ .",
+          blanks: ["arte"],
+          source: "Il Piacere"
         }
       ],
       versi: [
@@ -134,8 +175,10 @@
           lines: [
             "Taci. Su le soglie",
             "del bosco non odo",
-            "parole che dici umane;"
-          ]
+            "parole che dici umane;",
+            "ma odo parole più nuove"
+          ],
+          hint: "L'inizio dell'incantesimo naturale tra il poeta ed Ermione nella pineta della Versilia."
         }
       ],
       quiz: [
@@ -149,26 +192,38 @@
     'a8': { // Pirandello
       topic: "Luigi Pirandello",
       impiccato: [
-        { word: "MASCHERA", hint: "Rappresenta le diverse forme che assumiamo" },
+        { word: "MASCHERA", hint: "Rappresenta le diverse forme che assumiamo in società" },
         { word: "PASCAL", hint: "Il fu Mattia..." },
-        { word: "UMORISMO", hint: "Il sentimento del contrario" }
+        { word: "UMORISMO", hint: "Il sentimento del contrario teorizzato dallo scrittore" },
+        { word: "GIRGENTI", hint: "Città natale in Sicilia (attuale Agrigento)" }
       ],
       puzzle: [
-        { img: "avatar_autori/Pirandello.png", title: "Ritratto di Pirandello", pieceCount: 16 }
+        { words: ["Imparerai", "che", "incontrerai", "tante", "maschere", "e", "pochi", "volti"], solution: "Imparerai che incontrerai tante maschere e pochi volti", source: "Uno, nessuno e centomila" },
+        { words: ["La", "vita", "non", "conclude", "e", "non", "sa", "di", "nomi"], solution: "La vita non conclude e non sa di nomi", source: "Uno, nessuno e centomila" },
+        { words: ["Ciascuno", "di", "noi", "crede", "d'essere", "uno", "ma", "è", "centomila"], solution: "Ciascuno di noi crede d'essere uno ma è centomila", source: "Uno, nessuno e centomila" }
       ],
       cloze: [
         {
-          text: "Imparerai a tue _, che nel lungo tragitto della _, incontrerai tante _ e pochi _.",
-          words: ["spese", "vita", "maschere", "volti"]
+          text: "Imparerai a tue spese che nel lungo tragitto della vita incontrerai tante ___ e pochi ___.",
+          blanks: ["maschere", "volti"],
+          source: "Uno, nessuno e centomila"
+        },
+        {
+          text: "L'umorismo consiste nel sentimento del ___ , nato dalla riflessione.",
+          blanks: ["contrario"],
+          source: "L'Umorismo"
         }
       ],
       versi: [
         {
-          title: "Uno, nessuno e centomila",
+          title: "Uno, nessuno e centomila (Finale)",
           lines: [
             "La vita non conclude.",
-            "E non sa di nomi, la vita."
-          ]
+            "E non sa di nomi, la vita.",
+            "Quest'albero, respiro trèmulo di foglie nuove.",
+            "Io sono quest'albero, quest'albero, nuvola; fiumicello;"
+          ],
+          hint: "Il protagonista Vitangelo Moscarda abbandona ogni identità per rinascere ogni attimo nella natura."
         }
       ],
       quiz: [
@@ -443,16 +498,16 @@
       container.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
       // Label del topic
-      const topicBadge = data.topic ? `<span style="font-size:0.75rem; background:rgba(212,175,55,0.12); border:1px solid rgba(212,175,55,0.3); padding:2px 10px; border-radius:4px; color:var(--gold); margin-left:8px;">${data.topic}</span>` : '';
+      const topicBadge = data.topic ? `<span style="font-size:0.75rem; background:rgba(141,160,63,0.15); border:1px solid rgba(141,160,63,0.4); padding:3px 10px; border-radius:6px; color:#f5c53c; font-weight:600; text-transform:none;">${data.topic}</span>` : '';
 
       const typeLabels = {
-        quiz: '❓ Quiz',
-        impiccato: '🎭 Impiccato',
-        puzzle: '🧩 Riordina la Frase',
-        cloze: '📝 Cloze — Completa il Testo',
+        quiz: '❓ Quiz Letterario',
+        impiccato: '🎭 L\'Impiccato',
+        puzzle: '🧩 Ricostruisci la Citazione',
+        cloze: '📝 Testo Bucato (Cloze)',
         versi: '📜 Riordina i Versi'
       };
-      title.innerHTML = (this.isMancheMode ? '🏆 MANCHE COMPLETA - ' : '') + (typeLabels[type] || type) + topicBadge;
+      title.innerHTML = `<span style="color:#f5c53c;">${this.isMancheMode ? '🏆 MANCHE COMPLETA - ' : ''}${typeLabels[type] || type}</span> ${topicBadge}`;
 
       switch(type) {
         case 'impiccato': this.initImpiccato(content, data); break;
@@ -476,12 +531,16 @@
         const xp = Math.min(20, this.mancheScore);
         
         const content = document.getElementById('minigame-content');
-        content.innerHTML = `<div style="text-align:center; padding: 30px;">
-            <h2 style="color:var(--accent-gold); font-size:2rem; margin-bottom:15px;">🎉 MANCHE COMPLETATA!</h2>
-            <p style="font-size:1.2rem; color:#fff;">Hai completato tutti i giochi della manche.</p>
-            <div style="font-size:3rem; font-weight:bold; color:#16a34a; margin:20px 0;">+${xp} PUNTI</div>
-            <button class="btn" style="background:#16a34a; color:#fff;" onclick="EroiMinigames.finalizeMancheReward(${xp})">Riscuoti Punti</button>
-        </div>`;
+        content.innerHTML = `
+            <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:25px; padding: 25px 15px; text-align:center;">
+                <img src="assets/maestro.png" alt="Il Maestro" style="max-height:220px; object-fit:contain; filter:drop-shadow(0 10px 20px rgba(0,0,0,0.6));">
+                <div style="max-width:450px;">
+                    <h2 style="color:#f5c53c; font-size:1.8rem; margin-bottom:10px; font-family:var(--font-heading);">🎉 MANCHE COMPLETATA!</h2>
+                    <p style="font-size:1.05rem; color:#f5f5f0; line-height:1.4; margin-bottom:15px;">Congratulazioni! Hai completato tutte le prove letterarie di questa manche.</p>
+                    <div style="font-size:2.6rem; font-weight:bold; color:#16a34a; margin:15px 0;">+${xp} PUNTI</div>
+                    <button class="btn" style="background:#16a34a !important; color:#fff !important; width:auto; padding:10px 24px; border-radius:10px;" onclick="EroiMinigames.finalizeMancheReward(${xp})">Riscuoti Punti Squadra</button>
+                </div>
+            </div>`;
         return;
       }
       const nextGame = this.mancheGames.shift();
@@ -506,7 +565,7 @@
                         teamId: currentTurn.teamId,
                         teamName: currentTurn.teamName,
                         game: currentTurn.game,
-                        points: 0 // Assegnazione manuale, segniamo 0 per lo storico (o potremmo omettere i punti)
+                        points: 0
                     });
                 }
             } else {
@@ -581,7 +640,7 @@
     initQuiz: function(container, data) {
         let pool = data.quiz || [];
         if (pool.length === 0) {
-            container.innerHTML = '<p>Nessun quiz disponibile per questo autore.</p>';
+            container.innerHTML = '<p style="text-align:center; padding:20px; color:var(--text-muted);">Nessun quiz disponibile per questo autore.</p>';
             return;
         }
         
@@ -611,13 +670,25 @@
         const progress = `Domanda ${this.quizState.current + 1} di ${this.quizState.questions.length}`;
         
         const optionsHtml = qData.o.map((opt, idx) => `
-            <button class="btn btn-secondary" style="display:block; width:100%; text-align:left; margin-bottom:10px; padding:12px; font-size:0.95rem; white-space:normal; height:auto; line-height:1.4;" onclick="EroiMinigames.answerQuiz(${idx})">${opt}</button>
+            <button class="btn btn-secondary" style="display:block; width:100%; text-align:left; margin-bottom:10px; padding:12px 16px; font-size:0.95rem; white-space:normal; height:auto; line-height:1.4; border-radius:10px; background:rgba(35,40,25,0.7) !important;" onclick="EroiMinigames.answerQuiz(${idx})">
+                <span style="display:inline-block; width:24px; height:24px; line-height:22px; text-align:center; border-radius:50%; background:rgba(141,160,63,0.2); border:1px solid #8da03f; color:#f5f5f0; font-size:0.75rem; margin-right:8px; font-weight:bold;">${String.fromCharCode(65 + idx)}</span>
+                ${opt}
+            </button>
         `).join('');
         
         container.innerHTML = `
-            <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:15px; text-transform:uppercase; letter-spacing:1px; font-weight:bold;">${progress}</div>
-            <h3 style="color:#fff; font-size:1.2rem; margin-bottom:20px; line-height:1.4;">${qData.q} ${editBtn}</h3>
-            <div>${optionsHtml}</div>
+            <div style="display:flex; flex-wrap:wrap; gap:25px; align-items:center; justify-content:center; max-width:900px; margin:0 auto;">
+                <div style="text-align:center; min-width:140px; max-width:180px; flex-shrink:0;">
+                    <img src="assets/maestro.png" alt="Il Maestro" style="max-height:240px; width:auto; object-fit:contain; filter:drop-shadow(0 10px 20px rgba(0,0,0,0.6));">
+                </div>
+                <div style="flex:1; min-width:280px;">
+                    <div style="font-size:0.8rem; color:#f5c53c; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px; font-weight:bold;">${progress}</div>
+                    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(141,160,63,0.2); border-radius:12px; padding:16px; margin-bottom:16px;">
+                        <h3 style="color:#fff; font-size:1.15rem; margin:0; line-height:1.45; font-family:var(--font-heading);">${qData.q} ${editBtn}</h3>
+                    </div>
+                    <div>${optionsHtml}</div>
+                </div>
+            </div>
         `;
     },
     
@@ -637,11 +708,14 @@
         if (this.isMancheMode) points = Math.round((correct / total) * 5); // up to 5 points for manche
         
         container.innerHTML = `
-            <div style="text-align:center; padding:20px;">
-                <h3 style="color:var(--accent-gold); font-size:1.5rem; margin-bottom:15px;">Quiz Terminato!</h3>
-                <p style="font-size:1.1rem; color:#fff; margin-bottom:20px;">Hai risposto correttamente a ${correct} domande su ${total}.</p>
-                ${points > 0 ? `<div style="color:#16a34a; font-weight:bold; font-size:1.1rem; margin-bottom:15px;">🎉 Risultato positivo!</div>` : `<div style="color:#ef4444; font-weight:bold; font-size:1.1rem; margin-bottom:15px;">Purtroppo non hai superato il test.</div>`}
-                <button class="btn" onclick="EroiMinigames.rewardAndNext('quiz', ${points}, 0)">Continua</button>
+            <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:25px; padding:20px; text-align:center;">
+                <img src="assets/maestro.png" alt="Il Maestro" style="max-height:220px; object-fit:contain; filter:drop-shadow(0 10px 20px rgba(0,0,0,0.6));">
+                <div style="max-width:400px;">
+                    <h3 style="color:#f5c53c; font-size:1.6rem; margin-bottom:10px; font-family:var(--font-heading);">Quiz Terminato!</h3>
+                    <p style="font-size:1.1rem; color:#fff; margin-bottom:15px;">Hai risposto correttamente a <strong>${correct}</strong> domande su ${total}.</p>
+                    ${points > 0 ? `<div style="color:#16a34a; font-weight:bold; font-size:1.15rem; margin-bottom:18px;">🎉 Ottima prova! Punti guadagnati: +${points}</div>` : `<div style="color:#ef4444; font-weight:bold; font-size:1.1rem; margin-bottom:18px;">Non hai superato il punteggio minimo. Riprova!</div>`}
+                    <button class="btn" style="width:auto; padding:10px 24px; border-radius:8px;" onclick="EroiMinigames.rewardAndNext('quiz', ${points}, 0)">Continua</button>
+                </div>
             </div>
         `;
     },
@@ -659,15 +733,16 @@
       const s = impiccatoState;
       const word = s.word;
 
+      // Tratti SVG definiti con colore oro brillante e spessore solido
       const parts = [
         '',
-        '<line x1="20" y1="130" x2="100" y2="130" stroke="var(--gold)" stroke-width="3"/>',
-        '<line x1="60" y1="130" x2="60" y2="20" stroke="var(--gold)" stroke-width="3"/>',
-        '<line x1="60" y1="20" x2="100" y2="20" stroke="var(--gold)" stroke-width="3"/>',
-        '<line x1="100" y1="20" x2="100" y2="35" stroke="var(--gold)" stroke-width="3"/>',
-        '<circle cx="100" cy="45" r="10" stroke="var(--gold)" stroke-width="2" fill="none"/>',
-        '<line x1="100" y1="55" x2="100" y2="90" stroke="var(--gold)" stroke-width="2"/><line x1="100" y1="65" x2="85" y2="80" stroke="var(--gold)" stroke-width="2"/><line x1="100" y1="65" x2="115" y2="80" stroke="var(--gold)" stroke-width="2"/>',
-        '<line x1="100" y1="90" x2="85" y2="115" stroke="var(--gold)" stroke-width="2"/><line x1="100" y1="90" x2="115" y2="115" stroke="var(--gold)" stroke-width="2"/>'
+        '<line x1="20" y1="135" x2="130" y2="135" stroke="#8da03f" stroke-width="4" stroke-linecap="round"/>',
+        '<line x1="45" y1="135" x2="45" y2="15" stroke="#8da03f" stroke-width="4" stroke-linecap="round"/>',
+        '<line x1="45" y1="15" x2="105" y2="15" stroke="#8da03f" stroke-width="4" stroke-linecap="round"/><line x1="45" y1="35" x2="65" y2="15" stroke="#8da03f" stroke-width="3"/>',
+        '<line x1="105" y1="15" x2="105" y2="35" stroke="#f5c53c" stroke-width="3" stroke-linecap="round"/>',
+        '<circle cx="105" cy="48" r="13" stroke="#f5c53c" stroke-width="3" fill="none"/>',
+        '<line x1="105" y1="61" x2="105" y2="95" stroke="#f5c53c" stroke-width="3" stroke-linecap="round"/><line x1="105" y1="72" x2="88" y2="88" stroke="#f5c53c" stroke-width="3" stroke-linecap="round"/><line x1="105" y1="72" x2="122" y2="88" stroke="#f5c53c" stroke-width="3" stroke-linecap="round"/>',
+        '<line x1="105" y1="95" x2="88" y2="120" stroke="#f5c53c" stroke-width="3" stroke-linecap="round"/><line x1="105" y1="95" x2="122" y2="120" stroke="#f5c53c" stroke-width="3" stroke-linecap="round"/>'
       ];
 
       let svg = '';
@@ -675,8 +750,8 @@
 
       const wordDisplay = word.split('').map(l => 
         s.guessed.has(l)
-          ? `<span style="font-size:1.8rem;font-family:var(--font-heading);color:var(--gold);margin:0 4px;letter-spacing:2px;">${l}</span>`
-          : `<span style="font-size:1.8rem;color:var(--text-muted);margin:0 4px;">_</span>`
+          ? `<span style="display:inline-block; min-width:28px; font-size:1.8rem; font-family:var(--font-heading); color:#f5c53c; border-bottom:3px solid #f5c53c; margin:0 4px; font-weight:bold;">${l}</span>`
+          : `<span style="display:inline-block; min-width:28px; font-size:1.8rem; color:var(--text-muted); border-bottom:3px solid rgba(255,255,255,0.3); margin:0 4px;">&nbsp;</span>`
       ).join('');
 
       const wrongLetters = [...s.guessed].filter(l => !word.includes(l));
@@ -684,45 +759,45 @@
       const lost = s.wrongGuesses >= s.maxWrong;
 
       const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-      let kb = '<div style="display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:14px;">';
+      let kb = '<div style="display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-top:16px;">';
       alpha.forEach(l => {
         const isGuessed = s.guessed.has(l);
         const isWrong = isGuessed && !word.includes(l);
         const isOk = isGuessed && word.includes(l);
-        let st = 'min-width:36px;height:36px;border-radius:6px;font-weight:bold;font-size:0.82rem;cursor:pointer;border:1px solid;transition:all 0.2s;';
-        if (isWrong)   st += 'background:rgba(239,68,68,0.2);border-color:#ef4444;color:#ef4444;';
-        else if (isOk) st += 'background:rgba(22,163,74,0.2);border-color:#16a34a;color:#16a34a;';
-        else           st += 'background:rgba(212,175,55,0.08);border-color:rgba(212,175,55,0.3);color:var(--text-light);';
+        let st = 'min-width:38px; height:38px; border-radius:8px; font-weight:bold; font-size:0.9rem; cursor:pointer; border:1px solid; transition:all 0.2s;';
+        if (isWrong)   st += 'background:rgba(239,68,68,0.25); border-color:#ef4444; color:#ef4444;';
+        else if (isOk) st += 'background:rgba(22,163,74,0.25); border-color:#16a34a; color:#16a34a;';
+        else           st += 'background:rgba(255,255,255,0.05); border-color:rgba(141,160,63,0.3); color:#f5f5f0;';
         kb += `<button style="${st}" ${isGuessed||won||lost?'disabled':''} onclick="EroiMinigames.guessLetter('${l}')">${l}</button>`;
       });
       kb += '</div>';
 
       let result = '';
       if (won) {
-        result = `<div style="background:rgba(22,163,74,0.15);border:1px solid #16a34a;border-radius:10px;padding:16px;text-align:center;margin-top:16px;">
-          <div style="color:#16a34a;font-weight:bold;font-size:1.1rem;">🎉 Hai indovinato! +20 XP, +10 Dracme</div>
-          <button class="btn" style="margin-top:12px;" onclick="EroiMinigames.rewardAndNext('impiccato',20,10)">Nuova parola</button>
+        result = `<div style="background:rgba(22,163,74,0.15); border:1px solid #16a34a; border-radius:12px; padding:16px; text-align:center; margin-top:16px;">
+          <div style="color:#16a34a; font-weight:bold; font-size:1.2rem; font-family:var(--font-heading);">🎉 Complimenti! Hai indovinato la parola!</div>
+          <button class="btn" style="margin-top:12px; width:auto; padding:8px 20px;" onclick="EroiMinigames.rewardAndNext('impiccato',20,10)">Nuova parola</button>
         </div>`;
       } else if (lost) {
-        result = `<div style="background:rgba(239,68,68,0.1);border:1px solid #ef4444;border-radius:10px;padding:16px;text-align:center;margin-top:16px;">
-          <div style="color:#ef4444;font-weight:bold;">💀 La parola era: <span style="color:var(--gold);">${word}</span></div>
-          <button class="btn btn-secondary" style="margin-top:12px;" onclick="EroiMinigames.retryImpiccato()">Riprova</button>
+        result = `<div style="background:rgba(239,68,68,0.12); border:1px solid #ef4444; border-radius:12px; padding:16px; text-align:center; margin-top:16px;">
+          <div style="color:#ef4444; font-weight:bold; font-size:1.1rem;">💀 Peccato! La parola era: <strong style="color:#f5c53c; letter-spacing:1px;">${word}</strong></div>
+          <button class="btn btn-secondary" style="margin-top:12px; width:auto; padding:8px 20px;" onclick="EroiMinigames.retryImpiccato()">Riprova</button>
         </div>`;
       }
 
       container.innerHTML = `
-        <div style="display:grid;grid-template-columns:150px 1fr;gap:20px;align-items:start;">
-          <div style="text-align:center;">
-            <svg width="140" height="140" viewBox="0 0 140 140" style="background:rgba(0,0,0,0.3);border-radius:8px;border:1px solid rgba(212,175,55,0.2);">${svg}</svg>
-            <div style="margin-top:6px;font-size:0.8rem;color:var(--text-muted);">Errori: ${s.wrongGuesses}/${s.maxWrong}</div>
+        <div style="display:grid; grid-template-columns: minmax(160px, 200px) 1fr; gap:20px; align-items:center;">
+          <div style="text-align:center; background:rgba(0,0,0,0.4); border-radius:12px; padding:15px; border:1px solid rgba(141,160,63,0.3);">
+            <svg width="150" height="150" viewBox="0 0 150 150" style="display:block; margin:0 auto;">${svg}</svg>
+            <div style="margin-top:10px; font-size:0.85rem; font-weight:bold; color:${s.wrongGuesses >= 5 ? '#ef4444' : '#f5c53c'};">Errori: ${s.wrongGuesses}/${s.maxWrong}</div>
           </div>
           <div>
-            <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(212,175,55,0.2);border-radius:8px;padding:10px;margin-bottom:12px;font-size:0.84rem;color:var(--text-muted);display:flex;justify-content:space-between;align-items:center;">
-              <div>💡 <em>${s.hint}</em></div>
+            <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(141,160,63,0.3); border-radius:10px; padding:12px 16px; margin-bottom:15px; font-size:0.9rem; color:#f5f5f0; display:flex; justify-content:space-between; align-items:center;">
+              <div>💡 Indizio: <em>${s.hint}</em></div>
               ${(window.LiveEditor && typeof window.LiveEditor.renderBtn === 'function') ? window.LiveEditor.renderBtn(`impiccato_${currentMissionId || 'general'}`, { word: s.word, hint: s.hint, text: s.hint }) : ''}
             </div>
-            <div style="text-align:center;padding:14px 0;letter-spacing:6px;">${wordDisplay}</div>
-            ${wrongLetters.length ? `<div style="font-size:0.8rem;color:#ef4444;margin-bottom:6px;">Lettere sbagliate: ${wrongLetters.join(', ')}</div>` : ''}
+            <div style="text-align:center; padding:16px 0; letter-spacing:4px; margin-bottom:8px;">${wordDisplay}</div>
+            ${wrongLetters.length ? `<div style="font-size:0.82rem; color:#ef4444; margin-bottom:8px; text-align:center; font-weight:600;">Lettere errate: ${wrongLetters.join(', ')}</div>` : ''}
             ${kb}
           </div>
         </div>
@@ -749,42 +824,49 @@
     initPuzzle: function(container, data) {
       const pool = data.puzzle && data.puzzle.length ? data.puzzle : DEFAULT_DATA.puzzle;
       const ex = pool[Math.floor(Math.random() * pool.length)];
-      const shuffled = [...ex.words].sort(() => Math.random() - 0.5);
-      puzzleState = { ex, shuffled, selected: [], remaining: [...shuffled] };
+      const wordsList = ex.words && ex.words.length ? ex.words : (ex.solution ? ex.solution.split(' ') : ['Letteratura', 'Italiana']);
+      const shuffled = [...wordsList].sort(() => Math.random() - 0.5);
+      puzzleState = { ex: { ...ex, words: wordsList, solution: ex.solution || wordsList.join(' ') }, shuffled, selected: [], remaining: [...shuffled] };
       this.renderPuzzle(container);
     },
 
     renderPuzzle: function(container) {
       const s = puzzleState;
-      const correct = s.selected.join(' ') === s.ex.solution;
+      const correct = s.selected.join(' ').toLowerCase() === s.ex.solution.toLowerCase();
 
       const sel = s.selected.length
-        ? s.selected.map((w,i) => `<span style="display:inline-block;background:rgba(37,99,235,0.2);border:1px solid #2563eb;border-radius:6px;padding:6px 11px;margin:3px;font-weight:bold;cursor:pointer;color:var(--text-light);" onclick="EroiMinigames.puzzleRemove(${i})">${w}</span>`).join('')
-        : '<span style="color:var(--text-muted);font-style:italic;">Clicca le parole nell\'ordine corretto...</span>';
+        ? s.selected.map((w,i) => `<span style="display:inline-block; background:rgba(141,160,63,0.25); border:1px solid #8da03f; border-radius:8px; padding:6px 14px; margin:4px; font-weight:bold; cursor:pointer; color:#f5f5f0; box-shadow:0 2px 6px rgba(0,0,0,0.3);" onclick="EroiMinigames.puzzleRemove(${i})">${w} <i class="fa-solid fa-xmark" style="font-size:0.7rem; opacity:0.7; margin-left:4px;"></i></span>`).join('')
+        : '<span style="color:var(--text-muted); font-style:italic;">Clicca le parole in basso nell\'ordine corretto per ricostruire la citazione...</span>';
 
       const rem = s.remaining.map((w,i) =>
-        `<button style="background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.3);border-radius:6px;padding:7px 12px;margin:3px;font-weight:bold;color:var(--text-light);cursor:pointer;transition:all 0.2s;"
-         onmouseover="this.style.background='rgba(212,175,55,0.2)'" onmouseout="this.style.background='rgba(212,175,55,0.08)'"
+        `<button class="btn btn-secondary" style="display:inline-block; width:auto; background:rgba(255,255,255,0.05) !important; border:1px solid rgba(141,160,63,0.3) !important; border-radius:8px; padding:7px 14px; margin:4px; font-weight:bold; color:#f5f5f0; cursor:pointer; font-size:0.9rem;"
          onclick="EroiMinigames.puzzleAdd(${i})">${w}</button>`
       ).join('');
 
       const resultHtml = correct ? `
-        <div style="background:rgba(22,163,74,0.15);border:1px solid #16a34a;border-radius:10px;padding:16px;text-align:center;margin-top:16px;">
-          <div style="color:#16a34a;font-weight:bold;font-size:1.1rem;">✅ Perfetto! Frase ricostruita! +15 XP</div>
-          <div style="font-size:0.83rem;color:var(--text-muted);margin-top:5px;">Fonte: <em>${s.ex.source}</em></div>
-          <button class="btn" style="margin-top:12px;" onclick="EroiMinigames.rewardAndNext('puzzle',15,8)">Nuova frase</button>
+        <div style="background:rgba(22,163,74,0.15); border:1px solid #16a34a; border-radius:12px; padding:16px; text-align:center; margin-top:16px;">
+          <div style="color:#16a34a; font-weight:bold; font-size:1.15rem; font-family:var(--font-heading);">✅ Perfetto! Citazione ricostruita!</div>
+          <div style="font-size:0.85rem; color:var(--text-muted); margin-top:5px;">Fonte: <em>${s.ex.source || 'Opera Letteraria'}</em></div>
+          <button class="btn" style="margin-top:12px; width:auto; padding:8px 20px;" onclick="EroiMinigames.rewardAndNext('puzzle',15,8)">Nuova citazione</button>
         </div>` : '';
 
       container.innerHTML = `
-        <div style="font-size:0.87rem;color:var(--text-muted);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
-          <div>📖 <em>${s.ex.source}</em></div>
-          ${(window.LiveEditor && typeof window.LiveEditor.renderBtn === 'function') ? window.LiveEditor.renderBtn(`puzzle_${currentMissionId || 'general'}`, { text: s.ex.solution }) : ''}
-        </div>
-        <div style="min-height:55px;border:1.5px dashed rgba(212,175,55,0.3);border-radius:8px;padding:10px;margin-bottom:14px;background:rgba(0,0,0,0.2);">${sel}</div>
-        <div style="margin-bottom:8px;font-size:0.84rem;color:var(--text-muted);">Parole disponibili:</div>
-        <div style="min-height:55px;">${rem}</div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">
-          <button class="btn btn-secondary" onclick="EroiMinigames.puzzleReset()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+        <div style="display:flex; flex-wrap:wrap; gap:25px; align-items:center; justify-content:center;">
+          <div style="text-align:center; min-width:140px; max-width:180px; flex-shrink:0;">
+            <img src="assets/maestro.png" alt="Il Maestro" style="max-height:240px; width:auto; object-fit:contain; filter:drop-shadow(0 10px 20px rgba(0,0,0,0.6));">
+          </div>
+          <div style="flex:1; min-width:280px;">
+            <div style="font-size:0.88rem; color:#f5c53c; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; font-weight:bold;">
+              <div>📖 <em>${s.ex.source || 'Citazione'}</em></div>
+              ${(window.LiveEditor && typeof window.LiveEditor.renderBtn === 'function') ? window.LiveEditor.renderBtn(`puzzle_${currentMissionId || 'general'}`, { text: s.ex.solution }) : ''}
+            </div>
+            <div style="min-height:65px; border:1.5px dashed rgba(141,160,63,0.4); border-radius:10px; padding:12px; margin-bottom:14px; background:rgba(0,0,0,0.3);">${sel}</div>
+            <div style="margin-bottom:8px; font-size:0.82rem; color:var(--text-muted); font-weight:600;">Parole disponibili:</div>
+            <div style="min-height:55px; margin-bottom:12px;">${rem}</div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn btn-secondary" style="width:auto; padding:6px 16px; font-size:0.85rem;" onclick="EroiMinigames.puzzleReset()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+            </div>
+          </div>
         </div>
         ${resultHtml}`;
     },
@@ -816,7 +898,8 @@
     initCloze: function(container, data) {
       const pool = data.cloze && data.cloze.length ? data.cloze : DEFAULT_DATA.cloze;
       const ex = pool[Math.floor(Math.random() * pool.length)];
-      clozeState = { ex, answers: new Array(ex.blanks.length).fill('') };
+      const blanks = ex.blanks || ex.words || [];
+      clozeState = { ex: { ...ex, blanks: blanks }, answers: new Array(blanks.length).fill('') };
       this.renderCloze(container);
     },
 
@@ -826,58 +909,66 @@
       const textHtml = s.ex.text.replace(/_+/g, () => {
         const i = idx++;
         return `<input type="text" id="cloze-${i}" value="${s.answers[i]||''}"
-          style="width:120px;background:rgba(37,99,235,0.1);border:1.5px solid rgba(37,99,235,0.4);border-radius:6px;padding:4px 8px;color:var(--text-light);font-weight:bold;text-align:center;font-size:0.9rem;"
+          style="width:130px; background:rgba(141,160,63,0.15); border:1.5px solid rgba(141,160,63,0.5); border-radius:6px; padding:4px 8px; color:#f5f5f0; font-weight:bold; text-align:center; font-size:0.95rem;"
           oninput="EroiMinigames.updateCloze(${i},this.value)" placeholder="___">`;
       });
 
       container.innerHTML = `
-        <div style="background:rgba(0,0,0,0.3);border:1.5px solid rgba(212,175,55,0.2);border-radius:10px;padding:18px;margin-bottom:16px;">
-          <div style="font-size:0.84rem;color:var(--text-muted);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
-            <div>📖 <em>${s.ex.source}</em></div>
-            ${(window.LiveEditor && typeof window.LiveEditor.renderBtn === 'function') ? window.LiveEditor.renderBtn(`cloze_${currentMissionId || 'general'}`, { text: s.ex.text }) : ''}
+        <div style="display:flex; flex-wrap:wrap; gap:25px; align-items:center; justify-content:center;">
+          <div style="text-align:center; min-width:140px; max-width:180px; flex-shrink:0;">
+            <img src="assets/maestro.png" alt="Il Maestro" style="max-height:240px; width:auto; object-fit:contain; filter:drop-shadow(0 10px 20px rgba(0,0,0,0.6));">
           </div>
-          <div style="font-size:1.05rem;line-height:2.4;color:var(--text-light);font-weight:500;">${textHtml}</div>
-        </div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;">
-          <button class="btn" onclick="EroiMinigames.verifyCloze()"><i class="fa-solid fa-check"></i> Verifica</button>
-          <button class="btn btn-secondary" onclick="EroiMinigames.retryCurrentCloze()"><i class="fa-solid fa-dice"></i> Nuovo esercizio</button>
-        </div>
-        <div id="cloze-result" style="margin-top:14px;"></div>`;
+          <div style="flex:1; min-width:280px;">
+            <div style="background:rgba(0,0,0,0.35); border:1.5px solid rgba(141,160,63,0.3); border-radius:12px; padding:18px; margin-bottom:16px;">
+              <div style="font-size:0.85rem; color:#f5c53c; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; font-weight:bold;">
+                <div>📖 <em>${s.ex.source || 'Testo'}</em></div>
+                ${(window.LiveEditor && typeof window.LiveEditor.renderBtn === 'function') ? window.LiveEditor.renderBtn(`cloze_${currentMissionId || 'general'}`, { text: s.ex.text }) : ''}
+              </div>
+              <div style="font-size:1.05rem; line-height:2.4; color:#f5f5f0; font-weight:500;">${textHtml}</div>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn" style="width:auto; padding:8px 20px; border-radius:8px;" onclick="EroiMinigames.verifyCloze()"><i class="fa-solid fa-check"></i> Verifica</button>
+              <button class="btn btn-secondary" style="width:auto; padding:8px 20px; border-radius:8px;" onclick="EroiMinigames.retryCurrentCloze()"><i class="fa-solid fa-dice"></i> Nuovo esercizio</button>
+            </div>
+            <div id="cloze-result" style="margin-top:14px;"></div>
+          </div>
+        </div>`;
     },
 
     updateCloze: function(i, v) { if (clozeState.answers) clozeState.answers[i] = v; },
 
     verifyCloze: function() {
       const s = clozeState;
+      const blanks = s.ex.blanks || [];
       // Prendi valori dagli input
-      s.ex.blanks.forEach((_, i) => {
+      blanks.forEach((_, i) => {
         const inp = document.getElementById(`cloze-${i}`);
         if (inp) s.answers[i] = inp.value.trim();
       });
 
       let correct = 0;
-      s.ex.blanks.forEach((blank, i) => {
+      blanks.forEach((blank, i) => {
         const ok = (s.answers[i] || '').toLowerCase() === blank.toLowerCase();
         if (ok) correct++;
         const inp = document.getElementById(`cloze-${i}`);
         if (inp) {
           inp.style.borderColor = ok ? '#16a34a' : '#ef4444';
-          inp.style.background = ok ? 'rgba(22,163,74,0.15)' : 'rgba(239,68,68,0.1)';
-          if (!ok) { inp.value = blank; inp.style.color = '#f59e0b'; }
+          inp.style.background = ok ? 'rgba(22,163,74,0.2)' : 'rgba(239,68,68,0.15)';
+          if (!ok) { inp.value = blank; inp.style.color = '#f5c53c'; }
         }
       });
 
       const res = document.getElementById('cloze-result');
       if (!res) return;
-      if (correct === s.ex.blanks.length) {
-        res.innerHTML = `<div style="background:rgba(22,163,74,0.15);border:1px solid #16a34a;border-radius:10px;padding:16px;text-align:center;">
-          <div style="color:#16a34a;font-weight:bold;font-size:1.1rem;">🎉 Perfetto! Tutte le risposte corrette! +25 XP</div>
-          <button class="btn" style="margin-top:10px;" onclick="EroiMinigames.rewardAndNext('cloze',25,12)">Nuovo esercizio</button>
+      if (correct === blanks.length && blanks.length > 0) {
+        res.innerHTML = `<div style="background:rgba(22,163,74,0.15); border:1px solid #16a34a; border-radius:12px; padding:16px; text-align:center;">
+          <div style="color:#16a34a; font-weight:bold; font-size:1.15rem; font-family:var(--font-heading);">🎉 Perfetto! Tutte le parole inserite correttamente!</div>
+          <button class="btn" style="margin-top:10px; width:auto; padding:8px 20px;" onclick="EroiMinigames.rewardAndNext('cloze',25,12)">Nuovo esercizio</button>
         </div>`;
       } else {
-        res.innerHTML = `<div style="background:rgba(245,158,11,0.1);border:1px solid #f59e0b;border-radius:10px;padding:16px;text-align:center;">
-          <div style="color:#f59e0b;font-weight:bold;">${correct}/${s.ex.blanks.length} corrette. Le risposte sono rivelate in oro.</div>
-          <button class="btn btn-secondary" style="margin-top:10px;" onclick="EroiMinigames.retryCurrentCloze()">Riprova con nuovo testo</button>
+        res.innerHTML = `<div style="background:rgba(245,158,11,0.12); border:1px solid #f59e0b; border-radius:12px; padding:16px; text-align:center;">
+          <div style="color:#f5c53c; font-weight:bold;">${correct}/${blanks.length} corrette. Le risposte corrette sono rivelate in oro.</div>
+          <button class="btn btn-secondary" style="margin-top:10px; width:auto; padding:8px 20px;" onclick="EroiMinigames.retryCurrentCloze()">Riprova con nuovo testo</button>
         </div>`;
       }
     },
@@ -889,13 +980,13 @@
     },
 
     // =====================================================
-    // RIORDINA I VERSI (non solo proemio!)
+    // RIORDINA I VERSI
     // =====================================================
     initVersi: function(container, data) {
       const pool = data.versi && data.versi.length ? data.versi : DEFAULT_DATA.versi;
       const ex = pool[Math.floor(Math.random() * pool.length)];
       const shuffled = [...ex.lines].sort(() => Math.random() - 0.5);
-      versiState = { ex, shuffled, ordered: [], remaining: [...shuffled] };
+      versiState = { ex: { ...ex, hint: ex.hint || ex.title || 'Riordina i versi nell\'ordine poetico originale.' }, shuffled, ordered: [], remaining: [...shuffled] };
       this.renderVersi(container);
     },
 
@@ -907,57 +998,57 @@
       const orderedHtml = s.ordered.length
         ? s.ordered.map((l, i) => {
             const ok = isComplete ? l === s.ex.lines[i] : null;
-            const chk = isComplete ? (ok ? 'border-color:#16a34a;background:rgba(22,163,74,0.1);' : 'border-color:#ef4444;background:rgba(239,68,68,0.07);') : '';
-            return `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid rgba(212,175,55,0.2);border-radius:6px;margin-bottom:5px;${chk}cursor:pointer;" onclick="EroiMinigames.versiRemove(${i})">
-              <span style="color:var(--gold);font-weight:bold;min-width:20px;">${i+1}.</span>
-              <span style="color:var(--text-light);font-style:italic;">"${l}"</span>
+            const chk = isComplete ? (ok ? 'border-color:#16a34a;background:rgba(22,163,74,0.15);' : 'border-color:#ef4444;background:rgba(239,68,68,0.1);') : '';
+            return `<div style="display:flex; align-items:center; gap:10px; padding:10px 14px; border:1px solid rgba(141,160,63,0.3); border-radius:8px; margin-bottom:6px; ${chk} cursor:pointer; background:rgba(255,255,255,0.03);" onclick="EroiMinigames.versiRemove(${i})">
+              <span style="color:#f5c53c; font-weight:bold; min-width:22px;">${i+1}.</span>
+              <span style="color:#f5f5f0; font-style:italic;">"${l}"</span>
             </div>`;
           }).join('')
-        : '<div style="color:var(--text-muted);font-style:italic;padding:10px;">Clicca i versi in basso nell\'ordine corretto...</div>';
+        : '<div style="color:var(--text-muted); font-style:italic; padding:15px; text-align:center;">Clicca i versi a destra nell\'ordine corretto...</div>';
 
       const remainingHtml = s.remaining.map((l, i) =>
-        `<div style="display:flex;align-items:center;gap:10px;padding:9px 13px;background:rgba(212,175,55,0.05);border:1px solid rgba(212,175,55,0.2);border-radius:7px;margin-bottom:7px;cursor:pointer;transition:all 0.2s;"
-         onmouseover="this.style.background='rgba(212,175,55,0.15)'" onmouseout="this.style.background='rgba(212,175,55,0.05)'"
+        `<div style="display:flex; align-items:center; gap:10px; padding:10px 14px; background:rgba(141,160,63,0.08); border:1px solid rgba(141,160,63,0.3); border-radius:8px; margin-bottom:7px; cursor:pointer; transition:all 0.2s;"
+         onmouseover="this.style.background='rgba(141,160,63,0.2)'" onmouseout="this.style.background='rgba(141,160,63,0.08)'"
          onclick="EroiMinigames.versiAdd(${i})">
-          <i class="fa-solid fa-grip-lines" style="color:var(--gold);font-size:0.75rem;"></i>
-          <span style="color:var(--text-light);font-style:italic;">"${l}"</span>
+          <i class="fa-solid fa-grip-lines" style="color:#f5c53c; font-size:0.75rem;"></i>
+          <span style="color:#f5f5f0; font-style:italic;">"${l}"</span>
         </div>`
       ).join('');
 
       let resultHtml = '';
       if (isComplete) {
         if (isCorrect) {
-          resultHtml = `<div style="background:rgba(22,163,74,0.15);border:1px solid #16a34a;border-radius:10px;padding:16px;text-align:center;margin-top:14px;">
-            <div style="color:#16a34a;font-weight:bold;font-size:1.1rem;">🏆 Eccellente! Versi nell'ordine corretto! +30 XP</div>
-            <div style="font-size:0.84rem;color:var(--text-muted);margin-top:5px;"><em>${s.ex.title}</em></div>
-            <button class="btn" style="margin-top:12px;" onclick="EroiMinigames.rewardAndNext('versi',30,15)">Nuovo testo</button>
+          resultHtml = `<div style="background:rgba(22,163,74,0.15); border:1px solid #16a34a; border-radius:12px; padding:16px; text-align:center; margin-top:14px;">
+            <div style="color:#16a34a; font-weight:bold; font-size:1.15rem; font-family:var(--font-heading);">🏆 Eccellente! Versi nell'ordine corretto!</div>
+            <div style="font-size:0.85rem; color:var(--text-muted); margin-top:5px;"><em>${s.ex.title}</em></div>
+            <button class="btn" style="margin-top:12px; width:auto; padding:8px 20px;" onclick="EroiMinigames.rewardAndNext('versi',30,15)">Nuovo componimento</button>
           </div>`;
         } else {
-          resultHtml = `<div style="background:rgba(245,158,11,0.1);border:1px solid #f59e0b;border-radius:10px;padding:14px;margin-top:14px;">
-            <div style="color:#f59e0b;font-weight:bold;margin-bottom:8px;">Quasi! L'ordine corretto era:</div>
-            ${s.ex.lines.map((l,i)=>`<div style="font-size:0.83rem;color:var(--text-muted);font-style:italic;margin-bottom:3px;">${i+1}. "${l}"</div>`).join('')}
-            <button class="btn btn-secondary" style="margin-top:10px;" onclick="EroiMinigames.versiReset()">Riprova</button>
+          resultHtml = `<div style="background:rgba(245,158,11,0.12); border:1px solid #f59e0b; border-radius:12px; padding:14px; margin-top:14px; text-align:center;">
+            <div style="color:#f5c53c; font-weight:bold; margin-bottom:8px;">Quasi! L'ordine corretto era:</div>
+            ${s.ex.lines.map((l,i)=>`<div style="font-size:0.85rem; color:var(--text-muted); font-style:italic; margin-bottom:4px;">${i+1}. "${l}"</div>`).join('')}
+            <button class="btn btn-secondary" style="margin-top:10px; width:auto; padding:6px 18px;" onclick="EroiMinigames.versiReset()">Riprova</button>
           </div>`;
         }
       }
 
       container.innerHTML = `
-        <div style="background:rgba(120,53,15,0.08);border:1px solid rgba(120,53,15,0.3);border-radius:8px;padding:12px;margin-bottom:14px;">
-          <div style="font-weight:bold;color:var(--gold);margin-bottom:4px;">📜 ${s.ex.title}</div>
-          <div style="font-size:0.82rem;color:var(--text-muted);">💡 ${s.ex.hint}</div>
+        <div style="background:rgba(141,160,63,0.1); border:1px solid rgba(141,160,63,0.3); border-radius:10px; padding:14px; margin-bottom:16px;">
+          <div style="font-weight:bold; color:#f5c53c; margin-bottom:4px; font-family:var(--font-heading);">📜 ${s.ex.title || 'Opera Poetica'}</div>
+          <div style="font-size:0.85rem; color:#f5f5f0;">💡 ${s.ex.hint || 'Riordina i versi per completare la poesia.'}</div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px;">
           <div>
-            <div style="font-size:0.82rem;color:var(--text-muted);margin-bottom:8px;font-weight:600;">🔢 Il tuo ordine <span style="opacity:0.6;">(clicca per rimuovere)</span>:</div>
-            <div style="min-height:160px;border:1.5px dashed rgba(212,175,55,0.3);border-radius:8px;padding:8px;background:rgba(0,0,0,0.2);">${orderedHtml}</div>
+            <div style="font-size:0.82rem; color:var(--text-muted); margin-bottom:8px; font-weight:600;">🔢 Il tuo ordine <span style="opacity:0.6;">(clicca per rimuovere)</span>:</div>
+            <div style="min-height:160px; border:1.5px dashed rgba(141,160,63,0.4); border-radius:10px; padding:10px; background:rgba(0,0,0,0.3);">${orderedHtml}</div>
           </div>
           <div>
-            <div style="font-size:0.82rem;color:var(--text-muted);margin-bottom:8px;font-weight:600;">📋 Versi disponibili <span style="opacity:0.6;">(clicca per aggiungere)</span>:</div>
+            <div style="font-size:0.82rem; color:var(--text-muted); margin-bottom:8px; font-weight:600;">📋 Versi disponibili <span style="opacity:0.6;">(clicca per aggiungere)</span>:</div>
             <div>${remainingHtml}</div>
           </div>
         </div>
-        <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;">
-          <button class="btn btn-secondary" onclick="EroiMinigames.versiReset()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+        <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
+          <button class="btn btn-secondary" style="width:auto; padding:6px 16px; font-size:0.85rem;" onclick="EroiMinigames.versiReset()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
         </div>
         ${resultHtml}`;
     },
