@@ -8775,14 +8775,11 @@
         const content = document.getElementById('minigame-content');
         if (content) {
             content.innerHTML = `
-                <div class="minigame-maestro-layout" style="padding: 15px; text-align:center;">
-                    <img src="assets/maestro_success.png" alt="Il Maestro" class="minigame-maestro-img">
-                    <div style="max-width:450px;">
-                        <h2 style="color:#f5c53c; font-size:1.8rem; margin-bottom:10px; font-family:var(--font-heading);">🎉 MANCHE COMPLETATA!</h2>
-                        <p style="font-size:1.05rem; color:#f5f5f0; line-height:1.4; margin-bottom:15px;">Congratulazioni! Hai completato tutte le prove letterarie di questa manche.</p>
-                        <div style="font-size:2.6rem; font-weight:bold; color:#16a34a; margin:15px 0;">+${xp} PUNTI</div>
-                        <button class="btn" style="background:#16a34a !important; color:#fff !important; width:auto; padding:10px 24px; border-radius:10px;" onclick="EroiMinigames.finalizeMancheReward(${xp})">Riscuoti Punti Squadra</button>
-                    </div>
+                <div style="padding: 20px; text-align:center; max-width:550px; margin:0 auto;">
+                    <h2 style="color:#f5c53c; font-size:1.8rem; margin-bottom:10px; font-family:var(--font-heading);">🎉 MANCHE COMPLETATA!</h2>
+                    <p style="font-size:1.05rem; color:#f5f5f0; line-height:1.4; margin-bottom:15px;">Congratulazioni! Hai completato tutte le prove letterarie di questa manche.</p>
+                    <div style="font-size:2.6rem; font-weight:bold; color:#16a34a; margin:15px 0;">+${xp} PUNTI</div>
+                    <button class="btn" style="background:#16a34a !important; color:#fff !important; width:auto; padding:10px 24px; border-radius:10px;" onclick="EroiMinigames.finalizeMancheReward(${xp})">Riscuoti Punti Squadra</button>
                 </div>`;
         }
         return;
@@ -8926,15 +8923,12 @@
         `).join('');
         
         container.innerHTML = `
-            <div class="minigame-maestro-layout">
-                <img src="assets/maestro_quiz.png" alt="Il Maestro" class="minigame-maestro-img">
-                <div class="minigame-maestro-content">
-                    <div style="font-size:0.8rem; color:#f5c53c; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px; font-weight:bold;">${progress}</div>
-                    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(141,160,63,0.2); border-radius:12px; padding:16px; margin-bottom:16px;">
-                        <h3 style="color:#fff; font-size:1.15rem; margin:0; line-height:1.45; font-family:var(--font-heading);">${qData.q} ${editBtn}</h3>
-                    </div>
-                    <div>${optionsHtml}</div>
+            <div style="max-width:720px; margin:0 auto;">
+                <div style="font-size:0.8rem; color:#f5c53c; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px; font-weight:bold;">${progress}</div>
+                <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(141,160,63,0.2); border-radius:12px; padding:16px; margin-bottom:16px;">
+                    <h3 style="color:#fff; font-size:1.15rem; margin:0; line-height:1.45; font-family:var(--font-heading);">${qData.q} ${editBtn}</h3>
                 </div>
+                <div>${optionsHtml}</div>
             </div>
         `;
     },
@@ -8955,14 +8949,11 @@
         if (this.isMancheMode) points = Math.round((correct / total) * 5); // up to 5 points for manche
         
         container.innerHTML = `
-            <div class="minigame-maestro-layout" style="padding:15px; text-align:center;">
-                <img src="assets/maestro_success.png" alt="Il Maestro" class="minigame-maestro-img">
-                <div style="max-width:400px;">
-                    <h3 style="color:#f5c53c; font-size:1.6rem; margin-bottom:10px; font-family:var(--font-heading);">Quiz Terminato!</h3>
-                    <p style="font-size:1.1rem; color:#fff; margin-bottom:15px;">Hai risposto correttamente a <strong>${correct}</strong> domande su ${total}.</p>
-                    ${points > 0 ? `<div style="color:#16a34a; font-weight:bold; font-size:1.15rem; margin-bottom:18px;">🎉 Ottima prova! Punti guadagnati: +${points}</div>` : `<div style="color:#ef4444; font-weight:bold; font-size:1.1rem; margin-bottom:18px;">Non hai superato il punteggio minimo. Riprova!</div>`}
-                    <button class="btn" style="width:auto; padding:10px 24px; border-radius:8px;" onclick="EroiMinigames.rewardAndNext('quiz', ${points}, 0)">Continua</button>
-                </div>
+            <div style="padding:20px; text-align:center; max-width:500px; margin:0 auto;">
+                <h3 style="color:#f5c53c; font-size:1.6rem; margin-bottom:10px; font-family:var(--font-heading);">Quiz Terminato!</h3>
+                <p style="font-size:1.1rem; color:#fff; margin-bottom:15px;">Hai risposto correttamente a <strong>${correct}</strong> domande su ${total}.</p>
+                ${points > 0 ? `<div style="color:#16a34a; font-weight:bold; font-size:1.15rem; margin-bottom:18px;">🎉 Ottima prova! Punti guadagnati: +${points}</div>` : `<div style="color:#ef4444; font-weight:bold; font-size:1.1rem; margin-bottom:18px;">Non hai superato il punteggio minimo. Riprova!</div>`}
+                <button class="btn" style="width:auto; padding:10px 24px; border-radius:8px;" onclick="EroiMinigames.rewardAndNext('quiz', ${points}, 0)">Continua</button>
             </div>
         `;
     },
@@ -9098,19 +9089,16 @@
         </div>` : '';
 
       container.innerHTML = `
-        <div class="minigame-maestro-layout">
-          <img src="assets/maestro_quiz.png" alt="Il Maestro" class="minigame-maestro-img">
-          <div class="minigame-maestro-content">
-            <div style="font-size:0.88rem; color:#f5c53c; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; font-weight:bold;">
-              <div>📖 <em>${s.ex.source || 'Citazione'}</em></div>
-              ${(window.LiveEditor && typeof window.LiveEditor.renderBtn === 'function') ? window.LiveEditor.renderBtn(`puzzle_${currentMissionId || 'general'}`, { text: s.ex.solution }) : ''}
-            </div>
-            <div style="min-height:65px; border:1.5px dashed rgba(141,160,63,0.4); border-radius:10px; padding:12px; margin-bottom:14px; background:rgba(0,0,0,0.3);">${sel}</div>
-            <div style="margin-bottom:8px; font-size:0.82rem; color:var(--text-muted); font-weight:600;">Parole disponibili:</div>
-            <div style="min-height:55px; margin-bottom:12px;">${rem}</div>
-            <div style="display:flex; gap:10px; flex-wrap:wrap;">
-              <button class="btn btn-secondary" style="width:auto; padding:6px 16px; font-size:0.85rem;" onclick="EroiMinigames.puzzleReset()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
-            </div>
+        <div style="max-width:760px; margin:0 auto;">
+          <div style="font-size:0.88rem; color:#f5c53c; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; font-weight:bold;">
+            <div>📖 <em>${s.ex.source || 'Citazione'}</em></div>
+            ${(window.LiveEditor && typeof window.LiveEditor.renderBtn === 'function') ? window.LiveEditor.renderBtn(`puzzle_${currentMissionId || 'general'}`, { text: s.ex.solution }) : ''}
+          </div>
+          <div style="min-height:65px; border:1.5px dashed rgba(141,160,63,0.4); border-radius:10px; padding:12px; margin-bottom:14px; background:rgba(0,0,0,0.3);">${sel}</div>
+          <div style="margin-bottom:8px; font-size:0.82rem; color:var(--text-muted); font-weight:600;">Parole disponibili:</div>
+          <div style="min-height:55px; margin-bottom:12px;">${rem}</div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn btn-secondary" style="width:auto; padding:6px 16px; font-size:0.85rem;" onclick="EroiMinigames.puzzleReset()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
           </div>
         </div>
         ${resultHtml}`;
@@ -9159,22 +9147,19 @@
       });
 
       container.innerHTML = `
-        <div class="minigame-maestro-layout">
-          <img src="assets/maestro_thinking.png" alt="Il Maestro" class="minigame-maestro-img">
-          <div class="minigame-maestro-content">
-            <div style="background:rgba(0,0,0,0.35); border:1.5px solid rgba(141,160,63,0.3); border-radius:12px; padding:18px; margin-bottom:16px;">
-              <div style="font-size:0.85rem; color:#f5c53c; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; font-weight:bold;">
-                <div>📖 <em>${s.ex.source || 'Testo'}</em></div>
-                ${(window.LiveEditor && typeof window.LiveEditor.renderBtn === 'function') ? window.LiveEditor.renderBtn(`cloze_${currentMissionId || 'general'}`, { text: s.ex.text }) : ''}
-              </div>
-              <div style="font-size:1.05rem; line-height:2.4; color:#f5f5f0; font-weight:500;">${textHtml}</div>
+        <div style="max-width:760px; margin:0 auto;">
+          <div style="background:rgba(0,0,0,0.35); border:1.5px solid rgba(141,160,63,0.3); border-radius:12px; padding:18px; margin-bottom:16px;">
+            <div style="font-size:0.85rem; color:#f5c53c; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; font-weight:bold;">
+              <div>📖 <em>${s.ex.source || 'Testo'}</em></div>
+              ${(window.LiveEditor && typeof window.LiveEditor.renderBtn === 'function') ? window.LiveEditor.renderBtn(`cloze_${currentMissionId || 'general'}`, { text: s.ex.text }) : ''}
             </div>
-            <div style="display:flex; gap:10px; flex-wrap:wrap;">
-              <button class="btn" style="width:auto; padding:8px 20px; border-radius:8px;" onclick="EroiMinigames.verifyCloze()"><i class="fa-solid fa-check"></i> Verifica</button>
-              <button class="btn btn-secondary" style="width:auto; padding:8px 20px; border-radius:8px;" onclick="EroiMinigames.retryCurrentCloze()"><i class="fa-solid fa-dice"></i> Nuovo esercizio</button>
-            </div>
-            <div id="cloze-result" style="margin-top:14px;"></div>
+            <div style="font-size:1.05rem; line-height:2.4; color:#f5f5f0; font-weight:500;">${textHtml}</div>
           </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn" style="width:auto; padding:8px 20px; border-radius:8px;" onclick="EroiMinigames.verifyCloze()"><i class="fa-solid fa-check"></i> Verifica</button>
+            <button class="btn btn-secondary" style="width:auto; padding:8px 20px; border-radius:8px;" onclick="EroiMinigames.retryCurrentCloze()"><i class="fa-solid fa-dice"></i> Nuovo esercizio</button>
+          </div>
+          <div id="cloze-result" style="margin-top:14px;"></div>
         </div>`;
     },
 

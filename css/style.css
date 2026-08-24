@@ -2443,27 +2443,6 @@ h1, h2, h3, h4 {
 }
 
 /* Specific Minigame Layouts */
-.minigame-maestro-layout {
-    display: flex;
-    flex-direction: row;
-    gap: 22px;
-    align-items: center;
-    justify-content: center;
-}
-
-.minigame-maestro-img {
-    max-height: 200px;
-    width: auto;
-    object-fit: contain;
-    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6));
-    flex-shrink: 0;
-}
-
-.minigame-maestro-content {
-    flex: 1;
-    min-width: 0;
-}
-
 /* Impiccato Grid */
 .minigame-impiccato-grid {
     display: grid;
@@ -2501,13 +2480,6 @@ h1, h2, h3, h4 {
     }
     .minigame-modal-body {
         padding: 14px 16px;
-    }
-    .minigame-maestro-layout {
-        flex-direction: column;
-        gap: 12px;
-    }
-    .minigame-maestro-img {
-        max-height: 110px;
     }
     .minigame-impiccato-grid {
         grid-template-columns: 1fr;
