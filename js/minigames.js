@@ -8776,7 +8776,7 @@
         if (content) {
             content.innerHTML = `
                 <div class="minigame-maestro-layout" style="padding: 15px; text-align:center;">
-                    <img src="assets/maestro.png" alt="Il Maestro" class="minigame-maestro-img">
+                    <img src="assets/maestro_success.png" alt="Il Maestro" class="minigame-maestro-img">
                     <div style="max-width:450px;">
                         <h2 style="color:#f5c53c; font-size:1.8rem; margin-bottom:10px; font-family:var(--font-heading);">🎉 MANCHE COMPLETATA!</h2>
                         <p style="font-size:1.05rem; color:#f5f5f0; line-height:1.4; margin-bottom:15px;">Congratulazioni! Hai completato tutte le prove letterarie di questa manche.</p>
@@ -8927,7 +8927,7 @@
         
         container.innerHTML = `
             <div class="minigame-maestro-layout">
-                <img src="assets/maestro.png" alt="Il Maestro" class="minigame-maestro-img">
+                <img src="assets/maestro_quiz.png" alt="Il Maestro" class="minigame-maestro-img">
                 <div class="minigame-maestro-content">
                     <div style="font-size:0.8rem; color:#f5c53c; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px; font-weight:bold;">${progress}</div>
                     <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(141,160,63,0.2); border-radius:12px; padding:16px; margin-bottom:16px;">
@@ -8956,7 +8956,7 @@
         
         container.innerHTML = `
             <div class="minigame-maestro-layout" style="padding:15px; text-align:center;">
-                <img src="assets/maestro.png" alt="Il Maestro" class="minigame-maestro-img">
+                <img src="assets/maestro_success.png" alt="Il Maestro" class="minigame-maestro-img">
                 <div style="max-width:400px;">
                     <h3 style="color:#f5c53c; font-size:1.6rem; margin-bottom:10px; font-family:var(--font-heading);">Quiz Terminato!</h3>
                     <p style="font-size:1.1rem; color:#fff; margin-bottom:15px;">Hai risposto correttamente a <strong>${correct}</strong> domande su ${total}.</p>
@@ -9099,7 +9099,7 @@
 
       container.innerHTML = `
         <div class="minigame-maestro-layout">
-          <img src="assets/maestro.png" alt="Il Maestro" class="minigame-maestro-img">
+          <img src="assets/maestro_quiz.png" alt="Il Maestro" class="minigame-maestro-img">
           <div class="minigame-maestro-content">
             <div style="font-size:0.88rem; color:#f5c53c; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; font-weight:bold;">
               <div>📖 <em>${s.ex.source || 'Citazione'}</em></div>
@@ -9160,7 +9160,7 @@
 
       container.innerHTML = `
         <div class="minigame-maestro-layout">
-          <img src="assets/maestro.png" alt="Il Maestro" class="minigame-maestro-img">
+          <img src="assets/maestro_thinking.png" alt="Il Maestro" class="minigame-maestro-img">
           <div class="minigame-maestro-content">
             <div style="background:rgba(0,0,0,0.35); border:1.5px solid rgba(141,160,63,0.3); border-radius:12px; padding:18px; margin-bottom:16px;">
               <div style="font-size:0.85rem; color:#f5c53c; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; font-weight:bold;">
