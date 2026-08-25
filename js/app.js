@@ -1504,13 +1504,22 @@ async function renderProfilo() {
     if(!currentUserEmail) return;
 
     const profAvatarImg = document.getElementById('profilo-avatar-img');
+    const profDisplayName = document.getElementById('profilo-display-name');
+    const fantaDdUsername = document.getElementById('fanta-dd-username');
+
     if (profAvatarImg) {
         profAvatarImg.src = window.selectedFantaAvatar || 'assets/avatars/6.png';
         if (currentUserEmail && window.db) {
             window.db.collection('fanta_users').doc(currentUserEmail.toLowerCase()).get().then(d => {
-                if (d.exists && d.data().avatar) {
-                    profAvatarImg.src = d.data().avatar;
-                    window.selectedFantaAvatar = d.data().avatar;
+                if (d.exists) {
+                    const data = d.data() || {};
+                    if (data.avatar) {
+                        profAvatarImg.src = data.avatar;
+                        window.selectedFantaAvatar = data.avatar;
+                    }
+                    const nameToShow = data.nome || data.name || currentUserEmail.split('@')[0];
+                    if (profDisplayName) profDisplayName.textContent = nameToShow;
+                    if (fantaDdUsername) fantaDdUsername.textContent = nameToShow;
                 }
             }).catch(() => {});
         }
@@ -3996,6 +4005,10 @@ window.saveProfileData = async function() {
         window.selectedFantaAvatar = chosenAvatar;
         const profAvatarImg = document.getElementById('profilo-avatar-img');
         if (profAvatarImg) profAvatarImg.src = chosenAvatar;
+        const profDisplayName = document.getElementById('profilo-display-name');
+        const fantaDdUsername = document.getElementById('fanta-dd-username');
+        if (profDisplayName) profDisplayName.textContent = nameInput;
+        if (fantaDdUsername) fantaDdUsername.textContent = nameInput;
 
         alert('Profilo e avatar aggiornati con successo in tutto l\'ecosistema!');
         document.getElementById('edit-profile-modal').style.display = 'none';
@@ -4005,3 +4018,11 @@ window.saveProfileData = async function() {
         alert('Errore durante il salvataggio: ' + err.message);
     }
 };
+
+// Chiusura automatica dropdown al click esterno
+window.addEventListener('click', () => {
+    const dd = document.getElementById('fanta-user-dropdown');
+    if (dd && dd.style.display !== 'none') {
+        dd.style.display = 'none';
+    }
+});

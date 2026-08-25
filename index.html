@@ -430,30 +430,55 @@
 
                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; flex-wrap: wrap;">
                       <div style="display: flex; align-items: center; gap: 12px;">
-                          <img id="profilo-avatar-img" src="assets/avatars/6.png" alt="Avatar" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent-gold); box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
                           <h2 style="margin: 0;">Pannello Docente</h2>
                       </div>
-                      <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                          <!-- Modifica Profilo -->
-                          <button class="btn" style="width: auto; padding: 8px 14px; border-radius: 20px; font-size: 0.8rem; background: var(--bg-dark); color: var(--accent-gold); border: 1px solid var(--accent-gold); font-weight: 600; margin: 0; display: flex; align-items: center; gap: 6px; cursor: pointer;" onclick="window.openEditProfileModal()">
-                              <i class="fa-solid fa-user-gear"></i> <span class="hide-mobile">Modifica Profilo</span>
-                          </button>
-                          
+                      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                           <!-- Invita un collega -->
-                          <button class="btn" style="width: auto; padding: 8px 14px; border-radius: 20px; font-size: 0.8rem; background: var(--accent-gold); color: var(--bg-dark); font-weight: 600; margin: 0; display: flex; align-items: center; gap: 6px;" onclick="openInviteModal()">
+                          <button class="btn" style="width: auto; padding: 8px 14px; border-radius: 20px; font-size: 0.8rem; background: var(--accent-gold); color: var(--bg-dark); font-weight: 700; margin: 0; display: flex; align-items: center; gap: 6px; cursor: pointer;" onclick="openInviteModal()">
                               <i class="fa-solid fa-paper-plane"></i> <span class="hide-mobile">Invita Collega</span>
                           </button>
                           
-                          <!-- Campanella Notifiche con Badge -->
-                          <button class="btn btn-secondary" style="width: 36px; height: 36px; padding: 0; border-radius: 50%; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; position: relative; margin: 0; cursor: pointer;" onclick="apriNotificheModal()">
-                              <i class="fa-solid fa-bell"></i>
-                              <span id="notification-badge" style="display: none; position: absolute; top: -3px; right: -3px; background: #e63946; color: white; font-size: 0.6rem; font-weight: bold; width: 16px; height: 16px; border-radius: 50%; align-items: center; justify-content: center; border: 1.5px solid var(--bg-dark);">0</span>
-                          </button>
-                          
-                          <!-- Pulsante Esci -->
-                          <button class="btn btn-secondary" style="width: auto; padding: 8px 15px; border-radius: 20px; font-size: 0.8rem; margin: 0; display: flex; align-items: center; gap: 6px;" onclick="logoutDocente()">
-                              <i class="fa-solid fa-right-from-bracket"></i> <span class="hide-mobile">Esci</span>
-                          </button>
+                          <!-- User Profile Dropdown Trigger & Modal -->
+                          <div style="position: relative; z-index: 100;">
+                              <div onclick="event.stopPropagation(); const dd = document.getElementById('fanta-user-dropdown'); dd.style.display = dd.style.display === 'flex' ? 'none' : 'flex';" style="display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.4); border: 1.5px solid var(--accent-gold); padding: 4px 12px 4px 4px; border-radius: 30px; cursor: pointer; color: white;">
+                                  <img id="profilo-avatar-img" src="assets/avatars/6.png" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--accent-gold);">
+                                  <span id="profilo-display-name" style="font-size: 0.85rem; font-weight: 700; max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Profilo</span>
+                                  <span style="font-size: 0.65rem; color: var(--accent-gold);">▼</span>
+                              </div>
+
+                              <div id="fanta-user-dropdown" onclick="event.stopPropagation()" style="display: none; position: absolute; top: calc(100% + 8px); right: 0; background: #1a1614; border: 1px solid var(--accent-gold); border-radius: 12px; padding: 14px; width: 240px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); flex-direction: column; gap: 8px; z-index: 1000;">
+                                  <div style="font-size: 0.85rem; font-weight: 700; color: var(--accent-gold); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px; margin-bottom: 2px;">
+                                      <span id="fanta-dd-username">Docente</span><br>
+                                      <span style="font-size: 0.72rem; color: #888; font-weight: normal; text-transform: uppercase;">Docente Registrato</span>
+                                  </div>
+
+                                  <button class="btn btn-secondary" onclick="document.getElementById('fanta-user-dropdown').style.display='none'; window.openEditProfileModal();" style="width: 100%; border-radius: 8px; padding: 8px; font-size: 0.8rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #ccc; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 8px;">
+                                      <i class="fa-solid fa-user-gear"></i> Modifica Profilo
+                                  </button>
+
+                                  <div style="display: flex; gap: 6px; width: 100%;">
+                                      <button class="btn btn-secondary" onclick="document.getElementById('fanta-user-dropdown').style.display='none'; window.openSharedModal ? window.openSharedModal('privacy') : (window.openLegalModal ? window.openLegalModal('privacy') : null);" style="flex: 1; border-radius: 8px; padding: 8px; font-size: 0.8rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #ccc; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                                          <i class="fa-solid fa-shield"></i> Privacy
+                                      </button>
+                                      <button class="btn btn-secondary" onclick="document.getElementById('fanta-user-dropdown').style.display='none'; window.openSharedModal ? window.openSharedModal('termini') : (window.openLegalModal ? window.openLegalModal('terms') : null);" style="flex: 1; border-radius: 8px; padding: 8px; font-size: 0.8rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #ccc; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                                          <i class="fa-solid fa-scroll"></i> Termini
+                                      </button>
+                                  </div>
+
+                                  <button class="btn btn-secondary" onclick="document.getElementById('fanta-user-dropdown').style.display='none'; if(window.showContattiModal) window.showContattiModal(); else window.open('https://prof-memmo.github.io/games/contatti.html', '_blank');" style="width: 100%; border-radius: 8px; padding: 8px; font-size: 0.8rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #ccc; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 8px;">
+                                      <i class="fa-solid fa-envelope"></i> Contatti
+                                  </button>
+
+                                  <div style="display: flex; gap: 6px; width: 100%; margin-top: 4px;">
+                                      <button class="btn btn-secondary" onclick="document.getElementById('fanta-user-dropdown').style.display='none'; apriNotificheModal();" style="flex: 1; border-radius: 8px; padding: 8px; font-size: 0.78rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #ccc; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                                          <i class="fa-solid fa-bell"></i> Notifiche
+                                      </button>
+                                      <button class="btn btn-danger" onclick="document.getElementById('fanta-user-dropdown').style.display='none'; logoutDocente();" style="flex: 1; border-radius: 8px; padding: 8px; font-size: 0.78rem; background: #dc2626; border: none; color: white; cursor: pointer; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                                          <i class="fa-solid fa-power-off"></i> Esci
+                                      </button>
+                                  </div>
+                              </div>
+                          </div>
                       </div>
                   </div>
                   <input type="text" id="profilo-email" class="input-control mb-2" value="" readonly style="background: rgba(255,255,255,0.05); color: #aaa;">
