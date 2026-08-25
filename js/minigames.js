@@ -8940,7 +8940,7 @@
                 <div id="quiz-options-wrapper">${optionsHtml}</div>
                 <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;">
                     <button class="btn btn-secondary" style="background:rgba(245,197,60,0.15); border:1px solid #f5c53c; color:#f5c53c; font-weight:600;" onclick="EroiMinigames.hintQuiz()"><i class="fa-solid fa-lightbulb"></i> Aiuto 50:50</button>
-                    <button class="btn btn-secondary" style="background:rgba(255,255,255,0.05); color:#aaa;" onclick="EroiMinigames.skipQuizQuestion()"><i class="fa-solid fa-forward-step"></i> Passa Domanda (BES)</button>
+                    <button class="btn btn-secondary" style="background:rgba(255,255,255,0.05); color:#aaa;" onclick="EroiMinigames.skipQuizQuestion()"><i class="fa-solid fa-forward-step"></i> Passa Domanda</button>
                 </div>
             </div>
         `;
@@ -9052,7 +9052,7 @@
       const buttonsBar = `
         <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:16px;">
           <button class="btn btn-secondary" style="background:rgba(245,197,60,0.15); border:1px solid #f5c53c; color:#f5c53c; font-weight:600;" onclick="EroiMinigames.hintImpiccato()"><i class="fa-solid fa-lightbulb"></i> Aiuto: Svela Lettera</button>
-          <button class="btn btn-secondary" style="background:rgba(255,255,255,0.05); color:#aaa;" onclick="EroiMinigames.skipCurrent('impiccato')"><i class="fa-solid fa-forward-step"></i> Passa (BES)</button>
+          <button class="btn btn-secondary" style="background:rgba(255,255,255,0.05); color:#aaa;" onclick="EroiMinigames.skipCurrent('impiccato')"><i class="fa-solid fa-forward-step"></i> Passa</button>
         </div>`;
 
       let result = '';
@@ -9157,7 +9157,7 @@
             <button class="btn btn-secondary" style="width:auto; padding:6px 16px; font-size:0.85rem;" onclick="EroiMinigames.puzzleReset()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
             ${!correct ? `
               <button class="btn btn-secondary" style="background:rgba(245,197,60,0.15); border:1px solid #f5c53c; color:#f5c53c; font-weight:600; width:auto; padding:6px 16px; font-size:0.85rem;" onclick="EroiMinigames.hintPuzzle()"><i class="fa-solid fa-lightbulb"></i> Aiuto: Prossima Parola</button>
-              <button class="btn btn-secondary" style="background:rgba(255,255,255,0.05); color:#aaa; width:auto; padding:6px 16px; font-size:0.85rem;" onclick="EroiMinigames.skipCurrent('puzzle')"><i class="fa-solid fa-forward-step"></i> Passa (BES)</button>
+              <button class="btn btn-secondary" style="background:rgba(255,255,255,0.05); color:#aaa; width:auto; padding:6px 16px; font-size:0.85rem;" onclick="EroiMinigames.skipCurrent('puzzle')"><i class="fa-solid fa-forward-step"></i> Passa</button>
             ` : ''}
           </div>
         </div>
@@ -9232,7 +9232,7 @@
           <div style="display:flex; gap:10px; flex-wrap:wrap;">
             <button class="btn" style="width:auto; padding:8px 20px; border-radius:8px;" onclick="EroiMinigames.verifyCloze()"><i class="fa-solid fa-check"></i> Verifica</button>
             <button class="btn btn-secondary" style="background:rgba(245,197,60,0.15); border:1px solid #f5c53c; color:#f5c53c; font-weight:600; width:auto; padding:8px 20px; border-radius:8px;" onclick="EroiMinigames.hintCloze()"><i class="fa-solid fa-lightbulb"></i> Aiuto: Iniziali</button>
-            <button class="btn btn-secondary" style="background:rgba(255,255,255,0.05); color:#aaa; width:auto; padding:8px 20px; border-radius:8px;" onclick="EroiMinigames.skipCurrent('cloze')"><i class="fa-solid fa-forward-step"></i> Passa (BES)</button>
+            <button class="btn btn-secondary" style="background:rgba(255,255,255,0.05); color:#aaa; width:auto; padding:8px 20px; border-radius:8px;" onclick="EroiMinigames.skipCurrent('cloze')"><i class="fa-solid fa-forward-step"></i> Passa</button>
             <button class="btn btn-secondary" style="width:auto; padding:8px 20px; border-radius:8px;" onclick="EroiMinigames.retryCurrentCloze()"><i class="fa-solid fa-dice"></i> Nuovo esercizio</button>
           </div>
           <div id="cloze-result" style="margin-top:14px;"></div>
@@ -9367,7 +9367,7 @@
           <button class="btn btn-secondary" style="width:auto; padding:6px 16px; font-size:0.85rem;" onclick="EroiMinigames.versiReset()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
           ${!isComplete ? `
             <button class="btn btn-secondary" style="background:rgba(245,197,60,0.15); border:1px solid #f5c53c; color:#f5c53c; font-weight:600; width:auto; padding:6px 16px; font-size:0.85rem;" onclick="EroiMinigames.hintVersi()"><i class="fa-solid fa-lightbulb"></i> Aiuto: Prossimo Verso</button>
-            <button class="btn btn-secondary" style="background:rgba(255,255,255,0.05); color:#aaa; width:auto; padding:6px 16px; font-size:0.85rem;" onclick="EroiMinigames.skipCurrent('versi')"><i class="fa-solid fa-forward-step"></i> Passa (BES)</button>
+            <button class="btn btn-secondary" style="background:rgba(255,255,255,0.05); color:#aaa; width:auto; padding:6px 16px; font-size:0.85rem;" onclick="EroiMinigames.skipCurrent('versi')"><i class="fa-solid fa-forward-step"></i> Passa</button>
           ` : ''}
         </div>
         ${resultHtml}`;
