@@ -8916,7 +8916,7 @@
         const progress = `Domanda ${this.quizState.current + 1} di ${this.quizState.questions.length}`;
         
         const optionsHtml = qData.o.map((opt, idx) => `
-            <button class="btn btn-secondary" style="display:block; width:100%; text-align:left; margin-bottom:10px; padding:12px 16px; font-size:0.95rem; white-space:normal; height:auto; line-height:1.4; border-radius:10px; background:rgba(35,40,25,0.7) !important;" onclick="EroiMinigames.answerQuiz(${idx})">
+            <button id="quiz-opt-btn-${idx}" class="btn btn-secondary quiz-option-btn" style="display:block; width:100%; text-align:left; margin-bottom:10px; padding:12px 16px; font-size:0.95rem; white-space:normal; height:auto; line-height:1.4; border-radius:10px; background:rgba(35,40,25,0.7) !important;" onclick="EroiMinigames.answerQuiz(${idx})">
                 <span style="display:inline-block; width:24px; height:24px; line-height:22px; text-align:center; border-radius:50%; background:rgba(141,160,63,0.2); border:1px solid #8da03f; color:#f5f5f0; font-size:0.75rem; margin-right:8px; font-weight:bold;">${String.fromCharCode(65 + idx)}</span>
                 ${opt}
             </button>
@@ -8928,9 +8928,39 @@
                 <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(141,160,63,0.2); border-radius:12px; padding:16px; margin-bottom:16px;">
                     <h3 style="color:#fff; font-size:1.15rem; margin:0; line-height:1.45; font-family:var(--font-heading);">${qData.q} ${editBtn}</h3>
                 </div>
-                <div>${optionsHtml}</div>
+                <div id="quiz-options-wrapper">${optionsHtml}</div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;">
+                    <button class="btn btn-secondary" style="background:rgba(245,197,60,0.15); border:1px solid #f5c53c; color:#f5c53c; font-weight:600;" onclick="EroiMinigames.hintQuiz()"><i class="fa-solid fa-lightbulb"></i> Aiuto 50:50</button>
+                    <button class="btn btn-secondary" style="background:rgba(255,255,255,0.05); color:#aaa;" onclick="EroiMinigames.skipQuizQuestion()"><i class="fa-solid fa-forward-step"></i> Passa Domanda (BES)</button>
+                </div>
             </div>
         `;
+    },
+
+    hintQuiz: function() {
+        const qData = this.quizState.questions[this.quizState.current];
+        const correctIdx = qData.a;
+        const wrongIndices = [];
+        qData.o.forEach((_, idx) => {
+            if (idx !== correctIdx) wrongIndices.push(idx);
+        });
+        // Scegli casualmente 2 risposte errate da disattivare
+        const shuffledWrong = wrongIndices.sort(() => Math.random() - 0.5).slice(0, 2);
+        shuffledWrong.forEach(idx => {
+            const btn = document.getElementById(`quiz-opt-btn-${idx}`);
+            if (btn) {
+                btn.style.opacity = '0.3';
+                btn.style.textDecoration = 'line-through';
+                btn.style.pointerEvents = 'none';
+            }
+        });
+        if (window.showToast) window.showToast('Aiuto 50:50 attivato: due opzioni errate rimosse!', 'info');
+    },
+
+    skipQuizQuestion: function() {
+        if (window.showToast) window.showToast('Domanda saltata.', 'info');
+        this.quizState.current++;
+        this.renderQuizQuestion(document.getElementById('minigame-content'));
     },
     
     answerQuiz: function(selectedIdx) {
@@ -9010,6 +9040,12 @@
       });
       kb += '</div>';
 
+      const buttonsBar = `
+        <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:16px;">
+          <button class="btn btn-secondary" style="background:rgba(245,197,60,0.15); border:1px solid #f5c53c; color:#f5c53c; font-weight:600;" onclick="EroiMinigames.hintImpiccato()"><i class="fa-solid fa-lightbulb"></i> Aiuto: Svela Lettera</button>
+          <button class="btn btn-secondary" style="background:rgba(255,255,255,0.05); color:#aaa;" onclick="EroiMinigames.skipCurrent('impiccato')"><i class="fa-solid fa-forward-step"></i> Passa (BES)</button>
+        </div>`;
+
       let result = '';
       if (won) {
         result = `<div style="background:rgba(22,163,74,0.15); border:1px solid #16a34a; border-radius:12px; padding:16px; text-align:center; margin-top:16px;">
@@ -9037,6 +9073,7 @@
             <div style="text-align:center; padding:12px 0; letter-spacing:4px; margin-bottom:6px;">${wordDisplay}</div>
             ${wrongLetters.length ? `<div style="font-size:0.82rem; color:#ef4444; margin-bottom:6px; text-align:center; font-weight:600;">Lettere errate: ${wrongLetters.join(', ')}</div>` : ''}
             ${kb}
+            ${!won && !lost ? buttonsBar : ''}
           </div>
         </div>
         ${result}`;
@@ -9054,6 +9091,16 @@
       const data = getData(currentMissionId);
       const c = document.getElementById('minigame-content');
       if (c) this.initImpiccato(c, data);
+    },
+
+    hintImpiccato: function() {
+      if (!impiccatoState.word) return;
+      const missing = impiccatoState.word.split('').filter(l => !impiccatoState.guessed.has(l));
+      if (missing.length) {
+        const randomL = missing[Math.floor(Math.random() * missing.length)];
+        this.guessLetter(randomL);
+        if (window.showToast) window.showToast(`Lettera '${randomL}' rivelata!`, 'info');
+      }
     },
 
     // =====================================================
@@ -9099,6 +9146,10 @@
           <div style="min-height:55px; margin-bottom:12px;">${rem}</div>
           <div style="display:flex; gap:10px; flex-wrap:wrap;">
             <button class="btn btn-secondary" style="width:auto; padding:6px 16px; font-size:0.85rem;" onclick="EroiMinigames.puzzleReset()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+            ${!correct ? `
+              <button class="btn btn-secondary" style="background:rgba(245,197,60,0.15); border:1px solid #f5c53c; color:#f5c53c; font-weight:600; width:auto; padding:6px 16px; font-size:0.85rem;" onclick="EroiMinigames.hintPuzzle()"><i class="fa-solid fa-lightbulb"></i> Aiuto: Prossima Parola</button>
+              <button class="btn btn-secondary" style="background:rgba(255,255,255,0.05); color:#aaa; width:auto; padding:6px 16px; font-size:0.85rem;" onclick="EroiMinigames.skipCurrent('puzzle')"><i class="fa-solid fa-forward-step"></i> Passa (BES)</button>
+            ` : ''}
           </div>
         </div>
         ${resultHtml}`;
@@ -9123,6 +9174,20 @@
       puzzleState.remaining = [...puzzleState.shuffled];
       const c = document.getElementById('minigame-content');
       if (c) this.renderPuzzle(c);
+    },
+
+    hintPuzzle: function() {
+      if (!puzzleState.ex) return;
+      const fullWords = puzzleState.ex.solution.split(' ');
+      const nextIdx = puzzleState.selected.length;
+      if (nextIdx < fullWords.length) {
+        const expectedWord = fullWords[nextIdx];
+        const remIndex = puzzleState.remaining.indexOf(expectedWord);
+        if (remIndex !== -1) {
+          this.puzzleAdd(remIndex);
+          if (window.showToast) window.showToast(`Parola '${expectedWord}' posizionata!`, 'info');
+        }
+      }
     },
 
     // =====================================================
@@ -9157,6 +9222,8 @@
           </div>
           <div style="display:flex; gap:10px; flex-wrap:wrap;">
             <button class="btn" style="width:auto; padding:8px 20px; border-radius:8px;" onclick="EroiMinigames.verifyCloze()"><i class="fa-solid fa-check"></i> Verifica</button>
+            <button class="btn btn-secondary" style="background:rgba(245,197,60,0.15); border:1px solid #f5c53c; color:#f5c53c; font-weight:600; width:auto; padding:8px 20px; border-radius:8px;" onclick="EroiMinigames.hintCloze()"><i class="fa-solid fa-lightbulb"></i> Aiuto: Iniziali</button>
+            <button class="btn btn-secondary" style="background:rgba(255,255,255,0.05); color:#aaa; width:auto; padding:8px 20px; border-radius:8px;" onclick="EroiMinigames.skipCurrent('cloze')"><i class="fa-solid fa-forward-step"></i> Passa (BES)</button>
             <button class="btn btn-secondary" style="width:auto; padding:8px 20px; border-radius:8px;" onclick="EroiMinigames.retryCurrentCloze()"><i class="fa-solid fa-dice"></i> Nuovo esercizio</button>
           </div>
           <div id="cloze-result" style="margin-top:14px;"></div>
@@ -9164,6 +9231,18 @@
     },
 
     updateCloze: function(i, v) { if (clozeState.answers) clozeState.answers[i] = v; },
+
+    hintCloze: function() {
+      if (!clozeState.ex) return;
+      clozeState.ex.blanks.forEach((b, i) => {
+        const inp = document.getElementById(`cloze-${i}`);
+        if (inp && (!inp.value || inp.value === '___')) {
+          inp.value = b.charAt(0) + '...';
+          clozeState.answers[i] = b.charAt(0);
+        }
+      });
+      if (window.showToast) window.showToast('Iniziali suggerite nei campi!', 'info');
+    },
 
     verifyCloze: function() {
       const s = clozeState;
@@ -9277,6 +9356,10 @@
         </div>
         <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
           <button class="btn btn-secondary" style="width:auto; padding:6px 16px; font-size:0.85rem;" onclick="EroiMinigames.versiReset()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+          ${!isComplete ? `
+            <button class="btn btn-secondary" style="background:rgba(245,197,60,0.15); border:1px solid #f5c53c; color:#f5c53c; font-weight:600; width:auto; padding:6px 16px; font-size:0.85rem;" onclick="EroiMinigames.hintVersi()"><i class="fa-solid fa-lightbulb"></i> Aiuto: Prossimo Verso</button>
+            <button class="btn btn-secondary" style="background:rgba(255,255,255,0.05); color:#aaa; width:auto; padding:6px 16px; font-size:0.85rem;" onclick="EroiMinigames.skipCurrent('versi')"><i class="fa-solid fa-forward-step"></i> Passa (BES)</button>
+          ` : ''}
         </div>
         ${resultHtml}`;
     },
@@ -9300,6 +9383,24 @@
       versiState.remaining = [...versiState.shuffled];
       const c = document.getElementById('minigame-content');
       if (c) this.renderVersi(c);
+    },
+
+    hintVersi: function() {
+      if (!versiState.ex) return;
+      const nextIdx = versiState.ordered.length;
+      if (nextIdx < versiState.ex.lines.length) {
+        const expectedLine = versiState.ex.lines[nextIdx];
+        const remIndex = versiState.remaining.indexOf(expectedLine);
+        if (remIndex !== -1) {
+          this.versiAdd(remIndex);
+          if (window.showToast) window.showToast('Prossimo verso posizionato!', 'info');
+        }
+      }
+    },
+
+    skipCurrent: function(type) {
+      if (window.showToast) window.showToast('Esercizio saltato. Proseguiamo con il prossimo!', 'info');
+      this.startMinigameDirect(type, currentMissionId);
     },
 
     // =====================================================
