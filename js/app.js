@@ -1286,7 +1286,7 @@ function setLoggedIn(email, role = '') {
         else if (isStudent) loggedWelc.textContent = "Ciao, Studente!";
         else loggedWelc.textContent = "Benvenuto!";
     }
-    
+    if (loggedInNormalContent) {
         if (isStudent) {
             loggedInNormalContent.innerHTML = `
                 <div style="text-align:center; padding:15px; color:var(--text-muted);">
