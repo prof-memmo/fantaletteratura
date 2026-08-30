@@ -4099,6 +4099,13 @@ window.renderDocenteClassTeamsAndStudents = async function() {
         } catch (_) {}
     }
 
+    // Filtra per includere solo gli effettivi studenti ed escludere docenti, admin e prof.memmo
+    students = students.filter(s => {
+        const sEmail = (s.email || '').toLowerCase();
+        const sRole = (s.role || '').toLowerCase();
+        return sEmail !== 'prof.memmo@gmail.com' && sRole !== 'docente' && sRole !== 'teacher' && sRole !== 'admin' && (sRole === 'studente' || !sRole);
+    });
+
     // 2. Carica squadre della classe da fanta_teams
     let classTeams = [];
     try {
