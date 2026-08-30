@@ -2498,19 +2498,24 @@ async function rifiutaInvito(invId) {
 
 async function shareInvite(options = {}) {
     // options: { type: 'general'|'tournament'|'student', tourId, code, teamName }
-    const appUrl = window.location.origin + window.location.pathname;
-    let shareTitle = "Fantaletteratura";
-    let shareText = "Partecipa anche tu a Fantaletteratura, la sfida tra capolavori della letteratura!";
+    const showcaseUrl = "https://prof-memmo.github.io/games/";
+    const fantaUrl = "https://prof-memmo.github.io/fantaletteratura/";
+    
+    let targetUrl = showcaseUrl;
+    let shareTitle = "Ecosistema Didattico Prof. Memmo";
+    let shareText = "Ti consiglio di dare un'occhiata all'Ecosistema Didattico del Prof. Memmo: giochi didattici interattivi, sfide e materiali per la scuola!";
     
     if (options.type === 'student') {
+        targetUrl = fantaUrl;
         shareTitle = `Unisciti alla squadra ${options.teamName}`;
-        shareText = `Ciao! Unisciti alla mia squadra ${options.teamName} su Fantaletteratura. \nUsa il codice: ${options.code}\nEntra qui: ${appUrl}`;
+        shareText = `Ciao! Unisciti alla mia squadra ${options.teamName} su Fantaletteratura. \nUsa il codice: ${options.code}\nEntra qui: ${fantaUrl}`;
     } else if (options.type === 'tournament') {
-        shareTitle = "Invito al Torneo";
-        shareText = `Partecipa al mio torneo privato su Fantaletteratura! Iscrivi le tue squadre usando questo link: ${appUrl}`;
+        targetUrl = fantaUrl;
+        shareTitle = "Invito al Torneo di Fantaletteratura";
+        shareText = `Partecipa al mio torneo privato su Fantaletteratura! Iscrivi le tue squadre usando questo link: ${fantaUrl}`;
     }
 
-    const fullShareText = (options.type === 'student') ? shareText : (shareText + `\n\n🔗 Entra qui: ${appUrl}`);
+    const fullShareText = (options.type === 'student') ? shareText : (shareText + `\n\n🔗 Scopri di più qui: ${targetUrl}`);
 
     // Se disponibile API di sistema (Mobile)
     if (navigator.share) {
@@ -2518,7 +2523,7 @@ async function shareInvite(options = {}) {
             await navigator.share({
                 title: shareTitle,
                 text: fullShareText,
-                url: appUrl
+                url: targetUrl
             });
             return;
         } catch (err) {
@@ -2531,11 +2536,13 @@ async function shareInvite(options = {}) {
     if (!modal) return;
 
     document.getElementById('share-modal-title').textContent = shareTitle;
-    document.getElementById('share-modal-desc').textContent = shareText;
+    document.getElementById('share-modal-desc').textContent = (options.type === 'tournament') 
+        ? "Condividi l'invito al torneo con i tuoi colleghi!"
+        : (options.type === 'student' ? "Condividi il codice con i tuoi studenti!" : "Fai conoscere l'Ecosistema Didattico ai tuoi colleghi!");
 
     // Configura i link
     const encodedFullText = encodeURIComponent(fullShareText);
-    const encodedUrl = encodeURIComponent(appUrl);
+    const encodedUrl = encodeURIComponent(targetUrl);
 
     const waEl = document.getElementById('share-wa');
     if (waEl) waEl.href = `https://wa.me/?text=${encodedFullText}`;
@@ -2543,12 +2550,15 @@ async function shareInvite(options = {}) {
     const crEl = document.getElementById('share-classroom');
     if (crEl) crEl.href = `https://classroom.google.com/u/0/share?url=${encodedUrl}`;
     
+    const teamsEl = document.getElementById('share-teams');
+    if (teamsEl) teamsEl.href = `https://teams.microsoft.com/share?href=${encodedUrl}&msgText=${encodedFullText}`;
+
     window.currentShareText = fullShareText; // Per copia link
     modal.style.display = 'block';
 }
 
 function copyShareLink() {
-    const textToCopy = window.currentShareText || "Fantaletteratura: " + window.location.origin + window.location.pathname;
+    const textToCopy = window.currentShareText || "Ecosistema Didattico Prof. Memmo: https://prof-memmo.github.io/games/";
     navigator.clipboard.writeText(textToCopy).then(() => {
         alert("Link e messaggio copiati negli appunti!");
     });
