@@ -1509,19 +1509,49 @@ async function renderProfilo() {
 
     if (profAvatarImg) {
         profAvatarImg.src = window.selectedFantaAvatar || 'assets/avatars/6.png';
-        if (currentUserEmail && window.db) {
-            window.db.collection('fanta_users').doc(currentUserEmail.toLowerCase()).get().then(d => {
-                if (d.exists) {
-                    const data = d.data() || {};
-                    if (data.avatar) {
-                        profAvatarImg.src = data.avatar;
-                        window.selectedFantaAvatar = data.avatar;
+        if (window.db) {
+            const authUser = window.auth && window.auth.currentUser;
+            const uid = authUser ? authUser.uid : null;
+
+            // 1. Priorità su hub_users (collezione centrale dell'ecosistema)
+            let loadedFromHub = false;
+            if (uid) {
+                try {
+                    const hDoc = await window.db.collection('hub_users').doc(uid).get();
+                    if (hDoc.exists) {
+                        const hData = hDoc.data() || {};
+                        const hAvatar = hData.avatar || (hData.anagrafica && hData.anagrafica.avatar);
+                        const hName = hData.nome || hData.name || (hData.anagrafica && hData.anagrafica.nome);
+                        if (hAvatar) {
+                            profAvatarImg.src = hAvatar;
+                            window.selectedFantaAvatar = hAvatar;
+                        }
+                        if (hName) {
+                            if (profDisplayName) profDisplayName.textContent = hName;
+                            if (fantaDdUsername) fantaDdUsername.textContent = hName;
+                        }
+                        loadedFromHub = true;
                     }
-                    const nameToShow = data.nome || data.name || currentUserEmail.split('@')[0];
-                    if (profDisplayName) profDisplayName.textContent = nameToShow;
-                    if (fantaDdUsername) fantaDdUsername.textContent = nameToShow;
+                } catch(eHub) {
+                    console.warn("Hub avatar fetch:", eHub);
                 }
-            }).catch(() => {});
+            }
+
+            // 2. Fallback su fanta_users
+            if (!loadedFromHub && currentUserEmail) {
+                window.db.collection('fanta_users').doc(currentUserEmail.toLowerCase()).get().then(d => {
+                    if (d.exists) {
+                        const data = d.data() || {};
+                        if (data.avatar) {
+                            profAvatarImg.src = data.avatar;
+                            window.selectedFantaAvatar = data.avatar;
+                        }
+                        const nameToShow = data.nome || data.name || currentUserEmail.split('@')[0];
+                        if (profDisplayName) profDisplayName.textContent = nameToShow;
+                        if (fantaDdUsername) fantaDdUsername.textContent = nameToShow;
+                    }
+                }).catch(() => {});
+            }
         }
     }
     
@@ -2480,12 +2510,14 @@ async function shareInvite(options = {}) {
         shareText = `Partecipa al mio torneo privato su Fantaletteratura! Iscrivi le tue squadre usando questo link: ${appUrl}`;
     }
 
+    const fullShareText = (options.type === 'student') ? shareText : (shareText + `\n\n🔗 Entra qui: ${appUrl}`);
+
     // Se disponibile API di sistema (Mobile)
     if (navigator.share) {
         try {
             await navigator.share({
                 title: shareTitle,
-                text: shareText,
+                text: fullShareText,
                 url: appUrl
             });
             return;
@@ -2502,14 +2534,16 @@ async function shareInvite(options = {}) {
     document.getElementById('share-modal-desc').textContent = shareText;
 
     // Configura i link
-    const encodedText = encodeURIComponent(shareText);
+    const encodedFullText = encodeURIComponent(fullShareText);
     const encodedUrl = encodeURIComponent(appUrl);
 
-    document.getElementById('share-wa').href = `https://wa.me/?text=${encodedText}`;
-    document.getElementById('share-classroom').href = `https://classroom.google.com/u/0/share?url=${encodedUrl}`;
-    document.getElementById('share-teams').href = `https://teams.microsoft.com/share?href=${encodedUrl}&msgText=${encodedText}`;
+    const waEl = document.getElementById('share-wa');
+    if (waEl) waEl.href = `https://wa.me/?text=${encodedFullText}`;
     
-    window.currentShareText = shareText; // Per copia link
+    const crEl = document.getElementById('share-classroom');
+    if (crEl) crEl.href = `https://classroom.google.com/u/0/share?url=${encodedUrl}`;
+    
+    window.currentShareText = fullShareText; // Per copia link
     modal.style.display = 'block';
 }
 
@@ -3914,14 +3948,31 @@ window.openEditProfileModal = async function() {
 
     if (user && window.db) {
         try {
+            // 1. Prova prima hub_users
+            if (user.uid) {
+                const hubDoc = await window.db.collection('hub_users').doc(user.uid).get().catch(() => null);
+                if (hubDoc && hubDoc.exists) {
+                    const hData = hubDoc.data() || {};
+                    const hAvatar = hData.avatar || (hData.anagrafica && hData.anagrafica.avatar);
+                    const hName = hData.nome || hData.name || (hData.anagrafica && hData.anagrafica.nome);
+                    const hSchool = hData.scuola || hData.school || (hData.anagrafica && hData.anagrafica.scuola);
+                    if (hAvatar) currentAvatar = hAvatar;
+                    if (nameInput && hName) nameInput.value = hName;
+                    if (schoolInput && hSchool) schoolInput.value = hSchool;
+                }
+            }
+
+            // 2. Fallback su fanta_users
             const doc = await window.db.collection('fanta_users').doc(user.email.toLowerCase()).get();
             if (doc.exists) {
                 const userData = doc.data();
                 const isTeacher = (userData.role === 'docente' || userData.role === 'teacher' || userData.role === 'admin' || user.email === 'prof.memmo@gmail.com');
                 if (schoolGroup) schoolGroup.style.display = isTeacher ? 'block' : 'none';
-                if (schoolInput) schoolInput.value = userData.school || userData.scuola || '';
-                if (nameInput && userData.name) nameInput.value = userData.name;
-                if (userData.avatar) currentAvatar = userData.avatar;
+                if (schoolInput && !schoolInput.value) schoolInput.value = userData.school || userData.scuola || '';
+                if (nameInput && !nameInput.value && userData.name) nameInput.value = userData.name;
+                if (!currentAvatar || currentAvatar === 'assets/avatars/6.png') {
+                    if (userData.avatar) currentAvatar = userData.avatar;
+                }
             }
         } catch (err) {
             console.warn("Errore fetch profilo:", err);

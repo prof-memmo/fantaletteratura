@@ -433,11 +433,6 @@
                           <h2 style="margin: 0;">Pannello Docente</h2>
                       </div>
                       <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                          <!-- Invita un collega -->
-                          <button class="btn" style="width: auto; padding: 8px 14px; border-radius: 20px; font-size: 0.8rem; background: var(--accent-gold); color: var(--bg-dark); font-weight: 700; margin: 0; display: flex; align-items: center; gap: 6px; cursor: pointer;" onclick="openInviteModal()">
-                              <i class="fa-solid fa-paper-plane"></i> <span class="hide-mobile">Invita Collega</span>
-                          </button>
-                          
                           <!-- User Profile Dropdown Trigger & Modal -->
                           <div style="position: relative; z-index: 100;">
                               <div onclick="event.stopPropagation(); const dd = document.getElementById('fanta-user-dropdown'); dd.style.display = dd.style.display === 'flex' ? 'none' : 'flex';" style="display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.4); border: 1.5px solid var(--accent-gold); padding: 4px 12px 4px 4px; border-radius: 30px; cursor: pointer; color: white;">
@@ -454,6 +449,10 @@
 
                                   <button class="btn btn-secondary" onclick="document.getElementById('fanta-user-dropdown').style.display='none'; window.openEditProfileModal();" style="width: 100%; border-radius: 8px; padding: 8px; font-size: 0.8rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #ccc; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 8px;">
                                       <i class="fa-solid fa-user-gear"></i> Modifica Profilo
+                                  </button>
+
+                                  <button class="btn btn-secondary" onclick="document.getElementById('fanta-user-dropdown').style.display='none'; openInviteModal();" style="width: 100%; border-radius: 8px; padding: 8px; font-size: 0.8rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #ccc; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 8px;">
+                                      <i class="fa-solid fa-paper-plane" style="color:var(--accent-gold);"></i> Invita un Collega
                                   </button>
 
                                   <div style="display: flex; gap: 6px; width: 100%;">
@@ -828,21 +827,17 @@
         <div style="padding: 25px;">
             <p id="share-modal-desc" style="font-size:0.9rem; color:var(--text-muted); margin-bottom:20px; text-align:center;">Scegli dove vuoi condividere Fantaletteratura!</p>
             
-            <div class="share-grid">
-                <a href="#" class="share-btn whatsapp" id="share-wa">
-                    <i class="fa-brands fa-whatsapp"></i>
+            <div class="share-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:12px; max-width:460px; margin:0 auto;">
+                <a href="#" class="share-btn whatsapp" id="share-wa" target="_blank" style="padding:15px; border-radius:12px; text-decoration:none; display:flex; flex-direction:column; align-items:center; gap:8px; background:#25D366; color:white; font-weight:700;">
+                    <i class="fa-brands fa-whatsapp" style="font-size:1.6rem;"></i>
                     <span>WhatsApp</span>
                 </a>
-                <a href="#" class="share-btn classroom" id="share-classroom">
-                    <i class="fa-solid fa-graduation-cap"></i>
+                <a href="#" class="share-btn classroom" id="share-classroom" target="_blank" style="padding:15px; border-radius:12px; text-decoration:none; display:flex; flex-direction:column; align-items:center; gap:8px; background:#F4B400; color:#1a1614; font-weight:700;">
+                    <i class="fa-solid fa-graduation-cap" style="font-size:1.6rem;"></i>
                     <span>Classroom</span>
                 </a>
-                <a href="#" class="share-btn teams" id="share-teams">
-                    <i class="fa-solid fa-users-rectangle"></i>
-                    <span>MS Teams</span>
-                </a>
-                <a href="#" class="share-btn copy" id="share-copy" onclick="copyShareLink()">
-                    <i class="fa-solid fa-copy"></i>
+                <a href="#" class="share-btn copy" id="share-copy" onclick="copyShareLink()" style="padding:15px; border-radius:12px; text-decoration:none; display:flex; flex-direction:column; align-items:center; gap:8px; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); color:white; font-weight:700; cursor:pointer;">
+                    <i class="fa-solid fa-copy" style="font-size:1.6rem;"></i>
                     <span>Copia Link</span>
                 </a>
             </div>
