@@ -36,14 +36,18 @@ function navigateTo(viewId, pushHistory = true) {
         });
     }
 
-    // Restrizioni per Studenti
+    // Restrizioni per Studenti (ad eccezione del Draft 5 Star per la propria squadra)
     const isRestrictedForStudents = ['view-profilo', 'view-squadra', 'view-missioni'].includes(viewId);
     const userRole = (typeof currentUserRole !== 'undefined' ? currentUserRole : '') || localStorage.getItem('fanta_user_role') || (hasStudentCode && !isDocente ? 'studente' : '');
 
     if (isRestrictedForStudents && (userRole === 'studente' || (hasStudentCode && !isDocente))) {
-        alert("Questa sezione è riservata ai docenti e fantamici.");
-        navigateTo('view-welcome', pushHistory);
-        return;
+        if (viewId === 'view-squadra' && window.draftingTeamId) {
+            // Studente autorizzato a comporre il draft per la propria squadra
+        } else {
+            alert("Questa sezione è riservata ai docenti e fantamici.");
+            navigateTo('view-welcome', pushHistory);
+            return;
+        }
     }
 
     if (!isPublicView && !hasStudentCode && !isDocente) {

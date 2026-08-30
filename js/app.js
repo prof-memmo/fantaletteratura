@@ -1286,22 +1286,104 @@ function setLoggedIn(email, role = '') {
         else if (isStudent) loggedWelc.textContent = "Ciao, Studente!";
         else loggedWelc.textContent = "Benvenuto!";
     }
-    
     if (loggedInNormalContent) {
         if (isStudent) {
-            const teamCode = localStorage.getItem('fanta_active_team_code') || '';
             loggedInNormalContent.innerHTML = `
-                <h3 class="text-center mb-1 text-primary">Area Studente</h3>
-                <p class="text-center" style="font-size: 0.9rem; margin-bottom:20px;">
-                    Hai effettuato l'accesso come studente.
-                    ${teamCode ? `<br>Codice Squadra attivo: <b style="color:var(--accent-gold);">${teamCode}</b> <a href="#" onclick="navigateTo('view-studenti')" style="font-size:0.8rem; color:var(--primary-color); margin-left:6px;">(Cambia)</a>` : `<br><span style="color:#fbbf24;">Nessun codice squadra associato.</span>`}
-                </p>
-                <div style="display:flex; flex-direction:column; gap:10px;">
-                    ${!teamCode ? `<button class="btn" style="width:100%; background:var(--primary-color);" onclick="navigateTo('view-studenti')"><i class="fa-solid fa-key"></i> Inserisci Codice Squadra</button>` : ''}
-                    <button class="btn" style="width:100%;" onclick="navigateTo('view-classifiche')">Vedi le Classifiche</button>
-                    <button class="btn btn-secondary" style="width:100%; border-width:2px;" onclick="navigateTo('view-schede')">Esplora le Schede Autore</button>
+                <div style="text-align:center; padding:15px; color:var(--text-muted);">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem; margin-bottom:8px; display:block;"></i>
+                    Caricamento della tua squadra...
                 </div>
             `;
+            
+            (async () => {
+                try {
+                    const user = window.auth ? window.auth.currentUser : null;
+                    const uid = user ? user.uid : '';
+                    let assignedTeam = null;
+
+                    if (uid) {
+                        const snap = await window.db.collection('fanta_teams').get();
+                        snap.forEach(d => {
+                            const data = d.data();
+                            if (Array.isArray(data.members)) {
+                                if (data.members.some(m => (typeof m === 'object' ? (m.uid || m.id) : m) === uid)) {
+                                    assignedTeam = { docId: d.id, id: data.id || d.id, ...data };
+                                }
+                            }
+                        });
+                    }
+
+                    if (assignedTeam) {
+                        const authors = Array.isArray(assignedTeam.authors) ? assignedTeam.authors : [];
+                        const isDraftComplete = assignedTeam.draftCompleted || authors.length === 5;
+
+                        loggedInNormalContent.innerHTML = `
+                            <div class="glass" style="padding:20px; border-radius:14px; border:1px solid rgba(212,175,55,0.3); background:rgba(0,0,0,0.4); margin-bottom:15px; text-align:left;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                                    <span style="font-size:0.75rem; background:rgba(212,175,55,0.15); color:var(--accent-gold); padding:3px 10px; border-radius:12px; font-weight:700;">
+                                        🏆 LA TUA SQUADRA
+                                    </span>
+                                    <span style="font-size:0.8rem; color:var(--text-muted);">
+                                        Classe: <b style="color:#fff;">${assignedTeam.classe || assignedTeam.className || '-'}</b>
+                                    </span>
+                                </div>
+                                <h3 style="margin:0 0 10px 0; color:#fff; font-family:var(--font-heading); font-size:1.3rem;">
+                                    ${assignedTeam.name || 'Squadra'}
+                                </h3>
+                                
+                                ${!isDraftComplete ? `
+                                    <div style="background:rgba(234,179,8,0.1); border:1px solid rgba(234,179,8,0.25); border-radius:10px; padding:12px; margin-bottom:15px;">
+                                        <div style="font-size:0.85rem; color:#fef08a; font-weight:700; margin-bottom:4px;">
+                                            <i class="fa-solid fa-wand-magic-sparkles"></i> Scegli i 5 Autori della tua Squadra
+                                        </div>
+                                        <p style="font-size:0.8rem; color:#e2e8f0; margin:0 0 10px 0; line-height:1.4;">
+                                            Il tuo docente ti ha inserito in questa squadra! Scegli adesso i tuoi 5 autori letterari con il budget di 20.000 lire.
+                                        </p>
+                                        <button class="btn" onclick="window.avviaDraftSquadra('${assignedTeam.docId || assignedTeam.id}')" style="width:100%; padding:10px; font-size:0.9rem; font-weight:800; background:linear-gradient(135deg, var(--accent-gold), #b89628); color:#1a1614; border:none; border-radius:8px; cursor:pointer;">
+                                            ⭐ Scegli i 5 Autori
+                                        </button>
+                                    </div>
+                                ` : `
+                                    <div style="background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.25); border-radius:10px; padding:12px; margin-bottom:15px;">
+                                        <div style="font-size:0.82rem; color:#86efac; font-weight:700; margin-bottom:6px; display:flex; justify-content:space-between;">
+                                            <span>⭐ 5 AUTORI SCHIERATI</span>
+                                            <span>${assignedTeam.points || 0} pt</span>
+                                        </div>
+                                        <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                                            ${authors.map(a => `<span style="font-size:0.75rem; background:rgba(0,0,0,0.4); color:var(--accent-gold); padding:3px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.1);">${a.name || a}</span>`).join('')}
+                                        </div>
+                                    </div>
+                                `}
+
+                                <div style="display:flex; flex-direction:column; gap:8px;">
+                                    <button class="btn btn-secondary" style="width:100%; font-size:0.85rem;" onclick="navigateTo('view-classifiche')">
+                                        <i class="fa-solid fa-ranking-star"></i> Vedi le Classifiche
+                                    </button>
+                                    <button class="btn btn-secondary" style="width:100%; font-size:0.85rem;" onclick="navigateTo('view-schede')">
+                                        <i class="fa-solid fa-book-open"></i> Esplora Schede Autore
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        const teamCode = localStorage.getItem('fanta_active_team_code') || '';
+                        loggedInNormalContent.innerHTML = `
+                            <h3 class="text-center mb-1 text-primary">Area Studente</h3>
+                            <p class="text-center" style="font-size: 0.9rem; margin-bottom:20px;">
+                                Hai effettuato l'accesso come studente.
+                                ${teamCode ? `<br>Codice Squadra attivo: <b style="color:var(--accent-gold);">${teamCode}</b> <a href="#" onclick="navigateTo('view-studenti')" style="font-size:0.8rem; color:var(--primary-color); margin-left:6px;">(Cambia)</a>` : `<br><span style="color:#fbbf24;">Il tuo docente non ti ha ancora inserito in una squadra.</span>`}
+                            </p>
+                            <div style="display:flex; flex-direction:column; gap:10px;">
+                                ${!teamCode ? `<button class="btn" style="width:100%; background:var(--primary-color);" onclick="navigateTo('view-studenti')"><i class="fa-solid fa-key"></i> Inserisci Codice Squadra</button>` : ''}
+                                <button class="btn" style="width:100%;" onclick="navigateTo('view-classifiche')">Vedi le Classifiche</button>
+                                <button class="btn btn-secondary" style="width:100%; border-width:2px;" onclick="navigateTo('view-schede')">Esplora le Schede Autore</button>
+                            </div>
+                        `;
+                    }
+                } catch (e) {
+                    console.error("Errore fetch squadra studente:", e);
+                }
+            })();
         } else if (isFantamico) {
             loggedInNormalContent.innerHTML = `
                 <h3 class="text-center mb-1 text-primary">Ciao, Viandante!</h3>
@@ -1443,6 +1525,43 @@ function setupTeamSave() {
             return;
         }
 
+        // Se stiamo salvando il Draft di una Squadra Assegnata (Studente o LIM Docente)
+        if (window.draftingTeamId) {
+            const teamDocRef = window.db.collection('fanta_teams').doc(window.draftingTeamId);
+            teamDocRef.update({
+                authors: authorsSelected,
+                budgetRemaining: currentBudget,
+                draftCompleted: true,
+                mode: currentTeamMode || 'terze'
+            }).then(() => {
+                alert("Complimenti! I 5 autori della squadra sono stati salvati con successo!");
+                window.draftingTeamId = null;
+
+                // Reset form
+                const nameInp = document.querySelector('#view-squadra input[placeholder="Es: I Promessi Sposi"]');
+                const clsInp = document.getElementById('team-classe-input');
+                if (nameInp) { nameInp.value = ""; nameInp.readOnly = false; }
+                if (clsInp) { clsInp.value = ""; clsInp.readOnly = false; }
+                currentTeamMode = null;
+                teamSelection = { 1: null, 2: null, 3: null, 4: null, 5: null };
+                calculateBudget();
+
+                const isStud = currentUserRole === 'studente';
+                if (isStud) {
+                    setLoggedIn(currentUserEmail);
+                    navigateTo('view-welcome');
+                } else {
+                    renderProfilo();
+                    if (window.loadDocenteClassiComposizione) window.loadDocenteClassiComposizione();
+                    navigateTo('view-profilo');
+                }
+            }).catch(err => {
+                console.error("Errore salvataggio draft squadra:", err);
+                alert("Errore durante il salvataggio del draft. Riprova.");
+            });
+            return;
+        }
+
         const newTeam = {
             id: 't' + Date.now(),
             name: teamNameInput,
@@ -1509,19 +1628,49 @@ async function renderProfilo() {
 
     if (profAvatarImg) {
         profAvatarImg.src = window.selectedFantaAvatar || 'assets/avatars/6.png';
-        if (currentUserEmail && window.db) {
-            window.db.collection('fanta_users').doc(currentUserEmail.toLowerCase()).get().then(d => {
-                if (d.exists) {
-                    const data = d.data() || {};
-                    if (data.avatar) {
-                        profAvatarImg.src = data.avatar;
-                        window.selectedFantaAvatar = data.avatar;
+        if (window.db) {
+            const authUser = window.auth && window.auth.currentUser;
+            const uid = authUser ? authUser.uid : null;
+
+            // 1. Priorità su hub_users (collezione centrale dell'ecosistema)
+            let loadedFromHub = false;
+            if (uid) {
+                try {
+                    const hDoc = await window.db.collection('hub_users').doc(uid).get();
+                    if (hDoc.exists) {
+                        const hData = hDoc.data() || {};
+                        const hAvatar = hData.avatar || (hData.anagrafica && hData.anagrafica.avatar);
+                        const hName = hData.nome || hData.name || (hData.anagrafica && hData.anagrafica.nome);
+                        if (hAvatar) {
+                            profAvatarImg.src = hAvatar;
+                            window.selectedFantaAvatar = hAvatar;
+                        }
+                        if (hName) {
+                            if (profDisplayName) profDisplayName.textContent = hName;
+                            if (fantaDdUsername) fantaDdUsername.textContent = hName;
+                        }
+                        loadedFromHub = true;
                     }
-                    const nameToShow = data.nome || data.name || currentUserEmail.split('@')[0];
-                    if (profDisplayName) profDisplayName.textContent = nameToShow;
-                    if (fantaDdUsername) fantaDdUsername.textContent = nameToShow;
+                } catch(eHub) {
+                    console.warn("Hub avatar fetch:", eHub);
                 }
-            }).catch(() => {});
+            }
+
+            // 2. Fallback su fanta_users
+            if (!loadedFromHub && currentUserEmail) {
+                window.db.collection('fanta_users').doc(currentUserEmail.toLowerCase()).get().then(d => {
+                    if (d.exists) {
+                        const data = d.data() || {};
+                        if (data.avatar) {
+                            profAvatarImg.src = data.avatar;
+                            window.selectedFantaAvatar = data.avatar;
+                        }
+                        const nameToShow = data.nome || data.name || currentUserEmail.split('@')[0];
+                        if (profDisplayName) profDisplayName.textContent = nameToShow;
+                        if (fantaDdUsername) fantaDdUsername.textContent = nameToShow;
+                    }
+                }).catch(() => {});
+            }
         }
     }
     
@@ -2468,25 +2617,32 @@ async function rifiutaInvito(invId) {
 
 async function shareInvite(options = {}) {
     // options: { type: 'general'|'tournament'|'student', tourId, code, teamName }
-    const appUrl = window.location.origin + window.location.pathname;
-    let shareTitle = "Fantaletteratura";
-    let shareText = "Partecipa anche tu a Fantaletteratura, la sfida tra capolavori della letteratura!";
+    const showcaseUrl = "https://prof-memmo.github.io/games/";
+    const fantaUrl = "https://prof-memmo.github.io/fantaletteratura/";
+    
+    let targetUrl = showcaseUrl;
+    let shareTitle = "Ecosistema Didattico Prof. Memmo";
+    let shareText = "Ti consiglio di dare un'occhiata all'Ecosistema Didattico del Prof. Memmo: giochi didattici interattivi, sfide e materiali per la scuola!";
     
     if (options.type === 'student') {
+        targetUrl = fantaUrl;
         shareTitle = `Unisciti alla squadra ${options.teamName}`;
-        shareText = `Ciao! Unisciti alla mia squadra ${options.teamName} su Fantaletteratura. \nUsa il codice: ${options.code}\nEntra qui: ${appUrl}`;
+        shareText = `Ciao! Unisciti alla mia squadra ${options.teamName} su Fantaletteratura. \nUsa il codice: ${options.code}\nEntra qui: ${fantaUrl}`;
     } else if (options.type === 'tournament') {
-        shareTitle = "Invito al Torneo";
-        shareText = `Partecipa al mio torneo privato su Fantaletteratura! Iscrivi le tue squadre usando questo link: ${appUrl}`;
+        targetUrl = fantaUrl;
+        shareTitle = "Invito al Torneo di Fantaletteratura";
+        shareText = `Partecipa al mio torneo privato su Fantaletteratura! Iscrivi le tue squadre usando questo link: ${fantaUrl}`;
     }
+
+    const fullShareText = (options.type === 'student') ? shareText : (shareText + `\n\n🔗 Scopri di più qui: ${targetUrl}`);
 
     // Se disponibile API di sistema (Mobile)
     if (navigator.share) {
         try {
             await navigator.share({
                 title: shareTitle,
-                text: shareText,
-                url: appUrl
+                text: fullShareText,
+                url: targetUrl
             });
             return;
         } catch (err) {
@@ -2499,22 +2655,29 @@ async function shareInvite(options = {}) {
     if (!modal) return;
 
     document.getElementById('share-modal-title').textContent = shareTitle;
-    document.getElementById('share-modal-desc').textContent = shareText;
+    document.getElementById('share-modal-desc').textContent = (options.type === 'tournament') 
+        ? "Condividi l'invito al torneo con i tuoi colleghi!"
+        : (options.type === 'student' ? "Condividi il codice con i tuoi studenti!" : "Fai conoscere l'Ecosistema Didattico ai tuoi colleghi!");
 
     // Configura i link
-    const encodedText = encodeURIComponent(shareText);
-    const encodedUrl = encodeURIComponent(appUrl);
+    const encodedFullText = encodeURIComponent(fullShareText);
+    const encodedUrl = encodeURIComponent(targetUrl);
 
-    document.getElementById('share-wa').href = `https://wa.me/?text=${encodedText}`;
-    document.getElementById('share-classroom').href = `https://classroom.google.com/u/0/share?url=${encodedUrl}`;
-    document.getElementById('share-teams').href = `https://teams.microsoft.com/share?href=${encodedUrl}&msgText=${encodedText}`;
+    const waEl = document.getElementById('share-wa');
+    if (waEl) waEl.href = `https://wa.me/?text=${encodedFullText}`;
     
-    window.currentShareText = shareText; // Per copia link
+    const crEl = document.getElementById('share-classroom');
+    if (crEl) crEl.href = `https://classroom.google.com/u/0/share?url=${encodedUrl}`;
+    
+    const teamsEl = document.getElementById('share-teams');
+    if (teamsEl) teamsEl.href = `https://teams.microsoft.com/share?href=${encodedUrl}&msgText=${encodedFullText}`;
+
+    window.currentShareText = fullShareText; // Per copia link
     modal.style.display = 'block';
 }
 
 function copyShareLink() {
-    const textToCopy = window.currentShareText || "Fantaletteratura: " + window.location.origin + window.location.pathname;
+    const textToCopy = window.currentShareText || "Ecosistema Didattico Prof. Memmo: https://prof-memmo.github.io/games/";
     navigator.clipboard.writeText(textToCopy).then(() => {
         alert("Link e messaggio copiati negli appunti!");
     });
@@ -3832,6 +3995,447 @@ window.presClickHandler = function(e) {
     };
 })();
 
+// --- COMPOSIZIONE SQUADRE CLASSE DOCENTE ---
+window.cachedDocenteClasses = [];
+window.currentComposizioneClass = null;
+
+window.loadDocenteClassiComposizione = async function() {
+    const select = document.getElementById('docente-composizione-class-select');
+    if (!select) return;
+
+    select.innerHTML = '<option value="">Caricamento classi...</option>';
+
+    try {
+        const user = window.auth ? window.auth.currentUser : null;
+        if (!user) return;
+
+        const uid = user.uid;
+        const email = (user.email || '').toLowerCase();
+
+        const queries = [
+            window.db.collection('classes').where('teacherId', '==', uid).get().catch(() => ({ docs: [] })),
+            window.db.collection('classes').where('teacherEmail', '==', email).get().catch(() => ({ docs: [] })),
+            window.db.collection('classes').where('teacherIds', 'array-contains', uid).get().catch(() => ({ docs: [] })),
+            window.db.collection('classes').where('collaboratori', 'array-contains', email).get().catch(() => ({ docs: [] }))
+        ];
+
+        const results = await Promise.all(queries);
+        const classMap = new Map();
+        results.forEach(snap => {
+            if (snap && snap.docs) {
+                snap.docs.forEach(doc => {
+                    classMap.set(doc.id, { id: doc.id, ...doc.data() });
+                });
+            }
+        });
+
+        window.cachedDocenteClasses = Array.from(classMap.values());
+
+        if (window.cachedDocenteClasses.length === 0) {
+            select.innerHTML = '<option value="">Nessuna classe trovata</option>';
+            const teamsList = document.getElementById('docente-class-teams-list');
+            if (teamsList) {
+                teamsList.innerHTML = `
+                    <div class="glass" style="padding: 25px; text-align: center; grid-column: 1 / -1; color: var(--text-muted);">
+                        <p style="margin-bottom: 10px;">Non hai ancora creato o associato alcuna classe.</p>
+                        <a href="https://prof-memmo.github.io/games/profilo.html" target="_blank" class="btn btn-secondary" style="font-size:0.82rem; padding: 6px 14px; display:inline-flex; align-items:center; gap:6px;">
+                            <i class="fa-solid fa-chalkboard-user"></i> Crea una classe nell'Hub
+                        </a>
+                    </div>
+                `;
+            }
+            document.getElementById('docente-class-pool-container').style.display = 'none';
+            document.getElementById('docente-create-team-box').style.display = 'none';
+            return;
+        }
+
+        select.innerHTML = window.cachedDocenteClasses.map(c => `
+            <option value="${c.id}">${c.name || 'Classe senza nome'} (${c.school || c.citta || 'Scuola'}) [${c.code || c.classCode || '-'}]</option>
+        `).join('');
+
+        const firstClassId = window.cachedDocenteClasses[0].id;
+        window.onDocenteClassSelectChange(firstClassId);
+    } catch (err) {
+        console.error("Errore caricamento classi docente:", err);
+        select.innerHTML = '<option value="">Errore nel caricamento</option>';
+    }
+};
+
+window.onDocenteClassSelectChange = async function(classId) {
+    if (!classId) return;
+    const cls = window.cachedDocenteClasses.find(c => c.id === classId);
+    if (!cls) return;
+
+    window.currentComposizioneClass = cls;
+
+    // Aggiorna Codice Classe
+    const codeBadge = document.getElementById('docente-class-code-badge');
+    if (codeBadge) codeBadge.textContent = cls.code || cls.classCode || '-';
+
+    document.getElementById('docente-class-pool-container').style.display = 'block';
+    document.getElementById('docente-create-team-box').style.display = 'block';
+
+    await window.renderDocenteClassTeamsAndStudents();
+};
+
+window.renderDocenteClassTeamsAndStudents = async function() {
+    const cls = window.currentComposizioneClass;
+    if (!cls) return;
+
+    const classId = cls.id;
+    const classCode = (cls.code || cls.classCode || '').toUpperCase();
+
+    // 1. Carica studenti della classe
+    let students = [];
+    if (Array.isArray(cls.students) && cls.students.length > 0) {
+        students = cls.students;
+    } else {
+        // Query da hub_users per classCode
+        try {
+            if (classCode) {
+                const snap = await window.db.collection('hub_users').where('classCode', '==', classCode).get();
+                students = snap.docs.map(d => ({ uid: d.id, ...d.data() }));
+            }
+        } catch (_) {}
+    }
+
+    // 2. Carica squadre della classe da fanta_teams
+    let classTeams = [];
+    try {
+        const queryByClassId = await window.db.collection('fanta_teams').where('classId', '==', classId).get();
+        queryByClassId.forEach(d => classTeams.push({ docId: d.id, id: d.data().id || d.id, ...d.data() }));
+
+        if (classCode) {
+            const queryByCode = await window.db.collection('fanta_teams').where('classCode', '==', classCode).get();
+            queryByCode.forEach(d => {
+                if (!classTeams.some(t => t.docId === d.id)) {
+                    classTeams.push({ docId: d.id, id: d.data().id || d.id, ...d.data() });
+                }
+            });
+        }
+    } catch (err) {
+        console.error("Errore fetch squadre classe:", err);
+    }
+
+    // Mappa degli studenti già assegnati a una squadra
+    const assignedMap = new Map(); // studentUid -> teamName
+    classTeams.forEach(t => {
+        if (Array.isArray(t.members)) {
+            t.members.forEach(m => {
+                const uid = typeof m === 'object' ? (m.uid || m.id) : m;
+                if (uid) assignedMap.set(uid, t.name || 'Squadra');
+            });
+        }
+    });
+
+    // 3. Render Pool Studenti
+    const countEl = document.getElementById('docente-class-student-count');
+    if (countEl) countEl.textContent = students.length;
+
+    const badgesContainer = document.getElementById('docente-class-students-badges');
+    if (badgesContainer) {
+        if (students.length === 0) {
+            badgesContainer.innerHTML = `
+                <div style="font-size:0.82rem; color:var(--text-muted); padding:4px 0;">
+                    Nessuno studente iscritto con il codice <b>${classCode}</b>. Fai registrare i tuoi studenti o condividi il codice classe!
+                </div>
+            `;
+        } else {
+            badgesContainer.innerHTML = students.map(s => {
+                const sUid = s.uid || s.id;
+                const sName = s.displayName || s.name || s.email || 'Studente';
+                const assignedTeam = assignedMap.get(sUid);
+                const avatar = s.avatar ? (s.avatar.includes('/') ? s.avatar : `assets/avatars/${s.avatar}`) : 'assets/avatars/6.png';
+
+                if (assignedTeam) {
+                    return `
+                        <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.3); border-radius:20px; padding:3px 10px; font-size:0.8rem; color:#86efac;">
+                            <img src="${avatar}" style="width:20px; height:20px; border-radius:50%; object-fit:cover;">
+                            <span>${sName}</span>
+                            <span style="font-size:0.7rem; color:#4ade80; background:rgba(0,0,0,0.3); padding:1px 6px; border-radius:10px;">${assignedTeam}</span>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(234,179,8,0.12); border:1px solid rgba(234,179,8,0.3); border-radius:20px; padding:3px 10px; font-size:0.8rem; color:#fde047;">
+                            <img src="${avatar}" style="width:20px; height:20px; border-radius:50%; object-fit:cover;">
+                            <span>${sName}</span>
+                            <span style="font-size:0.7rem; color:#eab308; background:rgba(0,0,0,0.3); padding:1px 6px; border-radius:10px;">Libero</span>
+                        </div>
+                    `;
+                }
+            }).join('');
+        }
+    }
+
+    // 4. Render Lista Squadre
+    const teamsList = document.getElementById('docente-class-teams-list');
+    if (!teamsList) return;
+
+    if (classTeams.length === 0) {
+        teamsList.innerHTML = `
+            <div class="glass" style="padding: 30px 20px; text-align: center; grid-column: 1 / -1; color: var(--text-muted);">
+                <i class="fa-solid fa-shield-halved" style="font-size:2rem; color:var(--accent-gold); margin-bottom:10px; display:block;"></i>
+                <h4 style="margin:0 0 6px 0; color:#fff;">Nessuna squadra creata per questa classe</h4>
+                <p style="font-size:0.85rem; margin:0;">Utilizza il modulo in alto per creare la prima squadra e iniziare a distribuire gli studenti!</p>
+            </div>
+        `;
+        return;
+    }
+
+    // Lista studenti non ancora assegnati per il dropdown
+    const unassignedStudents = students.filter(s => !assignedMap.has(s.uid || s.id));
+
+    teamsList.innerHTML = classTeams.map(team => {
+        const teamDocId = team.docId || team.id;
+        const members = Array.isArray(team.members) ? team.members : [];
+        const authors = Array.isArray(team.authors) ? team.authors : [];
+        const isDraftComplete = team.draftCompleted || authors.length === 5;
+        const modeLabel = team.mode === 'seconde' ? '📙 Medievale' : (team.mode === 'avanzato' ? '📒 Avanzato' : '📘 Contemporanea');
+
+        return `
+            <div class="glass" style="padding: 18px; border-radius: 12px; border: 1px solid rgba(212,175,55,0.2); background: rgba(0,0,0,0.35); display:flex; flex-direction:column; justify-content:space-between; gap:14px;">
+                <div>
+                    <!-- Header Squadra -->
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+                        <div>
+                            <h4 style="margin:0; font-size:1.05rem; color:#ffffff; font-family:var(--font-heading);">${team.name || 'Squadra'}</h4>
+                            <div style="display:flex; gap:6px; align-items:center; margin-top:4px;">
+                                <span style="font-size:0.72rem; padding:2px 8px; border-radius:10px; background:rgba(255,255,255,0.08); color:var(--accent-gold);">${modeLabel}</span>
+                                ${team.joinCode ? `<span style="font-size:0.72rem; padding:2px 8px; border-radius:10px; background:rgba(212,175,55,0.15); color:#fef08a; font-weight:700;">Codice: ${team.joinCode}</span>` : ''}
+                            </div>
+                        </div>
+                        <button class="btn-secondary" onclick="window.eliminaSquadraClasse('${teamDocId}', '${(team.name||'').replace(/'/g, "\\'")}')" title="Elimina Squadra" style="padding:4px 8px; border-radius:8px; color:#ef4444; border-color:rgba(239,68,68,0.4); font-size:0.75rem; cursor:pointer;">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+
+                    <!-- Membri Studenti -->
+                    <div style="margin-bottom: 12px; background:rgba(255,255,255,0.03); padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
+                        <div style="font-size:0.78rem; font-weight:700; color:var(--text-muted); margin-bottom:8px; display:flex; justify-content:space-between;">
+                            <span>MEMBRI GRUPPO (${members.length}/5)</span>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:6px;">
+                            ${members.length === 0 ? `<div style="font-size:0.78rem; color:#94a3b8; font-style:italic;">Nessuno studente assegnato.</div>` : members.map(m => {
+                                const mUid = typeof m === 'object' ? (m.uid || m.id) : m;
+                                const mName = typeof m === 'object' ? (m.name || m.displayName || m.email) : (students.find(s => (s.uid||s.id) === mUid)?.name || 'Studente');
+                                const mAvatar = typeof m === 'object' && m.avatar ? (m.avatar.includes('/') ? m.avatar : `assets/avatars/${m.avatar}`) : 'assets/avatars/6.png';
+                                return `
+                                    <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.3); padding:4px 8px; border-radius:6px;">
+                                        <div style="display:flex; align-items:center; gap:6px; font-size:0.8rem; color:#fff;">
+                                            <img src="${mAvatar}" style="width:18px; height:18px; border-radius:50%; object-fit:cover;">
+                                            <span>${mName}</span>
+                                        </div>
+                                        <button onclick="window.rimuoviStudenteDaSquadra('${teamDocId}', '${mUid}')" title="Rimuovi dal gruppo" style="background:none; border:none; color:#94a3b8; cursor:pointer; font-size:0.75rem; padding:0 4px;">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </button>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+
+                        <!-- Dropdown per assegnare nuovi studenti -->
+                        ${members.length < 5 && unassignedStudents.length > 0 ? `
+                            <div style="display:flex; gap:6px; margin-top:8px;">
+                                <select id="assign-select-${teamDocId}" class="input-control" style="margin:0; padding:4px 8px; font-size:0.75rem; border-radius:6px; background:rgba(0,0,0,0.5); color:#fff; flex:1;">
+                                    <option value="">+ Aggiungi studente...</option>
+                                    ${unassignedStudents.map(s => `<option value="${s.uid || s.id}">${s.displayName || s.name || s.email}</option>`).join('')}
+                                </select>
+                                <button type="button" class="btn btn-secondary" onclick="window.onAssegnaClick('${teamDocId}')" style="margin:0; padding:4px 10px; font-size:0.75rem; white-space:nowrap; border-radius:6px;">
+                                    Assegna
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- Stato 5 Star -->
+                    <div style="background:rgba(0,0,0,0.25); padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
+                        <div style="font-size:0.78rem; font-weight:700; color:var(--text-muted); margin-bottom:6px;">
+                            I 5 AUTORI DELLA SQUADRA
+                        </div>
+                        ${isDraftComplete ? `
+                            <div style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:6px;">
+                                ${authors.map(a => `<span style="font-size:0.72rem; background:rgba(212,175,55,0.15); color:var(--accent-gold); padding:2px 6px; border-radius:4px; border:1px solid rgba(212,175,55,0.3);">${a.name || a}</span>`).join('')}
+                            </div>
+                            <div style="font-size:0.75rem; color:#86efac; font-weight:700;">
+                                ⭐ 5 Autori Schierati (${team.points || 0} pt)
+                            </div>
+                        ` : `
+                            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                                <span style="font-size:0.75rem; color:#fbbf24;">⏳ In attesa della scelta dei 5 autori</span>
+                                <button type="button" class="btn btn-secondary" onclick="window.avviaDraftDocenteLIM('${teamDocId}')" style="padding:4px 8px; font-size:0.72rem; border-radius:6px; border-color:var(--accent-gold); color:var(--accent-gold); cursor:pointer;">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Scegli Autori alla LIM
+                                </button>
+                            </div>
+                        `}
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+};
+
+window.creaNuovaSquadraClasse = async function() {
+    const cls = window.currentComposizioneClass;
+    if (!cls) { alert("Seleziona prima una classe!"); return; }
+
+    const nameInput = document.getElementById('new-team-name-input');
+    const modeSelect = document.getElementById('new-team-mode-select');
+    const teamName = nameInput ? nameInput.value.trim() : '';
+    const teamMode = modeSelect ? modeSelect.value : 'terze';
+
+    if (!teamName) {
+        alert("Inserisci un nome per la squadra!");
+        return;
+    }
+
+    try {
+        const user = window.auth ? window.auth.currentUser : null;
+        const ownerUid = user ? user.uid : '';
+        const ownerEmail = user ? user.email : '';
+
+        const generateCode = () => {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let res = '';
+            for (let i = 0; i < 4; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
+            return 'FL-' + res;
+        };
+
+        const newTeamData = {
+            id: 't' + Date.now(),
+            name: teamName,
+            classe: cls.name || 'Classe',
+            classId: cls.id,
+            classCode: (cls.code || cls.classCode || '').toUpperCase(),
+            className: cls.name || '',
+            ownerUid: ownerUid,
+            ownerEmail: ownerEmail,
+            mode: teamMode,
+            members: [],
+            authors: [],
+            budgetRemaining: 20000,
+            draftCompleted: false,
+            points: 0,
+            missionsCompleted: 0,
+            joinCode: generateCode(),
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        await window.db.collection('fanta_teams').add(newTeamData);
+        if (nameInput) nameInput.value = '';
+        await window.renderDocenteClassTeamsAndStudents();
+    } catch (err) {
+        console.error("Errore creazione squadra:", err);
+        alert("Errore durante la creazione della squadra.");
+    }
+};
+
+window.onAssegnaClick = async function(teamDocId) {
+    const select = document.getElementById(`assign-select-${teamDocId}`);
+    if (!select || !select.value) return;
+
+    const studentUid = select.value;
+    const cls = window.currentComposizioneClass;
+    let studentObj = { uid: studentUid, name: 'Studente' };
+
+    if (cls && Array.isArray(cls.students)) {
+        const s = cls.students.find(x => (x.uid || x.id) === studentUid);
+        if (s) studentObj = { uid: studentUid, name: s.displayName || s.name || s.email, avatar: s.avatar || '6.png' };
+    } else {
+        try {
+            const userSnap = await window.db.collection('hub_users').doc(studentUid).get();
+            if (userSnap.exists) {
+                const ud = userSnap.data();
+                studentObj = { uid: studentUid, name: ud.displayName || ud.name || ud.email, avatar: ud.avatar || '6.png' };
+            }
+        } catch (_) {}
+    }
+
+    try {
+        await window.db.collection('fanta_teams').doc(teamDocId).update({
+            members: firebase.firestore.FieldValue.arrayUnion(studentObj)
+        });
+        await window.renderDocenteClassTeamsAndStudents();
+    } catch (err) {
+        console.error("Errore assegnazione studente:", err);
+        alert("Errore durante l'assegnazione dello studente.");
+    }
+};
+
+window.rimuoviStudenteDaSquadra = async function(teamDocId, studentUid) {
+    try {
+        const teamDoc = await window.db.collection('fanta_teams').doc(teamDocId).get();
+        if (!teamDoc.exists) return;
+
+        const members = teamDoc.data().members || [];
+        const updatedMembers = members.filter(m => {
+            const uid = typeof m === 'object' ? (m.uid || m.id) : m;
+            return uid !== studentUid;
+        });
+
+        await window.db.collection('fanta_teams').doc(teamDocId).update({ members: updatedMembers });
+        await window.renderDocenteClassTeamsAndStudents();
+    } catch (err) {
+        console.error("Errore rimozione studente:", err);
+    }
+};
+
+window.eliminaSquadraClasse = async function(teamDocId, teamName) {
+    if (!confirm(`Sei sicuro di voler eliminare la squadra "${teamName}"?`)) return;
+
+    try {
+        await window.db.collection('fanta_teams').doc(teamDocId).delete();
+        await window.renderDocenteClassTeamsAndStudents();
+    } catch (err) {
+        console.error("Errore eliminazione squadra:", err);
+        alert("Errore durante l'eliminazione della squadra.");
+    }
+};
+
+window.avviaDraftSquadra = async function(teamDocId) {
+    try {
+        const docRef = window.db.collection('fanta_teams').doc(teamDocId);
+        const docSnap = await docRef.get();
+        if (!docSnap.exists) { alert("Squadra non trovata."); return; }
+
+        const teamData = docSnap.data();
+        window.draftingTeamId = teamDocId;
+
+        // Naviga a view-squadra
+        navigateTo('view-squadra');
+
+        // Precompila nome e classe
+        const nameInput = document.querySelector('#view-squadra input[placeholder="Es: I Promessi Sposi"]');
+        const classeInput = document.getElementById('team-classe-input');
+        if (nameInput) {
+            nameInput.value = teamData.name || '';
+            nameInput.readOnly = true;
+        }
+        if (classeInput) {
+            classeInput.value = teamData.classe || teamData.className || '';
+            classeInput.readOnly = true;
+        }
+
+        const mode = teamData.mode || 'terze';
+        selectTeamMode(mode);
+
+        if (Array.isArray(teamData.authors) && teamData.authors.length > 0) {
+            teamSelection = { 1: null, 2: null, 3: null, 4: null, 5: null };
+            teamData.authors.forEach((a, idx) => {
+                if (idx < 5) teamSelection[idx + 1] = a;
+            });
+            updateSlotsUI();
+            calculateBudget();
+        }
+    } catch (err) {
+        console.error("Errore avvio draft:", err);
+    }
+};
+
+window.avviaDraftDocenteLIM = function(teamDocId) {
+    window.avviaDraftSquadra(teamDocId);
+};
+
 window.switchDocenteTab = function(tabName) {
     // Nascondi tutti i contenuti
     document.querySelectorAll('.docente-tab-content').forEach(el => el.style.display = 'none');
@@ -3855,7 +4459,9 @@ window.switchDocenteTab = function(tabName) {
         targetBtn.style.color = '';
     }
     
-    if (tabName === 'storico') {
+    if (tabName === 'composizione') {
+        window.loadDocenteClassiComposizione();
+    } else if (tabName === 'storico') {
         window.renderMinigamesHistory();
     }
 };
@@ -3914,14 +4520,31 @@ window.openEditProfileModal = async function() {
 
     if (user && window.db) {
         try {
+            // 1. Prova prima hub_users
+            if (user.uid) {
+                const hubDoc = await window.db.collection('hub_users').doc(user.uid).get().catch(() => null);
+                if (hubDoc && hubDoc.exists) {
+                    const hData = hubDoc.data() || {};
+                    const hAvatar = hData.avatar || (hData.anagrafica && hData.anagrafica.avatar);
+                    const hName = hData.nome || hData.name || (hData.anagrafica && hData.anagrafica.nome);
+                    const hSchool = hData.scuola || hData.school || (hData.anagrafica && hData.anagrafica.scuola);
+                    if (hAvatar) currentAvatar = hAvatar;
+                    if (nameInput && hName) nameInput.value = hName;
+                    if (schoolInput && hSchool) schoolInput.value = hSchool;
+                }
+            }
+
+            // 2. Fallback su fanta_users
             const doc = await window.db.collection('fanta_users').doc(user.email.toLowerCase()).get();
             if (doc.exists) {
                 const userData = doc.data();
                 const isTeacher = (userData.role === 'docente' || userData.role === 'teacher' || userData.role === 'admin' || user.email === 'prof.memmo@gmail.com');
                 if (schoolGroup) schoolGroup.style.display = isTeacher ? 'block' : 'none';
-                if (schoolInput) schoolInput.value = userData.school || userData.scuola || '';
-                if (nameInput && userData.name) nameInput.value = userData.name;
-                if (userData.avatar) currentAvatar = userData.avatar;
+                if (schoolInput && !schoolInput.value) schoolInput.value = userData.school || userData.scuola || '';
+                if (nameInput && !nameInput.value && userData.name) nameInput.value = userData.name;
+                if (!currentAvatar || currentAvatar === 'assets/avatars/6.png') {
+                    if (userData.avatar) currentAvatar = userData.avatar;
+                }
             }
         } catch (err) {
             console.warn("Errore fetch profilo:", err);
