@@ -1334,19 +1334,19 @@ function setLoggedIn(email, role = '') {
                                 ${!isDraftComplete ? `
                                     <div style="background:rgba(234,179,8,0.1); border:1px solid rgba(234,179,8,0.25); border-radius:10px; padding:12px; margin-bottom:15px;">
                                         <div style="font-size:0.85rem; color:#fef08a; font-weight:700; margin-bottom:4px;">
-                                            <i class="fa-solid fa-wand-magic-sparkles"></i> Draft 5 Star da Completare
+                                            <i class="fa-solid fa-wand-magic-sparkles"></i> Scegli i 5 Autori della tua Squadra
                                         </div>
                                         <p style="font-size:0.8rem; color:#e2e8f0; margin:0 0 10px 0; line-height:1.4;">
-                                            Il tuo docente ti ha assegnato a questa squadra! Schiera adesso le tue 5 Star della letteratura con il budget di 20.000 lire.
+                                            Il tuo docente ti ha inserito in questa squadra! Scegli adesso i tuoi 5 autori letterari con il budget di 20.000 lire.
                                         </p>
                                         <button class="btn" onclick="window.avviaDraftSquadra('${assignedTeam.docId || assignedTeam.id}')" style="width:100%; padding:10px; font-size:0.9rem; font-weight:800; background:linear-gradient(135deg, var(--accent-gold), #b89628); color:#1a1614; border:none; border-radius:8px; cursor:pointer;">
-                                            ⭐ Avvia il Draft 5 Star
+                                            ⭐ Scegli i 5 Autori
                                         </button>
                                     </div>
                                 ` : `
                                     <div style="background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.25); border-radius:10px; padding:12px; margin-bottom:15px;">
                                         <div style="font-size:0.82rem; color:#86efac; font-weight:700; margin-bottom:6px; display:flex; justify-content:space-between;">
-                                            <span>⭐ QUINTETTO 5 STAR SCHIERATO</span>
+                                            <span>⭐ 5 AUTORI SCHIERATI</span>
                                             <span>${assignedTeam.points || 0} pt</span>
                                         </div>
                                         <div style="display:flex; flex-wrap:wrap; gap:6px;">
@@ -1534,7 +1534,7 @@ function setupTeamSave() {
                 draftCompleted: true,
                 mode: currentTeamMode || 'terze'
             }).then(() => {
-                alert("Complimenti! La formazione 5 Star della squadra è stata salvata con successo!");
+                alert("Complimenti! I 5 autori della squadra sono stati salvati con successo!");
                 window.draftingTeamId = null;
 
                 // Reset form
@@ -4251,20 +4251,20 @@ window.renderDocenteClassTeamsAndStudents = async function() {
                     <!-- Stato 5 Star -->
                     <div style="background:rgba(0,0,0,0.25); padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
                         <div style="font-size:0.78rem; font-weight:700; color:var(--text-muted); margin-bottom:6px;">
-                            FORMAZIONE 5 STAR
+                            I 5 AUTORI DELLA SQUADRA
                         </div>
                         ${isDraftComplete ? `
                             <div style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:6px;">
                                 ${authors.map(a => `<span style="font-size:0.72rem; background:rgba(212,175,55,0.15); color:var(--accent-gold); padding:2px 6px; border-radius:4px; border:1px solid rgba(212,175,55,0.3);">${a.name || a}</span>`).join('')}
                             </div>
                             <div style="font-size:0.75rem; color:#86efac; font-weight:700;">
-                                ⭐ Draft completato (${team.points || 0} pt)
+                                ⭐ 5 Autori Schierati (${team.points || 0} pt)
                             </div>
                         ` : `
                             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-                                <span style="font-size:0.75rem; color:#fbbf24;">⏳ In attesa del Draft degli studenti</span>
-                                <button type="button" class="btn btn-secondary" onclick="window.avviaDraftDocenteLIM('${teamDocId}')" style="padding:4px 8px; font-size:0.72rem; border-radius:6px; border-color:var(--accent-gold); color:var(--accent-gold);">
-                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Compila alla LIM
+                                <span style="font-size:0.75rem; color:#fbbf24;">⏳ In attesa della scelta dei 5 autori</span>
+                                <button type="button" class="btn btn-secondary" onclick="window.avviaDraftDocenteLIM('${teamDocId}')" style="padding:4px 8px; font-size:0.72rem; border-radius:6px; border-color:var(--accent-gold); color:var(--accent-gold); cursor:pointer;">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Scegli Autori alla LIM
                                 </button>
                             </div>
                         `}
