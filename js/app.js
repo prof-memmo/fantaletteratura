@@ -4129,7 +4129,7 @@ window.renderDocenteClassTeamsAndStudents = async function() {
     classTeams.forEach(t => {
         if (Array.isArray(t.members)) {
             t.members.forEach(m => {
-                const uid = typeof m === 'object' ? (m.uid || m.id) : m;
+                const uid = typeof m === 'object' ? (m.studentId || m.uid || m.id) : m;
                 if (uid) assignedMap.set(uid, t.name || 'Squadra');
             });
         }
@@ -4149,8 +4149,8 @@ window.renderDocenteClassTeamsAndStudents = async function() {
             `;
         } else {
             badgesContainer.innerHTML = students.map(s => {
-                const sUid = s.uid || s.id;
-                const sName = s.displayName || s.name || s.email || 'Studente';
+                const sUid = s.studentId || s.uid || s.id;
+                const sName = s.name || s.displayName || s.nickname || s.email || 'Studente';
                 const assignedTeam = assignedMap.get(sUid);
                 const avatar = s.avatar ? (s.avatar.includes('/') ? s.avatar : `assets/avatars/${s.avatar}`) : 'assets/avatars/6.png';
 
@@ -4191,7 +4191,7 @@ window.renderDocenteClassTeamsAndStudents = async function() {
     }
 
     // Lista studenti non ancora assegnati per il dropdown
-    const unassignedStudents = students.filter(s => !assignedMap.has(s.uid || s.id));
+    const unassignedStudents = students.filter(s => !assignedMap.has(s.studentId || s.uid || s.id));
 
     teamsList.innerHTML = classTeams.map(team => {
         const teamDocId = team.docId || team.id;
@@ -4224,8 +4224,8 @@ window.renderDocenteClassTeamsAndStudents = async function() {
                         </div>
                         <div style="display:flex; flex-direction:column; gap:6px;">
                             ${members.length === 0 ? `<div style="font-size:0.78rem; color:#94a3b8; font-style:italic;">Nessuno studente assegnato.</div>` : members.map(m => {
-                                const mUid = typeof m === 'object' ? (m.uid || m.id) : m;
-                                const mName = typeof m === 'object' ? (m.name || m.displayName || m.email) : (students.find(s => (s.uid||s.id) === mUid)?.name || 'Studente');
+                                const mUid = typeof m === 'object' ? (m.studentId || m.uid || m.id) : m;
+                                const mName = typeof m === 'object' ? (m.name || m.displayName || m.email) : (students.find(s => (s.studentId||s.uid||s.id) === mUid)?.name || 'Studente');
                                 const mAvatar = typeof m === 'object' && m.avatar ? (m.avatar.includes('/') ? m.avatar : `assets/avatars/${m.avatar}`) : 'assets/avatars/6.png';
                                 return `
                                     <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.3); padding:4px 8px; border-radius:6px;">
@@ -4246,7 +4246,7 @@ window.renderDocenteClassTeamsAndStudents = async function() {
                             <div style="display:flex; gap:6px; margin-top:8px;">
                                 <select id="assign-select-${teamDocId}" class="input-control" style="margin:0; padding:4px 8px; font-size:0.75rem; border-radius:6px; background:rgba(0,0,0,0.5); color:#fff; flex:1;">
                                     <option value="">+ Aggiungi studente...</option>
-                                    ${unassignedStudents.map(s => `<option value="${s.uid || s.id}">${s.displayName || s.name || s.email}</option>`).join('')}
+                                    ${unassignedStudents.map(s => `<option value="${s.studentId || s.uid || s.id}">${s.name || s.displayName || s.nickname || s.email}</option>`).join('')}
                                 </select>
                                 <button type="button" class="btn btn-secondary" onclick="window.onAssegnaClick('${teamDocId}')" style="margin:0; padding:4px 10px; font-size:0.75rem; white-space:nowrap; border-radius:6px;">
                                     Assegna
