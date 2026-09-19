@@ -4013,6 +4013,12 @@ window.loadDocenteClassiComposizione = async function() {
         const email = (user.email || '').toLowerCase();
 
         const queries = [
+            // Nuove classi unificate Hub
+            window.db.collection('hub_classes').where('teacherId', '==', uid).get().catch(() => ({ docs: [] })),
+            window.db.collection('hub_classes').where('teacherEmail', '==', email).get().catch(() => ({ docs: [] })),
+            window.db.collection('hub_classes').where('teacherIds', 'array-contains', uid).get().catch(() => ({ docs: [] })),
+            window.db.collection('hub_classes').where('collaboratori', 'array-contains', email).get().catch(() => ({ docs: [] })),
+            // Classi storiche/legacy
             window.db.collection('classes').where('teacherId', '==', uid).get().catch(() => ({ docs: [] })),
             window.db.collection('classes').where('teacherEmail', '==', email).get().catch(() => ({ docs: [] })),
             window.db.collection('classes').where('teacherIds', 'array-contains', uid).get().catch(() => ({ docs: [] })),
