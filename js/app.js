@@ -1457,10 +1457,10 @@ function setLoggedOut() {
     if (adminMenuItem) adminMenuItem.style.display = 'none';
 }
 
-async function getAllTeams() {
+async function getAllTeams(includeTest = false) {
     try {
         const dbTeams = await fanta_db.getTeams();
-        return dbTeams.filter(t => t.status !== 'archived');
+        return dbTeams.filter(t => t.status !== 'archived' && (includeTest || (!t.isTest && t.classCode !== 'TEST-MEMMO')));
     } catch (e) {
         console.error("Errore recupero squadre da Firebase:", e);
         return [];
