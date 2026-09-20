@@ -1386,11 +1386,10 @@ function setLoggedIn(email, role = '') {
             })();
         } else if (isFantamico) {
             loggedInNormalContent.innerHTML = `
-                <h3 class="text-center mb-1 text-primary">Ciao, Viandante!</h3>
+                <h3 class="text-center mb-1 text-primary">Bentornato, Viandante!</h3>
                 <p class="text-center" style="font-size: 0.9rem; margin-bottom:20px;">Hai effettuato l'accesso all'area personale Viandante.</p>
                 <div style="display:flex; flex-direction:column; gap:10px;">
-                    <button class="btn" style="width:100%;" onclick="navigateTo('view-profilo')">Vai al tuo Profilo / Squadre</button>
-                    <button class="btn btn-secondary" style="width:100%; border-width:2px;" onclick="navigateTo('view-squadra')">Crea una Nuova Squadra</button>
+                    <button class="btn" style="width:100%;" onclick="navigateTo('view-profilo')">Vai al tuo Profilo</button>
                 </div>
             `;
         } else {
@@ -1398,8 +1397,7 @@ function setLoggedIn(email, role = '') {
                 <h3 class="text-center mb-1 text-primary">Bentornato, Prof!</h3>
                 <p class="text-center" style="font-size: 0.9rem; margin-bottom:20px;">Hai effettuato l'accesso all'area personale.</p>
                 <div style="display:flex; flex-direction:column; gap:10px;">
-                    <button class="btn" style="width:100%;" onclick="navigateTo('view-profilo')">Vai alle tue Squadre / Profilo</button>
-                    <button class="btn btn-secondary" style="width:100%; border-width:2px;" onclick="navigateTo('view-squadra')">Iscrivi una Nuova Classe</button>
+                    <button class="btn" style="width:100%;" onclick="navigateTo('view-profilo')">Vai al tuo Profilo</button>
                 </div>
             `;
         }
