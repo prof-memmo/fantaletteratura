@@ -1386,11 +1386,10 @@ function setLoggedIn(email, role = '') {
             })();
         } else if (isFantamico) {
             loggedInNormalContent.innerHTML = `
-                <h3 class="text-center mb-1 text-primary">Ciao, Viandante!</h3>
+                <h3 class="text-center mb-1 text-primary">Bentornato, Viandante!</h3>
                 <p class="text-center" style="font-size: 0.9rem; margin-bottom:20px;">Hai effettuato l'accesso all'area personale Viandante.</p>
                 <div style="display:flex; flex-direction:column; gap:10px;">
-                    <button class="btn" style="width:100%;" onclick="navigateTo('view-profilo')">Vai al tuo Profilo / Squadre</button>
-                    <button class="btn btn-secondary" style="width:100%; border-width:2px;" onclick="navigateTo('view-squadra')">Crea una Nuova Squadra</button>
+                    <button class="btn" style="width:100%;" onclick="navigateTo('view-profilo')">Vai al tuo Profilo</button>
                 </div>
             `;
         } else {
@@ -1398,8 +1397,7 @@ function setLoggedIn(email, role = '') {
                 <h3 class="text-center mb-1 text-primary">Bentornato, Prof!</h3>
                 <p class="text-center" style="font-size: 0.9rem; margin-bottom:20px;">Hai effettuato l'accesso all'area personale.</p>
                 <div style="display:flex; flex-direction:column; gap:10px;">
-                    <button class="btn" style="width:100%;" onclick="navigateTo('view-profilo')">Vai alle tue Squadre / Profilo</button>
-                    <button class="btn btn-secondary" style="width:100%; border-width:2px;" onclick="navigateTo('view-squadra')">Iscrivi una Nuova Classe</button>
+                    <button class="btn" style="width:100%;" onclick="navigateTo('view-profilo')">Vai al tuo Profilo</button>
                 </div>
             `;
         }
@@ -1457,10 +1455,10 @@ function setLoggedOut() {
     if (adminMenuItem) adminMenuItem.style.display = 'none';
 }
 
-async function getAllTeams() {
+async function getAllTeams(includeTest = false) {
     try {
         const dbTeams = await fanta_db.getTeams();
-        return dbTeams.filter(t => t.status !== 'archived');
+        return dbTeams.filter(t => t.status !== 'archived' && (includeTest || (!t.isTest && t.classCode !== 'TEST-MEMMO')));
     } catch (e) {
         console.error("Errore recupero squadre da Firebase:", e);
         return [];
@@ -4013,6 +4011,12 @@ window.loadDocenteClassiComposizione = async function() {
         const email = (user.email || '').toLowerCase();
 
         const queries = [
+            // Nuove classi unificate Hub
+            window.db.collection('hub_classes').where('teacherId', '==', uid).get().catch(() => ({ docs: [] })),
+            window.db.collection('hub_classes').where('teacherEmail', '==', email).get().catch(() => ({ docs: [] })),
+            window.db.collection('hub_classes').where('teacherIds', 'array-contains', uid).get().catch(() => ({ docs: [] })),
+            window.db.collection('hub_classes').where('collaboratori', 'array-contains', email).get().catch(() => ({ docs: [] })),
+            // Classi storiche/legacy
             window.db.collection('classes').where('teacherId', '==', uid).get().catch(() => ({ docs: [] })),
             window.db.collection('classes').where('teacherEmail', '==', email).get().catch(() => ({ docs: [] })),
             window.db.collection('classes').where('teacherIds', 'array-contains', uid).get().catch(() => ({ docs: [] })),
@@ -4129,7 +4133,7 @@ window.renderDocenteClassTeamsAndStudents = async function() {
     classTeams.forEach(t => {
         if (Array.isArray(t.members)) {
             t.members.forEach(m => {
-                const uid = typeof m === 'object' ? (m.uid || m.id) : m;
+                const uid = typeof m === 'object' ? (m.studentId || m.uid || m.id) : m;
                 if (uid) assignedMap.set(uid, t.name || 'Squadra');
             });
         }
@@ -4149,8 +4153,8 @@ window.renderDocenteClassTeamsAndStudents = async function() {
             `;
         } else {
             badgesContainer.innerHTML = students.map(s => {
-                const sUid = s.uid || s.id;
-                const sName = s.displayName || s.name || s.email || 'Studente';
+                const sUid = s.studentId || s.uid || s.id;
+                const sName = s.name || s.displayName || s.nickname || s.email || 'Studente';
                 const assignedTeam = assignedMap.get(sUid);
                 const avatar = s.avatar ? (s.avatar.includes('/') ? s.avatar : `assets/avatars/${s.avatar}`) : 'assets/avatars/6.png';
 
@@ -4191,7 +4195,7 @@ window.renderDocenteClassTeamsAndStudents = async function() {
     }
 
     // Lista studenti non ancora assegnati per il dropdown
-    const unassignedStudents = students.filter(s => !assignedMap.has(s.uid || s.id));
+    const unassignedStudents = students.filter(s => !assignedMap.has(s.studentId || s.uid || s.id));
 
     teamsList.innerHTML = classTeams.map(team => {
         const teamDocId = team.docId || team.id;
@@ -4224,8 +4228,8 @@ window.renderDocenteClassTeamsAndStudents = async function() {
                         </div>
                         <div style="display:flex; flex-direction:column; gap:6px;">
                             ${members.length === 0 ? `<div style="font-size:0.78rem; color:#94a3b8; font-style:italic;">Nessuno studente assegnato.</div>` : members.map(m => {
-                                const mUid = typeof m === 'object' ? (m.uid || m.id) : m;
-                                const mName = typeof m === 'object' ? (m.name || m.displayName || m.email) : (students.find(s => (s.uid||s.id) === mUid)?.name || 'Studente');
+                                const mUid = typeof m === 'object' ? (m.studentId || m.uid || m.id) : m;
+                                const mName = typeof m === 'object' ? (m.name || m.displayName || m.email) : (students.find(s => (s.studentId||s.uid||s.id) === mUid)?.name || 'Studente');
                                 const mAvatar = typeof m === 'object' && m.avatar ? (m.avatar.includes('/') ? m.avatar : `assets/avatars/${m.avatar}`) : 'assets/avatars/6.png';
                                 return `
                                     <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.3); padding:4px 8px; border-radius:6px;">
@@ -4246,7 +4250,7 @@ window.renderDocenteClassTeamsAndStudents = async function() {
                             <div style="display:flex; gap:6px; margin-top:8px;">
                                 <select id="assign-select-${teamDocId}" class="input-control" style="margin:0; padding:4px 8px; font-size:0.75rem; border-radius:6px; background:rgba(0,0,0,0.5); color:#fff; flex:1;">
                                     <option value="">+ Aggiungi studente...</option>
-                                    ${unassignedStudents.map(s => `<option value="${s.uid || s.id}">${s.displayName || s.name || s.email}</option>`).join('')}
+                                    ${unassignedStudents.map(s => `<option value="${s.studentId || s.uid || s.id}">${s.name || s.displayName || s.nickname || s.email}</option>`).join('')}
                                 </select>
                                 <button type="button" class="btn btn-secondary" onclick="window.onAssegnaClick('${teamDocId}')" style="margin:0; padding:4px 10px; font-size:0.75rem; white-space:nowrap; border-radius:6px;">
                                     Assegna
