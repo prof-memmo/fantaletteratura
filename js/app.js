@@ -4213,7 +4213,6 @@ window.renderDocenteClassTeamsAndStudents = async function() {
                             <h4 style="margin:0; font-size:1.05rem; color:#ffffff; font-family:var(--font-heading);">${team.name || 'Squadra'}</h4>
                             <div style="display:flex; gap:6px; align-items:center; margin-top:4px;">
                                 <span style="font-size:0.72rem; padding:2px 8px; border-radius:10px; background:rgba(255,255,255,0.08); color:var(--accent-gold);">${modeLabel}</span>
-                                ${team.joinCode ? `<span style="font-size:0.72rem; padding:2px 8px; border-radius:10px; background:rgba(212,175,55,0.15); color:#fef08a; font-weight:700;">Codice: ${team.joinCode}</span>` : ''}
                             </div>
                         </div>
                         <button class="btn-secondary" onclick="window.eliminaSquadraClasse('${teamDocId}', '${(team.name||'').replace(/'/g, "\\'")}')" title="Elimina Squadra" style="padding:4px 8px; border-radius:8px; color:#ef4444; border-color:rgba(239,68,68,0.4); font-size:0.75rem; cursor:pointer;">
@@ -4229,7 +4228,7 @@ window.renderDocenteClassTeamsAndStudents = async function() {
                         <div style="display:flex; flex-direction:column; gap:6px;">
                             ${members.length === 0 ? `<div style="font-size:0.78rem; color:#94a3b8; font-style:italic;">Nessuno studente assegnato.</div>` : members.map(m => {
                                 const mUid = typeof m === 'object' ? (m.studentId || m.uid || m.id) : m;
-                                const mName = typeof m === 'object' ? (m.name || m.displayName || m.email) : (students.find(s => (s.studentId||s.uid||s.id) === mUid)?.name || 'Studente');
+                                const mName = typeof m === 'object' ? (m.displayName || m.name || m.nickname || m.email) : (students.find(s => (s.studentId||s.uid||s.id) === mUid)?.name || 'Studente');
                                 const mAvatar = typeof m === 'object' && m.avatar ? (m.avatar.includes('/') ? m.avatar : `assets/avatars/${m.avatar}`) : 'assets/avatars/6.png';
                                 return `
                                     <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.3); padding:4px 8px; border-radius:6px;">
@@ -4247,16 +4246,20 @@ window.renderDocenteClassTeamsAndStudents = async function() {
 
                         <!-- Dropdown per assegnare nuovi studenti -->
                         ${members.length < 5 && unassignedStudents.length > 0 ? `
-                            <div style="display:flex; gap:6px; margin-top:8px;">
-                                <select id="assign-select-${teamDocId}" class="input-control" style="margin:0; padding:4px 8px; font-size:0.75rem; border-radius:6px; background:rgba(0,0,0,0.5); color:#fff; flex:1;">
-                                    <option value="">+ Aggiungi studente...</option>
+                            <div style="display:flex; gap:8px; margin-top:10px; align-items:center; width:100%;">
+                                <select id="assign-select-${teamDocId}" class="input-control" style="margin:0; padding:6px 8px; font-size:0.78rem; border-radius:8px; background:rgba(0,0,0,0.6); border:1px solid rgba(212,175,55,0.4); color:#fff; flex:1; min-width:0;">
+                                    <option value="">+ Seleziona studente...</option>
                                     ${unassignedStudents.map(s => `<option value="${s.studentId || s.uid || s.id}">${s.name || s.displayName || s.nickname || s.email}</option>`).join('')}
                                 </select>
-                                <button type="button" class="btn btn-secondary" onclick="window.onAssegnaClick('${teamDocId}')" style="margin:0; padding:4px 10px; font-size:0.75rem; white-space:nowrap; border-radius:6px;">
-                                    Assegna
+                                <button type="button" class="btn btn-secondary" onclick="window.onAssegnaClick('${teamDocId}')" style="margin:0; padding:6px 12px; font-size:0.78rem; font-weight:700; width:auto !important; flex-shrink:0; white-space:nowrap; border-radius:8px; background:rgba(141,160,63,0.25); border:1px solid var(--accent-gold); color:#fef08a; cursor:pointer;">
+                                    <i class="fa-solid fa-user-plus"></i> Assegna
                                 </button>
                             </div>
-                        ` : ''}
+                        ` : (members.length >= 5 ? `
+                            <div style="font-size:0.75rem; color:#86efac; margin-top:6px; font-style:italic;">
+                                <i class="fa-solid fa-check"></i> Squadra al completo (5/5 membri)
+                            </div>
+                        ` : '')}
                     </div>
 
                     <!-- Stato 5 Star -->
@@ -4274,7 +4277,7 @@ window.renderDocenteClassTeamsAndStudents = async function() {
                         ` : `
                             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
                                 <span style="font-size:0.75rem; color:#fbbf24;">⏳ In attesa della scelta dei 5 autori</span>
-                                <button type="button" class="btn btn-secondary" onclick="window.avviaDraftDocenteLIM('${teamDocId}')" style="padding:4px 8px; font-size:0.72rem; border-radius:6px; border-color:var(--accent-gold); color:var(--accent-gold); cursor:pointer;">
+                                <button type="button" class="btn btn-secondary" onclick="window.avviaDraftDocenteLIM('${teamDocId}')" style="padding:4px 8px; font-size:0.72rem; border-radius:6px; border-color:var(--accent-gold); color:var(--accent-gold); cursor:pointer; width:auto !important;">
                                     <i class="fa-solid fa-wand-magic-sparkles"></i> Scegli Autori alla LIM
                                 </button>
                             </div>
@@ -4343,21 +4346,36 @@ window.creaNuovaSquadraClasse = async function() {
 
 window.onAssegnaClick = async function(teamDocId) {
     const select = document.getElementById(`assign-select-${teamDocId}`);
-    if (!select || !select.value) return;
+    if (!select || !select.value) {
+        alert("Seleziona uno studente dal menu a tendina prima di cliccare su 'Assegna'.");
+        return;
+    }
 
     const studentUid = select.value;
     const cls = window.currentComposizioneClass;
-    let studentObj = { uid: studentUid, name: 'Studente' };
+    let studentObj = { uid: studentUid, studentId: studentUid, name: 'Studente' };
 
     if (cls && Array.isArray(cls.students)) {
-        const s = cls.students.find(x => (x.uid || x.id) === studentUid);
-        if (s) studentObj = { uid: studentUid, name: s.displayName || s.name || s.email, avatar: s.avatar || '6.png' };
+        const s = cls.students.find(x => (x.studentId || x.uid || x.id) === studentUid);
+        if (s) {
+            studentObj = {
+                uid: s.studentId || s.uid || s.id,
+                studentId: s.studentId || s.uid || s.id,
+                name: s.displayName || s.name || s.nickname || s.email || 'Studente',
+                avatar: s.avatar || '6.png'
+            };
+        }
     } else {
         try {
             const userSnap = await window.db.collection('hub_users').doc(studentUid).get();
             if (userSnap.exists) {
                 const ud = userSnap.data();
-                studentObj = { uid: studentUid, name: ud.displayName || ud.name || ud.email, avatar: ud.avatar || '6.png' };
+                studentObj = {
+                    uid: studentUid,
+                    studentId: studentUid,
+                    name: ud.displayName || ud.name || ud.nickname || ud.email || 'Studente',
+                    avatar: ud.avatar || '6.png'
+                };
             }
         } catch (_) {}
     }
@@ -4369,18 +4387,19 @@ window.onAssegnaClick = async function(teamDocId) {
         await window.renderDocenteClassTeamsAndStudents();
     } catch (err) {
         console.error("Errore assegnazione studente:", err);
-        alert("Errore durante l'assegnazione dello studente.");
+        alert("Errore durante l'assegnazione dello studente: " + (err.message || err));
     }
 };
 
 window.rimuoviStudenteDaSquadra = async function(teamDocId, studentUid) {
+    if (!confirm("Vuoi rimuovere questo studente dalla squadra?")) return;
     try {
         const teamDoc = await window.db.collection('fanta_teams').doc(teamDocId).get();
         if (!teamDoc.exists) return;
 
         const members = teamDoc.data().members || [];
         const updatedMembers = members.filter(m => {
-            const uid = typeof m === 'object' ? (m.uid || m.id) : m;
+            const uid = typeof m === 'object' ? (m.studentId || m.uid || m.id) : m;
             return uid !== studentUid;
         });
 
@@ -4388,6 +4407,7 @@ window.rimuoviStudenteDaSquadra = async function(teamDocId, studentUid) {
         await window.renderDocenteClassTeamsAndStudents();
     } catch (err) {
         console.error("Errore rimozione studente:", err);
+        alert("Errore durante la rimozione dello studente.");
     }
 };
 

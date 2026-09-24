@@ -557,15 +557,12 @@
                              <button type="button" class="btn" style="flex:1; min-width:200px; margin-bottom:0; background: linear-gradient(135deg, #2ecc71, #27ae60) !important; color: #fff !important; font-weight: 800; border: none; box-shadow: 0 4px 10px rgba(46, 204, 113, 0.35);" onclick="navigateTo('view-presentazioni'); window.initPresentazioniTab();"><i class="fa-solid fa-desktop"></i> Genera Presentazione LIM</button>
                          </div>
                          
-                         <!-- Associazione collaboratore via codice squadra -->
-                         <div style="display: flex; gap: 8px; margin-bottom: 20px; width: 100%;">
-                             <input type="text" id="unisciti-squadra-codice" placeholder="Unisciti a una squadra come collaboratore con il Codice (es. ALFA24)" class="input-control" style="margin: 0; padding: 8px 12px; font-size: 0.8rem; border-radius: 12px; flex: 1;">
-                             <button type="button" class="btn" style="width: auto; padding: 8px 15px; font-size: 0.8rem; border-radius: 12px; margin: 0; white-space: nowrap; background:rgba(141,160,63,0.15); border-color:var(--primary-color);" onclick="window.uniscitiComeCollaboratore()">
-                                 <i class="fa-solid fa-user-plus"></i> Unisciti
+                         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:15px; margin-bottom:10px;">
+                             <h3 class="text-primary" style="margin:0;"><i class="fa-solid fa-users"></i> Le tue Squadre e Classifiche</h3>
+                             <button type="button" class="btn btn-secondary" onclick="switchDocenteTab('composizione')" style="width:auto; padding:6px 14px; font-size:0.8rem; border-radius:8px; border:1px solid var(--accent-gold); color:var(--accent-gold); cursor:pointer;">
+                                 <i class="fa-solid fa-people-group"></i> Componi Squadre per Classe
                              </button>
                          </div>
-                         
-                         <h3 class="mt-2 text-primary">Gestione Utenti, Classi e Squadre</h3>
                          <div id="profilo-squadre-list" style="padding: 10px 0; color: var(--text-muted); font-size: 0.9rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px;">
                              <div class="glass" style="padding:20px; text-align:center; grid-column: 1 / -1; width: 100%;"><i>Nessuna squadra creata. Premi il tasto sopra per iniziare!</i></div>
                          </div>
