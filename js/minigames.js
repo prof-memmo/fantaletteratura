@@ -8522,6 +8522,13 @@
       { title: "Proemio dell'ILIADE", lines: ["Cantami, o Diva, del pelide Achille", "l'ira funesta che infiniti addusse", "lutti agli Achei, molte anzi tempo all'Orco", "generose travolse alme d'eroi."], hint: "Il proemio annuncia il tema: l'ira di Achille. Inizia con l'invocazione alla Musa." },
       { title: "Proemio dell'ODISSEA", lines: ["Dimmi, o Musa, dell'eroe multiforme,", "che tanto vagò, dopo che distrusse", "la rocca sacra di Troia:", "di molti uomini vide le città e conobbe i costumi."], hint: "Il proemio enuncia il viaggio dell'eroe astuto. Il tema è il nostos, il ritorno." },
       { title: "Proemio dell'ENEIDE", lines: ["Canto le armi e l'uomo che per primo", "dalle coste di Troia, profugo per decreto del fato,", "giunse in Italia e al lido di Lavinio;", "molto fu sballottato per terra e per mare."], hint: "Il proemio dell'Eneide: armi, uomo, destino, Roma." }
+    ],
+    quiz: [
+      { q: "Chi è l'autore dell'Iliade e dell'Odissea?", o: ["Virgilio", "Omero", "Dante Alighieri", "Esiodo"], a: 1 },
+      { q: "Qual è la patria natale di Ulisse?", o: ["Troia", "Sparta", "Itaca", "Micene"], a: 2 },
+      { q: "Chi è l'eroe protagonista dell'Eneide?", o: ["Achille", "Enea", "Ettore", "Agamennone"], a: 1 },
+      { q: "Quale mostro mitologico custodiva il labirinto di Creta?", o: ["La Sfinge", "Il Minotauro", "Il Centauro", "Cerbero"], a: 1 },
+      { q: "Chi compose la Divina Commedia?", o: ["Francesco Petrarca", "Giovanni Boccaccio", "Dante Alighieri", "Ludovico Ariosto"], a: 2 }
     ]
   };
 
@@ -9212,7 +9219,18 @@
 
     hintPuzzle: function() {
       if (!puzzleState.ex) return;
-      const fullWords = puzzleState.ex.solution.split(' ');
+      const fullWords = (puzzleState.ex.words && puzzleState.ex.words.length) ? puzzleState.ex.words : puzzleState.ex.solution.split(' ');
+      
+      // Se ci sono parole errate già selezionate, rimuovile prima di suggerire
+      while (puzzleState.selected.length > 0) {
+        const lastIdx = puzzleState.selected.length - 1;
+        if (puzzleState.selected[lastIdx] !== fullWords[lastIdx]) {
+          this.puzzleRemove(lastIdx);
+        } else {
+          break;
+        }
+      }
+
       const nextIdx = puzzleState.selected.length;
       if (nextIdx < fullWords.length) {
         const expectedWord = fullWords[nextIdx];
@@ -9421,6 +9439,17 @@
 
     hintVersi: function() {
       if (!versiState.ex) return;
+      
+      // Se ci sono versi errati già ordinati, rimuovili prima di suggerire
+      while (versiState.ordered.length > 0) {
+        const lastIdx = versiState.ordered.length - 1;
+        if (versiState.ordered[lastIdx] !== versiState.ex.lines[lastIdx]) {
+          this.versiRemove(lastIdx);
+        } else {
+          break;
+        }
+      }
+
       const nextIdx = versiState.ordered.length;
       if (nextIdx < versiState.ex.lines.length) {
         const expectedLine = versiState.ex.lines[nextIdx];
