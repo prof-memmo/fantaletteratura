@@ -336,8 +336,8 @@
                     <!-- Danger Zone: Archiviazione Annuale Classifiche -->
                     <div id="admin-master-area" style="display:none; margin-bottom: 25px; padding: 15px; border: 1px solid var(--danger-color); border-radius: 12px; background: rgba(231, 76, 60, 0.1);">
                         <h3 class="text-danger" style="margin-top:0; font-size: 1.05rem;"><i class="fa-solid fa-box-archive"></i> Archiviazione Annuale Fantaletteratura</h3>
-                        <p style="font-size: 0.85rem; margin-bottom: 15px;">Salva una "fotografia" della classifica finale e archivia le squadre dell'anno scolastico in corso. Potrà essere ripristinata dall'Archivio Storico in caso di necessità.</p>
-                        <button type="button" class="btn text-danger" style="background: transparent; border: 1px solid var(--danger-color); width:auto; padding:8px 18px; font-size:0.85rem;" onclick="window.archiviaAnnoCorrente()"><i class="fa-solid fa-box-archive"></i> Esegui Archiviazione Anno</button>
+                        <p style="font-size: 0.85rem; margin-bottom: 15px;">Salva una "fotografia" della classifica finale e archivia selettivamente solo le squadre dello scorso anno, lasciando attive quelle create per il nuovo anno scolastico.</p>
+                        <button type="button" class="btn text-danger" style="background: transparent; border: 1px solid var(--danger-color); width:auto; padding:8px 18px; font-size:0.85rem;" onclick="window.openArchiveSelectionModal()"><i class="fa-solid fa-box-archive"></i> Esegui Archiviazione Anno</button>
                     </div>
 
                     <!-- Archivio Storico -->
@@ -725,6 +725,45 @@
     <script src="js/services/teams.js"></script>
     <script src="js/services/activities.js"></script>
     <script src="js/services/users.js"></script>
+
+    <!-- Modale Archiviazione Selettiva per Anno -->
+    <div id="selective-archive-modal" class="modal-wip" style="z-index: 5200; overflow-y:auto; display:none;" onclick="if(event.target===this) { this.style.display='none'; }">
+        <div class="modal-wip-content" style="max-width:650px; width:90%; padding: 25px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px;">
+              <h3 style="font-family: var(--font-heading); color: var(--accent-gold); font-size: 1.2rem; margin:0;"><i class="fa-solid fa-box-archive"></i> Archiviazione Annuale Selettiva</h3>
+              <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.8rem; border:none;" onclick="document.getElementById('selective-archive-modal').style.display='none'">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+            
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">
+                Seleziona quali squadre archiviare. Le squadre deselezionate (es. create per il nuovo anno) <strong>rimarranno attive</strong>.
+            </p>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; font-size:0.85rem; font-weight:700; color:var(--text-light); margin-bottom:5px;">Nome Etichetta Archivio:</label>
+                <input type="text" id="archive-name-input" class="form-control" style="width:100%; background:rgba(0,0,0,0.3); border:1px solid rgba(212,175,55,0.3); color:#fff; padding:8px 12px; border-radius:6px;" value="Archivio_2025_2026">
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom: 10px;">
+                <span style="font-size:0.8rem; font-weight:700; color:var(--accent-gold);">Squadre Attive Rilevate:</span>
+                <div style="display:flex; gap:6px;">
+                    <button type="button" class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem;" onclick="window.selectAllArchiveTeams(true)">Tutte</button>
+                    <button type="button" class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem; background:rgba(212,175,55,0.15); border-color:var(--accent-gold); color:var(--accent-gold);" onclick="window.selectOnlyOldArchiveTeams()">Solo Vecchie (Escludi Oggi)</button>
+                    <button type="button" class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem;" onclick="window.selectAllArchiveTeams(false)">Nessuna</button>
+                </div>
+            </div>
+
+            <div id="archive-teams-selector-list" style="display:flex; flex-direction:column; gap:8px; max-height:280px; overflow-y:auto; margin-bottom:20px; border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:10px; background:rgba(0,0,0,0.25);">
+                <!-- Popolato da JS -->
+            </div>
+
+            <div style="display:flex; gap:10px; justify-content:flex-end;">
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('selective-archive-modal').style.display='none'">Annulla</button>
+                <button type="button" class="btn text-danger" style="background:rgba(231,76,60,0.15); border:1px solid var(--danger-color); font-weight:700;" onclick="window.confirmSelectiveArchive()"><i class="fa-solid fa-box-archive"></i> Archivia Squadre Selezionate</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Modale Selezione Squadre per Minigiochi -->
     <div id="team-selector-modal" class="modal-wip" style="z-index: 5100; overflow-y:auto; display:none;" onclick="if(event.target===this) { this.style.display='none'; }">

@@ -1301,51 +1301,174 @@ window.renderAdminImpostazioni = async function() {
 };
 window.renderAdminProfilo = window.renderAdminImpostazioni;
 
-    window.archiviaAnnoCorrente = async function() {
+    window.cachedArchiveTeams = [];
+
+    window.openArchiveSelectionModal = async function() {
         const userEmail = (window.currentUserEmail || (window.auth && window.auth.currentUser && window.auth.currentUser.email) || '').toLowerCase();
         if(userEmail !== 'prof.memmo@gmail.com') {
             alert("Solo l'amministratore (prof.memmo@gmail.com) può eseguire l'archiviazione annuale.");
             return;
         }
+
+        const modal = document.getElementById('selective-archive-modal');
+        const listDiv = document.getElementById('archive-teams-selector-list');
+        const nameInput = document.getElementById('archive-name-input');
+        if (!modal || !listDiv) return;
+
         const currentYear = new Date().getFullYear();
-        if(!confirm(`Sei ASSOLUTAMENTE sicuro di voler archiviare l'anno scolastico per Fantaletteratura?\nTutte le squadre attive verranno congelate e salvate nell'Archivio Storico.`)) return;
+        if (nameInput) {
+            nameInput.value = `Archivio_${currentYear - 1}_${currentYear}`;
+        }
+
+        modal.style.display = 'flex';
+        listDiv.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> Caricamento squadre attive...</div>';
+
         try {
-            const defaultName = `Archivio_${currentYear - 1}_${currentYear}`;
-            const backupName = prompt("Inserisci un nome per l'archivio (es: Fantaletteratura_2025_2026):", defaultName);
-            if(!backupName) return;
-            
-            const usersSnapshot = await window.db.collection('fanta_users').get();
             const teamsSnapshot = await window.db.collection('fanta_teams').get();
-            
-            // 1. Estrai e ordina le squadre attive per la classifica finale congelata
             const activeTeams = teamsSnapshot.docs
-                .map(d => ({ docId: d.id, id: d.data().id || d.id, ...d.data() }))
+                .map(d => {
+                    const data = d.data();
+                    let createdDate = null;
+                    if (data.createdAt) {
+                        createdDate = data.createdAt.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
+                    }
+                    return { docId: d.id, id: data.id || d.id, createdDate, ...data };
+                })
                 .filter(t => t.status !== 'archived' && !t.archivedYear);
+
+            window.cachedArchiveTeams = activeTeams;
+
+            if (activeTeams.length === 0) {
+                listDiv.innerHTML = '<p style="font-size:0.85rem; color:var(--text-muted); text-align:center; padding:15px;">Nessuna squadra attiva trovata da archiviare.</p>';
+                return;
+            }
+
+            const now = new Date();
+            const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
+            listDiv.innerHTML = activeTeams.map(t => {
+                const teamId = t.docId || t.id;
+                const teamName = t.name || 'Squadra';
+                const teamClass = t.classe || t.className || '-';
+                const teamOwner = t.ownerEmail || 'Docente';
+                const teamPoints = t.points || 0;
                 
-            activeTeams.sort((a, b) => (b.points || 0) - (a.points || 0));
-            
-            const leaderboard = activeTeams.map(t => ({
+                let isCreatedToday = false;
+                let dateStr = 'Data sconosciuta';
+                if (t.createdDate && !isNaN(t.createdDate.getTime())) {
+                    isCreatedToday = (t.createdDate.getTime() >= todayMidnight);
+                    dateStr = t.createdDate.toLocaleDateString('it-IT') + ' ' + t.createdDate.toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
+                }
+
+                // Per impostazione predefinita, deseleziona le squadre create oggi e seleziona quelle storiche
+                const isChecked = !isCreatedToday ? 'checked' : '';
+                const badgeNew = isCreatedToday 
+                    ? `<span style="font-size:0.7rem; background:rgba(34,197,94,0.2); color:#4ade80; border:1px solid #16a34a; padding:2px 6px; border-radius:4px; font-weight:bold; margin-left:6px;">🟢 Creata Oggi (Nuova)</span>`
+                    : `<span style="font-size:0.7rem; background:rgba(212,175,55,0.15); color:var(--accent-gold); padding:2px 6px; border-radius:4px;">Anno Trascorso</span>`;
+
+                return `
+                    <label style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.03); padding:10px 12px; border:1px solid rgba(255,255,255,0.1); border-radius:8px; cursor:pointer;">
+                        <input type="checkbox" class="archive-team-cb" value="${teamId}" data-is-today="${isCreatedToday}" ${isChecked} style="accent-color:var(--accent-gold); width:18px; height:18px;">
+                        <div style="flex:1;">
+                            <div style="display:flex; align-items:center; justify-content:space-between;">
+                                <span style="font-weight:bold; color:var(--text-light); font-size:0.95rem;">${teamName}</span>
+                                <span style="color:var(--accent-gold); font-weight:700; font-size:0.85rem;">${teamPoints} pt</span>
+                            </div>
+                            <div style="font-size:0.75rem; color:var(--text-muted); margin-top:3px;">
+                                Classe: <strong style="color:#ddd;">${teamClass}</strong> | Docente: ${teamOwner} | ${dateStr} ${badgeNew}
+                            </div>
+                        </div>
+                    </label>
+                `;
+            }).join('');
+
+        } catch (e) {
+            console.error("Errore caricamento squadre per archiviazione:", e);
+            listDiv.innerHTML = '<p style="color:red; font-size:0.85rem; padding:15px; text-align:center;">Errore caricamento squadre.</p>';
+        }
+    };
+
+    window.selectAllArchiveTeams = function(checked) {
+        document.querySelectorAll('.archive-team-cb').forEach(cb => {
+            cb.checked = checked;
+        });
+    };
+
+    window.selectOnlyOldArchiveTeams = function() {
+        document.querySelectorAll('.archive-team-cb').forEach(cb => {
+            cb.checked = (cb.dataset.isToday !== 'true');
+        });
+    };
+
+    window.confirmSelectiveArchive = async function() {
+        const userEmail = (window.currentUserEmail || (window.auth && window.auth.currentUser && window.auth.currentUser.email) || '').toLowerCase();
+        if(userEmail !== 'prof.memmo@gmail.com') return;
+
+        const nameInput = document.getElementById('archive-name-input');
+        const backupName = (nameInput ? nameInput.value.trim() : '') || `Archivio_${new Date().getFullYear()}`;
+
+        const checkedBoxes = document.querySelectorAll('.archive-team-cb:checked');
+        if (checkedBoxes.length === 0) {
+            alert("Seleziona almeno una squadra da archiviare.");
+            return;
+        }
+
+        const selectedTeamIds = new Set(Array.from(checkedBoxes).map(cb => cb.value));
+        const totalActive = (window.cachedArchiveTeams || []).length;
+        const remainingCount = totalActive - selectedTeamIds.size;
+
+        const confirmMsg = `Confermi l'archiviazione di ${selectedTeamIds.size} squadre nell'archivio "${backupName}"?\n\n` +
+            `• ${selectedTeamIds.size} squadre verranno congelate nell'Archivio Storico.\n` +
+            `• ${remainingCount} squadre (es. create oggi) rimarranno ATTIVE per il nuovo anno scolastico.`;
+
+        if (!confirm(confirmMsg)) return;
+
+        try {
+            const teamsSnapshot = await window.db.collection('fanta_teams').get();
+            const usersSnapshot = await window.db.collection('fanta_users').get();
+
+            // 1. Prepara classifica finale per l'archivio (solo squadre selezionate)
+            const archivedTeamsData = [];
+            teamsSnapshot.docs.forEach(d => {
+                if (selectedTeamIds.has(d.id) || selectedTeamIds.has(d.data().id)) {
+                    archivedTeamsData.push({ docId: d.id, id: d.data().id || d.id, ...d.data() });
+                }
+            });
+
+            archivedTeamsData.sort((a, b) => (b.points || 0) - (a.points || 0));
+
+            const leaderboard = archivedTeamsData.map(t => ({
                 name: t.name || 'Squadra',
                 classRoom: t.classe || t.className || '-',
                 school: t.school || t.istituto || '-',
                 points: t.points || 0
             }));
-            
+
             let batch = window.db.batch();
-            
-            // 2. Salva documento nell'Archivio Storico (fanta_archives)
+
+            // 2. Salva documento in fanta_archives
             const archiveDocRef = window.db.collection('fanta_archives').doc();
             batch.set(archiveDocRef, {
                 yearName: backupName,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                totalTeams: activeTeams.length,
+                totalTeams: archivedTeamsData.length,
                 leaderboard: leaderboard
             });
-            
-            // 3. Archivia gli studenti salvando i riferimenti squadra precedenti
+
+            // 3. Archivia le sole squadre selezionate
+            teamsSnapshot.docs.forEach(doc => {
+                if (selectedTeamIds.has(doc.id) || selectedTeamIds.has(doc.data().id)) {
+                    batch.update(doc.ref, { archivedYear: backupName, status: 'archived' });
+                }
+            });
+
+            // 4. Archivia gli studenti appartenenti alle squadre selezionate
             usersSnapshot.docs.forEach(doc => {
                 const data = doc.data();
-                if (data.role !== 'admin' && data.role !== 'docente' && data.status !== 'archived') {
+                const studentTeam = data.teamId || data.teamCode;
+                const belongsToArchivedTeam = selectedTeamIds.has(data.teamId) || (data.teamCode && archivedTeamsData.some(t => t.joinCode === data.teamCode));
+
+                if (data.role !== 'admin' && data.role !== 'docente' && belongsToArchivedTeam) {
                     batch.update(doc.ref, { 
                         archivedYear: backupName, 
                         status: 'archived', 
@@ -1357,27 +1480,18 @@ window.renderAdminProfilo = window.renderAdminImpostazioni;
                 }
             });
 
-            // 4. Archivia le squadre
-            teamsSnapshot.docs.forEach(doc => {
-                const data = doc.data();
-                if (data.status !== 'archived') {
-                    batch.update(doc.ref, { archivedYear: backupName, status: 'archived' });
-                }
-            });
-
-            // 5. Azzera lo storico minigiochi
-            if (window.fanta_db && window.fanta_db.clearMinigameLogs) {
-                await window.fanta_db.clearMinigameLogs();
-            }
-
             await batch.commit();
-            alert(`Archiviazione "${backupName}" completata con successo! ${activeTeams.length} squadre archiviate nello storico.`);
+
+            alert(`Archiviazione "${backupName}" completata!\n${selectedTeamIds.size} squadre archiviate nello storico.\n${remainingCount} squadre nuove sono rimaste attive nel campionato!`);
             window.location.reload();
-        } catch(e) {
-            console.error("Errore archiviazione:", e);
+
+        } catch (e) {
+            console.error("Errore durante l'archiviazione selettiva:", e);
             alert("Errore archiviazione: " + e.message);
         }
     };
+
+    window.archiviaAnnoCorrente = window.openArchiveSelectionModal;
 
     window.ripristinaAnnoArchiviato = async function(backupName) {
         if(currentUserEmail !== 'prof.memmo@gmail.com') return;
