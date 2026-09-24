@@ -1302,38 +1302,79 @@ window.renderAdminImpostazioni = async function() {
 window.renderAdminProfilo = window.renderAdminImpostazioni;
 
     window.archiviaAnnoCorrente = async function() {
-        if(currentUserEmail !== 'prof.memmo@gmail.com') return;
+        const userEmail = (window.currentUserEmail || (window.auth && window.auth.currentUser && window.auth.currentUser.email) || '').toLowerCase();
+        if(userEmail !== 'prof.memmo@gmail.com') {
+            alert("Solo l'amministratore (prof.memmo@gmail.com) può eseguire l'archiviazione annuale.");
+            return;
+        }
         const currentYear = new Date().getFullYear();
-        if(!confirm(`Sei ASSOLUTAMENTE sicuro di voler archiviare l'anno ${currentYear}?`)) return;
+        if(!confirm(`Sei ASSOLUTAMENTE sicuro di voler archiviare l'anno scolastico per Fantaletteratura?\nTutte le squadre attive verranno congelate e salvate nell'Archivio Storico.`)) return;
         try {
-            const backupName = prompt("Inserisci un nome per l'archivio (es: Fantaletteratura_2025_2026):", `Archivio_${currentYear}`);
+            const defaultName = `Archivio_${currentYear - 1}_${currentYear}`;
+            const backupName = prompt("Inserisci un nome per l'archivio (es: Fantaletteratura_2025_2026):", defaultName);
             if(!backupName) return;
             
             const usersSnapshot = await window.db.collection('fanta_users').get();
             const teamsSnapshot = await window.db.collection('fanta_teams').get();
             
+            // 1. Estrai e ordina le squadre attive per la classifica finale congelata
+            const activeTeams = teamsSnapshot.docs
+                .map(d => ({ docId: d.id, id: d.data().id || d.id, ...d.data() }))
+                .filter(t => t.status !== 'archived' && !t.archivedYear);
+                
+            activeTeams.sort((a, b) => (b.points || 0) - (a.points || 0));
+            
+            const leaderboard = activeTeams.map(t => ({
+                name: t.name || 'Squadra',
+                classRoom: t.classe || t.className || '-',
+                school: t.school || t.istituto || '-',
+                points: t.points || 0
+            }));
+            
             let batch = window.db.batch();
             
+            // 2. Salva documento nell'Archivio Storico (fanta_archives)
+            const archiveDocRef = window.db.collection('fanta_archives').doc();
+            batch.set(archiveDocRef, {
+                yearName: backupName,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                totalTeams: activeTeams.length,
+                leaderboard: leaderboard
+            });
+            
+            // 3. Archivia gli studenti salvando i riferimenti squadra precedenti
             usersSnapshot.docs.forEach(doc => {
                 const data = doc.data();
-                if (data.role !== 'admin' && data.role !== 'docente') {
-                    batch.update(doc.ref, { archivedYear: backupName, status: 'archived', teamId: null, teamCode: null });
+                if (data.role !== 'admin' && data.role !== 'docente' && data.status !== 'archived') {
+                    batch.update(doc.ref, { 
+                        archivedYear: backupName, 
+                        status: 'archived', 
+                        archivedTeamId: data.teamId || null, 
+                        archivedTeamCode: data.teamCode || null,
+                        teamId: null, 
+                        teamCode: null 
+                    });
                 }
             });
 
+            // 4. Archivia le squadre
             teamsSnapshot.docs.forEach(doc => {
-                batch.update(doc.ref, { archivedYear: backupName, status: 'archived' });
+                const data = doc.data();
+                if (data.status !== 'archived') {
+                    batch.update(doc.ref, { archivedYear: backupName, status: 'archived' });
+                }
             });
 
+            // 5. Azzera lo storico minigiochi
             if (window.fanta_db && window.fanta_db.clearMinigameLogs) {
                 await window.fanta_db.clearMinigameLogs();
             }
 
             await batch.commit();
-            alert(`Archiviazione "${backupName}" completata con successo. Studenti e squadre sono stati archiviati.`);
+            alert(`Archiviazione "${backupName}" completata con successo! ${activeTeams.length} squadre archiviate nello storico.`);
             window.location.reload();
         } catch(e) {
-            console.error(e);
+            console.error("Errore archiviazione:", e);
             alert("Errore archiviazione: " + e.message);
         }
     };
