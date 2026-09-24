@@ -1865,25 +1865,29 @@ async function renderProfilo() {
                 `;
             }
 
-            // Studenti iscritti a questa squadra
-            const studentiArr = allStudentsMap[team.id] || [];
-            if (studentiArr.length > 0) {
-                const studentiRows = studentiArr.map(s => `
-                    <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.03);">
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <i class="fa-solid fa-graduation-cap" style="color:var(--text-muted); font-size:0.8rem;"></i>
-                            <span style="font-size:0.8rem; font-weight:500; color:var(--text-main);">${s.email}</span>
+            // Studenti iscritti/assegnati a questa squadra (da team.members o fallback allStudentsMap)
+            const membersList = Array.isArray(team.members) && team.members.length > 0 
+                ? team.members 
+                : (allStudentsMap[team.id] || []);
+
+            if (membersList.length > 0) {
+                const studentiRows = membersList.map(m => {
+                    const mName = typeof m === 'object' ? (m.displayName || m.name || m.nickname || m.email) : m;
+                    const mAvatar = typeof m === 'object' && m.avatar ? (m.avatar.includes('/') ? m.avatar : `assets/avatars/${m.avatar}`) : 'assets/avatars/6.png';
+                    return `
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.03);">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <img src="${mAvatar}" style="width:18px; height:18px; border-radius:50%; object-fit:cover;">
+                                <span style="font-size:0.8rem; font-weight:500; color:var(--text-main);">${mName}</span>
+                            </div>
                         </div>
-                        <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.7rem; width:auto; border-radius:10px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1);"
-                            onclick="profiloSpostaStudente('${s.email}', '${team.id}', '${team.name}')">
-                            <i class="fa-solid fa-right-left"></i> Sposta
-                        </button>
-                    </div>`).join('');
+                    `;
+                }).join('');
 
                 studentiSection = `
                     <details style="margin-top:6px; margin-bottom:6px; width:100%; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px;">
                         <summary style="font-size:0.78rem; cursor:pointer; color:var(--primary-color); font-weight:600; user-select:none; margin-bottom:6px; display:flex; align-items:center; gap:5px;">
-                            <i class="fa-solid fa-users"></i> Studenti Iscritti (${studentiArr.length}/5)
+                            <i class="fa-solid fa-users"></i> Studenti Assegnati (${membersList.length}/5)
                         </summary>
                         <div style="padding-left:4px; max-height: 200px; overflow-y: auto;">
                             ${studentiRows}
@@ -1893,35 +1897,30 @@ async function renderProfilo() {
             } else {
                 studentiSection = `
                     <div style="font-size:0.75rem; color:var(--text-muted); padding:8px 0; border-top:1px solid rgba(255,255,255,0.05); width:100%;">
-                        <i class="fa-solid fa-circle-info"></i> Nessuno studente ancora iscritto (0/5).
+                        <i class="fa-solid fa-circle-info"></i> Nessuno studente ancora assegnato (0/5).
                     </div>
                 `;
             }
 
-            // Sezione codice (mostrata per docenti)
-            codiceSection = `
-                <div style="width:100%; margin-bottom:8px; padding:8px 10px; border-radius:8px; background:rgba(141, 160, 63, 0.04); border:1px dashed rgba(141, 160, 63, 0.3); display:flex; justify-content:space-between; align-items:center; gap:10px;">
-                    <div style="display:flex; flex-direction:column; gap:4px; flex-grow:1;">
-                        <span style="font-size:0.68rem; text-transform:uppercase; color:var(--text-muted); font-weight:600; letter-spacing:0.5px;">Codice Studenti</span>
-                        <span class="join-code-badge" style="margin:0; font-size:1rem; padding:3px 8px; width:fit-content; text-align:center; font-weight:bold;">${team.joinCode || '---'}</span>
-                    </div>
-                    <button class="btn" style="width:auto; padding:6px 12px; font-size:0.75rem; border-radius:12px; height:fit-content;" onclick="shareInvite({type:'student', code:'${team.joinCode}', teamName:'${team.name.replace(/'/g, "\\'")}'})">
-                        <i class="fa-solid fa-share-nodes"></i> Condividi
-                    </button>
-                </div>`;
+            // Nessun codiceSection: i codici squadra non servono più con il flusso unificato dell'Hub
+            codiceSection = '';
 
-            // Sezione Azioni Docente
+            // Sezione Azioni Docente con link rapido a Composizione
             azioniSection = `
                 <div style="display:flex; flex-wrap:wrap; gap:8px; width:100%; margin-top:4px; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px;">
-                    <button class="btn btn-secondary" style="flex:1; min-width:80px; padding:5px 8px; font-size:0.72rem; border-radius:8px; background:rgba(255,255,255,0.03);" 
+                    <button class="btn btn-secondary" style="flex:1; min-width:90px; padding:6px 8px; font-size:0.75rem; border-radius:8px; background:rgba(212,175,55,0.12); border:1px solid var(--accent-gold); color:var(--accent-gold);" 
+                        onclick="switchDocenteTab('composizione');">
+                        <i class="fa-solid fa-people-group"></i> Componi
+                    </button>
+                    <button class="btn btn-secondary" style="flex:1; min-width:80px; padding:6px 8px; font-size:0.75rem; border-radius:8px; background:rgba(255,255,255,0.03);" 
                         onclick="docenteModificaSquadra('${team.id}', '${team.name.replace(/'/g, "\\'")}', '${(team.classe || '').replace(/'/g, "\\'")}')">
                         <i class="fa-solid fa-pen-to-square"></i> Modifica
                     </button>
-                    <button class="btn btn-secondary" style="flex:1.2; min-width:110px; padding:5px 8px; font-size:0.72rem; border-radius:8px; background:rgba(141,160,63,0.15); border-color:var(--primary-color);"
+                    <button class="btn btn-secondary" style="flex:1.2; min-width:100px; padding:6px 8px; font-size:0.75rem; border-radius:8px; background:rgba(141,160,63,0.15); border-color:var(--primary-color);"
                         onclick="window.apriCollaboratori('${team.id}', '${team.name.replace(/'/g, "\\'")}')">
                         <i class="fa-solid fa-user-plus"></i> Collaboratori
                     </button>
-                    <button class="btn btn-danger" style="flex:1; min-width:80px; padding:5px 8px; font-size:0.72rem; border-radius:8px; background:rgba(230, 57, 70, 0.1); border:1px solid rgba(230, 57, 70, 0.2); color:#e63946;" 
+                    <button class="btn btn-danger" style="flex:1; min-width:80px; padding:6px 8px; font-size:0.75rem; border-radius:8px; background:rgba(230, 57, 70, 0.1); border:1px solid rgba(230, 57, 70, 0.2); color:#e63946;" 
                         onclick="docenteEliminaSquadra('${team.id}', '${team.name.replace(/'/g, "\\'")}')">
                         <i class="fa-solid fa-trash-can"></i> Elimina
                     </button>
@@ -1930,11 +1929,11 @@ async function renderProfilo() {
             // Per il Viandante / Giocatore Singolo: interfaccia pulita senza codici studenti né collaboratori
             azioniSection = `
                 <div style="display:flex; flex-wrap:wrap; gap:8px; width:100%; margin-top:4px; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px;">
-                    <button class="btn btn-secondary" style="flex:1; min-width:80px; padding:5px 8px; font-size:0.72rem; border-radius:8px; background:rgba(255,255,255,0.03);" 
+                    <button class="btn btn-secondary" style="flex:1; min-width:80px; padding:6px 8px; font-size:0.75rem; border-radius:8px; background:rgba(255,255,255,0.03);" 
                         onclick="docenteModificaSquadra('${team.id}', '${team.name.replace(/'/g, "\\'")}', '${(team.classe || '').replace(/'/g, "\\'")}')">
                         <i class="fa-solid fa-pen-to-square"></i> Modifica
                     </button>
-                    <button class="btn btn-danger" style="flex:1; min-width:80px; padding:5px 8px; font-size:0.72rem; border-radius:8px; background:rgba(230, 57, 70, 0.1); border:1px solid rgba(230, 57, 70, 0.2); color:#e63946;" 
+                    <button class="btn btn-danger" style="flex:1; min-width:80px; padding:6px 8px; font-size:0.75rem; border-radius:8px; background:rgba(230, 57, 70, 0.1); border:1px solid rgba(230, 57, 70, 0.2); color:#e63946;" 
                         onclick="docenteEliminaSquadra('${team.id}', '${team.name.replace(/'/g, "\\'")}')">
                         <i class="fa-solid fa-trash-can"></i> Elimina
                     </button>
