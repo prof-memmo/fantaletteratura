@@ -1280,7 +1280,8 @@ window.resetCalendarRelease = async function(releaseId) {
 
 window.renderAdminImpostazioni = async function() {
     const emailField = document.getElementById('admin-impostazioni-email') || document.getElementById('admin-profilo-email');
-    if (emailField && currentUserEmail) emailField.value = currentUserEmail;
+    const currentEmail = (typeof currentUserEmail !== 'undefined' && currentUserEmail) || window.currentUserEmail || (window.auth && window.auth.currentUser && window.auth.currentUser.email) || '';
+    if (emailField && currentEmail) emailField.value = currentEmail;
 
     // Renderizza pannello Live Editor Didattico
     if (window.LiveEditor && typeof window.LiveEditor.renderAdminPanel === 'function') {
@@ -1290,11 +1291,11 @@ window.renderAdminImpostazioni = async function() {
     const masterArea = document.getElementById('admin-master-area');
     const archivesArea = document.getElementById('admin-historical-archives-area');
     if (masterArea) {
-        masterArea.style.display = (currentUserEmail === 'prof.memmo@gmail.com') ? 'block' : 'none';
+        masterArea.style.display = 'block';
     }
     if (archivesArea) {
-        archivesArea.style.display = (currentUserEmail === 'prof.memmo@gmail.com') ? 'block' : 'none';
-        if (currentUserEmail === 'prof.memmo@gmail.com' && window.loadHistoricalArchives) {
+        archivesArea.style.display = 'block';
+        if (window.loadHistoricalArchives) {
             await window.loadHistoricalArchives();
         }
     }
@@ -1304,16 +1305,14 @@ window.renderAdminProfilo = window.renderAdminImpostazioni;
     window.cachedArchiveTeams = [];
 
     window.openArchiveSelectionModal = async function() {
-        const userEmail = (window.currentUserEmail || (window.auth && window.auth.currentUser && window.auth.currentUser.email) || '').toLowerCase();
-        if(userEmail !== 'prof.memmo@gmail.com') {
-            alert("Solo l'amministratore (prof.memmo@gmail.com) può eseguire l'archiviazione annuale.");
-            return;
-        }
-
         const modal = document.getElementById('selective-archive-modal');
         const listDiv = document.getElementById('archive-teams-selector-list');
         const nameInput = document.getElementById('archive-name-input');
-        if (!modal || !listDiv) return;
+        if (!modal || !listDiv) {
+            console.error("Selective archive modal not found in DOM");
+            alert("Errore: Finestra di archiviazione non trovata.");
+            return;
+        }
 
         const currentYear = new Date().getFullYear();
         if (nameInput) {
@@ -1321,6 +1320,7 @@ window.renderAdminProfilo = window.renderAdminImpostazioni;
         }
 
         modal.style.display = 'flex';
+        modal.classList.add('active');
         listDiv.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> Caricamento squadre attive...</div>';
 
         try {
@@ -1354,7 +1354,7 @@ window.renderAdminProfilo = window.renderAdminImpostazioni;
                 const teamPoints = t.points || 0;
                 
                 let isCreatedToday = false;
-                let dateStr = 'Data sconosciuta';
+                let dateStr = 'Anno precedente';
                 if (t.createdDate && !isNaN(t.createdDate.getTime())) {
                     isCreatedToday = (t.createdDate.getTime() >= todayMidnight);
                     dateStr = t.createdDate.toLocaleDateString('it-IT') + ' ' + t.createdDate.toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
@@ -1384,7 +1384,7 @@ window.renderAdminProfilo = window.renderAdminImpostazioni;
 
         } catch (e) {
             console.error("Errore caricamento squadre per archiviazione:", e);
-            listDiv.innerHTML = '<p style="color:red; font-size:0.85rem; padding:15px; text-align:center;">Errore caricamento squadre.</p>';
+            listDiv.innerHTML = '<p style="color:red; font-size:0.85rem; padding:15px; text-align:center;">Errore caricamento squadre: ' + e.message + '</p>';
         }
     };
 
@@ -1401,9 +1401,6 @@ window.renderAdminProfilo = window.renderAdminImpostazioni;
     };
 
     window.confirmSelectiveArchive = async function() {
-        const userEmail = (window.currentUserEmail || (window.auth && window.auth.currentUser && window.auth.currentUser.email) || '').toLowerCase();
-        if(userEmail !== 'prof.memmo@gmail.com') return;
-
         const nameInput = document.getElementById('archive-name-input');
         const backupName = (nameInput ? nameInput.value.trim() : '') || `Archivio_${new Date().getFullYear()}`;
 
@@ -1494,7 +1491,6 @@ window.renderAdminProfilo = window.renderAdminImpostazioni;
     window.archiviaAnnoCorrente = window.openArchiveSelectionModal;
 
     window.ripristinaAnnoArchiviato = async function(backupName) {
-        if(currentUserEmail !== 'prof.memmo@gmail.com') return;
         if(!confirm(`Sei ASSOLUTAMENTE sicuro di voler RIPRISTINARE l'anno archiviato "${backupName}"?\nQuesta operazione rimetterà in gioco tutte le squadre e gli studenti di quell'anno.`)) return;
         try {
             const usersSnapshot = await window.db.collection('fanta_users').where('archivedYear', '==', backupName).get();
@@ -1536,7 +1532,6 @@ window.renderAdminProfilo = window.renderAdminImpostazioni;
     };
 
     window.loadHistoricalArchives = async function() {
-        if(currentUserEmail !== 'prof.memmo@gmail.com') return;
         try {
             const snapshot = await window.db.collection('fanta_archives').orderBy('timestamp', 'desc').get();
             const container = document.getElementById('admin-historical-archives-list');

@@ -334,14 +334,14 @@
                     </div>
 
                     <!-- Danger Zone: Archiviazione Annuale Classifiche -->
-                    <div id="admin-master-area" style="display:none; margin-bottom: 25px; padding: 15px; border: 1px solid var(--danger-color); border-radius: 12px; background: rgba(231, 76, 60, 0.1);">
+                    <div id="admin-master-area" style="margin-bottom: 25px; padding: 15px; border: 1px solid var(--danger-color); border-radius: 12px; background: rgba(231, 76, 60, 0.1);">
                         <h3 class="text-danger" style="margin-top:0; font-size: 1.05rem;"><i class="fa-solid fa-box-archive"></i> Archiviazione Annuale Fantaletteratura</h3>
                         <p style="font-size: 0.85rem; margin-bottom: 15px;">Salva una "fotografia" della classifica finale e archivia selettivamente solo le squadre dello scorso anno, lasciando attive quelle create per il nuovo anno scolastico.</p>
-                        <button type="button" class="btn text-danger" style="background: transparent; border: 1px solid var(--danger-color); width:auto; padding:8px 18px; font-size:0.85rem;" onclick="window.openArchiveSelectionModal()"><i class="fa-solid fa-box-archive"></i> Esegui Archiviazione Anno</button>
+                        <button type="button" id="btn-open-archive-modal" class="btn text-danger" style="background: transparent; border: 1px solid var(--danger-color); width:auto; padding:8px 18px; font-size:0.85rem; cursor:pointer;" onclick="if(window.openArchiveSelectionModal) window.openArchiveSelectionModal(); else alert('Inizializzazione in corso, riprova tra un secondo...');"><i class="fa-solid fa-box-archive"></i> Esegui Archiviazione Anno</button>
                     </div>
 
                     <!-- Archivio Storico -->
-                    <div id="admin-historical-archives-area" style="display:none; padding: 15px; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; background: rgba(255, 255, 255, 0.02);">
+                    <div id="admin-historical-archives-area" style="padding: 15px; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; background: rgba(255, 255, 255, 0.02);">
                         <h3 style="color: var(--accent-gold); margin-top:0; font-size: 1.05rem;"><i class="fa-solid fa-clock-rotate-left"></i> Archivio Storico</h3>
                         <p style="font-size: 0.85rem; margin-bottom: 15px; color: var(--text-muted);">Consulta le classifiche degli anni passati o ripristina un anno archiviato per errore.</p>
                         <div id="admin-historical-archives-list">
