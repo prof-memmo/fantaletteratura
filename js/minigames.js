@@ -8598,30 +8598,43 @@
         const listDiv = document.getElementById('team-selector-list');
         const modal = document.getElementById('team-selector-modal');
         if (!listDiv || !modal) {
-            // Fallback se la UI manca
             if (type === 'manche') this.startMancheLegacy(missionId);
             else this.startMinigameDirect(type, missionId);
             return;
         }
 
         modal.style.display = 'flex';
-        listDiv.innerHTML = '<div style="text-align:center; padding:10px;"><i class="fa-solid fa-spinner fa-spin"></i> Caricamento...</div>';
+        listDiv.innerHTML = '<div style="text-align:center; padding:15px; color:var(--text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> Caricamento squadre in corso...</div>';
 
         try {
-            const allTeams = window.fanta_db ? await window.fanta_db.getTeams() : [];
-            const myTeams = allTeams.filter(t => t.ownerEmail === window.currentUserEmail);
+            const userEmail = (window.currentUserEmail || (window.auth && window.auth.currentUser && window.auth.currentUser.email) || '').toLowerCase();
+            const allTeams = window.fanta_db ? await window.fanta_db.getTeams('all', false) : [];
+            
+            const myTeams = (userEmail === 'prof.memmo@gmail.com')
+                ? allTeams
+                : allTeams.filter(t => {
+                    const owner = (t.ownerEmail || '').toLowerCase();
+                    const coll = Array.isArray(t.collaboratori) ? t.collaboratori.map(c => (c || '').toLowerCase()) : [];
+                    return owner === userEmail || coll.includes(userEmail);
+                });
             
             if (myTeams.length === 0) {
-                listDiv.innerHTML = '<p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">Nessuna squadra disponibile. Crea una squadra dal tuo profilo per poter giocare.</p>';
+                listDiv.innerHTML = '<p style="font-size:0.85rem; color:var(--text-muted); text-align:center; padding:15px 0;">Nessuna squadra attiva trovata per questo account.<br>Crea prima delle squadre dal pannello docente per avviare la sfida.</p>';
                 return;
             }
 
-            listDiv.innerHTML = myTeams.map(t => `
-                <label style="display:flex; align-items:center; gap:10px; background:rgba(212,175,55,0.05); padding:10px; border:1px solid rgba(212,175,55,0.2); border-radius:8px; cursor:pointer;">
-                    <input type="checkbox" class="team-selector-checkbox" value="${t.id}" data-name="${t.name}" checked>
-                    <span style="font-weight:bold; color:var(--text-light);">${t.name}</span>
-                </label>
-            `).join('');
+            listDiv.innerHTML = myTeams.map(t => {
+                const teamId = t.docId || t.id;
+                const teamName = t.name || 'Squadra';
+                const teamClass = t.classe || t.className || '';
+                return `
+                    <label style="display:flex; align-items:center; gap:10px; background:rgba(212,175,55,0.08); padding:10px 12px; border:1px solid rgba(212,175,55,0.25); border-radius:8px; cursor:pointer; margin-bottom:6px;">
+                        <input type="checkbox" class="team-selector-checkbox" value="${teamId}" data-name="${teamName}" checked style="accent-color:var(--accent-gold); width:18px; height:18px;">
+                        <span style="font-weight:bold; color:var(--text-light); font-size:0.95rem;">${teamName}</span>
+                        ${teamClass ? `<span style="font-size:0.75rem; color:var(--text-muted); margin-left:auto;">(${teamClass})</span>` : ''}
+                    </label>
+                `;
+            }).join('');
 
         } catch (e) {
             console.error("Errore caricamento squadre per minigioco", e);
@@ -8702,7 +8715,11 @@
     },
 
     startMinigame: function(type, missionId) {
-        if (window.currentUserRole !== 'docente' && window.currentUserRole !== 'admin') {
+        const userEmail = (window.currentUserEmail || (window.auth && window.auth.currentUser && window.auth.currentUser.email) || '').toLowerCase();
+        const userRole = (window.currentUserRole || localStorage.getItem('fanta_user_role') || '').toLowerCase();
+        const isTeacherOrAdmin = userRole === 'docente' || userRole === 'teacher' || userRole === 'admin' || userEmail === 'prof.memmo@gmail.com';
+
+        if (!isTeacherOrAdmin) {
             this.startMinigameDirect(type, missionId);
             return;
         }
@@ -8710,7 +8727,11 @@
     },
 
     startManche: function(authorId) {
-        if (window.currentUserRole !== 'docente' && window.currentUserRole !== 'admin') {
+        const userEmail = (window.currentUserEmail || (window.auth && window.auth.currentUser && window.auth.currentUser.email) || '').toLowerCase();
+        const userRole = (window.currentUserRole || localStorage.getItem('fanta_user_role') || '').toLowerCase();
+        const isTeacherOrAdmin = userRole === 'docente' || userRole === 'teacher' || userRole === 'admin' || userEmail === 'prof.memmo@gmail.com';
+
+        if (!isTeacherOrAdmin) {
             this.startMancheLegacy(authorId);
             return;
         }
@@ -8800,39 +8821,43 @@
             const currentTurn = this.gameQueue[this.currentTurnIndex];
             
             if (currentTurn.game === 'versi') {
-                alert(`Hai terminato il minigioco 'Versi'. Assegna MANUALMENTE i punti alla ${currentTurn.teamName} dal tuo pannello LIM.`);
                 if (window.fanta_db && window.fanta_db.saveMinigameLog) {
-                    window.fanta_db.saveMinigameLog({
+                    await window.fanta_db.saveMinigameLog({
                         teamId: currentTurn.teamId,
                         teamName: currentTurn.teamName,
                         game: currentTurn.game,
-                        points: 0
+                        points: xp || 0
                     });
                 }
             } else {
                 try {
-                    const doc = await window.db.collection('fanta_teams').doc(currentTurn.teamId).get();
-                    if(doc.exists) {
-                        const t = doc.data();
-                        await window.db.collection('fanta_teams').doc(currentTurn.teamId).update({
-                            points: (t.points || 0) + xp
+                    const ref = await window.fanta_db.getTeamDocRef(currentTurn.teamId);
+                    await ref.update({
+                        points: firebase.firestore.FieldValue.increment(xp)
+                    });
+                    
+                    if (window.fanta_db && window.fanta_db.saveMinigameLog) {
+                        await window.fanta_db.saveMinigameLog({
+                            teamId: currentTurn.teamId,
+                            teamName: currentTurn.teamName,
+                            game: currentTurn.game,
+                            points: xp
                         });
+                    }
+                    
+                    if (window.showToast) {
+                        window.showToast(`+${xp} Punti assegnati a ${currentTurn.teamName}!`, 'success');
+                    } else {
                         alert(`+${xp} Punti assegnati AUTOMATICAMENTE a ${currentTurn.teamName}!`);
-                        
-                        // Salva nel log
-                        if (window.fanta_db && window.fanta_db.saveMinigameLog) {
-                            window.fanta_db.saveMinigameLog({
-                                teamId: currentTurn.teamId,
-                                teamName: currentTurn.teamName,
-                                game: currentTurn.game,
-                                points: xp
-                            });
-                        }
                     }
                 } catch(e) {
                     console.error("Errore aggiornamento punti", e);
                     alert(`Errore nell'assegnazione automatica a ${currentTurn.teamName}. Assegnali manualmente.`);
                 }
+            }
+            
+            if (typeof window.renderMinigamesHistory === 'function') {
+                window.renderMinigamesHistory();
             }
             
             this.currentTurnIndex++;
@@ -9408,7 +9433,13 @@
     },
 
     skipCurrent: function(type) {
-      if (window.showToast) window.showToast('Esercizio saltato. Proseguiamo con il prossimo!', 'info');
+      if (window.showToast) window.showToast('Esercizio saltato. Proseguiamo con il prossimo turno!', 'info');
+      const isQueueActive = (this.gameQueue && this.gameQueue.length > 0 && this.currentTurnIndex < this.gameQueue.length);
+      if (isQueueActive) {
+          this.currentTurnIndex++;
+          this.playNextInQueue();
+          return;
+      }
       this.startMinigameDirect(type, currentMissionId);
     },
 

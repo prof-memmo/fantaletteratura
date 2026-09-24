@@ -1259,12 +1259,14 @@ window.onclick = function(event) {
 
 function setLoggedIn(email, role = '') {
     currentUserEmail = email;
+    window.currentUserEmail = email;
     if (role) {
         localStorage.setItem('fanta_user_role', role);
         currentUserRole = role;
     } else {
         currentUserRole = localStorage.getItem('fanta_user_role') || '';
     }
+    window.currentUserRole = currentUserRole;
     
     // Sidebar and menu-btn removed
     
@@ -1305,6 +1307,7 @@ function setLoggedIn(email, role = '') {
                         const snap = await window.db.collection('fanta_teams').get();
                         snap.forEach(d => {
                             const data = d.data();
+                            if (data.status === 'archived' || data.archivedYear) return;
                             if (Array.isArray(data.members)) {
                                 if (data.members.some(m => (typeof m === 'object' ? (m.uid || m.id) : m) === uid)) {
                                     assignedTeam = { docId: d.id, id: data.id || d.id, ...data };
@@ -1314,6 +1317,7 @@ function setLoggedIn(email, role = '') {
                     }
 
                     if (assignedTeam) {
+                        window.currentUserTeamId = assignedTeam.docId || assignedTeam.id;
                         const authors = Array.isArray(assignedTeam.authors) ? assignedTeam.authors : [];
                         const isDraftComplete = assignedTeam.draftCompleted || authors.length === 5;
 
@@ -1436,6 +1440,9 @@ function setLoggedIn(email, role = '') {
 function setLoggedOut() {
     currentUserEmail = null;
     currentUserRole = null;
+    window.currentUserEmail = null;
+    window.currentUserRole = null;
+    window.currentUserTeamId = null;
     localStorage.removeItem('fanta_user_role');
     
     // Sidebar and menu-btn removed
@@ -4102,24 +4109,31 @@ window.renderDocenteClassTeamsAndStudents = async function() {
         } catch (_) {}
     }
 
-    // Filtra per includere solo gli effettivi studenti ed escludere docenti, admin e prof.memmo
+    // Filtra per includere solo gli effettivi studenti ed escludere docenti, admin, prof.memmo e archiviati
     students = students.filter(s => {
         const sEmail = (s.email || '').toLowerCase();
         const sRole = (s.role || '').toLowerCase();
-        return sEmail !== 'prof.memmo@gmail.com' && sRole !== 'docente' && sRole !== 'teacher' && sRole !== 'admin' && (sRole === 'studente' || !sRole);
+        const isArchived = s.status === 'archived' || !!s.archivedYear;
+        return !isArchived && sEmail !== 'prof.memmo@gmail.com' && sRole !== 'docente' && sRole !== 'teacher' && sRole !== 'admin' && (sRole === 'studente' || !sRole);
     });
 
-    // 2. Carica squadre della classe da fanta_teams
+    // 2. Carica squadre della classe da fanta_teams (escludendo archiviate)
     let classTeams = [];
     try {
         const queryByClassId = await window.db.collection('fanta_teams').where('classId', '==', classId).get();
-        queryByClassId.forEach(d => classTeams.push({ docId: d.id, id: d.data().id || d.id, ...d.data() }));
+        queryByClassId.forEach(d => {
+            const data = d.data();
+            if (data.status !== 'archived' && !data.archivedYear) {
+                classTeams.push({ docId: d.id, id: data.id || d.id, ...data });
+            }
+        });
 
         if (classCode) {
             const queryByCode = await window.db.collection('fanta_teams').where('classCode', '==', classCode).get();
             queryByCode.forEach(d => {
-                if (!classTeams.some(t => t.docId === d.id)) {
-                    classTeams.push({ docId: d.id, id: d.data().id || d.id, ...d.data() });
+                const data = d.data();
+                if (data.status !== 'archived' && !data.archivedYear && !classTeams.some(t => t.docId === d.id)) {
+                    classTeams.push({ docId: d.id, id: data.id || d.id, ...data });
                 }
             });
         }
