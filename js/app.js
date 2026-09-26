@@ -4142,6 +4142,7 @@ window.renderDocenteClassTeamsAndStudents = async function() {
     }
 
     // Mappa degli studenti già assegnati a una squadra
+    // Mappa degli studenti già assegnati a una squadra
     const assignedMap = new Map(); // studentUid -> teamName
     classTeams.forEach(t => {
         if (Array.isArray(t.members)) {
@@ -4151,6 +4152,10 @@ window.renderDocenteClassTeamsAndStudents = async function() {
             });
         }
     });
+
+    // Salva in cache per la modale di assegnazione rapida
+    window._currentClassStudentsCache = students;
+    window._currentAssignedMapCache = assignedMap;
 
     // 3. Render Pool Studenti
     const countEl = document.getElementById('docente-class-student-count');
@@ -4207,7 +4212,7 @@ window.renderDocenteClassTeamsAndStudents = async function() {
         return;
     }
 
-    // Lista studenti non ancora assegnati per il dropdown
+    // Lista studenti non ancora assegnati
     const unassignedStudents = students.filter(s => !assignedMap.has(s.studentId || s.uid || s.id));
 
     teamsList.innerHTML = classTeams.map(team => {
@@ -4216,6 +4221,7 @@ window.renderDocenteClassTeamsAndStudents = async function() {
         const authors = Array.isArray(team.authors) ? team.authors : [];
         const isDraftComplete = team.draftCompleted || authors.length === 5;
         const modeLabel = team.mode === 'seconde' ? '📙 Medievale' : (team.mode === 'avanzato' ? '📒 Avanzato' : '📘 Contemporanea');
+        const slotsAvailable = 5 - members.length;
 
         return `
             <div class="glass" style="padding: 18px; border-radius: 12px; border: 1px solid rgba(212,175,55,0.2); background: rgba(0,0,0,0.35); display:flex; flex-direction:column; justify-content:space-between; gap:14px;">
@@ -4257,16 +4263,16 @@ window.renderDocenteClassTeamsAndStudents = async function() {
                             }).join('')}
                         </div>
 
-                        <!-- Dropdown per assegnare nuovi studenti -->
-                        ${members.length < 5 && unassignedStudents.length > 0 ? `
-                            <div style="display:flex; gap:8px; margin-top:10px; align-items:center; width:100%;">
-                                <select id="assign-select-${teamDocId}" class="input-control" style="margin:0; padding:6px 8px; font-size:0.78rem; border-radius:8px; background:rgba(0,0,0,0.6); border:1px solid rgba(212,175,55,0.4); color:#fff; flex:1; min-width:0;">
-                                    <option value="">+ Seleziona studente...</option>
-                                    ${unassignedStudents.map(s => `<option value="${s.studentId || s.uid || s.id}">${s.name || s.displayName || s.nickname || s.email}</option>`).join('')}
-                                </select>
-                                <button type="button" class="btn btn-secondary" onclick="window.onAssegnaClick('${teamDocId}')" style="margin:0; padding:6px 12px; font-size:0.78rem; font-weight:700; width:auto !important; flex-shrink:0; white-space:nowrap; border-radius:8px; background:rgba(141,160,63,0.25); border:1px solid var(--accent-gold); color:#fef08a; cursor:pointer;">
-                                    <i class="fa-solid fa-user-plus"></i> Assegna
+                        <!-- Assegnazione Multipla Rapida -->
+                        ${slotsAvailable > 0 && unassignedStudents.length > 0 ? `
+                            <div style="margin-top:10px; display:flex; flex-direction:column; gap:6px;">
+                                <button type="button" class="btn btn-secondary" onclick="window.apriAssegnazioneMultipla('${teamDocId}', '${(team.name||'Squadra').replace(/'/g, "\\'")}', ${slotsAvailable})" style="margin:0; padding:8px 12px; font-size:0.8rem; font-weight:700; width:100% !important; border-radius:8px; background:rgba(141,160,63,0.22); border:1px solid var(--accent-gold); color:#fef08a; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+                                    <i class="fa-solid fa-user-plus"></i> + Seleziona Studenti (${slotsAvailable} ${slotsAvailable === 1 ? 'posto libero' : 'posti liberi'})
                                 </button>
+                                <select class="input-control" onchange="if(this.value){ window.assegnaSingoloStudente('${teamDocId}', this.value); }" style="margin:0; padding:5px 8px; font-size:0.74rem; border-radius:6px; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.1); color:#aaa; width:100%; cursor:pointer;">
+                                    <option value="">⚡ oppure aggiungi al volo singolo...</option>
+                                    ${unassignedStudents.map(s => `<option value="${s.studentId || s.uid || s.id}">+ ${s.name || s.displayName || s.nickname || s.email}</option>`).join('')}
+                                </select>
                             </div>
                         ` : (members.length >= 5 ? `
                             <div style="font-size:0.75rem; color:#86efac; margin-top:6px; font-style:italic;">
@@ -4357,14 +4363,125 @@ window.creaNuovaSquadraClasse = async function() {
     }
 };
 
-window.onAssegnaClick = async function(teamDocId) {
-    const select = document.getElementById(`assign-select-${teamDocId}`);
-    if (!select || !select.value) {
-        alert("Seleziona uno studente dal menu a tendina prima di cliccare su 'Assegna'.");
+window.apriAssegnazioneMultipla = function(teamDocId, teamName, maxAllowed) {
+    const modal = document.getElementById('modal-assegna-multipli');
+    if (!modal) return;
+
+    const nameEl = document.getElementById('modal-assegna-team-name');
+    const slotsEl = document.getElementById('modal-assegna-slots-info');
+    const countEl = document.getElementById('modal-assegna-selected-count');
+    const listEl = document.getElementById('modal-assegna-studenti-list');
+    const teamIdInput = document.getElementById('modal-assegna-target-team-id');
+    const maxInput = document.getElementById('modal-assegna-max-allowed');
+
+    if (nameEl) nameEl.textContent = teamName;
+    if (slotsEl) slotsEl.innerHTML = `<i class="fa-solid fa-chair"></i> Posti disponibili nel gruppo: <strong>${maxAllowed}</strong>`;
+    if (teamIdInput) teamIdInput.value = teamDocId;
+    if (maxInput) maxInput.value = maxAllowed;
+
+    const cls = window.currentComposizioneClass;
+    const students = window._currentClassStudentsCache || (cls && cls.students) || [];
+    const assignedMap = window._currentAssignedMapCache || new Map();
+    const unassigned = students.filter(s => !assignedMap.has(s.studentId || s.uid || s.id));
+
+    if (unassigned.length === 0) {
+        listEl.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem; text-align:center; padding:15px;">Tutti gli studenti della classe sono già stati assegnati!</div>';
+        if (countEl) countEl.textContent = '0 selezionati';
+        modal.style.display = 'flex';
         return;
     }
 
-    const studentUid = select.value;
+    listEl.innerHTML = unassigned.map(s => {
+        const sUid = s.studentId || s.uid || s.id;
+        const sName = s.displayName || s.name || s.nickname || s.email || 'Studente';
+        const sAvatar = s.avatar ? (s.avatar.includes('/') ? s.avatar : `assets/avatars/${s.avatar}`) : 'assets/avatars/6.png';
+        return `
+            <label style="display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.04); padding:8px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.08); cursor:pointer; transition:all 0.2s;" class="student-select-row">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <img src="${sAvatar}" style="width:24px; height:24px; border-radius:50%; object-fit:cover;">
+                    <span style="font-size:0.85rem; font-weight:600; color:#fff;">${sName}</span>
+                </div>
+                <input type="checkbox" class="student-batch-checkbox" value="${sUid}" data-name="${sName.replace(/"/g, '&quot;')}" data-avatar="${sAvatar}" onchange="window._aggiornaConteggioMultipli(${maxAllowed})" style="width:18px; height:18px; accent-color:var(--primary-color); cursor:pointer;">
+            </label>
+        `;
+    }).join('');
+
+    window._aggiornaConteggioMultipli(maxAllowed);
+    modal.style.display = 'flex';
+};
+
+window._aggiornaConteggioMultipli = function(maxAllowed) {
+    const checkboxes = document.querySelectorAll('.student-batch-checkbox');
+    const checked = document.querySelectorAll('.student-batch-checkbox:checked');
+    const countEl = document.getElementById('modal-assegna-selected-count');
+    const btn = document.getElementById('btn-conferma-assegna-multipli');
+
+    const numChecked = checked.length;
+    if (countEl) {
+        countEl.textContent = `${numChecked}/${maxAllowed} selezionati`;
+        countEl.style.color = numChecked > 0 ? 'var(--accent-gold)' : 'var(--text-muted)';
+    }
+
+    checkboxes.forEach(cb => {
+        const label = cb.closest('label');
+        if (!cb.checked) {
+            cb.disabled = (numChecked >= maxAllowed);
+            if (label) {
+                label.style.opacity = (numChecked >= maxAllowed) ? '0.4' : '1';
+                label.style.borderColor = 'rgba(255,255,255,0.08)';
+                label.style.background = 'rgba(255,255,255,0.04)';
+            }
+        } else {
+            cb.disabled = false;
+            if (label) {
+                label.style.opacity = '1';
+                label.style.borderColor = 'var(--primary-color)';
+                label.style.background = 'rgba(141,160,63,0.15)';
+            }
+        }
+    });
+
+    if (btn) {
+        btn.disabled = (numChecked === 0);
+        btn.innerHTML = `<i class="fa-solid fa-check"></i> Assegna ${numChecked} ${numChecked === 1 ? 'Studente' : 'Studenti'}`;
+    }
+};
+
+window.confermaAssegnazioneMultipla = async function() {
+    const teamDocId = document.getElementById('modal-assegna-target-team-id')?.value;
+    if (!teamDocId) return;
+
+    const checkedBoxes = Array.from(document.querySelectorAll('.student-batch-checkbox:checked'));
+    if (checkedBoxes.length === 0) {
+        alert("Seleziona almeno uno studente da assegnare.");
+        return;
+    }
+
+    const studentsToAdd = checkedBoxes.map(cb => ({
+        uid: cb.value,
+        studentId: cb.value,
+        name: cb.getAttribute('data-name') || 'Studente',
+        avatar: cb.getAttribute('data-avatar') || '6.png'
+    }));
+
+    try {
+        const btn = document.getElementById('btn-conferma-assegna-multipli');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Assegnazione in corso...'; }
+
+        await window.db.collection('fanta_teams').doc(teamDocId).update({
+            members: firebase.firestore.FieldValue.arrayUnion(...studentsToAdd)
+        });
+
+        document.getElementById('modal-assegna-multipli').style.display = 'none';
+        await window.renderDocenteClassTeamsAndStudents();
+    } catch (err) {
+        console.error("Errore assegnazione multipla:", err);
+        alert("Errore durante l'assegnazione: " + err.message);
+    }
+};
+
+window.assegnaSingoloStudente = async function(teamDocId, studentUid) {
+    if (!studentUid) return;
     const cls = window.currentComposizioneClass;
     let studentObj = { uid: studentUid, studentId: studentUid, name: 'Studente' };
 
@@ -4401,6 +4518,13 @@ window.onAssegnaClick = async function(teamDocId) {
     } catch (err) {
         console.error("Errore assegnazione studente:", err);
         alert("Errore durante l'assegnazione dello studente: " + (err.message || err));
+    }
+};
+
+window.onAssegnaClick = function(teamDocId) {
+    const select = document.getElementById(`assign-select-${teamDocId}`);
+    if (select && select.value) {
+        window.assegnaSingoloStudente(teamDocId, select.value);
     }
 };
 
