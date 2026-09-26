@@ -78,6 +78,11 @@ function navigateTo(viewId, pushHistory = true) {
     if(viewId === 'view-profilo') {
         renderProfilo();
     }
+    if(viewId === 'view-regolamento') {
+        if(window.RulesService) {
+            window.RulesService.renderPublicView('view-regolamento-content');
+        }
+    }
     if(viewId === 'view-schede') {
         if(typeof window.segnaTuttiAutoriRivelatiComeVisti === 'function') {
             window.segnaTuttiAutoriRivelatiComeVisti();

@@ -1075,6 +1075,7 @@ async function setupAdminPanel() {
             if (targetId === 'admin-view-missioni') { window.renderAdminMissioni(); window.renderAdminMissioniPending(); }
             if (targetId === 'admin-view-classifica') window.renderAdminClassifica();
             if (targetId === 'admin-view-tornei') window.renderAdminTornei();
+            if (targetId === 'admin-view-regolamento') window.renderAdminRegolamento();
             if (targetId === 'admin-view-impostazioni' || targetId === 'admin-view-profilo') window.renderAdminImpostazioni();
 
             // Mobile menu close
@@ -1095,9 +1096,17 @@ async function setupAdminPanel() {
         await window.renderAdminMissioniPending();
         await window.renderAdminClassifica();
         await window.renderAdminTornei();
+        await window.renderAdminRegolamento();
         await window.renderAdminImpostazioni();
     }
 }
+
+// Global hook per render regolamento
+window.renderAdminRegolamento = function() {
+    if (window.RulesService) {
+        window.RulesService.renderAdminEditor('admin-regolamento-container');
+    }
+};
 
 // =========================================================
 // GESTIONE CALENDARIO USCITE & AUTO-VALIDAZIONI ADMIN

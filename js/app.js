@@ -129,6 +129,21 @@ function initApp() {
     // 1. Navigation setup
     setupNavigation();
     
+    // Inizializzazione Regolamento Dinamico Centralizzato
+    if (window.RulesService) {
+        window.RulesService.init();
+        window.RulesService.subscribe(() => {
+            const pubContainer = document.getElementById('view-regolamento-content');
+            if (pubContainer && document.getElementById('view-regolamento') && document.getElementById('view-regolamento').classList.contains('active')) {
+                window.RulesService.renderPublicView('view-regolamento-content');
+            }
+            const docContainer = document.getElementById('docente-regolamento-container');
+            if (docContainer && document.getElementById('tab-docente-regolamento') && document.getElementById('tab-docente-regolamento').style.display !== 'none') {
+                window.RulesService.renderDocenteTab('docente-regolamento-container');
+            }
+        });
+    }
+    
     // 2. Data Initialization
     populateAuthorSelects(window.currentAdminMode || 'terze');
     populateSchede(window.currentAdminMode || 'terze');
@@ -4653,6 +4668,10 @@ window.switchDocenteTab = function(tabName) {
         window.loadDocenteClassiComposizione();
     } else if (tabName === 'storico') {
         window.renderMinigamesHistory();
+    } else if (tabName === 'regolamento') {
+        if (window.RulesService) {
+            window.RulesService.renderDocenteTab('docente-regolamento-container');
+        }
     }
 };
 

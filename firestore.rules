@@ -218,6 +218,10 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
+    match /fanta_rules/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
 
     // ==============================================================
     // 2. REGOLE LA ROTTA DEGLI EROI (Namespace eroi_*)
@@ -295,6 +299,10 @@ service cloud.firestore {
       allow read: if isAdmin() || isEroiAuthorized();
       allow write: if isAdmin();
     }
+    match /eroi_rules/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
 
     // ==============================================================
     // 3. REGOLE PALESTRA DI RIFLESSIONE (Namespace palestra_*)
@@ -347,6 +355,10 @@ service cloud.firestore {
 
     match /palestra_settings/{docId} {
       allow read: if isAdmin() || isPalestraAuthorized();
+      allow write: if isAdmin();
+    }
+    match /palestra_rules/{docId} {
+      allow read: if true;
       allow write: if isAdmin();
     }
 
@@ -415,6 +427,7 @@ service cloud.firestore {
     match /corte_cantos/{docId} { allow read: if isAdmin() || isCorteAuthorized(); allow write: if isAdmin(); }
     match /corte_missions/{docId} { allow read: if isAdmin() || isCorteAuthorized(); allow write: if isAdmin(); }
     match /corte_settings/{docId} { allow read: if isAdmin() || isCorteAuthorized(); allow write: if isAdmin(); }
+    match /corte_rules/{docId} { allow read: if true; allow write: if isAdmin(); }
     match /corte_missions_completed/{docId} {
       allow read: if isAdmin() || isCorteAuthorized();
       allow create: if isCorteAuthorized() && request.resource.data.userId == request.auth.uid;
@@ -468,6 +481,10 @@ service cloud.firestore {
     }
     match /ops_settings/{docId} {
       allow read: if isAdmin() || isOpsAuthorized();
+      allow write: if isAdmin();
+    }
+    match /ops_rules/{docId} {
+      allow read: if true;
       allow write: if isAdmin();
     }
 
