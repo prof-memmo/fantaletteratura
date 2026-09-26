@@ -369,17 +369,34 @@ Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma
             if (!container) return;
 
             const text = this.getRawText();
+            const fbUser = (window.auth && window.auth.currentUser) || 
+                           (window.firebase && window.firebase.auth && window.firebase.auth().currentUser);
+            const userEmail = fbUser ? (fbUser.email || '') : (window.currentUserEmail || '');
+            const isAuthAdmin = userEmail.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase();
 
             container.innerHTML = `
                 <div class="glass" style="padding: 24px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.12); margin-bottom: 25px;">
                     <!-- Intestazione in stile Live Editor -->
-                    <div style="margin-bottom: 16px;">
-                        <h3 style="margin: 0 0 6px 0; font-size: 1.15rem; color: #6366f1; display: flex; align-items: center; gap: 8px;">
-                            <i class="fa-solid fa-lock"></i> Regolamento Ufficiale (Testo Modifica Live)
-                        </h3>
-                        <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">
-                            Modifica il contenuto del Regolamento in testo semplice. Sarà formattato automaticamente con titoli e paragrafi eleganti sui siti.
-                        </p>
+                    <div style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <h3 style="margin: 0 0 6px 0; font-size: 1.15rem; color: #6366f1; display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-lock"></i> Regolamento Ufficiale (Testo Modifica Live)
+                            </h3>
+                            <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">
+                                Modifica il contenuto del Regolamento in testo semplice. Sarà formattato automaticamente con titoli e paragrafi eleganti sui siti.
+                            </p>
+                        </div>
+                        <div>
+                            ${isAuthAdmin ? `
+                                <span style="font-size: 0.75rem; background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px;">
+                                    <i class="fa-solid fa-circle-check"></i> Super-Admin Autenticato (${userEmail})
+                                </span>
+                            ` : `
+                                <span style="font-size: 0.75rem; background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px;">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> ${userEmail ? `Accesso: ${userEmail}` : 'Non autenticato (Effettua il Login)'}
+                                </span>
+                            `}
+                        </div>
                     </div>
 
                     <!-- Textarea Semplice a Schermo Intero -->
@@ -404,6 +421,15 @@ Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma
         async handleSaveButton() {
             const textarea = document.getElementById('rules-live-textarea');
             if (!textarea) return;
+
+            const fbUser = (window.auth && window.auth.currentUser) || 
+                           (window.firebase && window.firebase.auth && window.firebase.auth().currentUser);
+            const userEmail = (fbUser && fbUser.email ? fbUser.email : (window.currentUserEmail || '')).toLowerCase();
+
+            if (!fbUser || userEmail !== SUPER_ADMIN_EMAIL.toLowerCase()) {
+                alert(`⚠️ Attenzione: per salvare le modifiche nel Cloud devi essere autenticato come Super-Admin (${SUPER_ADMIN_EMAIL}).\n\nAttualmente connesso come: ${userEmail || 'Nessun account (fai login nella home o ricarica la pagina)'}`);
+                return;
+            }
 
             const btn = document.getElementById('btn-save-rules-live');
             const originalHtml = btn ? btn.innerHTML : '';
