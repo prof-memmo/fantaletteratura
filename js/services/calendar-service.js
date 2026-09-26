@@ -35,6 +35,9 @@ window.CalendarService = {
                             if (typeof window.renderAdminCalendario === 'function') {
                                 window.renderAdminCalendario();
                             }
+                            if (typeof window.renderAdminImprevisti === 'function') {
+                                window.renderAdminImprevisti();
+                            }
                         }
                     }, (err) => {
                         console.warn("Errore listener Firestore calendario:", err);
@@ -49,14 +52,18 @@ window.CalendarService = {
     },
 
     CLASSIC_HAZARDS: [
-        "⚡ Blocco dello Scrittore: Crisi d'ispirazione per gli autori di oggi (-2 punti)",
-        "🌟 Premio della Critica: L'opera riceve una standing ovation dai recensori (+3 punti)",
-        "⚔️ Duello Epistolare: Polemica feroce tra correnti letterarie rivali (+2 / -2 punti)",
-        "🎭 Adattamento a Teatro: L'opera va in scena con grande successo di pubblico (+4 punti)",
-        "📜 Manoscritto Inedito: Spunta una pergamena inedita dagli archivi (+3 punti)",
-        "🕯️ Notte di Boemia: Vita sregolata e nottate in taverna (-1 punto)",
-        "🚫 Censura Editoriale: L'opera viene contestata e bloccata temporaneamente (-3 punti)",
-        "🖋️ Bestseller nei Salotti: Ristampa record e trionfo tra i lettori (+3 punti)"
+        "⚜️ Dante cacciato da Firenze: L'esilio costa caro (-2 punti a Dante)",
+        "🎲 Foscolo perde tutto a Londra: Debiti di gioco in esilio (-2 punti a Ugo Foscolo)",
+        "🌙 Leopardi e il Passero Solitario: Malinconia e studio matto (-1 punto a Giacomo Leopardi)",
+        "🔥 Boccaccio sotto Censura: Novelle scandalose del Decameron all'Indice (-3 punti a Giovanni Boccaccio)",
+        "🌾 Verga e la Lupa: Dramma rusticano e gelosie in Sicilia (-2 punti a Giovanni Verga)",
+        "🌊 Manzoni sciacqua i panni in Arno: Italiano perfetto e successo morale (+3 punti ad Alessandro Manzoni)",
+        "👑 Petrarca incoronato in Campidoglio: Trionfo poetico d'alloro a Roma (+4 punti a Francesco Petrarca)",
+        "🏆 Carducci vince il Premio Nobel: Primo italiano a trionfare a Stoccolma (+4 punti a Giosuè Carducci)",
+        "🏰 Ariosto alla Corte Estense: Gran successo dell'Orlando Furioso tra i duchi (+3 punti a Ludovico Ariosto)",
+        "🌲 Calvino scopre il Barone Rampante: Bestseller travolgente (+3 punti a Italo Calvino)",
+        "🎭 Pirandello e la Maschera Nuda: Trionfo teatrale per Sei Personaggi (+3 punti a Luigi Pirandello)",
+        "✈️ D'Annunzio e il Volo su Vienna: Gesto patriottico e gloria nei salotti (+3 punti a Gabriele D'Annunzio)"
     ],
 
     getReleases() {
@@ -240,6 +247,7 @@ window.CalendarService = {
             this.applyCalendarValidations();
             if (typeof window.renderAdminCalendario === 'function') window.renderAdminCalendario();
             if (typeof window.renderAdminAutori === 'function') window.renderAdminAutori();
+            if (typeof window.renderAdminImprevisti === 'function') window.renderAdminImprevisti();
         } catch (e) {
             console.error("Errore salvataggio modifiche calendario:", e);
             alert("Errore salvataggio su Cloud: " + e.message);
