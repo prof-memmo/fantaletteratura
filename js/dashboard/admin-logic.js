@@ -1069,6 +1069,7 @@ async function setupAdminPanel() {
             // Specific renders
             if (targetId === 'admin-view-autori') window.renderAdminAutori();
             if (targetId === 'admin-view-calendario') window.renderAdminCalendario();
+            if (targetId === 'admin-view-imprevisti') window.renderAdminImprevisti();
             if (targetId === 'admin-view-docenti') window.renderAdminDocenti();
             if (targetId === 'admin-view-squadre') window.renderAdminSquadre();
             if (targetId === 'admin-view-missioni') { window.renderAdminMissioni(); window.renderAdminMissioniPending(); }
@@ -1087,6 +1088,7 @@ async function setupAdminPanel() {
     if (window.location.pathname.includes('admin.html')) {
         await window.renderAdminAutori();
         await window.renderAdminCalendario();
+        await window.renderAdminImprevisti();
         await window.renderAdminDocenti();
         await window.renderAdminSquadre();
         await window.renderAdminMissioni();
@@ -1557,6 +1559,174 @@ window.selectCalendarPresetHazard = async function(releaseId, presetText) {
     const input = document.getElementById(`hazard-input-${releaseId}`);
     if (input) input.value = presetText;
     await window.CalendarService.updateReleaseHazard(releaseId, presetText);
+};
+
+// =========================================================
+// GESTIONE DEDICATA TAB IMPREVISTI & MERCATO ADMIN
+// =========================================================
+
+window.currentImprevistiFilter = 'all';
+
+window.filterImprevistiView = function(filter) {
+    window.currentImprevistiFilter = filter;
+    document.querySelectorAll('#admin-view-imprevisti .admin-mode-filter-btn').forEach(btn => btn.classList.remove('active'));
+    const btnId = filter === 'terze_avanzato' ? 'btn-imprevisti-filter-terze' : `btn-imprevisti-filter-${filter}`;
+    const activeBtn = document.getElementById(btnId);
+    if (activeBtn) activeBtn.classList.add('active');
+    window.renderAdminImprevisti();
+};
+
+window.renderAdminImprevisti = function() {
+    const listContainer = document.getElementById('admin-imprevisti-list');
+    if (!listContainer) return;
+
+    if (!window.CalendarService) {
+        listContainer.innerHTML = '<p class="text-muted" style="text-align:center;">Servizio Calendario in caricamento...</p>';
+        return;
+    }
+
+    const allReleases = window.CalendarService.getReleases();
+    const filter = window.currentImprevistiFilter || 'all';
+
+    const filtered = allReleases.filter(r => {
+        if (filter === 'all') return true;
+        if (filter === 'seconde') return r.mode === 'seconde';
+        if (filter === 'terze_avanzato') return r.mode === 'terze_avanzato' || r.mode === 'terze' || r.mode === 'avanzato';
+        return true;
+    });
+
+    if (filtered.length === 0) {
+        listContainer.innerHTML = '<p class="text-muted" style="text-align:center;">Nessuna uscita trovata per questo filtro.</p>';
+        return;
+    }
+
+    const allAuthorsMap = {};
+    const collectAuthors = (list) => {
+        if (Array.isArray(list)) list.forEach(a => { allAuthorsMap[a.id] = a; });
+    };
+    if (typeof AUTHORS !== 'undefined') collectAuthors(AUTHORS);
+    if (typeof AUTHORS_SECONDE !== 'undefined') collectAuthors(AUTHORS_SECONDE);
+    if (typeof AUTHORS_INTERNAZIONALI !== 'undefined') collectAuthors(AUTHORS_INTERNAZIONALI);
+
+    const classicHazards = (window.CalendarService && window.CalendarService.CLASSIC_HAZARDS) || [];
+
+    listContainer.innerHTML = filtered.map(rel => {
+        const modeBadge = rel.mode === 'seconde'
+            ? `<span style="background: rgba(212, 114, 26, 0.2); color: #fb923c; border: 1px solid #d4721a; padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: bold;">📙 Età Medievale e Moderna</span>`
+            : `<span style="background: rgba(141, 160, 63, 0.2); color: #bef264; border: 1px solid #8da03f; padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: bold;">📘 Contemporanea &amp; Internazionali</span>`;
+
+        const hasHazard = !!rel.hazardText;
+        const borderStyle = hasHazard ? '1px solid rgba(234, 179, 8, 0.4)' : '1px solid rgba(255,255,255,0.1)';
+        const bgStyle = hasHazard ? 'rgba(234, 179, 8, 0.04)' : 'rgba(255,255,255,0.02)';
+
+        const authorsHtml = (rel.authorIds || []).map(aid => {
+            const author = allAuthorsMap[aid] || { id: aid, name: aid, image: 'avatar_autori/default.png' };
+            return `
+                <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">
+                    <img src="${author.image || 'avatar_autori/default.png'}" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; background: #fff;">
+                    <span style="font-size: 0.75rem; color: #e2e8f0;">${author.name}</span>
+                </div>
+            `;
+        }).join('');
+
+        return `
+            <div class="glass" style="padding: 16px; border-radius: 14px; border: ${borderStyle}; background: ${bgStyle};">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap;">
+                            ${modeBadge}
+                            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: bold;">ID: ${rel.id}</span>
+                            ${rel.isMarketOpen ? `<span style="background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid #3b82f6; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: bold;"><i class="fa-solid fa-repeat"></i> Mercato Aperto</span>` : ''}
+                        </div>
+                        <h3 style="margin: 0; font-size: 1.05rem; color: var(--accent-gold);">${rel.title}</h3>
+                        <p style="margin: 3px 0 0 0; font-size: 0.85rem; color: var(--text-light); font-weight: 600;">${rel.groupTitle}</p>
+                    </div>
+
+                    <!-- Modifica Data Uscita (sincronizzata con il Calendario) -->
+                    <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.4); padding: 5px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);">
+                        <label style="font-size: 0.75rem; color: var(--text-muted);"><i class="fa-solid fa-calendar"></i> Data:</label>
+                        <input type="date" value="${rel.effectiveDate}" style="background: transparent; border: none; color: #fff; font-size: 0.85rem; font-family: monospace; outline: none; cursor: pointer;" onchange="window.updateCalendarReleaseDate('${rel.id}', this.value); window.renderAdminImprevisti();">
+                    </div>
+                </div>
+
+                <!-- Editor Carta Imprevisto -->
+                <div style="background: rgba(0,0,0,0.25); padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(212,175,55,0.25); margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;">
+                        <label style="font-size: 0.85rem; font-weight: bold; color: var(--accent-gold); display: flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-scroll"></i> Carta Imprevisto Ufficiale:
+                        </label>
+                        <div style="display: flex; gap: 6px; align-items: center;">
+                            <select style="background: rgba(20,20,30,0.95); color: var(--text-light); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; font-size: 0.75rem; padding: 4px 8px; cursor: pointer;" onchange="window.selectImprevistoPreset('${rel.id}', this.value); this.selectedIndex=0;">
+                                <option value="">⚡ Inserisci imprevisto classico...</option>
+                                ${classicHazards.map(h => `<option value="${h.replace(/"/g, '&quot;')}">${h}</option>`).join('')}
+                            </select>
+                            ${hasHazard ? `
+                                <button class="btn btn-secondary" style="font-size: 0.72rem; padding: 4px 8px; border-radius: 6px;" onclick="window.removeCalendarHazard('${rel.id}')" title="Rimuovi imprevisto">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <input type="text" id="imprevisti-tab-input-${rel.id}" value="${(rel.hazardText || '').replace(/"/g, '&quot;')}" placeholder="Nessun imprevisto per questa data (es. Scandalo nei salotti: -2 pt a chi schiera autori del gruppo)" style="flex: 1; min-width: 260px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 0.85rem;" onchange="window.updateCalendarReleaseHazard('${rel.id}', this.value); window.renderAdminImprevisti();">
+                        
+                        <label style="display: inline-flex; align-items: center; gap: 6px; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); padding: 7px 12px; border-radius: 8px; font-size: 0.78rem; color: #93c5fd; cursor: pointer; user-select: none;">
+                            <input type="checkbox" ${rel.isMarketOpen ? 'checked' : ''} onchange="window.updateCalendarReleaseMarket('${rel.id}', this.checked); window.renderAdminImprevisti();" style="cursor: pointer;">
+                            <i class="fa-solid fa-repeat"></i> Finestra Mercato (1 Cambio)
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Autori inclusi -->
+                <div style="border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 8px;">
+                    <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 6px; font-weight: bold; text-transform: uppercase;">
+                        Autori Coinvolti (${(rel.authorIds || []).length}):
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 6px;">
+                        ${authorsHtml}
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+};
+
+window.selectImprevistoPreset = async function(releaseId, presetText) {
+    if (!presetText || !window.CalendarService) return;
+    await window.CalendarService.updateReleaseHazard(releaseId, presetText);
+    window.renderAdminImprevisti();
+    if (typeof window.renderAdminCalendario === 'function') window.renderAdminCalendario();
+};
+
+window.removeCalendarHazard = async function(releaseId) {
+    if (!window.CalendarService) return;
+    await window.CalendarService.updateReleaseHazard(releaseId, '');
+    window.renderAdminImprevisti();
+    if (typeof window.renderAdminCalendario === 'function') window.renderAdminCalendario();
+};
+
+window.assegnaImprevistiCasuali = async function() {
+    if (!window.CalendarService) return;
+    const classicHazards = window.CalendarService.CLASSIC_HAZARDS || [];
+    if (classicHazards.length === 0) return;
+
+    if (!confirm("Vuoi assegnare automaticamente un imprevisto letterario casuale a ciascuna delle 18 uscite dell'anno scolastico?")) return;
+
+    const releases = window.CalendarService.getReleases();
+    for (let i = 0; i < releases.length; i++) {
+        const rel = releases[i];
+        const randomHazard = classicHazards[i % classicHazards.length];
+        await window.CalendarService.updateReleaseHazard(rel.id, randomHazard);
+        // Abilita la finestra di mercato sulle uscite 9 e 18
+        if (i === 8 || i === 17) {
+            await window.CalendarService.updateReleaseMarket(rel.id, true);
+        }
+    }
+
+    window.renderAdminImprevisti();
+    if (typeof window.renderAdminCalendario === 'function') window.renderAdminCalendario();
+    alert("✅ Imprevisti e Finestre di Mercato assegnati a tutta la stagione con successo!");
 };
 
 window.renderAdminImpostazioni = async function() {

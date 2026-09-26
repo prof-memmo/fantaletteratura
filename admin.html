@@ -47,6 +47,7 @@
             <div class="admin-main-nav-container" id="admin-main-nav">
                 <button class="btn admin-tab-btn active" data-target="admin-view-autori"><i class="fa-solid fa-feather"></i> Autori</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-calendario"><i class="fa-solid fa-calendar-days"></i> Calendario</button>
+                <button class="btn admin-tab-btn" data-target="admin-view-imprevisti"><i class="fa-solid fa-scroll"></i> Imprevisti &amp; Mercato</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-docenti"><i class="fa-solid fa-users"></i> Gestione Utenti e Classi</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-squadre"><i class="fa-solid fa-users-rectangle"></i> Squadre</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-missioni"><i class="fa-solid fa-scroll"></i> Missioni</button>
@@ -137,6 +138,39 @@
 
                     <!-- VISTA 2: ELENCO CRONOLOGICO DETTAGLIATO -->
                     <div id="admin-calendar-releases-list" style="display: none; flex-direction: column; gap: 12px;">
+                        <!-- Popolato da JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: Pannello Admin - Gestione Imprevisti & Mercato -->
+            <section id="admin-view-imprevisti" class="admin-view" style="display:none;">
+                <div style="padding: 0 15px 15px 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <h2 style="margin: 0;"><i class="fa-solid fa-scroll" style="color: var(--accent-gold);"></i> Gestione Imprevisti &amp; Mercato</h2>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">Configura le <strong>date</strong>, le <strong>Carte Imprevisto</strong> e le <strong>Finestre di Mercato (1 Cambio)</strong> per la stagione. Tutte le modifiche si caricano automaticamente sul Calendario di gioco.</p>
+                    </div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 14px; border-radius: 12px;" onclick="window.renderAdminImprevisti()"><i class="fa-solid fa-rotate"></i> Ricarica</button>
+                        <button class="btn" style="background: var(--accent-gold); color: var(--bg-dark); font-weight: bold; font-size: 0.8rem; padding: 6px 14px; border-radius: 12px; border: none; cursor: pointer;" onclick="window.assegnaImprevistiCasuali()"><i class="fa-solid fa-wand-magic-sparkles"></i> Assegna Imprevisti a Tutto l'Anno</button>
+                    </div>
+                </div>
+                
+                <div class="glass" style="padding: 15px; margin: 0 15px 20px 15px;">
+                    <!-- Filtro modalità -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
+                        <div class="admin-mode-filter" style="margin: 0;">
+                            <button class="admin-mode-filter-btn f-all active" id="btn-imprevisti-filter-all" onclick="window.filterImprevistiView('all')">📅 Tutte le Uscite (18)</button>
+                            <button class="admin-mode-filter-btn f-orange" id="btn-imprevisti-filter-seconde" onclick="window.filterImprevistiView('seconde')">📙 Età Medievale e Moderna (9)</button>
+                            <button class="admin-mode-filter-btn f-green" id="btn-imprevisti-filter-terze" onclick="window.filterImprevistiView('terze_avanzato')">📘 Contemporanea &amp; Internazionali (9)</button>
+                        </div>
+                        <div style="font-size: 0.8rem; color: #4ade80; display: flex; align-items: center; gap: 5px;">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Sincronizzazione Cloud Automatica
+                        </div>
+                    </div>
+
+                    <!-- Lista Uscite e Imprevisti -->
+                    <div id="admin-imprevisti-list" style="display: flex; flex-direction: column; gap: 14px;">
                         <!-- Popolato da JS -->
                     </div>
                 </div>
