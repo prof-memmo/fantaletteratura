@@ -1,76 +1,169 @@
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
+  
+    // ==============================================================
+    // HELPER FUNCTIONS GLOBALI
+    // ==============================================================
     
-    // Funzione helper per verificare se l'utente è autenticato
-    function isAuthenticated() {
-      return request.auth != null;
+    // Verifica se l'utente autenticato è Amministratore (Admin)
+    function isAdmin() {
+      let isEmailAdmin = request.auth != null && request.auth.token.email.lower() == 'prof.memmo@gmail.com';
+      return isEmailAdmin;
     }
     
-    // Funzione helper per ottenere l'email dell'utente corrente (in minuscolo)
-    function currentUserEmail() {
-      return request.auth.token.email.lower();
-    }
-    
-    // Funzione helper per verificare se l'utente è il Game Master (Prof. Memmo)
-    function isGameMaster() {
-      return isAuthenticated() && currentUserEmail() == 'prof.memmo@gmail.com';
+    // Verifica se l'utente sta agendo sul proprio documento
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
     }
 
-    // Funzione helper per verificare se l'utente è un docente autorizzato per una determinata squadra (owner o collaboratore)
-    function isAuthorizedTeacherForTeam(teamId) {
-      let team = get(/databases/$(database)/documents/teams/$(teamId));
+    function currentUserEmail() {
+      return request.auth != null && request.auth.token.email != null ? request.auth.token.email.lower() : '';
+    }
+    
+    // Verifica che l'utente non stia tentando di auto-assegnarsi privilegi
+    function noPrivilegeEscalation() {
+      let affectedKeys = request.resource.data.diff(resource.data).affectedKeys();
+      return !affectedKeys.hasAny(['role', 'statusAccount', 'subscription', 'platforms', 'adminOverrides']);
+    }
+
+    // Valida la creazione iniziale di un profilo hub_users
+    function isValidNewUser() {
+      let data = request.resource.data;
+      let isAllowedRole = data.role in ['studente', 'docente', 'viandante'];
+      let isValidStatus = (data.statusAccount == 'active');
+      let hasDefaultSub = (data.subscription == 'base' || data.subscription == 'studente');
+      let hasNoAdminOverrides = !('adminOverrides' in data) || data.adminOverrides == null || data.adminOverrides == {};
+      
+      return isAllowedRole && isValidStatus && hasDefaultSub && hasNoAdminOverrides;
+    }
+
+    // ==============================================================
+    // PROFILI UTENTE CENTRALI (L'identità dell'Ecosistema)
+    // ==============================================================
+    match /hub_users/{userId} {
+      // Lettura: consentita a tutti gli utenti autenticati (docenti/studenti) per sincronizzazione classi
+      allow read: if request.auth != null || isAdmin();
+      
+      // Creazione: L'utente loggato inizializza il suo profilo validato, oppure l'admin
+      allow create: if (isOwner(userId) && isValidNewUser()) || isAdmin();
+      
+      // Aggiornamento: L'admin modifica qualsiasi cosa. L'owner aggiorna solo dati anagrafici/non privilegiati.
+      allow update: if isAdmin() || (isOwner(userId) && noPrivilegeEscalation());
+      
+      // Eliminazione: L'utente può eliminare il proprio profilo (GDPR), oppure l'amministratore.
+      allow delete: if isOwner(userId) || isAdmin();
+    }
+
+    // ==============================================================
+    // CLASSI E ROSTER CENTRALI DELL'ECOSISTEMA (hub_classes)
+    // ==============================================================
+    match /hub_classes/{classId} {
+      allow read: if request.auth != null || isAdmin();
+      allow create: if request.auth != null && (request.resource.data.teacherId == request.auth.uid || isAdmin());
+      allow update: if isAdmin() || (request.auth != null && (
+        resource.data.teacherId == request.auth.uid ||
+        (resource.data.teacherIds != null && resource.data.teacherIds.hasAny([request.auth.uid])) ||
+        (resource.data.teacherEmail != null && resource.data.teacherEmail.lower() == currentUserEmail()) ||
+        (resource.data.collaboratori != null && resource.data.collaboratori.hasAny([currentUserEmail()]))
+      ));
+      allow delete: if isAdmin() || (request.auth != null && (
+        resource.data.teacherId == request.auth.uid ||
+        (resource.data.teacherEmail != null && resource.data.teacherEmail.lower() == currentUserEmail())
+      ));
+    }
+    
+    // ==============================================================
+    // STRUMENTI E IMPOSTAZIONI HUB (Esclusivi per l'Amministratore)
+    // ==============================================================
+    match /hub_settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /ecosistema_settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /hub_newsletters/{docId} {
+      allow read, write: if isAdmin();
+    }
+    
+    match /hub_posta_inviata/{docId} {
+      allow read, write: if isAdmin();
+    }
+    
+    match /hub_posta/{docId} {
+      allow read, write: if isAdmin();
+    }
+    
+    match /hub_esperienze/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Impostazioni Globali Ecosistema e Stato Giochi Hub
+    match /games_status/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Impostazioni Vetrina
+    match /vetrina/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Modifiche Didattiche al Volo (Live Editor Didattico)
+    match /hub_didactic_overrides/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // ==============================================================
+    // 1. REGOLE FANTALETTERATURA (Namespace fanta_*)
+    // ==============================================================
+    
+    function isFantaAuthorized() {
+      return isAdmin() || request.auth != null;
+    }
+    
+    function isAuthorizedTeacherForTeamFanta(teamId) {
+      let team = get(/databases/$(database)/documents/fanta_teams/$(teamId));
       return team != null && (
         team.data.ownerEmail.lower() == currentUserEmail() ||
         ('collaboratori' in team.data && team.data.collaboratori != null && team.data.collaboratori.hasAny([currentUserEmail()]))
       );
     }
-
-    // 1. Collezione: settings (Stato di gioco globale, schede e punteggi sbloccati)
-    match /settings/{docId} {
-      // Chiunque può leggere le impostazioni correnti di gioco
-      allow read: if true;
-      // Solo il Game Master (Prof. Memmo) può modificare le impostazioni globali
-      allow write: if isGameMaster();
+    
+    match /fanta_settings/{docId} {
+      allow read: if isAdmin() || isFantaAuthorized();
+      allow write: if isAdmin();
     }
 
-    // 2. Collezione: users (Profili di docenti, studenti e fantamici)
-    match /users/{email} {
-      // Qualsiasi utente autenticato può leggere le informazioni dei profili
-      allow read: if isAuthenticated();
-      // Un utente può creare o cancellare solo il proprio profilo (o il Game Master)
-      allow create, delete: if isGameMaster() || (isAuthenticated() && currentUserEmail() == email.lower());
-      // Un utente può aggiornare il proprio profilo, oppure un docente autorizzato può aggiornare la squadra dello studente
-      allow update: if isGameMaster() || (isAuthenticated() && (
+    match /fanta_users/{email} {
+      allow read: if isAdmin() || isFantaAuthorized();
+      allow create, delete: if isAdmin() || (isFantaAuthorized() && currentUserEmail() == email.lower());
+      allow update: if isAdmin() || (isFantaAuthorized() && (
         currentUserEmail() == email.lower() ||
         (resource.data.role == 'studente' &&
          'teamId' in resource.data && resource.data.teamId != null &&
-         isAuthorizedTeacherForTeam(resource.data.teamId) &&
+         isAuthorizedTeacherForTeamFanta(resource.data.teamId) &&
          'teamId' in request.resource.data && request.resource.data.teamId != null &&
-         isAuthorizedTeacherForTeam(request.resource.data.teamId))
+         isAuthorizedTeacherForTeamFanta(request.resource.data.teamId))
       ));
     }
 
-    // 3. Collezione: pending_requests (Richieste di approvazione dei docenti)
-    match /pending_requests/{reqId} {
-      // Qualsiasi utente autenticato può leggere le richieste
-      allow read: if isAuthenticated();
-      // Chiunque può creare una nuova richiesta (durante la registrazione iniziale)
-      allow create: if true;
-      // Solo il proprietario della richiesta o il Game Master può modificarla o cancellarla
-      allow update, delete: if isGameMaster() || (isAuthenticated() && resource.data.email.lower() == currentUserEmail());
+    match /fanta_pending_requests/{reqId} {
+      allow read: if isAdmin() || isFantaAuthorized();
+      allow create: if isFantaAuthorized();
+      allow update, delete: if isAdmin() || (isFantaAuthorized() && resource.data.email.lower() == currentUserEmail());
     }
 
-    // 4. Collezione: teams (Fanta-squadre create dagli utenti)
-    match /teams/{teamId} {
-      // Chiunque può leggere le squadre (necessario per visualizzare classifiche e tornei)
-      allow read: if true;
-      // Un utente autenticato può creare una squadra solo a proprio nome
-      allow create: if isAuthenticated() && request.resource.data.ownerEmail.lower() == currentUserEmail();
-      // Solo il proprietario della squadra, un collaboratore o il Game Master può modificarla o eliminarla.
-      // Inoltre, un docente autenticato può aggiungere se stesso ai collaboratori conoscendo il joinCode della squadra.
-      allow update: if isGameMaster() || (isAuthenticated() && (
+    match /fanta_teams/{teamId} {
+      allow read: if isAdmin() || isFantaAuthorized();
+      allow create: if isFantaAuthorized() && request.resource.data.ownerEmail.lower() == currentUserEmail();
+      allow update: if isAdmin() || (isFantaAuthorized() && (
         resource.data.ownerEmail.lower() == currentUserEmail() ||
         ('collaboratori' in resource.data && resource.data.collaboratori != null && resource.data.collaboratori.hasAny([currentUserEmail()])) ||
         (
@@ -80,57 +173,311 @@ service cloud.firestore {
           request.resource.data.collaboratori.hasAll([currentUserEmail()])
         )
       ));
-      allow delete: if isGameMaster() || (isAuthenticated() && (
+      allow delete: if isAdmin() || (isFantaAuthorized() && (
         resource.data.ownerEmail.lower() == currentUserEmail() ||
         ('collaboratori' in resource.data && resource.data.collaboratori != null && resource.data.collaboratori.hasAny([currentUserEmail()]))
       ));
     }
 
-    // 5. Collezione: missions (Missioni inviate dagli studenti/docenti)
-    match /missions/{missionId} {
-      // Chiunque può leggere le missioni inviate
-      allow read: if true;
-      // Un utente autenticato può inviare/creare una missione a proprio nome
-      allow create: if isAuthenticated() && request.resource.data.ownerEmail.lower() == currentUserEmail();
-      // Solo l'autore della missione o il Game Master può modificarla o eliminarla
-      allow update, delete: if isGameMaster() || (isAuthenticated() && resource.data.ownerEmail.lower() == currentUserEmail());
+    match /fanta_missions/{missionId} {
+      allow read: if isAdmin() || isFantaAuthorized();
+      allow create: if isFantaAuthorized() && request.resource.data.ownerEmail.lower() == currentUserEmail();
+      allow update, delete: if isAdmin() || (isFantaAuthorized() && resource.data.ownerEmail.lower() == currentUserEmail());
     }
 
-    // 6. Collezione: tournaments (Tornei interni creati dai docenti)
-    match /tournaments/{tournamentId} {
-      // Chiunque può leggere i tornei esistenti
-      allow read: if true;
-      // Un utente autenticato (docente) può creare un torneo a proprio nome
-      allow create: if isAuthenticated() && request.resource.data.ownerEmail.lower() == currentUserEmail();
-      // Solo l'owner del torneo o il Game Master può modificarlo o eliminarlo
-      allow update, delete: if isGameMaster() || (isAuthenticated() && resource.data.ownerEmail.lower() == currentUserEmail());
+    match /fanta_tournaments/{tournamentId} {
+      allow read: if isAdmin() || isFantaAuthorized();
+      allow create: if isFantaAuthorized() && request.resource.data.ownerEmail.lower() == currentUserEmail();
+      allow update, delete: if isAdmin() || (isFantaAuthorized() && resource.data.ownerEmail.lower() == currentUserEmail());
     }
 
-    // 7. Collezione: invites (Inviti di collaborazione tra colleghi docenti)
-    match /invites/{inviteId} {
-      // L'utente può leggere l'invito solo se è il mittente o il destinatario
-      allow read: if isAuthenticated() && (resource.data.fromEmail.lower() == currentUserEmail() || resource.data.toEmail.lower() == currentUserEmail());
-      // Chiunque sia autenticato può inviare/creare un invito se impostato come mittente
-      allow create: if isAuthenticated() && request.resource.data.fromEmail.lower() == currentUserEmail();
-      // Il mittente, il destinatario o il Game Master possono aggiornare o cancellare l'invito
-      allow update, delete: if isGameMaster() || (isAuthenticated() && (resource.data.fromEmail.lower() == currentUserEmail() || resource.data.toEmail.lower() == currentUserEmail()));
+    match /fanta_invites/{inviteId} {
+      allow read: if isFantaAuthorized() && (resource.data.fromEmail.lower() == currentUserEmail() || resource.data.toEmail.lower() == currentUserEmail());
+      allow create: if isFantaAuthorized() && request.resource.data.fromEmail.lower() == currentUserEmail();
+      allow update, delete: if isAdmin() || (isFantaAuthorized() && (resource.data.fromEmail.lower() == currentUserEmail() || resource.data.toEmail.lower() == currentUserEmail()));
     }
-
-    // 8. Collezione: fanta_calendar (Calendario ufficiale uscite dei gironi)
+    
+    match /fanta_archives/{docId} {
+      allow read: if isAdmin() || isFantaAuthorized();
+      allow write: if isAdmin();
+    }
+    match /fanta_minigame_logs/{docId} {
+      allow read: if isAdmin() || isFantaAuthorized();
+      allow create: if isFantaAuthorized();
+      allow update, delete: if isAdmin();
+    }
+    match /fanta_games_status/{docId} {
+      allow read: if isAdmin() || isFantaAuthorized();
+      allow write: if isAdmin();
+    }
     match /fanta_calendar/{docId} {
-      // Chiunque può leggere il calendario ufficiale di campionato
       allow read: if true;
-      // Solo il Game Master (Super Admin Prof. Memmo) può modificare date e forzature
-      allow write: if isGameMaster();
+      allow write: if isAdmin();
+    }
+    match /fanta_imprevisti/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
-    // 9. Collezione: fanta_imprevisti (Mazzo Lore, Timeline e Finestre di Mercato)
-    match /fanta_imprevisti/{docId} {
-      // Read-only per tutti gli utenti e studenti
-      allow read: if true;
-      // Solo ed esclusivamente il Super-Admin Prof. Memmo ha potere di configurazione
-      allow write: if isGameMaster();
+    // ==============================================================
+    // 2. REGOLE LA ROTTA DEGLI EROI (Namespace eroi_*)
+    // ==============================================================
+
+    function isEroiAuthorized() {
+      return isAdmin() || request.auth != null;
     }
+
+    match /eroi_users/{userId} {
+      allow read: if isAdmin() || (request.auth != null && request.auth.uid == userId) || isEroiAuthorized();
+      allow create, update: if isAdmin() || (request.auth != null && request.auth.uid == userId) || isEroiAuthorized();
+      allow delete: if isAdmin();
+    }
+
+    match /users/{userId} {
+      allow read: if isAdmin() || (request.auth != null && request.auth.uid == userId) || isEroiAuthorized();
+      allow create, update: if isAdmin() || (request.auth != null && request.auth.uid == userId) || isEroiAuthorized();
+      allow delete: if isAdmin();
+    }
+
+    match /eroi_classes/{classId} {
+      allow read: if isAdmin() || isEroiAuthorized();
+      allow create: if isEroiAuthorized();
+      allow update: if isAdmin() || (isEroiAuthorized() && (
+        resource.data.teacherId == request.auth.uid ||
+        (resource.data.teacherIds != null && resource.data.teacherIds.hasAny([request.auth.uid])) ||
+        (resource.data.teacherEmail != null && resource.data.teacherEmail.lower() == currentUserEmail()) ||
+        (resource.data.collaboratori != null && resource.data.collaboratori.hasAny([currentUserEmail()]))
+      ));
+      allow delete: if isAdmin() || (isEroiAuthorized() && (
+        resource.data.teacherId == request.auth.uid ||
+        (resource.data.teacherEmail != null && resource.data.teacherEmail.lower() == currentUserEmail())
+      ));
+    }
+
+    match /classes/{classId} {
+      allow read: if isAdmin() || isEroiAuthorized() || request.auth != null;
+      allow create: if isEroiAuthorized() || request.auth != null;
+      allow update: if isAdmin() || (request.auth != null && (
+        resource.data.teacherId == request.auth.uid ||
+        (resource.data.teacherIds != null && resource.data.teacherIds.hasAny([request.auth.uid])) ||
+        (resource.data.teacherEmail != null && resource.data.teacherEmail.lower() == currentUserEmail()) ||
+        (resource.data.collaboratori != null && resource.data.collaboratori.hasAny([currentUserEmail()]))
+      ));
+      allow delete: if isAdmin() || (request.auth != null && (
+        resource.data.teacherId == request.auth.uid ||
+        (resource.data.teacherEmail != null && resource.data.teacherEmail.lower() == currentUserEmail())
+      ));
+    }
+
+    match /eroi_pending_requests/{reqId} {
+      allow read: if isAdmin() || isEroiAuthorized();
+      allow create: if isEroiAuthorized();
+      allow update, delete: if isAdmin() || isEroiAuthorized();
+    }
+
+    match /pending_requests/{reqId} {
+      allow read: if isAdmin() || isEroiAuthorized() || request.auth != null;
+      allow create: if isEroiAuthorized() || request.auth != null;
+      allow update, delete: if isAdmin() || isEroiAuthorized() || request.auth != null;
+    }
+
+    match /eroi_archives/{docId} {
+      allow read: if isAdmin() || isEroiAuthorized();
+      allow write: if isAdmin();
+    }
+
+    match /archives/{docId} {
+      allow read: if isAdmin() || isEroiAuthorized() || request.auth != null;
+      allow write: if isAdmin() || request.auth != null;
+    }
+
+    match /eroi_settings/{docId} {
+      allow read: if isAdmin() || isEroiAuthorized();
+      allow write: if isAdmin();
+    }
+
+    // ==============================================================
+    // 3. REGOLE PALESTRA DI RIFLESSIONE (Namespace palestra_*)
+    // ==============================================================
+
+    function isPalestraAuthorized() {
+      return isAdmin() || request.auth != null;
+    }
+
+    match /palestra_users/{userId} {
+      allow read: if isAdmin() || (request.auth != null && request.auth.uid == userId) || isPalestraAuthorized();
+      allow create, update: if isAdmin() || (request.auth != null && request.auth.uid == userId) || isPalestraAuthorized();
+      allow delete: if isAdmin();
+    }
+
+    match /palestra_classes/{classId} {
+      allow read: if isAdmin() || isPalestraAuthorized();
+      allow create: if isPalestraAuthorized();
+      allow update: if isAdmin() || (isPalestraAuthorized() && (
+        resource.data.teacherId == request.auth.uid ||
+        (resource.data.teacherIds != null && resource.data.teacherIds.hasAny([request.auth.uid])) ||
+        (resource.data.teacherEmail != null && resource.data.teacherEmail.lower() == currentUserEmail())
+      ));
+      allow delete: if isAdmin() || (isPalestraAuthorized() && (
+        resource.data.teacherId == request.auth.uid ||
+        (resource.data.teacherEmail != null && resource.data.teacherEmail.lower() == currentUserEmail())
+      ));
+    }
+
+    match /palestra_progress/{userId} {
+      allow read: if isAdmin() || (request.auth != null && request.auth.uid == userId) || isPalestraAuthorized();
+      allow create, update: if isAdmin() || (request.auth != null && request.auth.uid == userId) || isPalestraAuthorized();
+      allow delete: if isAdmin();
+    }
+
+    match /palestra_history/{docId} {
+      allow read: if isAdmin() || isPalestraAuthorized();
+      allow write: if isAdmin();
+    }
+
+    match /palestra_archives/{docId} {
+      allow read: if isAdmin() || isPalestraAuthorized();
+      allow write: if isAdmin();
+    }
+
+    match /palestra_test_assignments/{docId} {
+      allow read: if isAdmin() || isPalestraAuthorized();
+      allow create, update, delete: if isAdmin() || isPalestraAuthorized();
+    }
+
+    match /palestra_settings/{docId} {
+      allow read: if isAdmin() || isPalestraAuthorized();
+      allow write: if isAdmin();
+    }
+
+    // ==============================================================
+    // 4. REGOLE LA CORTE DELLA COMMEDIA (Namespace corte_*)
+    // ==============================================================
+
+    function isCorteAuthorized() {
+      return isAdmin() || request.auth != null;
+    }
+
+    match /corte_users/{userId} {
+      allow read: if isAdmin() || (request.auth != null && request.auth.uid == userId) || isCorteAuthorized();
+      allow create, update: if isAdmin() || (request.auth != null && request.auth.uid == userId) || isCorteAuthorized();
+      allow delete: if isAdmin();
+    }
+
+    match /corte_classes/{classId} {
+      allow read: if isAdmin() || isCorteAuthorized();
+      allow create: if isCorteAuthorized();
+      allow update, delete: if isAdmin() || (isCorteAuthorized() && (
+        resource.data.ownerId == request.auth.uid || 
+        resource.data.teacherId == request.auth.uid ||
+        (resource.data.teacherEmail != null && resource.data.teacherEmail.lower() == currentUserEmail())
+      ));
+    }
+
+    match /corte_courts/{courtId} {
+      allow read: if isAdmin() || isCorteAuthorized();
+      allow create: if isCorteAuthorized();
+      allow update, delete: if isAdmin() || (isCorteAuthorized() && (
+        resource.data.ownerId == request.auth.uid || 
+        resource.data.teacherId == request.auth.uid ||
+        (resource.data.teacherEmail != null && resource.data.teacherEmail.lower() == currentUserEmail())
+      ));
+    }
+
+    match /corte_sentences/{sentenceId} {
+      allow read: if isAdmin() || isCorteAuthorized();
+      allow create: if isCorteAuthorized() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAdmin() || (isCorteAuthorized() && resource.data.userId == request.auth.uid);
+    }
+
+    match /corte_xpLogs/{logId} {
+      allow read: if isAdmin() || isCorteAuthorized();
+      allow create: if isCorteAuthorized() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    match /corte_progress/{progressId} {
+      allow read: if isAdmin() || isCorteAuthorized();
+      allow create, update: if isAdmin() || (isCorteAuthorized() && (
+        request.resource.data.userId == request.auth.uid ||
+        request.auth.uid == progressId
+      ));
+      allow delete: if isAdmin();
+    }
+
+    match /corte_campaigns/{docId} { allow read: if isAdmin() || isCorteAuthorized(); allow write: if isAdmin(); }
+    match /corte_cases/{docId} { allow read: if isAdmin() || isCorteAuthorized(); allow write: if isAdmin(); }
+    match /corte_activities/{docId} { allow read: if isAdmin() || isCorteAuthorized(); allow write: if isAdmin(); }
+    match /corte_badges/{docId} { allow read: if isAdmin() || isCorteAuthorized(); allow write: if isAdmin(); }
+    match /corte_levels/{docId} { allow read: if isAdmin() || isCorteAuthorized(); allow write: if isAdmin(); }
+    match /corte_questions/{docId} { allow read: if isAdmin() || isCorteAuthorized(); allow write: if isAdmin(); }
+    match /corte_characters/{docId} { allow read: if isAdmin() || isCorteAuthorized(); allow write: if isAdmin(); }
+    match /corte_cantos/{docId} { allow read: if isAdmin() || isCorteAuthorized(); allow write: if isAdmin(); }
+    match /corte_missions/{docId} { allow read: if isAdmin() || isCorteAuthorized(); allow write: if isAdmin(); }
+    match /corte_settings/{docId} { allow read: if isAdmin() || isCorteAuthorized(); allow write: if isAdmin(); }
+    match /corte_missions_completed/{docId} {
+      allow read: if isAdmin() || isCorteAuthorized();
+      allow create: if isCorteAuthorized() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    // ==============================================================
+    // 5. REGOLE OPS! OPERAZIONE STORIA (Namespace ops_*)
+    // ==============================================================
+    function isOpsAuthorized() {
+      return isAdmin() || request.auth != null;
+    }
+    match /ops_users/{userId} {
+      allow read: if isAdmin() || (request.auth != null && request.auth.uid == userId) || isOpsAuthorized();
+      allow create, update: if isAdmin() || (request.auth != null && request.auth.uid == userId) || isOpsAuthorized();
+      allow delete: if isAdmin();
+    }
+    match /ops_classes/{classId} {
+      allow read: if isAdmin() || isOpsAuthorized();
+      allow create: if isOpsAuthorized();
+      allow update, delete: if isAdmin() || (isOpsAuthorized() && (
+        resource.data.teacherId == request.auth.uid ||
+        (resource.data.teacherEmail != null && resource.data.teacherEmail.lower() == currentUserEmail())
+      ));
+    }
+    match /ops_progress/{progressId} {
+      allow read: if isAdmin() || isOpsAuthorized();
+      allow create, update: if isAdmin() || (isOpsAuthorized() && (
+        request.resource.data.userId == request.auth.uid ||
+        request.auth.uid == progressId
+      ));
+      allow delete: if isAdmin();
+    }
+    match /ops_game_sessions/{sessionId} {
+      allow read: if isAdmin() || isOpsAuthorized();
+      allow create, update: if isOpsAuthorized();
+      allow delete: if isAdmin();
+    }
+    match /ops_archives/{docId} {
+      allow read: if isAdmin() || isOpsAuthorized();
+      allow write: if isAdmin();
+    }
+    // Stanze multiplayer live (host e smartphone partecipanti tramite codice stanza)
+    match /ops_rooms/{roomId} {
+      allow read, write: if true;
+    }
+    // Partite salvate
+    match /ops_saved_games/{saveId} {
+      allow read: if isAdmin() || (request.auth != null && (resource == null || resource.data.userId == request.auth.uid || isOpsAuthorized()));
+      allow create, update, delete: if isAdmin() || (request.auth != null && (request.resource.data.userId == request.auth.uid || resource.data.userId == request.auth.uid));
+    }
+    match /ops_settings/{docId} {
+      allow read: if isAdmin() || isOpsAuthorized();
+      allow write: if isAdmin();
+    }
+
+    // ==============================================================
+    // REGISTRO PAGAMENTI E TRANSAZIONI STRIPE (Solo Super Admin)
+    // ==============================================================
+    match /hub_transactions/{transactionId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
   }
 }
-
