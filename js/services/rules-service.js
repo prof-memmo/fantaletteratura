@@ -16,59 +16,35 @@
 
     const SUPER_ADMIN_EMAIL = 'prof.memmo@gmail.com';
 
-    const DEFAULT_FANTA_RULES_TEXT = `1. Scopo del Gioco
-Il gioco nasce da una libera interpretazione e ha scopo puramente ludico e didattico.
+    const DEFAULT_FANTA_RULES_TEXT = `1. Cos'è FantaLetteratura e Profilo Centrale
+Come tutti i giochi dell'ecosistema Prof. Memmo, FantaLetteratura nasce da una libera interpretazione e ha scopo puramente ludico e culturale. Il gioco permette a scuole, classi, docenti e Viandanti (appassionati, lettori e partecipanti esterni) di formare la propria squadra ideale acquistando 5 grandi autori della storia letteraria per sfidarsi nel corso dell'anno scolastico. L'accesso, la gestione del proprio account, dei piani e delle classi avvengono tramite il Profilo Centrale unico nel portale vetrina dell'ecosistema.
 
-2. Diritto al riposo digitale
-Dopo 45 minuti di permanenza sulla piattaforma, ogni studente verrà bloccato e forzato a una Pausa di 15 minuti per tutelare il benessere visivo e cognitivo.
+2. Formazione Squadre, Classi e Docenti Collaboratori
+Le classi e gli elenchi studenti vengono creati e gestiti dal Profilo Docente Centrale e sincronizzati automaticamente nel gioco. In base al piano attivo, il docente titolare può comporre le squadre della propria classe, avviare il draft alla LIM e aggiungere Docenti Collaboratori tramite email per condividere la gestione didattica. I Viandanti possono iscrivere e gestire autonomamente la propria squadra personale. Ogni squadra dispone di un budget iniziale proporzionato alla modalità scelta per acquistare e schierare la propria rosa di 5 autori.
 
-3. Limite Sessioni Giornaliere
-Non è permesso completare più di 2 sessioni di studio giornaliere (max 90 minuti/giorno complessivi).
+3. Schede Autore, Bonus/Malus e Calendario Social
+Per ogni autore schierato saranno attribuiti bonus e malus legati alla vita, alle opere e alle vicende biografiche dell'autore, pubblicate dal Game Master da ottobre a giugno. I relativi punti saranno attribuiti e visibili nella pagina "Schede" al momento della pubblicazione e sblocco da parte del Game Master. I giocatori riceveranno apposita notifica sul sito ed è possibile seguire ogni uscita passo dopo passo anche attraverso i canali social ufficiali del Prof. Memmo.
 
-4. Formazione Squadre
-Ogni classe/scuola forma una o più squadre. Anche i Fantamici possono iscrivere e gestire le proprie squadre personali.
+4. ⚡ Imprevisti Letterari e 🔁 Finestre di Mercato
+Durante l'anno scolastico verranno pubblicati eventi speciali e imprevisti storici/letterari autentici tramite il Bollettino della Gazzetta (annunciati anche sui canali social), che assegneranno bonus o malus dinamici agli autori schierati nelle rose. Sono inoltre previste sessioni ufficiali di riparazione (sessione autunnale e sessione primaverile) in cui ogni squadra potrà effettuare 1 cambio nella propria rosa di 5 autori per ottimizzare la propria strategia di gioco.
 
-5. Budget Iniziale
-Ogni squadra ha un budget iniziale proporzionato alla modalità scelta (es. 100 FantaCrediti) per acquistare 5 autori nella propria rosa.
+5. Missioni Didattiche (+5 Punti)
+Esistono bonus dinamici che possono essere caricati in "Missioni" (riservati esclusivamente a docenti e studenti) e formeranno un'apposita graduatoria. I bonus dinamici sono legati ad attività di classe, approfondimenti, performance e scoperte e hanno un valore standard di 5 punti per ogni missione approvata.
 
-6. Bonus e Malus Autori
-Per ogni autore schierato saranno attribuiti bonus e malus calcolati in base alla scheda autore e agli avvenimenti storici/letterari.
+6. Minigiochi Didattici in Classe
+I docenti possono sfidare le squadre della classe tramite appositi minigiochi interattivi (Quiz, Impiccato, Cloze, Puzzle e Versi) proiettabili alla LIM o giocabili dagli studenti. Le manche consentono di verificare le conoscenze sugli autori e sulle opere studiate, accumulando punti extra per la classe e tenendo traccia dei progressi nello storico delle sfide.
 
-7. Aggiornamenti Mensili
-I punteggi vengono aggiornati mensilmente per uno o più autori e per il completamento delle missioni.
+7. Tornei Interscolastici e Privati
+Docenti e Viandanti possono creare o partecipare ai tornei. I docenti possono invitare colleghi tramite Codice Invito per gareggiare tra classi o istituti scolastici diversi, mentre i Viandanti possono creare tornei dedicati per sfidarsi tra loro e scalare graduatorie riservate!
 
-8. Scheda Segretissima
-I bonus e i malus sono fissi e legati alla vita e alle opere dell'autore raccolte in una scheda segretissima redatta dal Game Master.
+8. Classifiche e Vittoria Finale
+Il gioco si articola in Classifiche ufficiali: Classifica Autori (calcolata sui punti dei 5 autori e aperta a tutti), Classifica Missioni (riservata alle sole attività didattiche scolastiche) e Classifica Globale (che somma autori e missioni per decretare le classi campionesse, con graduatorie distinte per le scuole e per i Viandanti). Vince chi, nella prima settimana di Giugno alla chiusura dell'anno scolastico, ha totalizzato il maggior numero di punti.
 
-9. Sblocco delle Schede
-La scheda di ogni autore sarà mostrata nel riepilogo mensile nella sezione "Schede" non appena il Game Master la sbloccherà assieme ai punti.
+9. Benessere degli Studenti e Riposo Digitale
+A tutela del benessere visivo e cognitivo degli studenti, dopo 45 minuti di permanenza sulla piattaforma ogni sessione verrà temporaneamente bloccata per una Pausa obbligatoria di 15 minuti (Diritto al riposo digitale). Agli studenti non è permesso completare più di 2 sessioni di studio giornaliere (max 90 minuti al giorno complessivi). Questa limitazione oraria non si applica ai profili dei docenti né a quelli dei Viandanti.
 
-10. Bonus Dinamici & Missioni
-Esistono bonus dinamici che possono essere caricati in "Missioni" (riservati a docenti e studenti) che alimentano la speciale Classifica Missioni.
-
-11. Valore Attività di Classe
-I bonus dinamici sono legati ad attività didattiche di classe, approfondimenti, performance e scoperte e hanno un valore standard di 5 punti.
-
-12. Tre Classifiche Ufficiali
-Esistono tre Classifiche distinte: Classifica Autori, Classifica Missioni e Classifica Globale. La classifica Missioni e i relativi bonus dinamici sono riservati a docenti e studenti.
-
-13. Tornei Interscolastici e Privati
-Docenti e Fantamici possono creare o partecipare ai tornei. I docenti possono invitare colleghi tramite Codice Invito per gareggiare tra classi o scuole diverse, mentre i Fantamici possono creare tornei dedicati per sfidarsi tra loro!
-
-14. ⚡ Imprevisti Letterari
-Durante l'anno scolastico vengono pubblicati eventi speciali e imprevisti storici/letterari autentici tramite il Bollettino della Gazzetta, che assegnano bonus o malus dinamici agli autori schierati nelle rose delle squadre.
-
-15. 🔁 Finestre di Mercato
-Sono previste due sessioni ufficiali di riparazione (sessione autunnale e sessione primaverile) durante le quali ogni squadra può effettuare 1 cambio nella propria rosa di 5 autori per ottimizzare la strategia di gioco.
-
-16. Vittoria Finale
-Vince chi, nella prima settimana di Giugno alla chiusura dell'anno scolastico, ha totalizzato il maggior numero di punti nella classifica finale.
-
-17. Spirito Etico e Didattico
-Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma sempre rispettoso che anima il gioco. Nessun bonus o malus può essere interpretato come un'esortazione a compiere atti illeciti o irrispettosi nei confronti di altri individui o della collettività.
-
-18. Aggiornamenti del Regolamento
-Il regolamento potrà subire variazioni e integrazioni ufficiali da parte del Super-Admin per garantire equilibrio e divertimento.`;
+10. Codice Etico e Aggiornamenti del Regolamento
+Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma sempre rispettoso, che anima il gioco. Nessun bonus o malus può essere interpretato come un'esortazione a compiere atti illeciti o irrispettosi nei confronti di altri individui o della collettività. Il regolamento potrà subire variazioni e integrazioni ufficiali da parte del Team.`;
 
     const RulesService = {
         _gameKey: 'fanta',
