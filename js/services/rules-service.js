@@ -48,8 +48,8 @@ Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma
 
     const RulesService = {
         _gameKey: 'fanta',
-        _collectionName: 'fanta_rules',
-        _docId: 'official',
+        _collectionName: 'fanta_settings',
+        _docId: 'official_rules',
         _storageKey: 'fanta_rules_official_text',
         _rawText: '',
         _lastUpdated: null,
@@ -63,7 +63,9 @@ Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma
         },
 
         isSuperAdmin(email) {
-            const userEmail = (email || (window.currentUser && window.currentUser.email) || (window.Auth && window.Auth.getUser && window.Auth.getUser().email) || window.currentUserEmail || '').toLowerCase();
+            const fbUserEmail = (window.auth && window.auth.currentUser && window.auth.currentUser.email) || 
+                                (window.firebase && window.firebase.auth && window.firebase.auth().currentUser && window.firebase.auth().currentUser.email);
+            const userEmail = (email || fbUserEmail || (window.currentUser && window.currentUser.email) || (window.Auth && window.Auth.getUser && window.Auth.getUser().email) || window.currentUserEmail || '').toLowerCase();
             return userEmail === SUPER_ADMIN_EMAIL.toLowerCase();
         },
 
@@ -174,7 +176,9 @@ Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma
         },
 
         async saveToCloud(text) {
-            const userEmail = (window.currentUser && window.currentUser.email) || (window.Auth && window.Auth.getUser && window.Auth.getUser().email) || window.currentUserEmail;
+            const fbUserEmail = (window.auth && window.auth.currentUser && window.auth.currentUser.email) || 
+                                (window.firebase && window.firebase.auth && window.firebase.auth().currentUser && window.firebase.auth().currentUser.email);
+            const userEmail = (fbUserEmail || (window.currentUser && window.currentUser.email) || (window.Auth && window.Auth.getUser && window.Auth.getUser().email) || window.currentUserEmail || '').toLowerCase();
             
             if (!this.isSuperAdmin(userEmail)) {
                 throw new Error("Accesso negato: solo il Super-Admin (" + SUPER_ADMIN_EMAIL + ") può salvare il regolamento.");
