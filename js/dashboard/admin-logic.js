@@ -2056,13 +2056,18 @@ window.renderAdminProfilo = window.renderAdminImpostazioni;
 
             let batch = window.db.batch();
 
-            // 2. Salva documento in fanta_archives
+            // 2. Salva documento in fanta_archives (inclusa la fotografia degli imprevisti e mercato dell'anno)
+            const currentImprevisti = (window.ImprevistiService && Array.isArray(window.ImprevistiService._events)) 
+                ? window.ImprevistiService._events 
+                : [];
+
             const archiveDocRef = window.db.collection('fanta_archives').doc();
             batch.set(archiveDocRef, {
                 yearName: backupName,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                 totalTeams: archivedTeamsData.length,
-                leaderboard: leaderboard
+                leaderboard: leaderboard,
+                imprevistiSnapshot: currentImprevisti
             });
 
             // 3. Archivia le sole squadre selezionate
