@@ -48,6 +48,17 @@ window.CalendarService = {
         this.applyCalendarValidations();
     },
 
+    CLASSIC_HAZARDS: [
+        "⚡ Blocco dello Scrittore: Crisi d'ispirazione per gli autori di oggi (-2 punti)",
+        "🌟 Premio della Critica: L'opera riceve una standing ovation dai recensori (+3 punti)",
+        "⚔️ Duello Epistolare: Polemica feroce tra correnti letterarie rivali (+2 / -2 punti)",
+        "🎭 Adattamento a Teatro: L'opera va in scena con grande successo di pubblico (+4 punti)",
+        "📜 Manoscritto Inedito: Spunta una pergamena inedita dagli archivi (+3 punti)",
+        "🕯️ Notte di Boemia: Vita sregolata e nottate in taverna (-1 punto)",
+        "🚫 Censura Editoriale: L'opera viene contestata e bloccata temporaneamente (-3 punti)",
+        "🖋️ Bestseller nei Salotti: Ristampa record e trionfo tra i lettori (+3 punti)"
+    ],
+
     getReleases() {
         const baseReleases = typeof CALENDAR_RELEASES !== 'undefined' ? CALENDAR_RELEASES : [];
         const todayStr = this.getTodayDateString();
@@ -57,6 +68,8 @@ window.CalendarService = {
             const effectiveDate = ov.date || rel.date;
             const isForced = ov.forced === true;
             const isBlocked = ov.blocked === true;
+            const hazardText = ov.hazardText !== undefined ? ov.hazardText : (rel.hazardText || '');
+            const isMarketOpen = ov.isMarketOpen === true;
             
             // Un'uscita è rilasciata se forzata, oppure se oggi >= data e NON è bloccata
             const isDateReached = todayStr >= effectiveDate;
@@ -73,7 +86,9 @@ window.CalendarService = {
                 isForced,
                 isBlocked,
                 isReleased,
-                status
+                status,
+                hazardText,
+                isMarketOpen
             };
         });
     },
@@ -158,6 +173,18 @@ window.CalendarService = {
         if (!this._overrides[releaseId]) this._overrides[releaseId] = {};
         this._overrides[releaseId].blocked = blockedState;
         if (blockedState) this._overrides[releaseId].forced = false;
+        await this._saveOverrides();
+    },
+
+    async updateReleaseHazard(releaseId, hazardText) {
+        if (!this._overrides[releaseId]) this._overrides[releaseId] = {};
+        this._overrides[releaseId].hazardText = (hazardText || '').trim();
+        await this._saveOverrides();
+    },
+
+    async updateReleaseMarket(releaseId, isMarketOpen) {
+        if (!this._overrides[releaseId]) this._overrides[releaseId] = {};
+        this._overrides[releaseId].isMarketOpen = isMarketOpen === true;
         await this._saveOverrides();
     },
 

@@ -115,5 +115,14 @@ service cloud.firestore {
       // Il mittente, il destinatario o il Game Master possono aggiornare o cancellare l'invito
       allow update, delete: if isGameMaster() || (isAuthenticated() && (resource.data.fromEmail.lower() == currentUserEmail() || resource.data.toEmail.lower() == currentUserEmail()));
     }
+
+    // 8. Collezione: fanta_calendar (Calendario ufficiale, uscite e imprevisti)
+    match /fanta_calendar/{docId} {
+      // Chiunque può leggere il calendario ufficiale e gli imprevisti di campionato
+      allow read: if true;
+      // Solo il Game Master (Super Admin Prof. Memmo) può modificare date, forzature e imprevisti
+      allow write: if isGameMaster();
+    }
   }
 }
+

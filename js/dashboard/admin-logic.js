@@ -1274,6 +1274,16 @@ window.renderMonthlyCalendar = function() {
                     <div style="font-size:0.68rem; opacity:0.95; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                         ${rel.groupTitle.split(':')[1] || rel.title}
                     </div>
+                    ${rel.hazardText ? `
+                        <div style="font-size:0.63rem; color: #fde047; font-weight: 600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display: flex; align-items: center; gap: 3px;" title="${rel.hazardText.replace(/"/g, '&quot;')}">
+                            <i class="fa-solid fa-scroll"></i> ${rel.hazardText}
+                        </div>
+                    ` : ''}
+                    ${rel.isMarketOpen ? `
+                        <div style="font-size:0.63rem; color: #93c5fd; font-weight: bold; display: flex; align-items: center; gap: 3px;">
+                            <i class="fa-solid fa-repeat"></i> Mercato Attivo
+                        </div>
+                    ` : ''}
                     <div class="admin-cal-event-status">
                         <span>${rel.authorIds ? rel.authorIds.length : 0} Autori</span> &bull; 
                         <span>${rel.isReleased ? 'Sbloccato' : 'In attesa'}</span>
@@ -1429,6 +1439,27 @@ window.renderAdminCalendarioList = function() {
                     </div>
                 </div>
 
+                <!-- Sezione Imprevisto Ufficiale & Mercato -->
+                <div style="margin-top: 10px; background: rgba(0,0,0,0.25); padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(212,175,55,0.25);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 6px;">
+                        <label style="font-size: 0.8rem; font-weight: bold; color: var(--accent-gold); display: flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-scroll"></i> Carta Imprevisto del Turno:
+                        </label>
+                        <select style="background: rgba(20,20,30,0.9); color: var(--text-light); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; font-size: 0.75rem; padding: 3px 8px; cursor: pointer;" onchange="window.selectCalendarPresetHazard('${rel.id}', this.value); this.selectedIndex=0;">
+                            <option value="">⚡ Inserisci imprevisto classico...</option>
+                            ${((window.CalendarService && window.CalendarService.CLASSIC_HAZARDS) || []).map(h => `<option value="${h.replace(/"/g, '&quot;')}">${h}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                        <input type="text" id="hazard-input-${rel.id}" value="${(rel.hazardText || '').replace(/"/g, '&quot;')}" placeholder="Nessun imprevisto per questo turno (es. Crisi d'ispirazione: -2 pt)" style="flex: 1; min-width: 240px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 6px 10px; border-radius: 8px; font-size: 0.82rem;" onchange="window.updateCalendarReleaseHazard('${rel.id}', this.value)">
+                        
+                        <label style="display: inline-flex; align-items: center; gap: 6px; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); padding: 5px 10px; border-radius: 8px; font-size: 0.75rem; color: #93c5fd; cursor: pointer; user-select: none;">
+                            <input type="checkbox" ${rel.isMarketOpen ? 'checked' : ''} onchange="window.updateCalendarReleaseMarket('${rel.id}', this.checked)" style="cursor: pointer;">
+                            <i class="fa-solid fa-repeat"></i> Finestra Mercato (1 Cambio)
+                        </label>
+                    </div>
+                </div>
+
                 <!-- Autori inclusi -->
                 <div style="margin-top: 10px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px;">
                     <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">
@@ -1509,6 +1540,23 @@ window.toggleBlockCalendarRelease = async function(releaseId, blockState) {
 window.resetCalendarRelease = async function(releaseId) {
     if (!window.CalendarService) return;
     await window.CalendarService.resetRelease(releaseId);
+};
+
+window.updateCalendarReleaseHazard = async function(releaseId, text) {
+    if (!window.CalendarService) return;
+    await window.CalendarService.updateReleaseHazard(releaseId, text);
+};
+
+window.updateCalendarReleaseMarket = async function(releaseId, isMarketOpen) {
+    if (!window.CalendarService) return;
+    await window.CalendarService.updateReleaseMarket(releaseId, isMarketOpen);
+};
+
+window.selectCalendarPresetHazard = async function(releaseId, presetText) {
+    if (!presetText || !window.CalendarService) return;
+    const input = document.getElementById(`hazard-input-${releaseId}`);
+    if (input) input.value = presetText;
+    await window.CalendarService.updateReleaseHazard(releaseId, presetText);
 };
 
 window.renderAdminImpostazioni = async function() {

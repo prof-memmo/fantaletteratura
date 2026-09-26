@@ -1538,10 +1538,11 @@ function setupTeamSave() {
         // --- Fine Controllo Limiti ---
 
         const teamNameInput = document.querySelector('#view-squadra input[placeholder="Es: I Promessi Sposi"]').value.trim();
-        const teamClasseInput = document.getElementById('team-classe-input').value.trim();
+        const clsEl = document.getElementById('team-classe-input');
+        const teamClasseInput = (clsEl ? clsEl.value.trim() : '') || (typeof currentUserClasse !== 'undefined' ? currentUserClasse : '') || (window.currentUserClass || '') || '';
         
-        if(!teamNameInput || !teamClasseInput) {
-            alert("Inserisci il nome e la classe della squadra!");
+        if(!teamNameInput) {
+            alert("Inserisci il nome della squadra!");
             return;
         }
 
@@ -1602,8 +1603,10 @@ function setupTeamSave() {
         fanta_db.saveTeam(newTeam).then(() => {
             alert("Squadra creata con successo!");
             // Reset form
-            document.querySelector('#view-squadra input[placeholder="Es: I Promessi Sposi"]').value = "";
-            document.getElementById('team-classe-input').value = "";
+            const nameInp = document.querySelector('#view-squadra input[placeholder="Es: I Promessi Sposi"]');
+            if (nameInp) nameInp.value = "";
+            const clsInp = document.getElementById('team-classe-input');
+            if (clsInp) clsInp.value = "";
             teamSelection = { 1: null, 2: null, 3: null, 4: null, 5: null };
             calculateBudget();
             
@@ -1615,8 +1618,10 @@ function setupTeamSave() {
         });
         
         // Reset form
-        document.querySelector('#view-squadra input[placeholder="Es: I Promessi Sposi"]').value = "";
-        document.getElementById('team-classe-input').value = "";
+        const nameInp2 = document.querySelector('#view-squadra input[placeholder="Es: I Promessi Sposi"]');
+        if (nameInp2) nameInp2.value = "";
+        const clsInp2 = document.getElementById('team-classe-input');
+        if (clsInp2) clsInp2.value = "";
         currentTeamMode = null;
         teamSelection = { 1: null, 2: null, 3: null, 4: null, 5: null };
 
