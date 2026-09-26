@@ -207,9 +207,10 @@ window.ImprevistiService = {
         }
 
         // 2. Realtime listener da Firestore
-        if (window.fbDb) {
+        const db = window.db || window.fbDb || (typeof firebase !== 'undefined' && firebase.firestore ? firebase.firestore() : null);
+        if (db) {
             try {
-                window.fbDb.collection('fanta_imprevisti').doc('timeline_config')
+                db.collection('fanta_imprevisti').doc('timeline_config')
                     .onSnapshot((doc) => {
                         if (doc && doc.exists) {
                             const data = doc.data() || {};
@@ -396,8 +397,9 @@ window.ImprevistiService = {
     async _saveEvents() {
         try {
             localStorage.setItem('fanta_imprevisti_events', JSON.stringify(this._events));
-            if (window.fbDb) {
-                await window.fbDb.collection('fanta_imprevisti').doc('timeline_config').set({
+            const db = window.db || window.fbDb || (typeof firebase !== 'undefined' && firebase.firestore ? firebase.firestore() : null);
+            if (db) {
+                await db.collection('fanta_imprevisti').doc('timeline_config').set({
                     events: this._events,
                     lastUpdated: new Date().toISOString(),
                     updatedBy: (window.Auth && window.Auth.getUser && window.Auth.getUser().email) || 'admin'

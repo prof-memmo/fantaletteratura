@@ -17,9 +17,10 @@ window.CalendarService = {
         } catch (e) {}
 
         // 2. Ascolta modifiche in tempo reale da Firestore
-        if (window.fbDb) {
+        const db = window.db || window.fbDb || (typeof firebase !== 'undefined' && firebase.firestore ? firebase.firestore() : null);
+        if (db) {
             try {
-                window.fbDb.collection('fanta_calendar').doc('releases_config')
+                db.collection('fanta_calendar').doc('releases_config')
                     .onSnapshot((doc) => {
                         if (doc && doc.exists) {
                             const data = doc.data() || {};
@@ -237,8 +238,9 @@ window.CalendarService = {
     async _saveOverrides() {
         try {
             localStorage.setItem('fanta_calendar_overrides', JSON.stringify(this._overrides));
-            if (window.fbDb) {
-                await window.fbDb.collection('fanta_calendar').doc('releases_config').set({
+            const db = window.db || window.fbDb || (typeof firebase !== 'undefined' && firebase.firestore ? firebase.firestore() : null);
+            if (db) {
+                await db.collection('fanta_calendar').doc('releases_config').set({
                     overrides: this._overrides,
                     lastUpdated: new Date().toISOString(),
                     updatedBy: (window.Auth && window.Auth.getUser && window.Auth.getUser().email) || 'admin'
