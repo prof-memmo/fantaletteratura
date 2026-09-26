@@ -211,7 +211,7 @@ window.ImprevistiService = {
         if (db) {
             try {
                 db.collection('fanta_imprevisti').doc('timeline_config')
-                    .onSnapshot((doc) => {
+                    .onSnapshot(async (doc) => {
                         if (doc && doc.exists) {
                             const data = doc.data() || {};
                             this._events = Array.isArray(data.events) ? data.events : [];
@@ -226,6 +226,18 @@ window.ImprevistiService = {
                             // Aggiorna vista Studenti se presente
                             if (typeof window.renderStudentImprevistiNotice === 'function') {
                                 window.renderStudentImprevistiNotice();
+                            }
+                        } else if (doc && !doc.exists) {
+                            // Inizializza su Firestore con la lista eventi corrente (o vuota)
+                            try {
+                                await db.collection('fanta_imprevisti').doc('timeline_config').set({
+                                    events: this._events || [],
+                                    deckCount: (this.LORE_DECK || []).length,
+                                    lastUpdated: new Date().toISOString(),
+                                    updatedBy: (window.Auth && window.Auth.getUser && window.Auth.getUser().email) || 'admin'
+                                }, { merge: true });
+                            } catch (errInit) {
+                                // Se l'utente non è Super-Admin, ignora
                             }
                         }
                     }, (err) => {

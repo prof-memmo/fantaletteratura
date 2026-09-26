@@ -21,7 +21,7 @@ window.CalendarService = {
         if (db) {
             try {
                 db.collection('fanta_calendar').doc('releases_config')
-                    .onSnapshot((doc) => {
+                    .onSnapshot(async (doc) => {
                         if (doc && doc.exists) {
                             const data = doc.data() || {};
                             this._overrides = data.overrides || {};
@@ -38,6 +38,21 @@ window.CalendarService = {
                             }
                             if (typeof window.renderAdminImprevisti === 'function') {
                                 window.renderAdminImprevisti();
+                            }
+                        } else if (doc && !doc.exists) {
+                            // Se non esiste ancora su Firestore, salva la struttura predefinita con le 18 uscite
+                            const baseReleases = typeof CALENDAR_RELEASES !== 'undefined' ? CALENDAR_RELEASES : [];
+                            try {
+                                await db.collection('fanta_calendar').doc('releases_config').set({
+                                    releases: baseReleases,
+                                    overrides: this._overrides || {},
+                                    season: '2026-2027',
+                                    totalReleases: baseReleases.length,
+                                    lastUpdated: new Date().toISOString(),
+                                    updatedBy: (window.Auth && window.Auth.getUser && window.Auth.getUser().email) || 'admin'
+                                }, { merge: true });
+                            } catch (errInit) {
+                                // Se l'utente corrente non ha permessi di scrittura, continua con i dati base locali
                             }
                         }
                     }, (err) => {
