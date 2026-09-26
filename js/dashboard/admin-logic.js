@@ -197,17 +197,26 @@ async function setupAdminPanel() {
         });
         const allUsers = Array.from(userMap.values());
         
+        const isTeacher = (u) => u.role === 'teacher' || u.role === 'docente' || u.role === 'admin';
+        const isGuest = (u) => u.role === 'guest';
+        const isArchived = (u) => u.status === 'archived' || !!u.archivedYear;
+        const isStudentActive = (u) => !isTeacher(u) && !isGuest(u) && !isArchived(u);
+        const isStudentArchived = (u) => !isTeacher(u) && !isGuest(u) && isArchived(u);
+
         const scuoleSet = new Set();
         allUsers.forEach(u => {
-            let sc = (u.school || u.scuola || '').trim();
-            if (sc && sc.toUpperCase() !== 'N/A' && sc.toUpperCase() !== 'N/D') scuoleSet.add(sc.toLowerCase());
+            if (!isArchived(u)) {
+                let sc = (u.school || u.scuola || '').trim();
+                if (sc && sc.toUpperCase() !== 'N/A' && sc.toUpperCase() !== 'N/D') scuoleSet.add(sc.toLowerCase());
+            }
         });
 
         const counts = {
-            tutti: allUsers.length,
-            teacher: allUsers.filter(u => u.role === 'teacher' || u.role === 'docente' || u.role === 'admin').length,
-            student: allUsers.filter(u => u.role !== 'teacher' && u.role !== 'docente' && u.role !== 'admin' && u.role !== 'guest').length,
-            guest: allUsers.filter(u => u.role === 'guest').length,
+            tutti: allUsers.filter(u => !isArchived(u)).length,
+            teacher: allUsers.filter(u => isTeacher(u)).length,
+            student: allUsers.filter(u => isStudentActive(u)).length,
+            guest: allUsers.filter(u => isGuest(u) && !isArchived(u)).length,
+            archived: allUsers.filter(u => isArchived(u)).length,
             scuole: scuoleSet.size
         };
         
@@ -215,7 +224,7 @@ async function setupAdminPanel() {
             statsContainer.innerHTML = `
                 <div class="admin-stat-card ${currentAdminDocentiFilter === 'tutti' ? 'active' : ''}" onclick="window.setAdminDocentiFilter('tutti')">
                     <div class="stat-value">${counts.tutti}</div>
-                    <div class="stat-label">TUTTI</div>
+                    <div class="stat-label">TUTTI ATTIVI</div>
                 </div>
                 <div class="admin-stat-card ${currentAdminDocentiFilter === 'teacher' ? 'active' : ''}" onclick="window.setAdminDocentiFilter('teacher')">
                     <div class="stat-value">${counts.teacher}</div>
@@ -223,11 +232,11 @@ async function setupAdminPanel() {
                 </div>
                 <div class="admin-stat-card ${currentAdminDocentiFilter === 'student' ? 'active' : ''}" onclick="window.setAdminDocentiFilter('student')">
                     <div class="stat-value">${counts.student}</div>
-                    <div class="stat-label">STUDENTI</div>
+                    <div class="stat-label">STUDENTI ATTIVI</div>
                 </div>
-                <div class="admin-stat-card ${currentAdminDocentiFilter === 'guest' ? 'active' : ''}" onclick="window.setAdminDocentiFilter('guest')">
-                    <div class="stat-value">${counts.guest}</div>
-                    <div class="stat-label">FANTAMICI</div>
+                <div class="admin-stat-card ${currentAdminDocentiFilter === 'archived' ? 'active' : ''}" onclick="window.setAdminDocentiFilter('archived')">
+                    <div class="stat-value" style="color: #94a3b8;">${counts.archived}</div>
+                    <div class="stat-label">ARCHIVIATI (READ-ONLY)</div>
                 </div>
                 <div class="admin-stat-card ${currentAdminDocentiFilter === 'scuole' ? 'active' : ''}" onclick="window.setAdminDocentiFilter('scuole')">
                     <div class="stat-value">${counts.scuole}</div>
@@ -251,21 +260,23 @@ async function setupAdminPanel() {
 
             const schoolGroups = {};
             allUsers.forEach(u => {
-                let sc = (u.school || u.scuola || '').trim();
-                if (sc && sc.toUpperCase() !== 'N/A' && sc.toUpperCase() !== 'N/D') {
-                    const normKey = sc.toLowerCase();
-                    if (!schoolGroups[normKey]) {
-                        schoolGroups[normKey] = {
-                            name: sc,
-                            docenti: [],
-                            studenti: [],
-                            teams: []
-                        };
-                    }
-                    if (u.role === 'teacher' || u.role === 'docente' || u.role === 'admin') {
-                        schoolGroups[normKey].docenti.push(u);
-                    } else {
-                        schoolGroups[normKey].studenti.push(u);
+                if (!isArchived(u)) {
+                    let sc = (u.school || u.scuola || '').trim();
+                    if (sc && sc.toUpperCase() !== 'N/A' && sc.toUpperCase() !== 'N/D') {
+                        const normKey = sc.toLowerCase();
+                        if (!schoolGroups[normKey]) {
+                            schoolGroups[normKey] = {
+                                name: sc,
+                                docenti: [],
+                                studenti: [],
+                                teams: []
+                            };
+                        }
+                        if (isTeacher(u)) {
+                            schoolGroups[normKey].docenti.push(u);
+                        } else {
+                            schoolGroups[normKey].studenti.push(u);
+                        }
                     }
                 }
             });
@@ -294,7 +305,7 @@ async function setupAdminPanel() {
             }
 
             if (schoolsList.length === 0) {
-                list.innerHTML = '<p style="text-align: center; color: #888; padding: 20px;">Nessuna scuola trovata con i filtri correnti.</p>';
+                list.innerHTML = '<p style="text-align: center; color: #888; padding: 20px;">Nessuna scuola attiva trovata con i filtri correnti.</p>';
                 return;
             }
 
@@ -332,7 +343,7 @@ async function setupAdminPanel() {
                                     ${s.name}
                                 </div>
                                 <div style="font-size:0.75rem; color:#888; margin-top:4px;">
-                                    ${s.docenti.length} ${s.docenti.length === 1 ? 'Docente' : 'Docenti'} &bull; ${s.studenti.length} Studenti
+                                    ${s.docenti.length} ${s.docenti.length === 1 ? 'Docente' : 'Docenti'} &bull; ${s.studenti.length} Studenti Attivi
                                 </div>
                             </div>
                             <div style="flex: 3;">
@@ -357,20 +368,22 @@ async function setupAdminPanel() {
         }
         
         let users = allUsers;
-        if (currentAdminDocentiFilter !== 'tutti') {
-            if (currentAdminDocentiFilter === 'student') {
-                users = allUsers.filter(u => u.role !== 'teacher' && u.role !== 'docente' && u.role !== 'admin' && u.role !== 'guest');
-            } else if (currentAdminDocentiFilter === 'teacher') {
-                users = allUsers.filter(u => u.role === 'teacher' || u.role === 'docente' || u.role === 'admin');
-            } else if (currentAdminDocentiFilter === 'guest') {
-                users = allUsers.filter(u => u.role === 'guest');
-            }
+        if (currentAdminDocentiFilter === 'tutti') {
+            users = allUsers.filter(u => !isArchived(u));
+        } else if (currentAdminDocentiFilter === 'student') {
+            users = allUsers.filter(u => isStudentActive(u));
+        } else if (currentAdminDocentiFilter === 'teacher') {
+            users = allUsers.filter(u => isTeacher(u));
+        } else if (currentAdminDocentiFilter === 'guest') {
+            users = allUsers.filter(u => isGuest(u) && !isArchived(u));
+        } else if (currentAdminDocentiFilter === 'archived') {
+            users = allUsers.filter(u => isArchived(u));
         }
         
         list.innerHTML = '';
         let filteredUsers = users.filter(u => {
             const q = filterText.toLowerCase();
-            return (u.email || '').toLowerCase().includes(q) || (u.name || '').toLowerCase().includes(q) || (u.school || u.scuola || '').toLowerCase().includes(q);
+            return (u.email || '').toLowerCase().includes(q) || (u.name || '').toLowerCase().includes(q) || (u.school || u.scuola || '').toLowerCase().includes(q) || (u.archivedYear || '').toLowerCase().includes(q);
         });
 
         if (filteredUsers.length === 0) {
@@ -399,7 +412,7 @@ async function setupAdminPanel() {
         list.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:2px solid var(--accent-gold); font-size:0.8rem; text-transform:uppercase; color:var(--accent-gold);">
                 <div style="display:flex; gap:15px; width:100%;">
-                    <div style="cursor:pointer; flex: 1;" onclick="window.sortAdminDocenti('role')">Ruolo <i class="fa-solid fa-sort" style="margin-left:5px; color:#888;"></i></div>
+                    <div style="cursor:pointer; flex: 1;" onclick="window.sortAdminDocenti('role')">Ruolo / Stato <i class="fa-solid fa-sort" style="margin-left:5px; color:#888;"></i></div>
                     <div style="cursor:pointer; flex: 2;" onclick="window.sortAdminDocenti('email')">Utente <i class="fa-solid fa-sort" style="margin-left:5px; color:#888;"></i></div>
                     <div style="cursor:pointer; flex: 1;" onclick="window.sortAdminDocenti('date')">Data Iscrizione <i class="fa-solid fa-sort" style="margin-left:5px; color:#888;"></i></div>
                     <div style="flex: 1; text-align:right;">Azioni</div>
@@ -413,18 +426,37 @@ async function setupAdminPanel() {
             const userEmail = (u.email || u.id || '').toLowerCase();
             const schoolBadge = (u.school || u.scuola) ? `<span style="font-size:0.7rem; color:#888; display:block;"><i class="fa-solid fa-school"></i> ${u.school || u.scuola}</span>` : '';
             const isSuperAdminUser = getCanonicalEmail(userEmail) === 'profmemmo@gmail.com' || userEmail === 'guglielmo.piersanti@padregemelli.net';
+            const userIsArchived = isArchived(u);
+            const archiveYearLabel = u.archivedYear ? `Archivio ${u.archivedYear}` : 'Archiviato';
+            const archiveBadge = userIsArchived 
+                ? `<span class="badge" style="background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3); font-size: 0.68rem; padding: 2px 7px; border-radius: 10px; font-weight: 700; margin-left: 6px; display: inline-flex; align-items: center; gap: 4px;"><i class="fa-solid fa-lock"></i> ${archiveYearLabel} (Read-Only)</span>`
+                : '';
 
-            list.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:12px 10px; border-bottom:1px solid rgba(255,255,255,0.05);">
+            let roleControlHtml = '';
+            if (userIsArchived) {
+                roleControlHtml = `
+                    <select class="input-field" style="padding: 4px 8px; font-size: 0.75rem; border-radius: 8px; background: rgba(0,0,0,0.25); color: #888; border: 1px dashed rgba(255,255,255,0.15); cursor: not-allowed;" disabled title="Account archiviato in sola lettura">
+                        <option selected>🔒 Studente (Archiviato)</option>
+                    </select>
+                `;
+            } else {
+                roleControlHtml = `
+                    <select class="input-field" style="padding: 4px 8px; font-size: 0.75rem; border-radius: 8px; background: rgba(0,0,0,0.4); color: #fff; border: 1px solid rgba(255,255,255,0.2);" onchange="window.cambiaRuoloFantaUser('${userEmail}', this.value)" ${isSuperAdminUser ? 'disabled' : ''}>
+                        <option value="student" ${!isTeacher(u) && !isGuest(u) ? 'selected' : ''}>Studente</option>
+                        <option value="teacher" ${isTeacher(u) ? 'selected' : ''}>Docente</option>
+                        <option value="guest" ${isGuest(u) ? 'selected' : ''}>Fantamico</option>
+                    </select>
+                `;
+            }
+
+            list.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:12px 10px; border-bottom:1px solid rgba(255,255,255,0.05); ${userIsArchived ? 'opacity: 0.85; background: rgba(255,255,255,0.01);' : ''}">
                 <div style="display:flex; gap:15px; width:100%; align-items:center;">
                     <div style="flex: 1;">
-                        <select class="input-field" style="padding: 4px 8px; font-size: 0.75rem; border-radius: 8px; background: rgba(0,0,0,0.4); color: #fff; border: 1px solid rgba(255,255,255,0.2);" onchange="window.cambiaRuoloFantaUser('${userEmail}', this.value)" ${isSuperAdminUser ? 'disabled' : ''}>
-                            <option value="student" ${u.role !== 'teacher' && u.role !== 'docente' && u.role !== 'admin' && u.role !== 'guest' ? 'selected' : ''}>Studente</option>
-                            <option value="teacher" ${u.role === 'teacher' || u.role === 'docente' || u.role === 'admin' ? 'selected' : ''}>Docente</option>
-                            <option value="guest" ${u.role === 'guest' ? 'selected' : ''}>Fantamico</option>
-                        </select>
+                        ${roleControlHtml}
                     </div>
                     <div style="flex: 2;">
                         <span style="font-weight: 700; color: #fff;">${u.name || 'Senza Nome'}</span>
+                        ${archiveBadge}
                         <div style="font-size:0.8rem; color:#aaa;">${userEmail}</div>
                         ${schoolBadge}
                     </div>
