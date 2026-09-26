@@ -118,11 +118,31 @@ async function setupAdminPanel() {
     };
 
     let currentAdminDocentiFilter = 'tutti';
+    
+    function getCanonicalEmail(emailOrId) {
+        if (!emailOrId) return '';
+        let em = String(emailOrId).toLowerCase().trim();
+        if (em.endsWith('@gmail.com')) {
+            const parts = em.split('@');
+            em = parts[0].replace(/\./g, '') + '@gmail.com';
+        }
+        return em;
+    }
+
     window.setAdminDocentiFilter = function(f) {
         currentAdminDocentiFilter = f;
         const searchInput = document.getElementById('admin-docenti-search');
         if(searchInput) searchInput.value = '';
         window.renderAdminDocenti();
+    };
+
+    window.filtraDocentiPerScuola = function(schoolName) {
+        window.setAdminDocentiFilter('teacher');
+        const searchInput = document.getElementById('admin-docenti-search');
+        if (searchInput) {
+            searchInput.value = schoolName;
+        }
+        window.renderAdminDocenti(schoolName);
     };
 
     window.sortAdminDocenti = function(col) {
@@ -141,9 +161,41 @@ async function setupAdminPanel() {
         const statsContainer = document.getElementById('admin-docenti-stats');
         if (!list) return;
         
-        // Fetch all users to get counts
+        // Fetch all users and deduplicate canonical accounts
         const snapshotAll = await window.db.collection('fanta_users').get();
-        const allUsers = snapshotAll.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const userMap = new Map();
+        snapshotAll.docs.forEach(doc => {
+            const data = doc.data();
+            const rawEmail = (data.email || doc.id || '').trim();
+            const key = getCanonicalEmail(rawEmail);
+            if (!key) return;
+
+            if (!userMap.has(key)) {
+                userMap.set(key, {
+                    id: doc.id,
+                    docIds: [doc.id],
+                    ...data,
+                    email: data.email || (doc.id.includes('@') ? doc.id : rawEmail)
+                });
+            } else {
+                const existing = userMap.get(key);
+                existing.docIds.push(doc.id);
+                userMap.set(key, {
+                    ...existing,
+                    ...data,
+                    id: existing.id,
+                    docIds: existing.docIds,
+                    email: existing.email || data.email,
+                    name: (data.name && data.name !== 'Senza Nome') ? data.name : (existing.name || 'Senza Nome'),
+                    school: (data.school || data.scuola || existing.school || existing.scuola || '').trim(),
+                    scuola: (data.school || data.scuola || existing.school || existing.scuola || '').trim(),
+                    role: (data.role || existing.role || 'student'),
+                    createdAt: existing.createdAt || data.createdAt,
+                    joinedAt: existing.joinedAt || data.joinedAt
+                });
+            }
+        });
+        const allUsers = Array.from(userMap.values());
         
         const scuoleSet = new Set();
         allUsers.forEach(u => {
@@ -178,13 +230,131 @@ async function setupAdminPanel() {
                     <div class="stat-label">FANTAMICI</div>
                 </div>
                 <div class="admin-stat-card ${currentAdminDocentiFilter === 'scuole' ? 'active' : ''}" onclick="window.setAdminDocentiFilter('scuole')">
-                    <div class="stat-value" style="color: #ec4899;">${counts.scuole}</div>
+                    <div class="stat-value">${counts.scuole}</div>
                     <div class="stat-label">SCUOLE ATTIVE</div>
                 </div>
             `;
         }
 
-        list.innerHTML = '<p class="text-center">Caricamento iscritti...</p>';
+        list.innerHTML = '<p class="text-center">Caricamento...</p>';
+        
+        // --- VISTA DEDICATA SCUOLE ATTIVE ---
+        if (currentAdminDocentiFilter === 'scuole') {
+            let allTeams = [];
+            try {
+                if (typeof getAllTeams === 'function') {
+                    allTeams = await getAllTeams();
+                }
+            } catch (e) {
+                console.warn("Recupero squadre per scuole:", e);
+            }
+
+            const schoolGroups = {};
+            allUsers.forEach(u => {
+                let sc = (u.school || u.scuola || '').trim();
+                if (sc && sc.toUpperCase() !== 'N/A' && sc.toUpperCase() !== 'N/D') {
+                    const normKey = sc.toLowerCase();
+                    if (!schoolGroups[normKey]) {
+                        schoolGroups[normKey] = {
+                            name: sc,
+                            docenti: [],
+                            studenti: [],
+                            teams: []
+                        };
+                    }
+                    if (u.role === 'teacher' || u.role === 'docente' || u.role === 'admin') {
+                        schoolGroups[normKey].docenti.push(u);
+                    } else {
+                        schoolGroups[normKey].studenti.push(u);
+                    }
+                }
+            });
+
+            // Associa squadre alle scuole tramite docenti
+            allTeams.forEach(t => {
+                const ownerEmail = (t.ownerEmail || '').toLowerCase();
+                const teacherMatch = allUsers.find(u => (u.email || '').toLowerCase() === ownerEmail);
+                if (teacherMatch) {
+                    const sc = (teacherMatch.school || teacherMatch.scuola || '').trim().toLowerCase();
+                    if (schoolGroups[sc]) {
+                        schoolGroups[sc].teams.push(t);
+                    }
+                }
+            });
+
+            let schoolsList = Object.values(schoolGroups);
+
+            if (filterText) {
+                const q = filterText.toLowerCase();
+                schoolsList = schoolsList.filter(s => {
+                    const nameMatch = s.name.toLowerCase().includes(q);
+                    const docMatch = s.docenti.some(d => (d.name || '').toLowerCase().includes(q) || (d.email || '').toLowerCase().includes(q));
+                    return nameMatch || docMatch;
+                });
+            }
+
+            if (schoolsList.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #888; padding: 20px;">Nessuna scuola trovata con i filtri correnti.</p>';
+                return;
+            }
+
+            list.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:2px solid var(--accent-gold); font-size:0.8rem; text-transform:uppercase; color:var(--accent-gold);">
+                    <div style="display:flex; gap:15px; width:100%;">
+                        <div style="flex: 2;">Scuola</div>
+                        <div style="flex: 3;">Docenti Coinvolti</div>
+                        <div style="flex: 2;">Squadre / Attività</div>
+                        <div style="flex: 1; text-align:right;">Azioni</div>
+                    </div>
+                </div>
+            `;
+
+            schoolsList.forEach(s => {
+                const docentiHtml = s.docenti.length > 0
+                    ? s.docenti.map(d => `
+                        <div style="margin-bottom: 4px; display:flex; align-items:center; gap:6px;">
+                            <i class="fa-solid fa-chalkboard-user" style="color:var(--accent-gold); font-size:0.75rem;"></i>
+                            <span style="font-weight:600; color:#fff; font-size:0.85rem;">${d.name || 'Docente'}</span>
+                            <span style="font-size:0.75rem; color:#888;">(${d.email})</span>
+                        </div>
+                    `).join('')
+                    : '<i style="color:#888; font-size:0.8rem;">Nessun docente registrato</i>';
+
+                const teamsCount = s.teams.length;
+                const docEmails = s.docenti.map(d => d.email).filter(Boolean).join(',');
+
+                list.innerHTML += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 10px; border-bottom:1px solid rgba(255,255,255,0.05);">
+                        <div style="display:flex; gap:15px; width:100%; align-items:center;">
+                            <div style="flex: 2;">
+                                <div style="font-weight: 700; color: #fff; font-size: 0.95rem; display:flex; align-items:center; gap:8px;">
+                                    <i class="fa-solid fa-school" style="color:var(--primary-color);"></i>
+                                    ${s.name}
+                                </div>
+                                <div style="font-size:0.75rem; color:#888; margin-top:4px;">
+                                    ${s.docenti.length} ${s.docenti.length === 1 ? 'Docente' : 'Docenti'} &bull; ${s.studenti.length} Studenti
+                                </div>
+                            </div>
+                            <div style="flex: 3;">
+                                ${docentiHtml}
+                            </div>
+                            <div style="flex: 2;">
+                                <span class="badge" style="background: rgba(141,160,63,0.15); color: var(--primary-color); border: 1px solid var(--primary-color); padding: 4px 10px; border-radius: 12px; font-size: 0.78rem; font-weight:600;">
+                                    <i class="fa-solid fa-users-rectangle"></i> ${teamsCount} ${teamsCount === 1 ? 'Squadra' : 'Squadre'}
+                                </span>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:8px; flex: 1; justify-content:flex-end;">
+                                ${docEmails ? `<a href="mailto:${docEmails}" title="Scrivi ai docenti di ${s.name}" class="btn btn-secondary" style="padding:4px 8px; font-size:0.8rem; width:auto; text-decoration:none;"><i class="fa-solid fa-envelope"></i></a>` : ''}
+                                <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem; width:auto;" onclick="window.filtraDocentiPerScuola('${s.name.replace(/'/g, "\\'")}')" title="Vedi i docenti">
+                                    <i class="fa-solid fa-users"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            return;
+        }
         
         let users = allUsers;
         if (currentAdminDocentiFilter !== 'tutti') {
@@ -194,11 +364,6 @@ async function setupAdminPanel() {
                 users = allUsers.filter(u => u.role === 'teacher' || u.role === 'docente' || u.role === 'admin');
             } else if (currentAdminDocentiFilter === 'guest') {
                 users = allUsers.filter(u => u.role === 'guest');
-            } else if (currentAdminDocentiFilter === 'scuole') {
-                users = allUsers.filter(u => {
-                    let sc = (u.school || u.scuola || '').trim();
-                    return sc && sc.toUpperCase() !== 'N/A' && sc.toUpperCase() !== 'N/D';
-                });
             }
         }
         
@@ -247,11 +412,12 @@ async function setupAdminPanel() {
             let dataStr = dataIsc ? (dataIsc.toDate ? dataIsc.toDate().toLocaleDateString() : new Date(dataIsc).toLocaleDateString()) : 'N/D';
             const userEmail = (u.email || u.id || '').toLowerCase();
             const schoolBadge = (u.school || u.scuola) ? `<span style="font-size:0.7rem; color:#888; display:block;"><i class="fa-solid fa-school"></i> ${u.school || u.scuola}</span>` : '';
+            const isSuperAdminUser = getCanonicalEmail(userEmail) === 'profmemmo@gmail.com' || userEmail === 'guglielmo.piersanti@padregemelli.net';
 
             list.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:12px 10px; border-bottom:1px solid rgba(255,255,255,0.05);">
                 <div style="display:flex; gap:15px; width:100%; align-items:center;">
                     <div style="flex: 1;">
-                        <select class="input-field" style="padding: 4px 8px; font-size: 0.75rem; border-radius: 8px; background: rgba(0,0,0,0.4); color: #fff; border: 1px solid rgba(255,255,255,0.2);" onchange="window.cambiaRuoloFantaUser('${userEmail}', this.value)" ${userEmail === 'prof.memmo@gmail.com' ? 'disabled' : ''}>
+                        <select class="input-field" style="padding: 4px 8px; font-size: 0.75rem; border-radius: 8px; background: rgba(0,0,0,0.4); color: #fff; border: 1px solid rgba(255,255,255,0.2);" onchange="window.cambiaRuoloFantaUser('${userEmail}', this.value)" ${isSuperAdminUser ? 'disabled' : ''}>
                             <option value="student" ${u.role !== 'teacher' && u.role !== 'docente' && u.role !== 'admin' && u.role !== 'guest' ? 'selected' : ''}>Studente</option>
                             <option value="teacher" ${u.role === 'teacher' || u.role === 'docente' || u.role === 'admin' ? 'selected' : ''}>Docente</option>
                             <option value="guest" ${u.role === 'guest' ? 'selected' : ''}>Fantamico</option>
@@ -265,7 +431,7 @@ async function setupAdminPanel() {
                     <div style="flex: 1;"><span style="font-size:0.75rem; color:#888;"><i class="fa-solid fa-calendar-days"></i> ${dataStr}</span></div>
                     <div style="display:flex; align-items:center; gap:10px; flex: 1; justify-content:flex-end;">
                         <a href="mailto:${userEmail}" title="Scrivi a ${u.name || 'Senza Nome'}" style="color:var(--accent-gold); text-decoration:none; font-size: 1rem;"><i class="fa-solid fa-envelope"></i></a>
-                        ${userEmail !== 'prof.memmo@gmail.com' ? `
+                        ${!isSuperAdminUser ? `
                             <button class="btn btn-secondary text-danger" style="padding:4px 8px; font-size:0.75rem; width:auto; background:var(--bg-card); border-color:var(--danger-color); cursor:pointer;" onclick="eliminaDocente('${userEmail}')" title="Elimina Utente"><i class="fa-solid fa-trash"></i></button>
                         ` : ''}
                     </div>
@@ -276,10 +442,29 @@ async function setupAdminPanel() {
 
     window.cambiaRuoloFantaUser = async function(email, newRole) {
         try {
-            await window.db.collection('fanta_users').doc(email.toLowerCase()).update({
-                role: newRole,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            const canonical = getCanonicalEmail(email);
+            const snapshotAll = await window.db.collection('fanta_users').get();
+            const batch = window.db.batch();
+            let matched = 0;
+            snapshotAll.docs.forEach(doc => {
+                const data = doc.data();
+                const rawEmail = (data.email || doc.id || '').trim();
+                if (getCanonicalEmail(rawEmail) === canonical || doc.id.toLowerCase() === email.toLowerCase()) {
+                    batch.update(doc.ref, {
+                        role: newRole,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    matched++;
+                }
             });
+            if (matched > 0) {
+                await batch.commit();
+            } else {
+                await window.db.collection('fanta_users').doc(email.toLowerCase()).set({
+                    role: newRole,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+            }
             window.renderAdminDocenti();
         } catch(e) {
             console.error("Errore cambio ruolo:", e);
@@ -290,7 +475,23 @@ async function setupAdminPanel() {
     window.eliminaDocente = async function(email) {
         if(!confirm(`Sei sicuro di voler eliminare l'account ${email}?`)) return;
         try {
-            await window.db.collection('fanta_users').doc(email.toLowerCase()).delete();
+            const canonical = getCanonicalEmail(email);
+            const snapshotAll = await window.db.collection('fanta_users').get();
+            const batch = window.db.batch();
+            let matched = 0;
+            snapshotAll.docs.forEach(doc => {
+                const data = doc.data();
+                const rawEmail = (data.email || doc.id || '').trim();
+                if (getCanonicalEmail(rawEmail) === canonical || doc.id.toLowerCase() === email.toLowerCase()) {
+                    batch.delete(doc.ref);
+                    matched++;
+                }
+            });
+            if (matched > 0) {
+                await batch.commit();
+            } else {
+                await window.db.collection('fanta_users').doc(email.toLowerCase()).delete();
+            }
             window.renderAdminDocenti();
         } catch (e) {
             console.error(e);
