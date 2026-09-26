@@ -23,6 +23,11 @@
         <!-- VIEWS -->
         <main id="main-content">
             
+            <!-- BANNER BOLLETTINO IMPREVISTI & MERCATO (READ-ONLY PER STUDENTI) -->
+            <div id="student-imprevisti-banner" style="display:none; margin: 10px auto 18px auto; max-width: 900px; padding: 0 15px;">
+                <!-- Popolato dinamicamente da JS quando un evento è attivo -->
+            </div>
+            
             <!-- VIEW: Pausa Obbligatoria -->
             <section id="view-pausa-obbligatoria" class="view" style="display: none;">
                 <div style="max-width: 600px; margin: 0 auto; text-align: center; padding: 20px;">
@@ -1472,10 +1477,11 @@
     </script>
 
     <!-- Scripts -->
-    <script src="js/data.js?v=20260824_clean_minigames"></script>
-    <script src="js/services/calendar-service.js?v=20260824_clean_minigames"></script>
-    <script src="js/music.js?v=20260824_clean_minigames"></script>
-    <script src="js/minigames.js?v=20260824_clean_minigames"></script>
+    <script src="js/data.js?v=20260926_clean_imprevisti_v4"></script>
+    <script src="js/services/calendar-service.js?v=20260926_clean_imprevisti_v4"></script>
+    <script src="js/services/imprevisti-service.js?v=20260926_clean_imprevisti_v4"></script>
+    <script src="js/music.js?v=20260926_clean_imprevisti_v4"></script>
+    <script src="js/minigames.js?v=20260926_clean_imprevisti_v4"></script>
     <!-- Components -->
     <script src="js/components/navbar.js?v=20260824_clean_minigames"></script>
     <script src="js/components/modals.js?v=20260824_clean_minigames"></script>

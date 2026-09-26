@@ -116,11 +116,19 @@ service cloud.firestore {
       allow update, delete: if isGameMaster() || (isAuthenticated() && (resource.data.fromEmail.lower() == currentUserEmail() || resource.data.toEmail.lower() == currentUserEmail()));
     }
 
-    // 8. Collezione: fanta_calendar (Calendario ufficiale, uscite e imprevisti)
+    // 8. Collezione: fanta_calendar (Calendario ufficiale uscite dei gironi)
     match /fanta_calendar/{docId} {
-      // Chiunque può leggere il calendario ufficiale e gli imprevisti di campionato
+      // Chiunque può leggere il calendario ufficiale di campionato
       allow read: if true;
-      // Solo il Game Master (Super Admin Prof. Memmo) può modificare date, forzature e imprevisti
+      // Solo il Game Master (Super Admin Prof. Memmo) può modificare date e forzature
+      allow write: if isGameMaster();
+    }
+
+    // 9. Collezione: fanta_imprevisti (Mazzo Lore, Timeline e Finestre di Mercato)
+    match /fanta_imprevisti/{docId} {
+      // Read-only per tutti gli utenti e studenti
+      allow read: if true;
+      // Solo ed esclusivamente il Super-Admin Prof. Memmo ha potere di configurazione
       allow write: if isGameMaster();
     }
   }

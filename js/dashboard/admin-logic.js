@@ -1562,171 +1562,329 @@ window.selectCalendarPresetHazard = async function(releaseId, presetText) {
 };
 
 // =========================================================
-// GESTIONE DEDICATA TAB IMPREVISTI & MERCATO ADMIN
+// GESTIONE DEDICATA TAB IMPREVISTI & MERCATO ADMIN (SUPER-ADMIN ONLY)
 // =========================================================
 
-window.currentImprevistiFilter = 'all';
+window.currentImprevistiTimelineFilter = 'all';
 
-window.filterImprevistiView = function(filter) {
-    window.currentImprevistiFilter = filter;
+window.filterImprevistiTimeline = function(filter) {
+    window.currentImprevistiTimelineFilter = filter;
     document.querySelectorAll('#admin-view-imprevisti .admin-mode-filter-btn').forEach(btn => btn.classList.remove('active'));
-    const btnId = filter === 'terze_avanzato' ? 'btn-imprevisti-filter-terze' : `btn-imprevisti-filter-${filter}`;
+    const btnId = `btn-timeline-filter-${filter}`;
     const activeBtn = document.getElementById(btnId);
     if (activeBtn) activeBtn.classList.add('active');
     window.renderAdminImprevisti();
 };
 
 window.renderAdminImprevisti = function() {
-    const listContainer = document.getElementById('admin-imprevisti-list');
-    if (!listContainer) return;
+    if (!window.ImprevistiService) return;
 
-    if (!window.CalendarService) {
-        listContainer.innerHTML = '<p class="text-muted" style="text-align:center;">Servizio Calendario in caricamento...</p>';
-        return;
-    }
+    // 1. Render Mazzo di Carte (Lore Deck)
+    const deckGrid = document.getElementById('admin-deck-cards-grid');
+    const deckCountBadge = document.getElementById('deck-count-badge');
+    if (deckGrid) {
+        const deck = window.ImprevistiService.getDeck() || [];
+        if (deckCountBadge) deckCountBadge.innerText = `${deck.length} Carte Disponibili`;
 
-    const allReleases = window.CalendarService.getReleases();
-    const filter = window.currentImprevistiFilter || 'all';
+        deckGrid.innerHTML = deck.map(card => {
+            const isMalus = card.effectType === 'malus';
+            const isMarket = card.isMarket === true;
+            
+            let effectBadge = '';
+            if (isMarket) {
+                effectBadge = `<span style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #38bdf8; padding: 2px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: bold;"><i class="fa-solid fa-repeat"></i> Mercato (1 Cambio)</span>`;
+            } else if (isMalus) {
+                effectBadge = `<span style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; padding: 2px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: bold;">${card.points} Punti</span>`;
+            } else {
+                effectBadge = `<span style="background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; padding: 2px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: bold;">+${card.points} Punti</span>`;
+            }
 
-    const filtered = allReleases.filter(r => {
-        if (filter === 'all') return true;
-        if (filter === 'seconde') return r.mode === 'seconde';
-        if (filter === 'terze_avanzato') return r.mode === 'terze_avanzato' || r.mode === 'terze' || r.mode === 'avanzato';
-        return true;
-    });
-
-    if (filtered.length === 0) {
-        listContainer.innerHTML = '<p class="text-muted" style="text-align:center;">Nessuna uscita trovata per questo filtro.</p>';
-        return;
-    }
-
-    const allAuthorsMap = {};
-    const collectAuthors = (list) => {
-        if (Array.isArray(list)) list.forEach(a => { allAuthorsMap[a.id] = a; });
-    };
-    if (typeof AUTHORS !== 'undefined') collectAuthors(AUTHORS);
-    if (typeof AUTHORS_SECONDE !== 'undefined') collectAuthors(AUTHORS_SECONDE);
-    if (typeof AUTHORS_INTERNAZIONALI !== 'undefined') collectAuthors(AUTHORS_INTERNAZIONALI);
-
-    const classicHazards = (window.CalendarService && window.CalendarService.CLASSIC_HAZARDS) || [];
-
-    listContainer.innerHTML = filtered.map(rel => {
-        const modeBadge = rel.mode === 'seconde'
-            ? `<span style="background: rgba(212, 114, 26, 0.2); color: #fb923c; border: 1px solid #d4721a; padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: bold;">📙 Età Medievale e Moderna</span>`
-            : `<span style="background: rgba(141, 160, 63, 0.2); color: #bef264; border: 1px solid #8da03f; padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: bold;">📘 Contemporanea &amp; Internazionali</span>`;
-
-        const hasHazard = !!rel.hazardText;
-        const borderStyle = hasHazard ? '1px solid rgba(234, 179, 8, 0.4)' : '1px solid rgba(255,255,255,0.1)';
-        const bgStyle = hasHazard ? 'rgba(234, 179, 8, 0.04)' : 'rgba(255,255,255,0.02)';
-
-        const authorsHtml = (rel.authorIds || []).map(aid => {
-            const author = allAuthorsMap[aid] || { id: aid, name: aid, image: 'avatar_autori/default.png' };
             return `
-                <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">
-                    <img src="${author.image || 'avatar_autori/default.png'}" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; background: #fff;">
-                    <span style="font-size: 0.75rem; color: #e2e8f0;">${author.name}</span>
+                <div class="glass" style="padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); display: flex; flex-direction: column; justify-content: space-between; gap: 10px; transition: transform 0.2s, border-color 0.2s;" onmouseenter="this.style.borderColor='var(--accent-gold)'" onmouseleave="this.style.borderColor='rgba(255,255,255,0.1)'">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; margin-bottom: 6px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <i class="${card.icon}" style="color: ${card.color || 'var(--accent-gold)'}; font-size: 1.1rem;"></i>
+                                <strong style="font-size: 0.88rem; color: #fff;">${card.title}</strong>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 6px; align-items: center; margin-bottom: 6px; flex-wrap: wrap;">
+                            ${effectBadge}
+                            ${card.authorName ? `<span style="font-size: 0.72rem; color: var(--text-muted); background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px;">Target: ${card.authorName}</span>` : ''}
+                        </div>
+                        <p style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.35; margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;" title="${card.lore}">
+                            ${card.lore}
+                        </p>
+                    </div>
+                    <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 5px 10px; border-radius: 8px; width: 100%; border: 1px solid rgba(212,175,55,0.4); color: var(--accent-gold); font-weight: 600;" onclick="window.programmaCardFromDeck('${card.cardId}')">
+                        <i class="fa-solid fa-calendar-plus"></i> Programma nel Calendario
+                    </button>
                 </div>
             `;
         }).join('');
+    }
 
-        return `
-            <div class="glass" style="padding: 16px; border-radius: 14px; border: ${borderStyle}; background: ${bgStyle};">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
-                    <div>
-                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap;">
-                            ${modeBadge}
-                            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: bold;">ID: ${rel.id}</span>
-                            ${rel.isMarketOpen ? `<span style="background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid #3b82f6; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: bold;"><i class="fa-solid fa-repeat"></i> Mercato Aperto</span>` : ''}
+    // 2. Render Timeline degli Imprevisti Programmati
+    const timelineList = document.getElementById('admin-imprevisti-timeline-list');
+    if (timelineList) {
+        const allEvents = window.ImprevistiService.getEvents() || [];
+        const filter = window.currentImprevistiTimelineFilter || 'all';
+
+        const filtered = allEvents.filter(ev => {
+            if (filter === 'all') return true;
+            if (filter === 'active') return ev.status === 'active';
+            if (filter === 'scheduled') return ev.status === 'scheduled';
+            if (filter === 'archived') return ev.status === 'archived';
+            return true;
+        });
+
+        if (filtered.length === 0) {
+            timelineList.innerHTML = `
+                <div style="text-align: center; padding: 30px; color: var(--text-muted);">
+                    <i class="fa-solid fa-calendar-xmark" style="font-size: 2rem; margin-bottom: 10px; display: block; opacity: 0.5;"></i>
+                    Nessun imprevisto programmato per questo filtro.<br>
+                    <span style="font-size: 0.8rem;">Seleziona una carta dal mazzo in alto oppure clicca su <strong>"🪄 Distribuisci a Tutto l'Anno"</strong>.</span>
+                </div>
+            `;
+            return;
+        }
+
+        timelineList.innerHTML = filtered.map(ev => {
+            let statusBadge = '';
+            if (ev.isBlocked) {
+                statusBadge = `<span style="background: rgba(100, 116, 139, 0.2); color: #94a3b8; border: 1px solid #64748b; padding: 3px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: bold;">🚫 Disattivato</span>`;
+            } else if (ev.status === 'active') {
+                statusBadge = `<span style="background: rgba(34, 197, 94, 0.25); color: #4ade80; border: 1px solid #22c55e; padding: 3px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: bold; animation: pulse 2s infinite;"><i class="fa-solid fa-bolt"></i> ATTIVO OGGI</span>`;
+            } else if (ev.status === 'scheduled') {
+                statusBadge = `<span style="background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid #3b82f6; padding: 3px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: bold;"><i class="fa-regular fa-clock"></i> In Programma</span>`;
+            } else {
+                statusBadge = `<span style="background: rgba(255, 255, 255, 0.08); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1); padding: 3px 8px; border-radius: 6px; font-size: 0.72rem;">📜 Storico</span>`;
+            }
+
+            let effectBadge = '';
+            if (ev.isMarket) {
+                effectBadge = `<span style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #38bdf8; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold;"><i class="fa-solid fa-repeat"></i> Mercato Aperto (1 Cambio)</span>`;
+            } else if (ev.effectType === 'malus') {
+                effectBadge = `<span style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold;">${ev.points} Punti</span>`;
+            } else if (ev.points > 0) {
+                effectBadge = `<span style="background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold;">+${ev.points} Punti</span>`;
+            }
+
+            const borderStyle = ev.status === 'active' ? '1px solid rgba(34, 197, 94, 0.5)' : '1px solid rgba(255,255,255,0.08)';
+            const bgStyle = ev.status === 'active' ? 'rgba(34, 197, 94, 0.04)' : 'rgba(0,0,0,0.25)';
+
+            return `
+                <div class="glass" style="padding: 14px 16px; border-radius: 12px; border: ${borderStyle}; background: ${bgStyle}; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                    <!-- Data & Info -->
+                    <div style="display: flex; align-items: center; gap: 14px; flex: 1; min-width: 280px;">
+                        <div style="background: rgba(0,0,0,0.5); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12); text-align: center; min-width: 105px;">
+                            <span style="font-size: 0.68rem; color: var(--text-muted); display: block; text-transform: uppercase;">Data Evento</span>
+                            <span style="font-family: monospace; font-size: 0.95rem; color: #fff; font-weight: bold;">${ev.date}</span>
                         </div>
-                        <h3 style="margin: 0; font-size: 1.05rem; color: var(--accent-gold);">${rel.title}</h3>
-                        <p style="margin: 3px 0 0 0; font-size: 0.85rem; color: var(--text-light); font-weight: 600;">${rel.groupTitle}</p>
-                    </div>
 
-                    <!-- Modifica Data Uscita (sincronizzata con il Calendario) -->
-                    <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.4); padding: 5px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);">
-                        <label style="font-size: 0.75rem; color: var(--text-muted);"><i class="fa-solid fa-calendar"></i> Data:</label>
-                        <input type="date" value="${rel.effectiveDate}" style="background: transparent; border: none; color: #fff; font-size: 0.85rem; font-family: monospace; outline: none; cursor: pointer;" onchange="window.updateCalendarReleaseDate('${rel.id}', this.value); window.renderAdminImprevisti();">
-                    </div>
-                </div>
-
-                <!-- Editor Carta Imprevisto -->
-                <div style="background: rgba(0,0,0,0.25); padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(212,175,55,0.25); margin-bottom: 12px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;">
-                        <label style="font-size: 0.85rem; font-weight: bold; color: var(--accent-gold); display: flex; align-items: center; gap: 6px;">
-                            <i class="fa-solid fa-scroll"></i> Carta Imprevisto Ufficiale:
-                        </label>
-                        <div style="display: flex; gap: 6px; align-items: center;">
-                            <select style="background: rgba(20,20,30,0.95); color: var(--text-light); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; font-size: 0.75rem; padding: 4px 8px; cursor: pointer;" onchange="window.selectImprevistoPreset('${rel.id}', this.value); this.selectedIndex=0;">
-                                <option value="">⚡ Inserisci imprevisto classico...</option>
-                                ${classicHazards.map(h => `<option value="${h.replace(/"/g, '&quot;')}">${h}</option>`).join('')}
-                            </select>
-                            ${hasHazard ? `
-                                <button class="btn btn-secondary" style="font-size: 0.72rem; padding: 4px 8px; border-radius: 6px;" onclick="window.removeCalendarHazard('${rel.id}')" title="Rimuovi imprevisto">
-                                    <i class="fa-solid fa-trash-can"></i>
-                                </button>
-                            ` : ''}
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap;">
+                                ${statusBadge}
+                                ${effectBadge}
+                                ${ev.authorName ? `<span style="font-size: 0.72rem; color: #e2e8f0; background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 6px;">Target: <strong>${ev.authorName}</strong></span>` : ''}
+                            </div>
+                            <h4 style="margin: 0; font-size: 1rem; color: var(--accent-gold);">${ev.title}</h4>
+                            ${ev.lore ? `<p style="margin: 3px 0 0 0; font-size: 0.8rem; color: var(--text-light); line-height: 1.35;">${ev.lore}</p>` : ''}
                         </div>
                     </div>
-                    
-                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                        <input type="text" id="imprevisti-tab-input-${rel.id}" value="${(rel.hazardText || '').replace(/"/g, '&quot;')}" placeholder="Nessun imprevisto per questa data (es. Scandalo nei salotti: -2 pt a chi schiera autori del gruppo)" style="flex: 1; min-width: 260px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 0.85rem;" onchange="window.updateCalendarReleaseHazard('${rel.id}', this.value); window.renderAdminImprevisti();">
-                        
-                        <label style="display: inline-flex; align-items: center; gap: 6px; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); padding: 7px 12px; border-radius: 8px; font-size: 0.78rem; color: #93c5fd; cursor: pointer; user-select: none;">
-                            <input type="checkbox" ${rel.isMarketOpen ? 'checked' : ''} onchange="window.updateCalendarReleaseMarket('${rel.id}', this.checked); window.renderAdminImprevisti();" style="cursor: pointer;">
-                            <i class="fa-solid fa-repeat"></i> Finestra Mercato (1 Cambio)
-                        </label>
+
+                    <!-- Azioni Super-Admin -->
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 6px 10px; border-radius: 8px; ${ev.isForcedActive ? 'background: rgba(34,197,94,0.3); border-color: #22c55e;' : ''}" onclick="window.toggleForceActiveImprevisto('${ev.id}')" title="${ev.isForcedActive ? 'Disattiva forzatura' : 'Forza attivo subito'}">
+                            <i class="fa-solid fa-bolt"></i> ${ev.isForcedActive ? 'Attivo Forzato' : 'Forza Attivo'}
+                        </button>
+                        <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 6px 10px; border-radius: 8px;" onclick="window.openCustomImprevistoModal('${ev.id}')" title="Modifica data o dettagli">
+                            <i class="fa-solid fa-pen"></i> Modifica
+                        </button>
+                        <button class="btn btn-secondary text-danger" style="font-size: 0.75rem; padding: 6px 10px; border-radius: 8px; border-color: rgba(239,68,68,0.3);" onclick="window.deleteImprevistoEvent('${ev.id}')" title="Elimina dalla timeline">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
                     </div>
                 </div>
-
-                <!-- Autori inclusi -->
-                <div style="border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 8px;">
-                    <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 6px; font-weight: bold; text-transform: uppercase;">
-                        Autori Coinvolti (${(rel.authorIds || []).length}):
-                    </div>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 6px;">
-                        ${authorsHtml}
-                    </div>
-                </div>
-            </div>
-        `;
-    }).join('');
+            `;
+        }).join('');
+    }
 };
 
-window.selectImprevistoPreset = async function(releaseId, presetText) {
-    if (!presetText || !window.CalendarService) return;
-    await window.CalendarService.updateReleaseHazard(releaseId, presetText);
-    window.renderAdminImprevisti();
-    if (typeof window.renderAdminCalendario === 'function') window.renderAdminCalendario();
+window.populateAuthorDropdown = function(selectedAuthorId = '') {
+    const select = document.getElementById('imp-form-author');
+    if (!select) return;
+
+    const allAuthors = [];
+    const seen = new Set();
+    const collect = (list) => {
+        if (Array.isArray(list)) {
+            list.forEach(a => {
+                if (!seen.has(a.id)) {
+                    seen.add(a.id);
+                    allAuthors.push(a);
+                }
+            });
+        }
+    };
+    if (typeof AUTHORS !== 'undefined') collect(AUTHORS);
+    if (typeof AUTHORS_SECONDE !== 'undefined') collect(AUTHORS_SECONDE);
+    if (typeof AUTHORS_INTERNAZIONALI !== 'undefined') collect(AUTHORS_INTERNAZIONALI);
+
+    select.innerHTML = '<option value="">-- Evento Globale / Nessuno --</option>' + 
+        allAuthors.map(a => `<option value="${a.id}" ${a.id === selectedAuthorId ? 'selected' : ''}>${a.name}</option>`).join('');
 };
 
-window.removeCalendarHazard = async function(releaseId) {
-    if (!window.CalendarService) return;
-    await window.CalendarService.updateReleaseHazard(releaseId, '');
-    window.renderAdminImprevisti();
-    if (typeof window.renderAdminCalendario === 'function') window.renderAdminCalendario();
+window.programmaCardFromDeck = function(cardId) {
+    if (!window.ImprevistiService) return;
+    const card = window.ImprevistiService.getCardById(cardId);
+    if (!card) return;
+
+    window.populateAuthorDropdown(card.authorId || '');
+
+    document.getElementById('imp-form-id').value = '';
+    document.getElementById('imp-form-card-id').value = card.cardId;
+    document.getElementById('imp-form-date').value = window.ImprevistiService.getTodayString();
+    document.getElementById('imp-form-title').value = card.title;
+    document.getElementById('imp-form-subtitle').value = card.subtitle || '';
+    document.getElementById('imp-form-lore').value = card.lore || '';
+    document.getElementById('imp-form-effect-type').value = card.effectType || 'bonus';
+    document.getElementById('imp-form-points').value = card.points !== undefined ? card.points : 0;
+    document.getElementById('imp-form-is-market').checked = card.isMarket === true;
+
+    document.getElementById('imprevisto-modal-title').innerText = `Programma: ${card.title}`;
+    const modal = document.getElementById('modal-imprevisto-editor');
+    if (modal) modal.style.display = 'flex';
 };
 
-window.assegnaImprevistiCasuali = async function() {
-    if (!window.CalendarService) return;
-    const classicHazards = window.CalendarService.CLASSIC_HAZARDS || [];
-    if (classicHazards.length === 0) return;
+window.openCustomImprevistoModal = function(editEventId = '') {
+    window.populateAuthorDropdown();
+    const modal = document.getElementById('modal-imprevisto-editor');
 
-    if (!confirm("Vuoi assegnare automaticamente un imprevisto letterario casuale a ciascuna delle 18 uscite dell'anno scolastico?")) return;
-
-    const releases = window.CalendarService.getReleases();
-    for (let i = 0; i < releases.length; i++) {
-        const rel = releases[i];
-        const randomHazard = classicHazards[i % classicHazards.length];
-        await window.CalendarService.updateReleaseHazard(rel.id, randomHazard);
-        // Abilita la finestra di mercato sulle uscite 9 e 18
-        if (i === 8 || i === 17) {
-            await window.CalendarService.updateReleaseMarket(rel.id, true);
+    if (editEventId && window.ImprevistiService) {
+        const events = window.ImprevistiService.getEvents();
+        const ev = events.find(e => e.id === editEventId);
+        if (ev) {
+            document.getElementById('imp-form-id').value = ev.id;
+            document.getElementById('imp-form-card-id').value = ev.cardId || 'custom';
+            document.getElementById('imp-form-date').value = ev.date || window.ImprevistiService.getTodayString();
+            document.getElementById('imp-form-title').value = ev.title || '';
+            document.getElementById('imp-form-subtitle').value = ev.subtitle || '';
+            document.getElementById('imp-form-lore').value = ev.lore || '';
+            window.populateAuthorDropdown(ev.authorId || '');
+            document.getElementById('imp-form-effect-type').value = ev.effectType || 'bonus';
+            document.getElementById('imp-form-points').value = ev.points !== undefined ? ev.points : 0;
+            document.getElementById('imp-form-is-market').checked = ev.isMarket === true;
+            document.getElementById('imprevisto-modal-title').innerText = 'Modifica Imprevisto Programmato';
+            if (modal) modal.style.display = 'flex';
+            return;
         }
     }
 
-    window.renderAdminImprevisti();
-    if (typeof window.renderAdminCalendario === 'function') window.renderAdminCalendario();
-    alert("✅ Imprevisti e Finestre di Mercato assegnati a tutta la stagione con successo!");
+    // Nuovo custom
+    document.getElementById('imp-form-id').value = '';
+    document.getElementById('imp-form-card-id').value = 'custom';
+    document.getElementById('imp-form-date').value = (window.ImprevistiService && window.ImprevistiService.getTodayString()) || new Date().toISOString().split('T')[0];
+    document.getElementById('imp-form-title').value = '';
+    document.getElementById('imp-form-subtitle').value = '';
+    document.getElementById('imp-form-lore').value = '';
+    document.getElementById('imp-form-effect-type').value = 'bonus';
+    document.getElementById('imp-form-points').value = 2;
+    document.getElementById('imp-form-is-market').checked = false;
+    document.getElementById('imprevisto-modal-title').innerText = 'Crea Nuovo Imprevisto Personalizzato';
+    if (modal) modal.style.display = 'flex';
+};
+
+window.closeImprevistoModal = function() {
+    const modal = document.getElementById('modal-imprevisto-editor');
+    if (modal) modal.style.display = 'none';
+};
+
+window.submitImprevistoModal = async function(event) {
+    if (event) event.preventDefault();
+    if (!window.ImprevistiService) return;
+
+    const eventId = document.getElementById('imp-form-id').value;
+    const date = document.getElementById('imp-form-date').value;
+    const title = document.getElementById('imp-form-title').value;
+    const subtitle = document.getElementById('imp-form-subtitle').value;
+    const lore = document.getElementById('imp-form-lore').value;
+    const authorSelect = document.getElementById('imp-form-author');
+    const authorId = authorSelect ? authorSelect.value : null;
+    const authorName = (authorSelect && authorSelect.options[authorSelect.selectedIndex]) ? (authorId ? authorSelect.options[authorSelect.selectedIndex].text : 'Globale') : 'Globale';
+    const effectType = document.getElementById('imp-form-effect-type').value;
+    const points = parseInt(document.getElementById('imp-form-points').value, 10) || 0;
+    const isMarket = document.getElementById('imp-form-is-market').checked;
+    const cardId = document.getElementById('imp-form-card-id').value || 'custom';
+
+    try {
+        if (eventId) {
+            // Modifica
+            await window.ImprevistiService.updateEvent(eventId, {
+                date,
+                title,
+                subtitle,
+                lore,
+                authorId: authorId || null,
+                authorName,
+                effectType,
+                points,
+                isMarket
+            });
+        } else {
+            // Nuovo inserimento
+            await window.ImprevistiService.addEvent({
+                cardId,
+                date,
+                title,
+                subtitle,
+                lore,
+                authorId: authorId || null,
+                authorName,
+                effectType,
+                points,
+                isMarket
+            });
+        }
+
+        window.closeImprevistoModal();
+        window.renderAdminImprevisti();
+    } catch (e) {
+        alert("Errore salvataggio imprevisto: " + e.message);
+    }
+};
+
+window.deleteImprevistoEvent = async function(eventId) {
+    if (!confirm("Sei sicuro di voler eliminare questo imprevisto dalla timeline?")) return;
+    if (window.ImprevistiService) {
+        await window.ImprevistiService.deleteEvent(eventId);
+        window.renderAdminImprevisti();
+    }
+};
+
+window.toggleForceActiveImprevisto = async function(eventId) {
+    if (window.ImprevistiService) {
+        await window.ImprevistiService.toggleForceActive(eventId);
+        window.renderAdminImprevisti();
+    }
+};
+
+window.distribuisciImprevistiStagionali = async function() {
+    if (!window.ImprevistiService) return;
+    
+    const today = window.ImprevistiService.getTodayString();
+    const startDate = prompt("Inserisci la data di inizio della stagione scolastica (YYYY-MM-DD):", today);
+    if (!startDate) return;
+
+    if (!confirm("Vuoi distribuire l'intero mazzo di imprevisti e finestre di mercato lungo l'anno scolastico a partire dal " + startDate + "?")) return;
+
+    try {
+        await window.ImprevistiService.generateSeasonalSchedule(startDate);
+        window.renderAdminImprevisti();
+        alert("✅ Imprevisti e Finestre di Mercato distribuiti con successo per tutta la stagione!");
+    } catch (e) {
+        alert("Errore: " + e.message);
+    }
 };
 
 window.renderAdminImpostazioni = async function() {

@@ -143,35 +143,67 @@
                 </div>
             </section>
 
-            <!-- VIEW: Pannello Admin - Gestione Imprevisti & Mercato -->
+            <!-- VIEW: Pannello Super-Admin - Gestione Imprevisti & Mercato (Indipendente dai Gironi) -->
             <section id="admin-view-imprevisti" class="admin-view" style="display:none;">
-                <div style="padding: 0 15px 15px 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div style="padding: 0 15px 15px 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
                     <div>
-                        <h2 style="margin: 0;"><i class="fa-solid fa-scroll" style="color: var(--accent-gold);"></i> Gestione Imprevisti &amp; Mercato</h2>
-                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">Configura le <strong>date</strong>, le <strong>Carte Imprevisto</strong> e le <strong>Finestre di Mercato (1 Cambio)</strong> per la stagione. Tutte le modifiche si caricano automaticamente sul Calendario di gioco.</p>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                            <span style="background: rgba(234, 179, 8, 0.15); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.3); font-size: 0.72rem; font-weight: bold; padding: 2px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+                                <i class="fa-solid fa-shield-halved"></i> Super-Admin Esclusivo
+                            </span>
+                            <span style="background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3); font-size: 0.72rem; font-weight: bold; padding: 2px 8px; border-radius: 6px;">
+                                ⛓️ Slegato dai Gironi
+                            </span>
+                        </div>
+                        <h2 style="margin: 0;"><i class="fa-solid fa-scroll" style="color: var(--accent-gold);"></i> Imprevisti Letterari &amp; Finestre di Mercato</h2>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">Pianifica gli eventi letterari indipendenti lungo l'anno scolastico. Gli studenti visualizzeranno solo l'evento attivo del giorno in modalità read-only.</p>
                     </div>
                     <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 14px; border-radius: 12px;" onclick="window.renderAdminImprevisti()"><i class="fa-solid fa-rotate"></i> Ricarica</button>
-                        <button class="btn" style="background: var(--accent-gold); color: var(--bg-dark); font-weight: bold; font-size: 0.8rem; padding: 6px 14px; border-radius: 12px; border: none; cursor: pointer;" onclick="window.assegnaImprevistiCasuali()"><i class="fa-solid fa-wand-magic-sparkles"></i> Assegna Imprevisti a Tutto l'Anno</button>
+                        <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 14px; border-radius: 12px; border: 1px solid var(--accent-gold); color: var(--accent-gold);" onclick="window.openCustomImprevistoModal()"><i class="fa-solid fa-plus"></i> Nuovo Imprevisto</button>
+                        <button class="btn" style="background: var(--accent-gold); color: var(--bg-dark); font-weight: bold; font-size: 0.8rem; padding: 6px 14px; border-radius: 12px; border: none; cursor: pointer;" onclick="window.distribuisciImprevistiStagionali()"><i class="fa-solid fa-wand-magic-sparkles"></i> 🪄 Distribuisci a Tutto l'Anno</button>
                     </div>
                 </div>
-                
-                <div class="glass" style="padding: 15px; margin: 0 15px 20px 15px;">
-                    <!-- Filtro modalità -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
-                        <div class="admin-mode-filter" style="margin: 0;">
-                            <button class="admin-mode-filter-btn f-all active" id="btn-imprevisti-filter-all" onclick="window.filterImprevistiView('all')">📅 Tutte le Uscite (18)</button>
-                            <button class="admin-mode-filter-btn f-orange" id="btn-imprevisti-filter-seconde" onclick="window.filterImprevistiView('seconde')">📙 Età Medievale e Moderna (9)</button>
-                            <button class="admin-mode-filter-btn f-green" id="btn-imprevisti-filter-terze" onclick="window.filterImprevistiView('terze_avanzato')">📘 Contemporanea &amp; Internazionali (9)</button>
+
+                <!-- SEZIONE 1: MAZZO DI CARTE LETTERARIE (LORE ARCHIVE) -->
+                <div class="glass" style="padding: 16px; margin: 0 15px 20px 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <h3 style="margin: 0; font-size: 1.05rem; color: var(--accent-gold); display: flex; align-items: center; gap: 6px;">
+                                <i class="fa-solid fa-layer-group"></i> Mazzo di Carte Letterarie (Lore Reale Autentico)
+                            </h3>
+                            <span id="deck-count-badge" style="font-size: 0.75rem; background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 10px; color: var(--text-light);">14 Carte</span>
+                        </div>
+                        <span style="font-size: 0.78rem; color: var(--text-muted);">Clicca su una carta per programmarla nel calendario</span>
+                    </div>
+
+                    <div id="admin-deck-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; max-height: 380px; overflow-y: auto; padding-right: 4px;">
+                        <!-- Popolato dinamicamente da ImprevistiService.getDeck() -->
+                    </div>
+                </div>
+
+                <!-- SEZIONE 2: TIMELINE & TABELLA DELL'ANNO -->
+                <div class="glass" style="padding: 16px; margin: 0 15px 20px 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
+                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                            <h3 style="margin: 0; font-size: 1.05rem; color: #fff; display: flex; align-items: center; gap: 6px;">
+                                <i class="fa-solid fa-timeline" style="color: var(--accent-gold);"></i> Timeline degli Imprevisti Programmati
+                            </h3>
+                            <div class="admin-mode-filter" style="margin: 0;">
+                                <button class="admin-mode-filter-btn f-all active" id="btn-timeline-filter-all" onclick="window.filterImprevistiTimeline('all')">📅 Tutti</button>
+                                <button class="admin-mode-filter-btn f-green" id="btn-timeline-filter-active" onclick="window.filterImprevistiTimeline('active')">⚡ Attivi</button>
+                                <button class="admin-mode-filter-btn f-gold" id="btn-timeline-filter-scheduled" onclick="window.filterImprevistiTimeline('scheduled')">⏳ Programmati</button>
+                                <button class="admin-mode-filter-btn f-orange" id="btn-timeline-filter-archived" onclick="window.filterImprevistiTimeline('archived')">📜 Storico</button>
+                            </div>
                         </div>
                         <div style="font-size: 0.8rem; color: #4ade80; display: flex; align-items: center; gap: 5px;">
-                            <i class="fa-solid fa-cloud-arrow-up"></i> Sincronizzazione Cloud Automatica
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Sincronizzazione Firestore Attiva
                         </div>
                     </div>
 
-                    <!-- Lista Uscite e Imprevisti -->
-                    <div id="admin-imprevisti-list" style="display: flex; flex-direction: column; gap: 14px;">
-                        <!-- Popolato da JS -->
+                    <!-- Lista Timeline Eventi Programmati -->
+                    <div id="admin-imprevisti-timeline-list" style="display: flex; flex-direction: column; gap: 12px;">
+                        <!-- Popolato dinamicamente da JS -->
                     </div>
                 </div>
             </section>
@@ -833,6 +865,101 @@
         </div>
     </div>
 
+    <!-- MODALE EDITOR / PROGRAMMATORE IMPREVISTI (SUPER-ADMIN) -->
+    <div id="modal-imprevisto-editor" class="modal-wip" style="display:none; z-index: 5500;" onclick="if(event.target===this) window.closeImprevistoModal()">
+        <div class="modal-wip-content" style="max-width: 540px; width: 92%; padding: 24px; text-align: left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-scroll" style="color: var(--accent-gold); font-size: 1.2rem;"></i>
+                    <h3 id="imprevisto-modal-title" style="margin: 0; font-size: 1.15rem; color: #fff;">Programma Imprevisto</h3>
+                </div>
+                <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.85rem; border-radius: 50%;" onclick="window.closeImprevistoModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="form-imprevisto-editor" onsubmit="window.submitImprevistoModal(event)">
+                <input type="hidden" id="imp-form-id" value="">
+                <input type="hidden" id="imp-form-card-id" value="">
+
+                <!-- Data Programmata -->
+                <div style="margin-bottom: 14px;">
+                    <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; font-weight: bold;">
+                        <i class="fa-solid fa-calendar-day" style="color: var(--accent-gold);"></i> Data di Attivazione nel Campionato:
+                    </label>
+                    <input type="date" id="imp-form-date" required style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 12px; border-radius: 8px; font-family: monospace; font-size: 0.95rem;">
+                </div>
+
+                <!-- Titolo Evento -->
+                <div style="margin-bottom: 14px;">
+                    <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; font-weight: bold;">
+                        Titolo Imprevisto / Evento:
+                    </label>
+                    <input type="text" id="imp-form-title" required placeholder="es. ⚜️ Dante cacciato da Firenze" style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 0.9rem;">
+                </div>
+
+                <!-- Sottotitolo / Motivo -->
+                <div style="margin-bottom: 14px;">
+                    <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">
+                        Sottotitolo / Tema Storico:
+                    </label>
+                    <input type="text" id="imp-form-subtitle" placeholder="es. L'esilio e la condanna al rogo" style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 0.85rem;">
+                </div>
+
+                <!-- Lore Letterario Reale -->
+                <div style="margin-bottom: 14px;">
+                    <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; font-weight: bold;">
+                        Lore Storico-Letterario Autentico (Spiegazione per gli studenti):
+                    </label>
+                    <textarea id="imp-form-lore" rows="3" placeholder="Descrivi l'avvenimento letterario reale e l'impatto sul campionato..." style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 0.82rem; line-height: 1.4;"></textarea>
+                </div>
+
+                <!-- Target Autore / Gruppo -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+                    <div>
+                        <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; font-weight: bold;">
+                            Autore Target:
+                        </label>
+                        <select id="imp-form-author" style="width: 100%; background: rgba(20,20,30,0.95); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 10px; border-radius: 8px; font-size: 0.85rem;">
+                            <option value="">-- Evento Globale / Nessuno --</option>
+                            <!-- Popolato da JS -->
+                        </select>
+                    </div>
+
+                    <div>
+                        <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; font-weight: bold;">
+                            Effetto Punti:
+                        </label>
+                        <div style="display: flex; gap: 6px;">
+                            <select id="imp-form-effect-type" style="width: 60%; background: rgba(20,20,30,0.95); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 6px; border-radius: 8px; font-size: 0.8rem;">
+                                <option value="bonus">➕ Bonus</option>
+                                <option value="malus">➖ Malus</option>
+                                <option value="market">🔁 Mercato</option>
+                            </select>
+                            <input type="number" id="imp-form-points" value="0" style="width: 40%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 8px; border-radius: 8px; font-size: 0.85rem; text-align: center;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Opzione Finestra di Mercato (1 Cambio) -->
+                <div style="margin-bottom: 20px; background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.25); padding: 10px 14px; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="imp-form-is-market" style="width: 18px; height: 18px; cursor: pointer;">
+                    <label for="imp-form-is-market" style="font-size: 0.85rem; color: #93c5fd; font-weight: 600; cursor: pointer;">
+                        <i class="fa-solid fa-repeat"></i> Abilita Finestra di Mercato (1 Cambio Rosa per tutte le squadre)
+                    </label>
+                </div>
+
+                <!-- Bottoni Azione -->
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" class="btn btn-secondary" onclick="window.closeImprevistoModal()">Annulla</button>
+                    <button type="submit" class="btn" style="background: var(--accent-gold); color: var(--bg-dark); font-weight: bold; border: none; padding: 8px 18px; border-radius: 10px;">
+                        <i class="fa-solid fa-floppy-disk"></i> Salva Imprevisto
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Music Player Popup -->
     <div id="music-player-popup" style="display: none; position: fixed; bottom: 30px; right: 20px; z-index: 9999; background: rgba(10, 10, 20, 0.95); border: 1px solid var(--accent-gold); border-radius: 15px; padding: 15px; width: 250px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(10px); opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease; transform: translateY(20px);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">
@@ -852,20 +979,21 @@
     </div>
 
     <!-- Scripts -->
-    <script src="js/data.js?v=20260926_imprevisti_v3"></script>
-    <script src="js/services/calendar-service.js?v=20260926_imprevisti_v3"></script>
-    <script src="js/music.js?v=20260926_imprevisti_v3"></script>
-    <script src="js/minigames.js?v=20260926_imprevisti_v3"></script>
+    <script src="js/data.js?v=20260926_imprevisti_v4"></script>
+    <script src="js/services/calendar-service.js?v=20260926_imprevisti_v4"></script>
+    <script src="js/services/imprevisti-service.js?v=20260926_imprevisti_v4"></script>
+    <script src="js/music.js?v=20260926_imprevisti_v4"></script>
+    <script src="js/minigames.js?v=20260926_imprevisti_v4"></script>
     <!-- Components -->
-    <script src="js/components/navbar.js?v=20260926_imprevisti_v3"></script>
-    <script src="js/components/modals.js?v=20260926_imprevisti_v3"></script>
+    <script src="js/components/navbar.js?v=20260926_imprevisti_v4"></script>
+    <script src="js/components/modals.js?v=20260926_imprevisti_v4"></script>
     <!-- Dashboard -->
-    <script src="js/dashboard/admin-logic.js?v=20260926_imprevisti_v3"></script>
+    <script src="js/dashboard/admin-logic.js?v=20260926_imprevisti_v4"></script>
     <!-- Live Editor -->
-    <script src="js/live-editor.js?v=20260926_imprevisti_v3"></script>
-    <script src="js/app.js?v=20260926_imprevisti_v3"></script>
+    <script src="js/live-editor.js?v=20260926_imprevisti_v4"></script>
+    <script src="js/app.js?v=20260926_imprevisti_v4"></script>
     <!-- Modali condivisi ed Access Control ecosistema Prof. Memmo -->
     <script>window.HUB_GAME_ID = "fantaletteratura";</script>
-    <script src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/hub-subscription-guard.js?v=20260926_imprevisti_v3"></script>
+    <script src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/hub-subscription-guard.js?v=20260926_imprevisti_v4"></script>
 </body>
 </html>
