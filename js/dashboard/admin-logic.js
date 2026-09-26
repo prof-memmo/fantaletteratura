@@ -1599,6 +1599,10 @@ window.renderAdminImprevisti = function() {
                 effectBadge = `<span style="background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; padding: 2px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: bold;">+${card.points} Punti</span>`;
             }
 
+            const authorObj = card.authorId && window.ImprevistiService ? window.ImprevistiService.getAuthorById(card.authorId) : null;
+            const authorDisplayName = authorObj ? authorObj.name : card.authorName;
+            const authorImg = authorObj && authorObj.image ? authorObj.image : null;
+
             return `
                 <div class="glass" style="padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); display: flex; flex-direction: column; justify-content: space-between; gap: 10px; transition: transform 0.2s, border-color 0.2s;" onmouseenter="this.style.borderColor='var(--accent-gold)'" onmouseleave="this.style.borderColor='rgba(255,255,255,0.1)'">
                     <div>
@@ -1610,7 +1614,12 @@ window.renderAdminImprevisti = function() {
                         </div>
                         <div style="display: flex; gap: 6px; align-items: center; margin-bottom: 6px; flex-wrap: wrap;">
                             ${effectBadge}
-                            ${card.authorName ? `<span style="font-size: 0.72rem; color: var(--text-muted); background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px;">Target: ${card.authorName}</span>` : ''}
+                            ${authorDisplayName ? `
+                                <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem; color: #e2e8f0; background: rgba(255,255,255,0.08); padding: 2px 7px; border-radius: 6px;">
+                                    ${authorImg ? `<img src="${authorImg}" style="width: 16px; height: 16px; border-radius: 50%; object-fit: cover;">` : '<i class="fa-solid fa-user-pen"></i>'}
+                                    Target: <strong>${authorDisplayName}</strong>
+                                </span>
+                            ` : `<span style="font-size: 0.72rem; color: #94a3b8; background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px;">Target: Globale (Tutte le squadre)</span>`}
                         </div>
                         <p style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.35; margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;" title="${card.lore}">
                             ${card.lore}
@@ -1670,6 +1679,10 @@ window.renderAdminImprevisti = function() {
                 effectBadge = `<span style="background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold;">+${ev.points} Punti</span>`;
             }
 
+            const authorObj = ev.authorId && window.ImprevistiService ? window.ImprevistiService.getAuthorById(ev.authorId) : null;
+            const authorDisplayName = authorObj ? authorObj.name : ev.authorName;
+            const authorImg = authorObj && authorObj.image ? authorObj.image : null;
+
             const borderStyle = ev.status === 'active' ? '1px solid rgba(34, 197, 94, 0.5)' : '1px solid rgba(255,255,255,0.08)';
             const bgStyle = ev.status === 'active' ? 'rgba(34, 197, 94, 0.04)' : 'rgba(0,0,0,0.25)';
 
@@ -1686,7 +1699,12 @@ window.renderAdminImprevisti = function() {
                             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap;">
                                 ${statusBadge}
                                 ${effectBadge}
-                                ${ev.authorName ? `<span style="font-size: 0.72rem; color: #e2e8f0; background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 6px;">Target: <strong>${ev.authorName}</strong></span>` : ''}
+                                ${authorDisplayName && authorDisplayName !== 'Globale' ? `
+                                    <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem; color: #e2e8f0; background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 6px;">
+                                        ${authorImg ? `<img src="${authorImg}" style="width: 16px; height: 16px; border-radius: 50%; object-fit: cover;">` : '<i class="fa-solid fa-user-pen"></i>'}
+                                        Target: <strong>${authorDisplayName}</strong>
+                                    </span>
+                                ` : ''}
                             </div>
                             <h4 style="margin: 0; font-size: 1rem; color: var(--accent-gold);">${ev.title}</h4>
                             ${ev.lore ? `<p style="margin: 3px 0 0 0; font-size: 0.8rem; color: var(--text-light); line-height: 1.35;">${ev.lore}</p>` : ''}
@@ -1715,24 +1733,10 @@ window.populateAuthorDropdown = function(selectedAuthorId = '') {
     const select = document.getElementById('imp-form-author');
     if (!select) return;
 
-    const allAuthors = [];
-    const seen = new Set();
-    const collect = (list) => {
-        if (Array.isArray(list)) {
-            list.forEach(a => {
-                if (!seen.has(a.id)) {
-                    seen.add(a.id);
-                    allAuthors.push(a);
-                }
-            });
-        }
-    };
-    if (typeof AUTHORS !== 'undefined') collect(AUTHORS);
-    if (typeof AUTHORS_SECONDE !== 'undefined') collect(AUTHORS_SECONDE);
-    if (typeof AUTHORS_INTERNAZIONALI !== 'undefined') collect(AUTHORS_INTERNAZIONALI);
+    const allAuthors = window.ImprevistiService ? window.ImprevistiService.getAllAuthors() : [];
 
     select.innerHTML = '<option value="">-- Evento Globale / Nessuno --</option>' + 
-        allAuthors.map(a => `<option value="${a.id}" ${a.id === selectedAuthorId ? 'selected' : ''}>${a.name}</option>`).join('');
+        allAuthors.map(a => `<option value="${a.id}" ${a.id === selectedAuthorId ? 'selected' : ''}>${a.name} (${a.modeGroup || 'Autore'})</option>`).join('');
 };
 
 window.programmaCardFromDeck = function(cardId) {

@@ -7,13 +7,14 @@ window.ImprevistiService = {
     _isInitialized: false,
 
     // DECK UFFICIALE: Lore Letterario Reale Autentico
+    // DECK UFFICIALE: Lore Letterario Reale Autentico con ID Autori Esatti
     LORE_DECK: [
         {
             cardId: 'dante_esilio',
             title: '⚜️ Dante cacciato da Firenze',
             subtitle: "L'esilio e la condanna al rogo",
             lore: "Nel 1302 i Guelfi Neri condannano Dante all'esilio perpetuo. Il poeta inizia il suo doloroso peregrinare per le corti d'Italia lontano dalla sua amata Firenze.",
-            authorId: 'dante',
+            authorId: 'dante-alighieri-sec',
             authorName: 'Dante Alighieri',
             effectType: 'malus',
             points: -2,
@@ -26,7 +27,7 @@ window.ImprevistiService = {
             title: '🌊 Manzoni sciacqua i panni in Arno',
             subtitle: 'La svolta linguistica fiorentina',
             lore: "Nel 1827 Manzoni si reca a Firenze per risciacquare la lingua de 'I Promessi Sposi' nel fiorentino colto, creando il modello della lingua italiana unita.",
-            authorId: 'manzoni',
+            authorId: 'a3',
             authorName: 'Alessandro Manzoni',
             effectType: 'bonus',
             points: 3,
@@ -39,7 +40,7 @@ window.ImprevistiService = {
             title: '🎲 Foscolo perde tutto a Londra',
             subtitle: 'Debiti e gioco nei circoli inglesi',
             lore: "Nell'esilio londinese Ugo Foscolo conduce una vita dispendiosa nei circoli aristocratici, accumulando pesanti debiti che lo costringono a nascondersi sotto falso nome.",
-            authorId: 'foscolo',
+            authorId: 'a1',
             authorName: 'Ugo Foscolo',
             effectType: 'malus',
             points: -2,
@@ -48,11 +49,24 @@ window.ImprevistiService = {
             color: '#f97316'
         },
         {
+            cardId: 'carducci_nobel',
+            title: '🏆 Carducci vince il Nobel',
+            subtitle: 'Primo italiano a trionfare a Stoccolma',
+            lore: "Nel 1906 Giosuè Carducci è il primo autore italiano a vincere il Premio Nobel per la Letteratura, celebrato per la forza plastica e classica delle sue Odi Barbare.",
+            authorId: 'a4',
+            authorName: 'Giosuè Carducci',
+            effectType: 'bonus',
+            points: 4,
+            isMarket: false,
+            icon: 'fa-solid fa-trophy',
+            color: '#f59e0b'
+        },
+        {
             cardId: 'petrarca_alloro',
             title: "👑 Petrarca incoronato d'Alloro",
             subtitle: 'Trionfo solenne in Campidoglio',
             lore: "L'8 aprile 1341 a Roma, Francesco Petrarca viene incoronato Poeta Laureato sul colle del Campidoglio, consacrando la sua gloria umanistica imperitura.",
-            authorId: 'petrarca',
+            authorId: 'francesco-petrarca',
             authorName: 'Francesco Petrarca',
             effectType: 'bonus',
             points: 4,
@@ -65,7 +79,7 @@ window.ImprevistiService = {
             title: '🌙 Leopardi e lo Studio Matto',
             subtitle: 'Notti insonni nella biblioteca di Recanati',
             lore: "Sette anni di studio matto e disperatissimo nella biblioteca paterna logorano il corpo del giovane Giacomo, ma generano la lirica più sublime della poesia moderna.",
-            authorId: 'leopardi',
+            authorId: 'a2',
             authorName: 'Giacomo Leopardi',
             effectType: 'bonus',
             points: 2,
@@ -78,7 +92,7 @@ window.ImprevistiService = {
             title: '🔥 Boccaccio sotto Censura',
             subtitle: "Le novelle del Decameron all'Indice",
             lore: "La vivacità terrena e le beffe anticlericali del Decameron attirano le ire dei predicatori e la censura moralista, costringendo Boccaccio a dolorose ritrattazioni morali.",
-            authorId: 'boccaccio',
+            authorId: 'giovanni-boccaccio',
             authorName: 'Giovanni Boccaccio',
             effectType: 'malus',
             points: -3,
@@ -87,24 +101,11 @@ window.ImprevistiService = {
             color: '#dc2626'
         },
         {
-            cardId: 'carducci_nobel',
-            title: '🏆 Carducci vince il Nobel',
-            subtitle: 'Primo italiano a trionfare a Stoccolma',
-            lore: "Nel 1906 Giosuè Carducci è il primo autore italiano a vincere il Premio Nobel per la Letteratura, celebrato per la forza plastica e classica delle sue Odi Barbare.",
-            authorId: 'carducci',
-            authorName: 'Giosuè Carducci',
-            effectType: 'bonus',
-            points: 4,
-            isMarket: false,
-            icon: 'fa-solid fa-trophy',
-            color: '#f59e0b'
-        },
-        {
             cardId: 'pirandello_teatro',
             title: '🎭 Pirandello e i Sei Personaggi',
             subtitle: 'Rivoluzione scenica mondiale',
             lore: "La prima di 'Sei personaggi in cerca d'autore' fa scalpore al Teatro Valle di Roma: il pubblico grida 'Manicomio!', ma nasce il teatro moderno che conquista Broadway e Parigi.",
-            authorId: 'pirandello',
+            authorId: 'a8',
             authorName: 'Luigi Pirandello',
             effectType: 'bonus',
             points: 3,
@@ -117,7 +118,7 @@ window.ImprevistiService = {
             title: "🏰 Ariosto alla Corte di Ferrara",
             subtitle: "L'Orlando Furioso tra i duchi",
             lore: "Ludovico Ariosto presenta l'Orlando Furioso alla corte estense: 'Messer Ludovico, dove mai avete trovato tante corbellerie?', esclama il cardinale Ippolito, ma il poema diventa leggenda.",
-            authorId: 'ariosto',
+            authorId: 'ludovico-ariosto',
             authorName: 'Ludovico Ariosto',
             effectType: 'bonus',
             points: 3,
@@ -130,7 +131,7 @@ window.ImprevistiService = {
             title: '🌾 Verga e la Vita dei Campi',
             subtitle: 'Ritorno alla terra e Verismo',
             lore: "Verga abbandona i romanzi mondani milanesi per immergersi nelle passioni tragiche della Sicilia rurale con 'Vita dei Campi' e 'I Malavoglia', inaugurando la poetica dell'impersonalità.",
-            authorId: 'verga',
+            authorId: 'a5',
             authorName: 'Giovanni Verga',
             effectType: 'bonus',
             points: 2,
@@ -143,7 +144,7 @@ window.ImprevistiService = {
             title: '🌲 Calvino e il Barone Rampante',
             subtitle: 'La trilogia dei nostri antenati',
             lore: "Cosimo Piovasco di Rondò sale sugli alberi e non ne scenderà mai più: Calvino pubblica 'Il Barone Rampante', celebrato per il connubio perfetto tra favola morale e illuminismo.",
-            authorId: 'calvino',
+            authorId: 'a14',
             authorName: 'Italo Calvino',
             effectType: 'bonus',
             points: 3,
@@ -156,8 +157,8 @@ window.ImprevistiService = {
             title: '✈️ D\'Annunzio e il Volo su Vienna',
             subtitle: 'Gesto audace e gloria patriottica',
             lore: "Il 9 agosto 1918 Gabriele D'Annunzio lancia 400.000 volantini tricolori su Vienna con la squadriglia Serenissima, compiendo un'impresa propagandistica e letteraria senza precedenti.",
-            authorId: 'dannunzio',
-            authorName: 'Gabriele D\'Annunzio',
+            authorId: 'a7',
+            authorName: "Gabriele D'Annunzio",
             effectType: 'bonus',
             points: 3,
             isMarket: false,
@@ -165,12 +166,38 @@ window.ImprevistiService = {
             color: '#6366f1'
         },
         {
+            cardId: 'montale_ossi',
+            title: '🌊 Montale e gli Ossi di Seppia',
+            subtitle: 'La poesia scabra del Novecento',
+            lore: "Nel 1925 Eugenio Montale pubblica 'Ossi di seppia': la pietra lavica della Liguria e il 'male di vivere' diventano pietre miliari della lirica novecentesca.",
+            authorId: 'a11',
+            authorName: 'Eugenio Montale',
+            effectType: 'bonus',
+            points: 3,
+            isMarket: false,
+            icon: 'fa-solid fa-water',
+            color: '#0284c7'
+        },
+        {
+            cardId: 'ungaretti_carso',
+            title: '🪖 Ungaretti al Fronte del Carso',
+            subtitle: 'Versi essenziali tra le trincee',
+            lore: "Foglietti di carta scritti nel fango delle trincee durante la Grande Guerra: nasce 'Il Porto Sepolto', rivoluzionando per sempre la metrica e la brevità della poesia.",
+            authorId: 'a10',
+            authorName: 'Giuseppe Ungaretti',
+            effectType: 'bonus',
+            points: 3,
+            isMarket: false,
+            icon: 'fa-solid fa-pen-nib',
+            color: '#84cc16'
+        },
+        {
             cardId: 'mercato_autunno',
             title: '🔁 Finestra di Mercato: Sessione Autunnale',
             subtitle: '1 Cambio Rosa per tutte le squadre',
             lore: "I presidenti di lega e gli studenti possono effettuare 1 sostituzione strategica nella propria rosa di autori per riallineare la formazione prima delle grandi sfide.",
             authorId: null,
-            authorName: 'Tutti gli Autori',
+            authorName: null,
             effectType: 'market',
             points: 0,
             isMarket: true,
@@ -183,11 +210,40 @@ window.ImprevistiService = {
             subtitle: '1 Cambio Rosa per la volata finale',
             lore: "Sessione di riparazione primaverile: si apre la finestra per 1 cambio di formazione prima del gran finale del campionato di FantaLetteratura.",
             authorId: null,
-            authorName: 'Tutti gli Autori',
+            authorName: null,
             effectType: 'market',
             points: 0,
             isMarket: true,
             icon: 'fa-solid fa-arrows-rotate',
+            color: '#38bdf8'
+        }
+    ],
+
+    // Mappa di tutti gli autori registrati nel database del gioco
+    getAllAuthors() {
+        const authors = [];
+        const seen = new Set();
+        const collect = (list, modeName) => {
+            if (Array.isArray(list)) {
+                list.forEach(a => {
+                    if (a && a.id && !seen.has(a.id)) {
+                        seen.add(a.id);
+                        authors.push({ ...a, modeGroup: modeName });
+                    }
+                });
+            }
+        };
+        if (typeof AUTHORS !== 'undefined') collect(AUTHORS, 'Contemporanea');
+        if (typeof AUTHORS_SECONDE !== 'undefined') collect(AUTHORS_SECONDE, 'Medievale e Moderna');
+        if (typeof AUTHORS_INTERNAZIONALI !== 'undefined') collect(AUTHORS_INTERNAZIONALI, 'Internazionali');
+        return authors;
+    },
+
+    getAuthorById(authorId) {
+        if (!authorId) return null;
+        const all = this.getAllAuthors();
+        return all.find(a => a.id === authorId || a.id === authorId.toLowerCase()) || null;
+    },otate',
             color: '#38bdf8'
         }
     ],
