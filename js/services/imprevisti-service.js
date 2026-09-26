@@ -243,10 +243,7 @@ window.ImprevistiService = {
         if (!authorId) return null;
         const all = this.getAllAuthors();
         return all.find(a => a.id === authorId || a.id === authorId.toLowerCase()) || null;
-    },otate',
-            color: '#38bdf8'
-        }
-    ],
+    },
 
     async init() {
         if (this._isInitialized) return;
