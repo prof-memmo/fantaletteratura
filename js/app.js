@@ -208,12 +208,7 @@ function selectTeamMode(modeId) {
 
     // Reset any previous selection
     teamSelection = { 1: null, 2: null, 3: null, 4: null, 5: null };
-    document.querySelectorAll('.author-slot-btn').forEach(btn => {
-        const ord = ['1ª','2ª','3ª','4ª','5ª'];
-        const slot = btn.dataset.slot;
-        btn.innerHTML = `<span class="slot-name"><i class="fa-solid fa-plus"></i> Scegli la ${ord[slot-1]} star</span> <span class="slot-cost text-primary"></span>`;
-    });
-    document.querySelectorAll('.author-remove-btn').forEach(b => b.classList.remove('visible'));
+    renderRosterSlots();
     calculateBudget();
 
     // Re-populate author grid for this mode
@@ -261,6 +256,108 @@ function selectLeaderboardMode(modeId) {
 }
 
 
+function renderRosterSlots() {
+    const container = document.getElementById('roster-slots-grid');
+    const countSpan = document.getElementById('roster-count');
+    if (!container) return;
+
+    const modeKey = currentTeamMode || 'terze';
+    const modeCfg = GAME_MODES[modeKey] || GAME_MODES.terze;
+    const pool = modeCfg.authors || AUTHORS;
+    const currency = modeCfg.currencyLabel || 'lire';
+
+    let filledCount = 0;
+    let html = '';
+
+    for (let slot = 1; slot <= 5; slot++) {
+        const authorId = teamSelection[slot];
+        if (authorId) {
+            filledCount++;
+            const author = pool.find(a => a.id === authorId) || { name: 'Autore', cost: 0, image: '' };
+            const price = (author.cost || author.points || 0).toLocaleString();
+            html += `
+                <div class="roster-slot-card filled">
+                    <button class="slot-remove-btn" onclick="removeAuthorFromSlot(${slot})" title="Rimuovi ${author.name}">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <img src="${author.image || 'assets/avatar-default.png'}" alt="${author.name}" class="slot-thumb">
+                    <div class="slot-author-name" title="${author.name}">${author.name}</div>
+                    <div class="slot-author-cost">${price} ${currency}</div>
+                </div>
+            `;
+        } else {
+            html += `
+                <div class="roster-slot-card empty">
+                    <div class="slot-empty-icon"><i class="fa-regular fa-star"></i></div>
+                    <div class="slot-empty-title">${slot}ª Star</div>
+                </div>
+            `;
+        }
+    }
+
+    container.innerHTML = html;
+    if (countSpan) countSpan.textContent = filledCount;
+}
+
+function updateAuthorCardsSelection() {
+    const selectedIds = Object.values(teamSelection).filter(val => val !== null);
+    document.querySelectorAll('#author-grid .author-card').forEach(card => {
+        const id = card.dataset.id;
+        if (selectedIds.includes(id)) {
+            card.classList.add('is-selected');
+        } else {
+            card.classList.remove('is-selected');
+        }
+    });
+}
+
+function toggleAuthorSelection(authorId, modeId) {
+    const modeKey = modeId || currentTeamMode || 'terze';
+    
+    // Check if already selected -> remove
+    for (let slot = 1; slot <= 5; slot++) {
+        if (teamSelection[slot] === authorId) {
+            teamSelection[slot] = null;
+            renderRosterSlots();
+            updateAuthorCardsSelection();
+            calculateBudget();
+            return;
+        }
+    }
+
+    // Not selected -> find first available slot
+    let freeSlot = null;
+    for (let slot = 1; slot <= 5; slot++) {
+        if (!teamSelection[slot]) {
+            freeSlot = slot;
+            break;
+        }
+    }
+
+    if (!freeSlot) {
+        alert("Hai già selezionato tutte le 5 Star! Clicca su una Star nel pannello in alto (✕) per sostituirla.");
+        return;
+    }
+
+    teamSelection[freeSlot] = authorId;
+    renderRosterSlots();
+    updateAuthorCardsSelection();
+    calculateBudget();
+}
+
+function removeAuthorFromSlot(slot) {
+    teamSelection[slot] = null;
+    renderRosterSlots();
+    updateAuthorCardsSelection();
+    calculateBudget();
+}
+
+// Global hook for external callers (e.g. LIM / draft)
+window.updateSlotsUI = function() {
+    renderRosterSlots();
+    updateAuthorCardsSelection();
+};
+
 function populateAuthorSelects(modeId) {
     const grid = document.getElementById('author-grid');
     if(!grid) return;
@@ -272,7 +369,7 @@ function populateAuthorSelects(modeId) {
     const currency = modeCfg.currencyLabel || 'lire';
     
     grid.innerHTML = '';
-    // Sort logic update: use cost or points
+    // Sort by cost or points descending
     const sortedAuthors = [...pool].sort((a, b) => (b.cost || b.points || 0) - (a.cost || a.points || 0));
     
     sortedAuthors.forEach(author => {
@@ -280,30 +377,21 @@ function populateAuthorSelects(modeId) {
         const isInternationalClass = author.isInternational ? 'card-international' : '';
         card.className = `author-card glass ${isInternationalClass}`;
         card.dataset.id = author.id;
+        const price = (author.cost || author.points || 0).toLocaleString();
+        
         card.innerHTML = `
+            <div class="author-check-badge"><i class="fa-solid fa-check"></i></div>
             <div class="author-image-wrapper">
                 <img src="${author.image}" alt="${author.name}">
             </div>
-            <div class="author-name" style="font-family: var(--font-heading); font-weight:bold; font-size:1.1rem; color:#f5c53c;">${author.name}</div>
-            <div class="text-primary" style="font-size:0.9rem; font-weight:600;">${author.cost || author.points} ${currency}</div>
+            <div class="author-name" style="font-family: var(--font-heading); font-weight:bold; font-size:1.05rem; color:#f5c53c; margin-bottom:4px;">${author.name}</div>
+            <div class="text-primary" style="font-size:0.85rem; font-weight:700;">${price} ${currency}</div>
         `;
+        
         card.addEventListener('click', () => {
-            selectAuthorForSlot(author.id, modeKey);
+            toggleAuthorSelection(author.id, modeKey);
         });
         grid.appendChild(card);
-    });
-
-    // Setup slot buttons — attach once, track current modeId via closure later
-    document.querySelectorAll('.author-slot-btn').forEach(btn => {
-        // Remove old listeners by cloning
-        const newBtn = btn.cloneNode(true);
-        btn.parentNode.replaceChild(newBtn, btn);
-        newBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            activeSlot = newBtn.dataset.slot;
-            document.getElementById('author-selector-modal').style.display = 'block';
-            updateGridDisabledState();
-        });
     });
 
     // Search filter
@@ -311,9 +399,10 @@ function populateAuthorSelects(modeId) {
     if (searchInput) {
         const newInput = searchInput.cloneNode(true);
         searchInput.parentNode.replaceChild(newInput, searchInput);
+        newInput.value = '';
         newInput.addEventListener('input', () => {
-            const q = newInput.value.toLowerCase();
-            document.querySelectorAll('.author-card').forEach(card => {
+            const q = newInput.value.toLowerCase().trim();
+            document.querySelectorAll('#author-grid .author-card').forEach(card => {
                 const nameDiv = card.querySelector('.author-name');
                 const name = nameDiv ? nameDiv.textContent.toLowerCase() : '';
                 card.style.display = name.includes(q) ? '' : 'none';
@@ -321,76 +410,8 @@ function populateAuthorSelects(modeId) {
         });
     }
 
-    const closeBtn = document.getElementById('close-author-modal');
-    if(closeBtn) {
-        const newClose = closeBtn.cloneNode(true);
-        closeBtn.parentNode.replaceChild(newClose, closeBtn);
-        newClose.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('author-selector-modal').style.display = 'none';
-            activeSlot = null;
-        });
-    }
-}
-
-function updateGridDisabledState() {
-    // Disable authors already selected in other slots
-    const selectedIds = Object.values(teamSelection).filter(val => val !== null);
-    document.querySelectorAll('.author-card').forEach(card => {
-        if (selectedIds.includes(card.dataset.id)) {
-            card.style.opacity = '0.3';
-            card.style.pointerEvents = 'none';
-        } else {
-            card.style.opacity = '1';
-            card.style.pointerEvents = 'auto';
-        }
-    });
-}
-
-function selectAuthorForSlot(authorId, modeId) {
-    if (!activeSlot) return;
-    teamSelection[activeSlot] = authorId;
-
-    // Determine which author pool
-    const mode = modeId ? GAME_MODES[modeId] : (currentTeamMode ? GAME_MODES[currentTeamMode] : null);
-    const pool = (mode && mode.authors && mode.authors.length > 0) ? mode.authors : AUTHORS;
-    const author = pool.find(a => a.id === authorId);
-    if (!author) return;
-    
-    // Determine mode configuration for currency
-    const modeKey = modeId || currentTeamMode || 'terze';
-    const modeCfg = GAME_MODES[modeKey] || GAME_MODES.terze;
-    const currency = modeCfg.currencyLabel || 'lire';
-    const price = author.cost || author.points || 0;
-    
-    // Update button UI
-    const btn = document.querySelector(`.author-slot-btn[data-slot="${activeSlot}"]`);
-    if(btn) {
-        btn.innerHTML = `<div style="display:flex; align-items:center; gap:10px;">
-                            <img src="${author.image}" style="width:30px; height:30px; object-fit:cover; border-radius:50%; background:#fff;"> 
-                            <span>${author.name}</span>
-                         </div> 
-                         <span class="text-primary">${price} ${currency}</span>`;
-    }
-
-    // Show remove button for this slot
-    const removeBtn = document.querySelector(`.author-remove-btn[data-slot="${activeSlot}"]`);
-    if (removeBtn) removeBtn.classList.add('visible');
-
-    document.getElementById('author-selector-modal').style.display = 'none';
-    calculateBudget();
-}
-
-function removeAuthorFromSlot(slot) {
-    teamSelection[slot] = null;
-    const ord = ['1ª','2ª','3ª','4ª','5ª'];
-    const btn = document.querySelector(`.author-slot-btn[data-slot="${slot}"]`);
-    if (btn) {
-        btn.innerHTML = `<span class="slot-name"><i class="fa-solid fa-plus"></i> Scegli la ${ord[slot-1]} star</span> <span class="slot-cost text-primary"></span>`;
-    }
-    const removeBtn = document.querySelector(`.author-remove-btn[data-slot="${slot}"]`);
-    if (removeBtn) removeBtn.classList.remove('visible');
-    calculateBudget();
+    renderRosterSlots();
+    updateAuthorCardsSelection();
 }
 
 function setupBudgetCalculator() {
@@ -1611,12 +1632,8 @@ function setupTeamSave() {
         if (budgetContainer) budgetContainer.style.display = 'none';
         if (slotsSection) slotsSection.style.display = 'none';
 
-        document.querySelectorAll('.author-slot-btn').forEach(btn => {
-            const ord = ['1ª','2ª','3ª','4ª','5ª'];
-            const slot = btn.dataset.slot;
-            btn.innerHTML = `<span class="slot-name"><i class="fa-solid fa-plus"></i> Scegli la ${ord[slot-1]} star</span> <span class="slot-cost text-primary"></span>`;
-        });
-        document.querySelectorAll('.author-remove-btn').forEach(b => b.classList.remove('visible'));
+        renderRosterSlots();
+        updateAuthorCardsSelection();
         calculateBudget();
         
         renderProfilo();

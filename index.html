@@ -204,47 +204,45 @@
                         </button>
                     </div>
 
-                    <!-- SLOT AUTORI (nascosti finché non si sceglie modalità) -->
-                    <div id="author-slots-section" style="display:none;">
-                        <label style="margin-bottom: 10px; display: block;">Seleziona le 5 Star</label>
-                        <div style="display:flex; flex-direction:column; gap:10px; margin-bottom: 20px;">
-                            <div class="author-slot-wrapper">
-                                <button class="btn btn-secondary author-slot-btn" data-slot="1" style="display:flex; justify-content:space-between; align-items:center;"><span class="slot-name"><i class="fa-solid fa-plus"></i> Scegli la 1ª star</span> <span class="slot-cost text-primary"></span></button>
-                                <button class="author-remove-btn" data-slot="1" onclick="removeAuthorFromSlot(1)" title="Rimuovi autore"><i class="fa-solid fa-xmark"></i></button>
+                    <!-- SELEZIONE ROSTER & GRIGLIA AUTORI (nascosti finché non si sceglie modalità) -->
+                    <div id="author-slots-section" style="display:none; margin-top:25px;">
+                        
+                        <!-- Le 5 Star Selezionate (Roster) -->
+                        <div class="roster-panel glass" style="padding:15px; border-radius:14px; margin-bottom:20px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                                <label style="margin:0; font-weight:700; font-size:1.05rem; display:flex; align-items:center; gap:8px;">
+                                    <i class="fa-solid fa-star text-gold"></i> Le tue 5 Star
+                                </label>
+                                <span id="roster-count-badge" class="badge" style="background:rgba(245,197,60,0.15); color:#f5c53c; border:1px solid rgba(245,197,60,0.3); font-weight:700; font-size:0.85rem; padding:4px 10px; border-radius:20px;">
+                                    <span id="roster-count">0</span> / 5 Scelte
+                                </span>
                             </div>
-                            <div class="author-slot-wrapper">
-                                <button class="btn btn-secondary author-slot-btn" data-slot="2" style="display:flex; justify-content:space-between; align-items:center;"><span class="slot-name"><i class="fa-solid fa-plus"></i> Scegli la 2ª star</span> <span class="slot-cost text-primary"></span></button>
-                                <button class="author-remove-btn" data-slot="2" onclick="removeAuthorFromSlot(2)" title="Rimuovi autore"><i class="fa-solid fa-xmark"></i></button>
-                            </div>
-                            <div class="author-slot-wrapper">
-                                <button class="btn btn-secondary author-slot-btn" data-slot="3" style="display:flex; justify-content:space-between; align-items:center;"><span class="slot-name"><i class="fa-solid fa-plus"></i> Scegli la 3ª star</span> <span class="slot-cost text-primary"></span></button>
-                                <button class="author-remove-btn" data-slot="3" onclick="removeAuthorFromSlot(3)" title="Rimuovi autore"><i class="fa-solid fa-xmark"></i></button>
-                            </div>
-                            <div class="author-slot-wrapper">
-                                <button class="btn btn-secondary author-slot-btn" data-slot="4" style="display:flex; justify-content:space-between; align-items:center;"><span class="slot-name"><i class="fa-solid fa-plus"></i> Scegli la 4ª star</span> <span class="slot-cost text-primary"></span></button>
-                                <button class="author-remove-btn" data-slot="4" onclick="removeAuthorFromSlot(4)" title="Rimuovi autore"><i class="fa-solid fa-xmark"></i></button>
-                            </div>
-                            <div class="author-slot-wrapper">
-                                <button class="btn btn-secondary author-slot-btn" data-slot="5" style="display:flex; justify-content:space-between; align-items:center;"><span class="slot-name"><i class="fa-solid fa-plus"></i> Scegli la 5ª star</span> <span class="slot-cost text-primary"></span></button>
-                                <button class="author-remove-btn" data-slot="5" onclick="removeAuthorFromSlot(5)" title="Rimuovi autore"><i class="fa-solid fa-xmark"></i></button>
+                            
+                            <div id="roster-slots-grid" class="roster-slots-grid">
+                                <!-- Inseriti dinamicamente da JS: 5 slot compatti con miniatura, nome, costo e pulsante rimuovi ✕ -->
                             </div>
                         </div>
-                        <button class="btn" id="btn-save-team" disabled>Salva Squadra</button>
-                    </div>
-                </div>
 
-                <!-- Modale per scelta Star -->
-                <div id="author-selector-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-dark); z-index:2000; overflow-y:auto;">
-                    <div style="padding: 15px; position: sticky; top: 0; background:var(--bg-dark); z-index:10; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center;">
-                        <h3 style="margin:0;">Scegli una star</h3>
-                        <button class="btn-secondary" id="close-author-modal" style="padding: 5px 15px; width:auto; border-radius:20px; border:none;"><i class="fa-solid fa-xmark"></i></button>
-                    </div>
-                    <div style="padding: 15px;">
-                        <div class="input-group">
-                            <input type="text" id="search-author" class="input-control" placeholder="Cerca autore..." style="margin-bottom: 15px;">
+                        <!-- Filtro e Ricerca Autori -->
+                        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
+                            <label style="margin:0; font-weight:600; font-size:0.95rem; color:var(--text-muted);">
+                                <i class="fa-solid fa-users"></i> Scegli gli autori per la tua squadra:
+                            </label>
+                            <div class="input-group" style="margin-bottom:0; max-width:280px; width:100%;">
+                                <input type="text" id="search-author" class="input-control" placeholder="🔍 Cerca autore..." style="padding:8px 12px; font-size:0.9rem;">
+                            </div>
                         </div>
-                        <div id="author-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px;">
+
+                        <!-- Griglia Autori Diretta -->
+                        <div id="author-grid" class="author-direct-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 14px; margin-bottom: 25px;">
                             <!-- Inseriti JS -->
+                        </div>
+
+                        <!-- Pulsante Salva Squadra -->
+                        <div style="position:sticky; bottom:20px; z-index:100; padding:10px 0; background:linear-gradient(to top, var(--bg-dark) 80%, transparent);">
+                            <button class="btn" id="btn-save-team" style="width:100%; font-size:1.1rem; padding:14px; font-weight:bold; box-shadow:0 4px 20px rgba(0,0,0,0.4);" disabled>
+                                <i class="fa-solid fa-check"></i> Salva Squadra
+                            </button>
                         </div>
                     </div>
                 </div>
