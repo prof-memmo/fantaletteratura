@@ -230,25 +230,32 @@ Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma
                 const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
                 if (lines.length === 0) return;
 
-                const firstLine = lines[0];
+                let firstLine = lines[0].replace(/^[\u2022\*\-]\s*/, '').trim();
                 let title = '';
                 let content = '';
 
-                // Se la prima linea è un titolo numerato (es. "1. Titolo" o "1) Titolo")
+                // Rimuovi eventuale numerazione iniziale (es. "1. Titolo" o "1) Titolo")
                 const matchNumbered = firstLine.match(/^(\d+[\.\)]\s*)(.*)$/);
                 if (matchNumbered) {
-                    title = matchNumbered[2].trim();
-                    content = lines.slice(1).join(' ').trim();
-                    if (!content) {
-                        // Se c'è solo una riga, il contenuto è la riga stessa
-                        content = title;
-                        title = '';
-                    }
-                } else if (lines.length > 1) {
+                    firstLine = matchNumbered[2].trim();
+                }
+
+                if (lines.length > 1) {
                     title = firstLine;
                     content = lines.slice(1).join(' ').trim();
                 } else {
-                    content = firstLine;
+                    // Se è su una singola riga, controlla se c'è un "TITOLO: Testo"
+                    const colonMatch = firstLine.match(/^([^:]{3,60}):\s*(.+)$/);
+                    if (colonMatch) {
+                        title = colonMatch[1].trim();
+                        content = colonMatch[2].trim();
+                    } else {
+                        content = firstLine;
+                    }
+                }
+
+                if (title) {
+                    title = title.replace(/:\s*$/, '').trim();
                 }
 
                 items.push({
@@ -272,39 +279,19 @@ Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma
             const items = this.parseTextToItems();
 
             container.innerHTML = `
-                <div class="glass" style="padding: 24px; border-radius: 16px;">
-                    <div class="text-center mb-3">
-                        <img src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/games/fantaletteratura-badge.png" alt="Logo Fantaletteratura" class="fanta-logo-glow" style="max-height: 120px; width: auto; display: block; margin: 0 auto 15px; filter: drop-shadow(0 0 15px rgba(212,175,55,0.4));">
-                        <h2 style="margin: 0 0 8px 0;">Regolamento Ufficiale<br>Fantaletteratura</h2>
-                        <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0 auto; max-width: 550px;">
-                            Norme ufficiali, imprevisti letterari, finestre di mercato e linee guida didattiche.
-                        </p>
+                <div class="glass" style="padding: 28px 24px; border-radius: 16px; max-width: 900px; margin: 0 auto;">
+                    <div class="text-center mb-4">
+                        <img src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/games/fantaletteratura-badge.png" alt="Logo Fantaletteratura" class="fanta-logo-glow" style="max-height: 120px; width: auto; display: block; margin: 0 auto 14px; filter: drop-shadow(0 0 15px rgba(212,175,55,0.4));">
+                        <h2 style="font-size: 1.6rem; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 4px 0; color: #fff; font-weight: 700;">Regolamento</h2>
                     </div>
 
-                    <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 20px;">
-                        ${items.map(item => {
-                            const isSpecial = item.title.includes('Imprevisti') || item.title.includes('Mercato') || item.text.includes('Imprevisti') || item.text.includes('Mercato');
-                            const bgStyle = isSpecial 
-                                ? 'background: linear-gradient(135deg, rgba(234, 179, 8, 0.12) 0%, rgba(0,0,0,0.3) 100%); border: 1px solid rgba(234, 179, 8, 0.4);' 
-                                : 'background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);';
-
-                            return `
-                                <div class="glass" style="padding: 16px; border-radius: 12px; ${bgStyle}">
-                                    <div style="display: flex; align-items: flex-start; gap: 12px;">
-                                        <span style="flex-shrink: 0; font-size: 0.8rem; font-weight: bold; background: rgba(212,175,55,0.2); color: var(--accent-gold); padding: 3px 9px; border-radius: 6px;">
-                                            #${item.index}
-                                        </span>
-                                        <div style="flex: 1;">
-                                            ${item.title ? `<div style="font-weight: 700; font-size: 0.95rem; color: #fff; margin-bottom: 4px;">${item.title}</div>` : ''}
-                                            <div style="font-size: 0.88rem; line-height: 1.5; color: #e2e8f0;">
-                                                ${item.text}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
+                    <ul style="list-style-type: disc; padding-left: 24px; margin: 20px 0 0 0; line-height: 1.85; font-size: 0.95rem; color: #f1f5f9;">
+                        ${items.map(item => `
+                            <li style="margin-bottom: 16px; text-align: left;">
+                                ${item.title ? `<strong style="color: #fff; text-transform: uppercase;">${item.title}:</strong> ` : ''}<span>${item.text}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
                 </div>
             `;
         },
@@ -327,7 +314,7 @@ Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma
             const items = this.parseTextToItems();
 
             container.innerHTML = `
-                <div class="glass" style="padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                <div class="glass" style="padding: 24px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px;">
                         <div>
                             <h3 style="margin: 0; color: var(--accent-gold); display: flex; align-items: center; gap: 8px;">
@@ -342,21 +329,13 @@ Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma
                         </span>
                     </div>
 
-                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <ul style="list-style-type: disc; padding-left: 20px; margin: 0; line-height: 1.8; font-size: 0.9rem; color: #e2e8f0;">
                         ${items.map(item => `
-                            <div class="glass" style="padding: 14px; border-radius: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);">
-                                <div style="display: flex; align-items: flex-start; gap: 10px;">
-                                    <span style="flex-shrink: 0; font-size: 0.75rem; font-weight: bold; color: var(--accent-gold); background: rgba(212,175,55,0.15); padding: 2px 7px; border-radius: 4px;">
-                                        #${item.index}
-                                    </span>
-                                    <div>
-                                        ${item.title ? `<strong style="color: #fff; display: block; margin-bottom: 3px; font-size: 0.9rem;">${item.title}</strong>` : ''}
-                                        <span style="color: #e2e8f0; font-size: 0.85rem; line-height: 1.4;">${item.text}</span>
-                                    </div>
-                                </div>
-                            </div>
+                            <li style="margin-bottom: 14px; text-align: left;">
+                                ${item.title ? `<strong style="color: #fff; text-transform: uppercase;">${item.title}:</strong> ` : ''}<span>${item.text}</span>
+                            </li>
                         `).join('')}
-                    </div>
+                    </ul>
                 </div>
             `;
         },
