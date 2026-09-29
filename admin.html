@@ -305,9 +305,15 @@
             <section id="admin-view-classifica" class="admin-view" style="display:none;">
                 <h2 style="padding: 0 15px;">Classifica Globale</h2>
                 <div class="glass" style="padding: 15px; margin: 0 15px 20px 15px;">
+                    <!-- Filtro Categoria: Scuole vs Viandanti -->
+                    <div class="admin-target-filter" style="margin-bottom:12px; display:flex; gap:8px; flex-wrap:wrap;">
+                        <button class="btn admin-target-filter-btn" id="admin-target-all" onclick="window.setAdminClassificaTarget('all')" style="padding:6px 14px; font-size:0.85rem; border-radius:15px; font-weight:700; background:var(--primary-color);">🌐 Tutte le squadre</button>
+                        <button class="btn btn-secondary admin-target-filter-btn" id="admin-target-scuole" onclick="window.setAdminClassificaTarget('scuola')" style="padding:6px 14px; font-size:0.85rem; border-radius:15px; font-weight:700;">🏫 Solo Scuole</button>
+                        <button class="btn btn-secondary admin-target-filter-btn" id="admin-target-viandanti" onclick="window.setAdminClassificaTarget('viandante')" style="padding:6px 14px; font-size:0.85rem; border-radius:15px; font-weight:700;">🧭 Solo Viandanti</button>
+                    </div>
                     <!-- Filtro modalità -->
                     <div class="admin-mode-filter" style="margin-bottom:15px;">
-                        <button class="admin-mode-filter-btn f-all" onclick="window.renderAdminClassifica('all')">Tutte le modalità</button>
+                        <button class="admin-mode-filter-btn f-all" onclick="window.renderAdminClassifica('all')">Tutte le epoche</button>
                         <button class="admin-mode-filter-btn f-green" onclick="window.renderAdminClassifica('terze')">📘 Contemporanea: Autori Italiani</button>
                         <button class="admin-mode-filter-btn f-orange" onclick="window.renderAdminClassifica('seconde')">📙 Età Medievale e Moderna</button>
                         <button class="admin-mode-filter-btn f-gold" onclick="window.renderAdminClassifica('avanzato')">📒 Contemporanea: Autori Italiani e Internazionali</button>

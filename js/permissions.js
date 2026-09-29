@@ -125,8 +125,8 @@
             }
 
             if (planKey === 'viandante') {
-                // Viandante = no funzioni classe/docente
-                if (action === 'create_class' || action === 'gestione_studenti' || action === 'tornei_classe') return false;
+                // Viandante = no funzioni classe/docente e no missioni didattiche (Articolo 5)
+                if (action === 'create_class' || action === 'gestione_studenti' || action === 'tornei_classe' || action === 'use_missioni') return false;
             }
 
             return true;

@@ -906,38 +906,93 @@ async function setupAdminPanel() {
         }
     };
 
+    let currentAdminTargetFilter = 'all';
+    let currentAdminModeFilter = 'all';
+
+    window.setAdminClassificaTarget = function(target) {
+        currentAdminTargetFilter = target || 'all';
+        const btnAll = document.getElementById('admin-target-all');
+        const btnScuole = document.getElementById('admin-target-scuole');
+        const btnViandanti = document.getElementById('admin-target-viandanti');
+
+        [btnAll, btnScuole, btnViandanti].forEach(b => {
+            if (b) {
+                b.classList.add('btn-secondary');
+                b.style.background = 'transparent';
+            }
+        });
+
+        if (target === 'all' && btnAll) {
+            btnAll.classList.remove('btn-secondary');
+            btnAll.style.background = 'var(--primary-color)';
+        } else if (target === 'scuola' && btnScuole) {
+            btnScuole.classList.remove('btn-secondary');
+            btnScuole.style.background = 'var(--primary-color)';
+        } else if (target === 'viandante' && btnViandanti) {
+            btnViandanti.classList.remove('btn-secondary');
+            btnViandanti.style.background = '#8b5cf6';
+        }
+
+        window.renderAdminClassifica(currentAdminModeFilter);
+    };
+
     window.renderAdminClassifica = async function(modeFilter) {
+        if (modeFilter) currentAdminModeFilter = modeFilter;
         const list = document.getElementById('admin-classifica-list');
         if (!list) return;
-        list.innerHTML = '';
+        list.innerHTML = '<p style="padding:10px; color:var(--text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> Caricamento classifica...</p>';
 
         let teams = await getAllTeams();
-        if (modeFilter && modeFilter !== 'all') {
-            teams = teams.filter(t => (t.mode || 'terze') === modeFilter);
+        if (currentAdminTargetFilter && currentAdminTargetFilter !== 'all') {
+            teams = teams.filter(t => (t.teamType || (window.getTeamType ? window.getTeamType(t) : 'scuola')) === currentAdminTargetFilter);
+        }
+        if (currentAdminModeFilter && currentAdminModeFilter !== 'all') {
+            teams = teams.filter(t => (t.mode || 'terze') === currentAdminModeFilter);
         }
 
         let calc = teams.map(team => {
-            // Use the right author pool for this team's mode
-            const tm = team.mode ? GAME_MODES[team.mode] : null;
+            const tmKey = team.mode || 'terze';
+            const tm = GAME_MODES[tmKey];
             const pool = (tm && tm.authors && tm.authors.length > 0) ? tm.authors : AUTHORS;
             let authPts = 0;
-            team.authors.forEach(aid => {
-                const a = pool.find(x => x.id === aid);
-                if(a && a.isPointsRevealed) authPts += a.points;
-            });
-            const modeInfo = team.mode ? GAME_MODES[team.mode] : null;
-            const badge = modeInfo ? `<span class="mode-badge ${modeInfo.colorClass}">${modeInfo.emoji}</span>` : '';
-            return { name: team.name, badge, total: authPts + (team.missionsCompleted * 5) };
+            if (team.authors && Array.isArray(team.authors)) {
+                team.authors.forEach(aid => {
+                    const a = pool.find(x => x.id === aid);
+                    if(a && a.isPointsRevealed) authPts += a.points;
+                });
+            }
+            const modeInfo = tm || null;
+            const modeBadge = modeInfo ? `<span class="mode-badge ${modeInfo.colorClass}">${modeInfo.emoji}</span>` : '';
+            const tType = team.teamType || (window.getTeamType ? window.getTeamType(team) : 'scuola');
+            const targetBadge = tType === 'viandante' 
+                ? `<span class="badge" style="background:#8b5cf6; color:#fff; font-size:0.7rem; padding:2px 6px; border-radius:10px;">🧭 Viandante</span>` 
+                : `<span class="badge" style="background:var(--primary-color); color:#fff; font-size:0.7rem; padding:2px 6px; border-radius:10px;">🏫 Scuola</span>`;
+
+            const missionPts = (team.missionsCompleted || 0) * 5;
+            const minigamePts = (team.minigamePoints || 0);
+            const total = tType === 'viandante' ? (authPts + minigamePts) : (authPts + missionPts);
+
+            return { 
+                name: team.name + (team.classe ? ` (${team.classe})` : ''), 
+                modeBadge, 
+                targetBadge, 
+                total 
+            };
         }).sort((a,b) => b.total - a.total);
 
         if (calc.length === 0) {
-            list.innerHTML = '<i>Nessuna squadra in questa modalità.</i>';
+            list.innerHTML = '<i style="display:block; padding:10px;">Nessuna squadra trovata con questi filtri.</i>';
             return;
         }
 
+        list.innerHTML = '';
         calc.forEach((t, i) => {
-            list.innerHTML += `<div style="display:flex; justify-content:space-between; padding:8px 10px; font-size:0.9rem;">
-                <span>${i + 1}. ${t.badge} ${t.name}</span><span style="font-weight:bold; color:var(--primary-color);">${t.total} pt</span>
+            list.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; font-size:0.9rem; border-bottom:1px solid rgba(255,255,255,0.05);">
+                <div>
+                    <span style="font-weight:700; color:var(--text-muted); min-width:24px; display:inline-block;">${i + 1}.</span> 
+                    ${t.modeBadge} ${t.targetBadge} <strong style="margin-left:5px;">${t.name}</strong>
+                </div>
+                <span style="font-weight:bold; color:var(--primary-color); font-size:1rem;">${t.total} pt</span>
             </div>`;
         });
     };

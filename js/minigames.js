@@ -8875,23 +8875,53 @@
         this.assignPointsToTeamLegacy(xp);
     },
 
-    assignPointsToTeamLegacy: function(xp) {
+    assignPointsToTeamLegacy: async function(xp) {
+        if (!xp || xp <= 0) return;
+
+        // 1. Caso Studente
         if (window.currentUserRole === 'studente' && window.currentUserTeamId && window.db) {
-            window.db.collection('fanta_teams').doc(window.currentUserTeamId).get().then(doc => {
-                if(doc.exists) {
+            try {
+                const doc = await window.db.collection('fanta_teams').doc(window.currentUserTeamId).get();
+                if (doc.exists) {
                     const t = doc.data();
-                    window.db.collection('fanta_teams').doc(t.id).update({
+                    await window.db.collection('fanta_teams').doc(t.id).update({
                         points: (t.points || 0) + xp
                     });
-                    if(window.showToast) {
-                        window.showToast(`+${xp} Punti guadagnati per la tua squadra!`, 'success');
-                    } else {
-                        alert(`+${xp} Punti guadagnati per la tua squadra!`);
-                    }
+                    if (window.showToast) window.showToast(`+${xp} Punti guadagnati per la tua squadra!`, 'success');
+                    else alert(`+${xp} Punti guadagnati per la tua squadra!`);
                 }
-            });
-        } else if (window.currentUserRole === 'docente' || window.currentUserRole === 'admin') {
-            alert(`+${xp} Punti per la squadra selezionata. (Assegnali manualmente dal pannello LIM).`);
+            } catch(err) {
+                console.error("Errore assegnazione punti studente:", err);
+            }
+        } 
+        // 2. Caso Viandante / Utente Singolo
+        else if ((window.currentUserRole === 'viandante' || window.currentUserRole === 'fantamico' || window.currentUserRole === 'guest') && window.currentUserEmail && window.db) {
+            try {
+                const snap = await window.db.collection('fanta_teams')
+                    .where('ownerEmail', '==', window.currentUserEmail)
+                    .get();
+                if (!snap.empty) {
+                    const teamDoc = snap.docs[0];
+                    const currentMinigamePts = teamDoc.data().minigamePoints || 0;
+                    await window.db.collection('fanta_teams').doc(teamDoc.id).update({
+                        minigamePoints: currentMinigamePts + xp
+                    });
+                    if (window.showToast) {
+                        window.showToast(`+${xp} Punti minigioco aggiunti alla tua squadra Viandante (${teamDoc.data().name})!`, 'success');
+                    } else {
+                        alert(`+${xp} Punti minigioco aggiunti alla tua squadra Viandante (${teamDoc.data().name})!`);
+                    }
+                } else {
+                    if (window.showToast) window.showToast(`+${xp} Punti minigioco guadagnati! Crea una squadra per registrarli.`, 'info');
+                    else alert(`+${xp} Punti minigioco guadagnati! Crea una squadra per registrarli.`);
+                }
+            } catch(err) {
+                console.error("Errore salvataggio punti minigioco viandante:", err);
+            }
+        }
+        // 3. Caso Docente / Admin
+        else if (window.currentUserRole === 'docente' || window.currentUserRole === 'admin') {
+            alert(`+${xp} Punti per la squadra selezionata. (Assegnali dal pannello di classe/LIM).`);
         }
     },
 
