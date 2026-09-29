@@ -144,10 +144,8 @@ window.CalendarService = {
                 const mode = GAME_MODES[modeKey];
                 if (mode && Array.isArray(mode.authors)) {
                     mode.authors.forEach(a => {
-                        if (releasedAuthorIds.has(a.id)) {
-                            a.isPointsRevealed = true;
-                            a.isSchedaRevealed = true;
-                        }
+                        a.isPointsRevealed = releasedAuthorIds.has(a.id);
+                        a.isSchedaRevealed = releasedAuthorIds.has(a.id);
                     });
                 }
             });
@@ -156,26 +154,20 @@ window.CalendarService = {
         // Applica ad AUTHORS globale se presente
         if (typeof AUTHORS !== 'undefined' && Array.isArray(AUTHORS)) {
             AUTHORS.forEach(a => {
-                if (releasedAuthorIds.has(a.id)) {
-                    a.isPointsRevealed = true;
-                    a.isSchedaRevealed = true;
-                }
+                a.isPointsRevealed = releasedAuthorIds.has(a.id);
+                a.isSchedaRevealed = releasedAuthorIds.has(a.id);
             });
         }
         if (typeof AUTHORS_SECONDE !== 'undefined' && Array.isArray(AUTHORS_SECONDE)) {
             AUTHORS_SECONDE.forEach(a => {
-                if (releasedAuthorIds.has(a.id)) {
-                    a.isPointsRevealed = true;
-                    a.isSchedaRevealed = true;
-                }
+                a.isPointsRevealed = releasedAuthorIds.has(a.id);
+                a.isSchedaRevealed = releasedAuthorIds.has(a.id);
             });
         }
         if (typeof AUTHORS_INTERNAZIONALI !== 'undefined' && Array.isArray(AUTHORS_INTERNAZIONALI)) {
             AUTHORS_INTERNAZIONALI.forEach(a => {
-                if (releasedAuthorIds.has(a.id)) {
-                    a.isPointsRevealed = true;
-                    a.isSchedaRevealed = true;
-                }
+                a.isPointsRevealed = releasedAuthorIds.has(a.id);
+                a.isSchedaRevealed = releasedAuthorIds.has(a.id);
             });
         }
 
