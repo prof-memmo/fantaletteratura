@@ -863,19 +863,61 @@ window.openImageModal = function(src) {
     };
 };
 
+window.currentSchedeMode = 'terze';
+
+window.switchSchedeMode = function(modeKey) {
+    window.currentSchedeMode = modeKey || 'terze';
+    populateSchede(window.currentSchedeMode);
+};
+
 function populateSchede(modeId = null) {
     const grid = document.getElementById('schede-grid');
     if(!grid) return;
     
+    // Assicura l'applicazione delle validazioni del calendario prima del rendering
+    if (window.CalendarService && typeof window.CalendarService.applyCalendarValidations === 'function') {
+        window.CalendarService.applyCalendarValidations();
+    }
+
+    const modeKey = modeId || window.currentSchedeMode || currentTeamMode || 'terze';
+    window.currentSchedeMode = modeKey;
+
+    // Aggiorna stato attivo dei pulsanti tab
+    document.querySelectorAll('.schede-tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+        btn.style.background = '';
+        btn.style.color = '';
+        btn.style.borderColor = '';
+    });
+    const activeBtn = document.getElementById(`schede-tab-${modeKey}`);
+    if (activeBtn) {
+        activeBtn.classList.add('active');
+        activeBtn.style.background = 'var(--primary-color)';
+        activeBtn.style.color = 'var(--bg-dark)';
+        activeBtn.style.borderColor = 'var(--primary-color)';
+    }
+
     grid.innerHTML = '';
 
-    const modeKey = modeId || currentTeamMode || 'terze';
     const modeCfg = GAME_MODES[modeKey] || GAME_MODES.terze;
     const pool = modeCfg.authors || AUTHORS;
     const revealedAuthors = pool.filter(a => a.isSchedaRevealed);
 
     if(revealedAuthors.length === 0) {
-        grid.innerHTML = '<p class="text-muted" style="grid-column: 1/-1; text-align: center; padding: 20px 0;">In attesa della prima scheda... i professori le pubblicheranno a breve!</p>';
+        let dateMsg = "I professori le pubblicheranno a breve!";
+        if (modeKey === 'terze') {
+            dateMsg = "Prima uscita in programma per Martedì 13 Ottobre 2026 (Foscolo, Manzoni, Leopardi).";
+        } else if (modeKey === 'avanzato') {
+            dateMsg = "Prima uscita in programma per Martedì 13 Ottobre 2026 con gli autori internazionali.";
+        }
+        
+        grid.innerHTML = `
+            <div class="glass" style="grid-column: 1/-1; text-align: center; padding: 30px 20px; border-radius: 14px; border: 1px dashed rgba(255,255,255,0.15);">
+                <i class="fa-solid fa-hourglass-half" style="font-size: 2rem; color: var(--accent-gold); margin-bottom: 12px; display: block;"></i>
+                <div style="font-weight: 700; font-size: 1.05rem; margin-bottom: 6px; color: #fff;">In attesa della prima scheda per questo campionato</div>
+                <div class="text-muted" style="font-size: 0.88rem; max-width: 500px; margin: 0 auto;">${dateMsg}</div>
+            </div>
+        `;
         return;
     }
 
@@ -909,6 +951,19 @@ function populateSchede(modeId = null) {
         // Conserva l'ordine cronologico (dal primo autore studiato all'ultimo)
         grid.insertAdjacentHTML('beforeend', card); 
     });
+
+    // Search filter
+    const searchInput = document.getElementById('search-scheda-input') || document.querySelector('#view-schede input.input-control');
+    if (searchInput) {
+        searchInput.oninput = function() {
+            const q = searchInput.value.toLowerCase().trim();
+            grid.querySelectorAll('.author-card').forEach(card => {
+                const nameDiv = card.querySelector('div[style*="font-family"]') || card;
+                const name = nameDiv ? nameDiv.textContent.toLowerCase() : '';
+                card.style.display = name.includes(q) ? '' : 'none';
+            });
+        };
+    }
 }
 
 /* =========================================

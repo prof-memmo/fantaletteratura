@@ -84,6 +84,9 @@ function navigateTo(viewId, pushHistory = true) {
         }
     }
     if(viewId === 'view-schede') {
+        if(typeof populateSchede === 'function') {
+            populateSchede(window.currentSchedeMode || 'terze');
+        }
         if(typeof window.segnaTuttiAutoriRivelatiComeVisti === 'function') {
             window.segnaTuttiAutoriRivelatiComeVisti();
         }

@@ -315,8 +315,22 @@
             <section id="view-schede" class="view">
 
                 <h2 class="mb-2"><i class="fa-solid fa-scroll"></i> Tutte le schede</h2>
-                <div class="input-group">
-                    <input type="text" class="input-control" placeholder="Cerca scheda...">
+
+                <!-- Tabs Modalità / Campionato -->
+                <div class="schede-mode-tabs" style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
+                    <button type="button" class="btn btn-secondary schede-tab-btn active" id="schede-tab-terze" onclick="switchSchedeMode('terze')" style="flex:1; min-width:130px; padding:8px 12px; font-size:0.85rem; border-radius:20px; font-weight:700;">
+                        📘 Terze (Contemporanea)
+                    </button>
+                    <button type="button" class="btn btn-secondary schede-tab-btn" id="schede-tab-seconde" onclick="switchSchedeMode('seconde')" style="flex:1; min-width:130px; padding:8px 12px; font-size:0.85rem; border-radius:20px; font-weight:700;">
+                        📙 Seconde (Medievale)
+                    </button>
+                    <button type="button" class="btn btn-secondary schede-tab-btn" id="schede-tab-avanzato" onclick="switchSchedeMode('avanzato')" style="flex:1; min-width:130px; padding:8px 12px; font-size:0.85rem; border-radius:20px; font-weight:700;">
+                        📒 Internazionali
+                    </button>
+                </div>
+
+                <div class="input-group" style="margin-bottom: 15px;">
+                    <input type="text" id="search-scheda-input" class="input-control" placeholder="🔍 Cerca scheda...">
                 </div>
                 <div id="schede-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; margin-top: 15px;"></div>
             </section>
