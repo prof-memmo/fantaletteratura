@@ -1447,6 +1447,96 @@ h1, h2, h3, h4 {
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   FUORI MERCATO (Card disabilitata per acquisto, didattica consultabile)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.author-card.card-fuori-mercato {
+    position: relative;
+    filter: grayscale(85%) opacity(0.72);
+    border: 1px dashed rgba(220, 53, 69, 0.5) !important;
+    background: linear-gradient(145deg, rgba(35, 15, 20, 0.7), rgba(20, 10, 15, 0.8)) !important;
+    cursor: pointer !important;
+    transition: all 0.25s ease-in-out;
+}
+
+.author-card.card-fuori-mercato:hover {
+    filter: grayscale(25%) opacity(0.95);
+    border-color: #e63946 !important;
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 10px 25px rgba(230, 57, 70, 0.3);
+}
+
+.author-card.card-fuori-mercato .author-image-wrapper {
+    border-color: #6a2530 !important;
+    filter: contrast(0.92);
+}
+
+.author-card.card-fuori-mercato .author-name {
+    color: #f1b5bc !important;
+}
+
+.author-card.card-fuori-mercato .price-tag {
+    color: #9c7a82 !important;
+    text-decoration: line-through;
+    opacity: 0.75;
+}
+
+.fuori-mercato-badge {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    right: 6px;
+    background: linear-gradient(135deg, #7a1523 0%, #4a0d16 100%);
+    color: #ffe5e8;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    padding: 4px 6px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 110, 130, 0.4);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.65);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    z-index: 6;
+    line-height: 1.15;
+    text-align: center;
+    backdrop-filter: blur(4px);
+    pointer-events: none;
+}
+
+.fuori-mercato-badge .badge-title {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #ffccd2;
+    font-size: 0.70rem;
+    font-weight: 900;
+}
+
+.fuori-mercato-badge .badge-sub {
+    font-size: 0.55rem;
+    font-weight: 600;
+    color: #e8a8b1;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.fuori-mercato-didattica-hint {
+    font-size: 0.68rem;
+    color: #ffccd2;
+    margin-top: 5px;
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    opacity: 0.85;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    SHARE MODAL & STUDENT CODE
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 .share-grid {

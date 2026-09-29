@@ -328,6 +328,17 @@ function updateAuthorCardsSelection() {
 
 function toggleAuthorSelection(authorId, modeId) {
     const modeKey = modeId || currentTeamMode || 'terze';
+    const modeCfg = GAME_MODES[modeKey] || GAME_MODES.terze;
+    const pool = modeCfg.authors || AUTHORS;
+    const author = pool.find(a => a.id === authorId);
+
+    // Controlla se l'autore è Fuori Mercato
+    const isFuoriMercato = Boolean(
+        author && (
+            author.isPointsRevealed === true ||
+            (window.CalendarService && typeof window.CalendarService.isAuthorReleased === 'function' && window.CalendarService.isAuthorReleased(authorId))
+        )
+    );
     
     // Check if already selected -> remove
     for (let slot = 1; slot <= 5; slot++) {
@@ -338,6 +349,14 @@ function toggleAuthorSelection(authorId, modeId) {
             calculateBudget();
             return;
         }
+    }
+
+    // Se l'autore è fuori mercato, impedisce l'acquisto e apre la scheda didattica
+    if (isFuoriMercato) {
+        if (typeof window.openAuthorSchedaModal === 'function') {
+            window.openAuthorSchedaModal(authorId, modeKey);
+        }
+        return;
     }
 
     // Not selected -> find first available slot
@@ -377,6 +396,11 @@ function populateAuthorSelects(modeId) {
     const grid = document.getElementById('author-grid');
     if(!grid) return;
 
+    // Assicura l'applicazione delle validazioni del calendario prima del rendering
+    if (window.CalendarService && typeof window.CalendarService.applyCalendarValidations === 'function') {
+        window.CalendarService.applyCalendarValidations();
+    }
+
     // Determine which author pool to use
     const modeKey = modeId || currentTeamMode || 'terze';
     const modeCfg = GAME_MODES[modeKey] || GAME_MODES.terze;
@@ -386,26 +410,75 @@ function populateAuthorSelects(modeId) {
     grid.innerHTML = '';
     // Sort by cost or points descending
     const sortedAuthors = [...pool].sort((a, b) => (b.cost || b.points || 0) - (a.cost || a.points || 0));
+
+    // Controllo fine stagione: quanti autori sono ancora acquistabili
+    const availableAuthorsCount = sortedAuthors.filter(a => !(
+        a.isPointsRevealed === true ||
+        (window.CalendarService && typeof window.CalendarService.isAuthorReleased === 'function' && window.CalendarService.isAuthorReleased(a.id))
+    )).length;
+
+    let warningBanner = document.getElementById('season-end-warning');
+    if (availableAuthorsCount < 5) {
+        if (!warningBanner) {
+            warningBanner = document.createElement('div');
+            warningBanner.id = 'season-end-warning';
+            warningBanner.style.cssText = 'background: rgba(220, 53, 69, 0.2); border: 1px solid #e63946; color: #ffccd2; padding: 12px 16px; border-radius: 10px; margin-bottom: 15px; font-size: 0.9rem; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.4);';
+            grid.parentNode.insertBefore(warningBanner, grid);
+        }
+        warningBanner.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> <strong>Attenzione (Fine Stagione):</strong> Restano solo <strong>${availableAuthorsCount}</strong> autori disponibili all'acquisto per questo campionato. Non è più possibile formare una rosa completa da 5. Contatta il docente o l'amministratore.`;
+        warningBanner.style.display = 'block';
+    } else if (warningBanner) {
+        warningBanner.style.display = 'none';
+    }
     
     sortedAuthors.forEach(author => {
+        const isFuoriMercato = Boolean(
+            author.isPointsRevealed === true ||
+            (window.CalendarService && typeof window.CalendarService.isAuthorReleased === 'function' && window.CalendarService.isAuthorReleased(author.id))
+        );
+
         const card = document.createElement('div');
         const isInternationalClass = author.isInternational ? 'card-international' : '';
-        card.className = `author-card glass ${isInternationalClass}`;
+        const fuoriMercatoClass = isFuoriMercato ? 'card-fuori-mercato' : '';
+        
+        card.className = `author-card glass ${isInternationalClass} ${fuoriMercatoClass}`.trim();
         card.dataset.id = author.id;
         const price = (author.cost || author.points || 0).toLocaleString();
         
-        card.innerHTML = `
-            <div class="author-check-badge"><i class="fa-solid fa-check"></i></div>
-            <div class="author-image-wrapper">
-                <img src="${author.image}" alt="${author.name}">
-            </div>
-            <div class="author-name" style="font-family: var(--font-heading); font-weight:bold; font-size:1.05rem; color:#f5c53c; margin-bottom:4px;">${author.name}</div>
-            <div class="text-primary" style="font-size:0.85rem; font-weight:700;">${price} ${currency}</div>
-        `;
-        
-        card.addEventListener('click', () => {
-            toggleAuthorSelection(author.id, modeKey);
-        });
+        if (isFuoriMercato) {
+            card.innerHTML = `
+                <div class="fuori-mercato-badge">
+                    <span class="badge-title"><i class="fa-solid fa-lock"></i> FUORI MERCATO</span>
+                    <span class="badge-sub">Disponibile nella prossima stagione</span>
+                </div>
+                <div class="author-image-wrapper">
+                    <img src="${author.image}" alt="${author.name}">
+                </div>
+                <div class="author-name" style="font-family: var(--font-heading); font-weight:bold; font-size:1.05rem; margin-bottom:4px;">${author.name}</div>
+                <div class="price-tag text-primary" style="font-size:0.85rem; font-weight:700;">${price} ${currency}</div>
+                <div class="fuori-mercato-didattica-hint"><i class="fa-solid fa-book-open"></i> Consulta scheda</div>
+            `;
+            
+            card.addEventListener('click', () => {
+                if (typeof window.openAuthorSchedaModal === 'function') {
+                    window.openAuthorSchedaModal(author.id, modeKey);
+                }
+            });
+        } else {
+            card.innerHTML = `
+                <div class="author-check-badge"><i class="fa-solid fa-check"></i></div>
+                <div class="author-image-wrapper">
+                    <img src="${author.image}" alt="${author.name}">
+                </div>
+                <div class="author-name" style="font-family: var(--font-heading); font-weight:bold; font-size:1.05rem; color:#f5c53c; margin-bottom:4px;">${author.name}</div>
+                <div class="text-primary" style="font-size:0.85rem; font-weight:700;">${price} ${currency}</div>
+            `;
+            
+            card.addEventListener('click', () => {
+                toggleAuthorSelection(author.id, modeKey);
+            });
+        }
+
         grid.appendChild(card);
     });
 

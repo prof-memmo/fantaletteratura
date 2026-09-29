@@ -423,6 +423,7 @@ Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma
                     btn.innerHTML = `<i class="fa-solid fa-check"></i> SALVATO CON SUCCESSO!`;
                     btn.style.background = '#16a34a';
                 }
+                alert("✅ Regolamento salvato e sincronizzato con successo nel Cloud!");
                 setTimeout(() => {
                     if (btn) {
                         btn.disabled = false;

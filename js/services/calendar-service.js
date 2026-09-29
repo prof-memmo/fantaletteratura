@@ -39,6 +39,10 @@ window.CalendarService = {
                             if (typeof window.renderAdminImprevisti === 'function') {
                                 window.renderAdminImprevisti();
                             }
+                            // Aggiorna la griglia autori se la schermata di selezione è attiva
+                            if (typeof window.populateAuthorSelects === 'function' && document.getElementById('author-grid')) {
+                                window.populateAuthorSelects(window.currentTeamMode || 'terze');
+                            }
                         } else if (doc && !doc.exists) {
                             // Se non esiste ancora su Firestore, salva la struttura predefinita con le 18 uscite
                             const baseReleases = typeof CALENDAR_RELEASES !== 'undefined' ? CALENDAR_RELEASES : [];
@@ -176,6 +180,12 @@ window.CalendarService = {
         }
 
         console.log(`📅 CalendarService: validate ${releasedAuthorIds.size} entità autore in base al calendario.`);
+    },
+
+    isAuthorReleased(authorId) {
+        if (!authorId) return false;
+        const releases = this.getReleases();
+        return releases.some(rel => rel.isReleased && Array.isArray(rel.authorIds) && rel.authorIds.includes(authorId));
     },
 
     async updateReleaseDate(releaseId, newDate) {
