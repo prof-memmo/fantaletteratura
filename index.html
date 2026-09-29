@@ -1451,16 +1451,28 @@
         const totalMiniguidaSteps = 4;
         
         function openMiniguida() {
+            if (window.FantaMiniguidaService) {
+                window.FantaMiniguidaService.openModal();
+                return;
+            }
             document.getElementById('modal-miniguida').style.display = 'flex';
             currentMiniguidaStep = 0;
             updateMiniguidaView();
         }
         
         function closeMiniguida() {
+            if (window.FantaMiniguidaService) {
+                window.FantaMiniguidaService.closeModal();
+                return;
+            }
             document.getElementById('modal-miniguida').style.display = 'none';
         }
         
         function nextMiniguidaStep() {
+            if (window.FantaMiniguidaService) {
+                window.FantaMiniguidaService.nextStep();
+                return;
+            }
             if (currentMiniguidaStep < totalMiniguidaSteps - 1) {
                 currentMiniguidaStep++;
                 updateMiniguidaView();
@@ -1471,11 +1483,13 @@
         
         function updateMiniguidaView() {
             for (let i = 0; i < totalMiniguidaSteps; i++) {
-                document.getElementById('miniguida-step-' + i).style.display = i === currentMiniguidaStep ? 'flex' : 'none';
-                const dot = document.getElementById('miniguida-dots').children[i];
-                dot.style.background = i === currentMiniguidaStep ? 'var(--primary-color)' : '#e2e8f0';
+                const el = document.getElementById('miniguida-step-' + i);
+                if (el) el.style.display = i === currentMiniguidaStep ? 'flex' : 'none';
+                const dot = document.getElementById('miniguida-dots')?.children[i];
+                if (dot) dot.style.background = i === currentMiniguidaStep ? 'var(--primary-color)' : '#e2e8f0';
             }
-            document.getElementById('miniguida-next-btn').innerText = currentMiniguidaStep === totalMiniguidaSteps - 1 ? 'GIOCA!' : 'AVANTI';
+            const nextBtn = document.getElementById('miniguida-next-btn');
+            if (nextBtn) nextBtn.innerText = currentMiniguidaStep === totalMiniguidaSteps - 1 ? 'GIOCA!' : 'AVANTI';
         }
     </script>
 
@@ -1484,6 +1498,7 @@
     <script src="js/services/calendar-service.js?v=20260926_rules_live_v3"></script>
     <script src="js/services/imprevisti-service.js?v=20260926_rules_live_v3"></script>
     <script src="js/services/rules-service.js?v=20260927_bullet_rules_v1"></script>
+    <script src="js/services/miniguida-service.js?v=20260929_miniguida_v1"></script>
     <script src="js/music.js?v=20260926_rules_live_v3"></script>
     <script src="js/minigames.js?v=20260926_rules_live_v3"></script>
     <!-- Components -->

@@ -54,6 +54,7 @@
                 <button class="btn admin-tab-btn" data-target="admin-view-tornei"><i class="fa-solid fa-trophy"></i> Tornei</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-classifica"><i class="fa-solid fa-ranking-star"></i> Classifica Globale</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-regolamento" onclick="window.renderAdminRegolamento()"><i class="fa-solid fa-scroll"></i> Regolamento</button>
+                <button class="btn admin-tab-btn" data-target="admin-view-miniguida" onclick="window.renderAdminMiniguida()"><i class="fa-solid fa-chalkboard-user"></i> Miniguida</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-impostazioni"><i class="fa-solid fa-gear"></i> Impostazioni</button>
             </div>
 
@@ -428,6 +429,13 @@
             <section id="admin-view-regolamento" class="admin-view" style="display:none;">
                 <div id="admin-regolamento-container">
                     <!-- Popolato dinamicamente da RulesService -->
+                </div>
+            </section>
+
+            <!-- VIEW: Pannello Super-Admin / Docente - Miniguida Dinamica -->
+            <section id="admin-view-miniguida" class="admin-view" style="display:none;">
+                <div id="fanta-miniguida-editor-container">
+                    <!-- Popolato dinamicamente da MiniguidaService -->
                 </div>
             </section>
 
@@ -997,6 +1005,7 @@
     <script src="js/services/calendar-service.js?v=20260926_rules_live_v3"></script>
     <script src="js/services/imprevisti-service.js?v=20260926_rules_live_v3"></script>
     <script src="js/services/rules-service.js?v=20260927_bullet_rules_v1"></script>
+    <script src="js/services/miniguida-service.js?v=20260929_miniguida_v1"></script>
     <script src="js/music.js?v=20260926_rules_live_v3"></script>
     <script src="js/minigames.js?v=20260926_imprevisti_v4"></script>
     <!-- Components -->
@@ -1004,6 +1013,13 @@
     <script src="js/components/modals.js?v=20260926_imprevisti_v4"></script>
     <!-- Dashboard -->
     <script src="js/dashboard/admin-logic.js?v=20260926_imprevisti_v4"></script>
+    <script>
+        window.renderAdminMiniguida = function() {
+            if (window.FantaMiniguidaService) {
+                window.FantaMiniguidaService.renderAdminEditor('fanta-miniguida-editor-container');
+            }
+        };
+    </script>
     <!-- Live Editor -->
     <script src="js/live-editor.js?v=20260926_imprevisti_v4"></script>
     <script src="js/app.js?v=20260926_imprevisti_v4"></script>
