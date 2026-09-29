@@ -89,10 +89,23 @@ window.CalendarService = {
     getReleases() {
         const baseReleases = typeof CALENDAR_RELEASES !== 'undefined' ? CALENDAR_RELEASES : [];
         const todayStr = this.getTodayDateString();
+        const d = new Date();
+        const currYear = d.getFullYear();
+        const currMonth = d.getMonth() + 1;
+        const schoolYearStart = (currMonth >= 9) ? currYear : (currYear - 1);
 
         return baseReleases.map(rel => {
             const ov = this._overrides[rel.id] || {};
-            const effectiveDate = ov.date || rel.date;
+            let effectiveDate = ov.date || rel.date;
+
+            // Se la data proviene dal calendario base senza override, normalizza l'anno all'anno scolastico attivo
+            if (!ov.date && rel.date && rel.date.length === 10) {
+                const parts = rel.date.split('-');
+                const baseMonth = parseInt(parts[1], 10);
+                const targetYear = (baseMonth >= 9) ? schoolYearStart : (schoolYearStart + 1);
+                effectiveDate = `${targetYear}-${parts[1]}-${parts[2]}`;
+            }
+
             const isForced = ov.forced === true;
             const isBlocked = ov.blocked === true;
             const hazardText = ov.hazardText !== undefined ? ov.hazardText : (rel.hazardText || '');
