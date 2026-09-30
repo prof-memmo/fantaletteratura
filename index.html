@@ -385,12 +385,17 @@
                 <!-- Hero Card: Manche Completa Gran Torneo -->
                 <div class="glass mb-2" style="padding: 18px; border-radius: 16px; background: linear-gradient(135deg, rgba(212,175,55,0.18), rgba(0,0,0,0.4)); border: 1.5px solid var(--accent-gold); text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.3);">
                     <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 15px;">
-                        <div style="text-align: left; flex: 1; min-width: 250px;">
-                            <div style="display: inline-block; padding: 3px 10px; background: var(--accent-gold); color: #000; font-weight: 800; font-size: 0.7rem; border-radius: 20px; margin-bottom: 6px;">
-                                <i class="fa-solid fa-crown"></i> SFIDA COMPLETA
+                        <div style="display: flex; align-items: center; gap: 16px; text-align: left; flex: 1; min-width: 250px;">
+                            <div style="width: 64px; height: 64px; border-radius: 16px; background: rgba(212,175,55,0.2); border: 1.5px solid var(--accent-gold); display: flex; align-items: center; justify-content: center; padding: 6px; flex-shrink: 0; box-shadow: 0 4px 12px rgba(212,175,55,0.3);">
+                                <img src="assets/icone-giochi/6.png" alt="Manche Completa" style="max-width: 100%; max-height: 100%; object-fit: contain; aspect-ratio: 1/1;">
                             </div>
-                            <h3 style="margin: 0 0 5px 0; font-size: 1.25rem; color: #fff;">Manche Completa (Gran Torneo)</h3>
-                            <p style="margin: 0; font-size: 0.85rem; color: #ccc;">Affronta in sequenza tutti i 5 giochi per conquistare fino a 20 punti per la tua squadra!</p>
+                            <div>
+                                <div style="display: inline-block; padding: 3px 10px; background: var(--accent-gold); color: #000; font-weight: 800; font-size: 0.7rem; border-radius: 20px; margin-bottom: 4px;">
+                                    <i class="fa-solid fa-crown"></i> SFIDA COMPLETA
+                                </div>
+                                <h3 style="margin: 0 0 4px 0; font-size: 1.25rem; color: #fff;">Manche Completa (Gran Torneo)</h3>
+                                <p style="margin: 0; font-size: 0.85rem; color: #ccc;">Affronta in sequenza tutti i giochi per conquistare fino a 20 punti per la tua squadra!</p>
+                            </div>
                         </div>
                         <button type="button" class="btn" style="background: var(--accent-gold); color: #000; font-weight: 800; padding: 10px 24px; border-radius: 25px; border: none; box-shadow: 0 4px 15px rgba(212,175,55,0.4); font-size: 0.95rem; cursor: pointer;" onclick="window.avviaSalaGiochiGame('manche')">
                             <i class="fa-solid fa-play"></i> Avvia Manche
@@ -404,8 +409,10 @@
                     <!-- 1. Quiz -->
                     <div class="glass" style="padding: 16px; border-radius: 14px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1); transition: transform 0.2s, border-color 0.2s;">
                         <div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                <span style="font-size: 1.5rem; color: #60a5fa;"><i class="fa-solid fa-list-check"></i></span>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(96,165,250,0.12); border: 1px solid rgba(96,165,250,0.3); display: flex; align-items: center; justify-content: center; padding: 6px; flex-shrink: 0;">
+                                    <img src="assets/icone-giochi/1.png" alt="Quiz Letterario" style="max-width: 100%; max-height: 100%; object-fit: contain; aspect-ratio: 1/1;">
+                                </div>
                                 <span style="font-size: 0.75rem; background: rgba(96,165,250,0.15); color: #60a5fa; border: 1px solid rgba(96,165,250,0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Max 2 pt</span>
                             </div>
                             <h4 style="margin: 0 0 6px 0; font-size: 1.05rem; color: #fff;">Quiz Letterario</h4>
@@ -421,8 +428,10 @@
                     <!-- 2. Impiccato -->
                     <div class="glass" style="padding: 16px; border-radius: 14px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1); transition: transform 0.2s, border-color 0.2s;">
                         <div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                <span style="font-size: 1.5rem; color: #f59e0b;"><i class="fa-solid fa-pen-nib"></i></span>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); display: flex; align-items: center; justify-content: center; padding: 6px; flex-shrink: 0;">
+                                    <img src="assets/icone-giochi/2.png" alt="L'Impiccato" style="max-width: 100%; max-height: 100%; object-fit: contain; aspect-ratio: 1/1;">
+                                </div>
                                 <span style="font-size: 0.75rem; background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Max 2 pt</span>
                             </div>
                             <h4 style="margin: 0 0 6px 0; font-size: 1.05rem; color: #fff;">L'Impiccato</h4>
@@ -438,8 +447,10 @@
                     <!-- 3. Cloze -->
                     <div class="glass" style="padding: 16px; border-radius: 14px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1); transition: transform 0.2s, border-color 0.2s;">
                         <div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                <span style="font-size: 1.5rem; color: #34d399;"><i class="fa-solid fa-align-left"></i></span>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(52,211,153,0.12); border: 1px solid rgba(52,211,153,0.3); display: flex; align-items: center; justify-content: center; padding: 6px; flex-shrink: 0;">
+                                    <img src="assets/icone-giochi/3.png" alt="Testo Bucato" style="max-width: 100%; max-height: 100%; object-fit: contain; aspect-ratio: 1/1;">
+                                </div>
                                 <span style="font-size: 0.75rem; background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid rgba(52,211,153,0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Max 2 pt</span>
                             </div>
                             <h4 style="margin: 0 0 6px 0; font-size: 1.05rem; color: #fff;">Testo Bucato (Cloze)</h4>
@@ -455,8 +466,10 @@
                     <!-- 4. Puzzle -->
                     <div class="glass" style="padding: 16px; border-radius: 14px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1); transition: transform 0.2s, border-color 0.2s;">
                         <div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                <span style="font-size: 1.5rem; color: #a78bfa;"><i class="fa-solid fa-puzzle-piece"></i></span>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.3); display: flex; align-items: center; justify-content: center; padding: 6px; flex-shrink: 0;">
+                                    <img src="assets/icone-giochi/4.png" alt="Puzzle di Citazioni" style="max-width: 100%; max-height: 100%; object-fit: contain; aspect-ratio: 1/1;">
+                                </div>
                                 <span style="font-size: 0.75rem; background: rgba(167,139,250,0.15); color: #a78bfa; border: 1px solid rgba(167,139,250,0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Max 2 pt</span>
                             </div>
                             <h4 style="margin: 0 0 6px 0; font-size: 1.05rem; color: #fff;">Puzzle di Citazioni</h4>
@@ -472,8 +485,10 @@
                     <!-- 5. Versi -->
                     <div class="glass" style="padding: 16px; border-radius: 14px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1); transition: transform 0.2s, border-color 0.2s;">
                         <div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                <span style="font-size: 1.5rem; color: #f43f5e;"><i class="fa-solid fa-align-justify"></i></span>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(244,63,94,0.12); border: 1px solid rgba(244,63,94,0.3); display: flex; align-items: center; justify-content: center; padding: 6px; flex-shrink: 0;">
+                                    <img src="assets/icone-giochi/5.png" alt="Riordina i Versi" style="max-width: 100%; max-height: 100%; object-fit: contain; aspect-ratio: 1/1;">
+                                </div>
                                 <span style="font-size: 0.75rem; background: rgba(244,63,94,0.15); color: #f43f5e; border: 1px solid rgba(244,63,94,0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Max 2 pt</span>
                             </div>
                             <h4 style="margin: 0 0 6px 0; font-size: 1.05rem; color: #fff;">Riordina i Versi</h4>
