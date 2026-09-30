@@ -3084,3 +3084,140 @@ h1, h2, h3, h4 {
     font-weight: 700;
 }
 
+/* =========================================
+   SALA GIOCHI: REBUS, CRITTO, INDOVINELLI, ANAGRAMMI, DIFFERENZE
+========================================= */
+.rebus-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.rebus-box {
+    background: rgba(0,0,0,0.4);
+    border: 1.5px solid rgba(212,175,55,0.4);
+    border-radius: 14px;
+    padding: 12px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.letter-slot {
+    width: 36px;
+    height: 42px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.06);
+    border: 1.5px solid rgba(255,255,255,0.2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #fff;
+    margin: 2px;
+    text-transform: uppercase;
+}
+
+.letter-slot.filled {
+    border-color: var(--accent-gold);
+    background: rgba(212,175,55,0.15);
+    color: var(--accent-gold);
+}
+
+.crittografia-box {
+    background: rgba(15,17,8,0.9);
+    border: 1.5px solid var(--accent-gold);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 18px;
+    line-height: 1.8;
+}
+
+.cipher-letter-box {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 3px 4px;
+}
+
+.riddle-card {
+    background: linear-gradient(135deg, rgba(236,72,153,0.1), rgba(0,0,0,0.5));
+    border: 1.5px solid rgba(236,72,153,0.35);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 18px;
+    text-align: center;
+}
+
+.anagram-tile {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 44px;
+    border-radius: 8px;
+    background: rgba(99,102,241,0.2);
+    border: 1.5px solid #6366f1;
+    color: #fff;
+    font-size: 1.15rem;
+    font-weight: 800;
+    margin: 4px;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+    user-select: none;
+}
+
+.anagram-tile:hover {
+    transform: scale(1.1);
+    background: rgba(99,102,241,0.4);
+}
+
+.diff-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 600px) {
+    .diff-container {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+.diff-box {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 2px solid var(--accent-gold);
+    background: #000;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+}
+
+.diff-spot {
+    position: absolute;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px dashed rgba(255,255,255,0.4);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.diff-spot.found {
+    border: 3px solid #2ecc71;
+    background: rgba(46,204,113,0.3);
+    box-shadow: 0 0 12px #2ecc71;
+    pointer-events: none;
+}
+
+

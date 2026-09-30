@@ -8777,7 +8777,12 @@
         cloze: '📝 Testo Bucato (Cloze)',
         versi: '📜 Riordina i Versi',
         memory: '🃏 Memory Letterario',
-        cruciverba: '✏️ Parole Crociate'
+        cruciverba: '✏️ Parole Crociate',
+        rebus: '🎯 Rebus Letterario',
+        crittografia: '🔐 Crittografia in Codice',
+        indovinello: '💡 Indovinello Letterario',
+        anagramma: '🔤 Anagrammi & Sciarade',
+        differenze: '🔍 Trova le Differenze'
       };
       title.innerHTML = `<span style="color:#f5c53c;">${this.isMancheMode ? '🏆 MANCHE COMPLETA - ' : ''}${typeLabels[type] || type}</span> ${topicBadge}`;
 
@@ -8789,6 +8794,11 @@
         case 'quiz':      this.initQuiz(content, data); break;
         case 'memory':    this.initMemory(content, data, currentMissionId); break;
         case 'cruciverba': this.initCruciverba(content, data, currentMissionId); break;
+        case 'rebus':     this.initRebus(content, data, currentMissionId); break;
+        case 'crittografia': this.initCrittografia(content, data, currentMissionId); break;
+        case 'indovinello': this.initIndovinello(content, data, currentMissionId); break;
+        case 'anagramma': this.initAnagramma(content, data, currentMissionId); break;
+        case 'differenze': this.initDifferenze(content, data, currentMissionId); break;
       }
     },
 
@@ -10112,6 +10122,785 @@
           </div>
         `;
       }
+    },
+
+    // =====================================================
+    // MOTORE: REBUS LETTERARI (BLOCCO 3)
+    // =====================================================
+    rebusState: {
+      item: null,
+      userAnswer: [],
+      isSolved: false
+    },
+
+    rebusDB: [
+      {
+        id: 1,
+        title: "Rebus 1 - Capolavoro Dantesco",
+        icons: [{ icon: "👑", label: "RE", len: 2 }, { icon: "🚌", label: "BUS", len: 3 }],
+        diagram: "2 3 = 5",
+        solution: "REBUS",
+        hint: "Il nome stesso di questo celebre passatempo enigmistico!"
+      },
+      {
+        id: 2,
+        title: "Rebus 2 - Romanzo Epistolare",
+        icons: [{ icon: "🏺", label: "OR", len: 2 }, { icon: "📜", label: "TIS", len: 3 }],
+        diagram: "2 3 = 5",
+        solution: "ORTIS",
+        hint: "Le ultime lettere di Jacopo..."
+      },
+      {
+        id: 3,
+        title: "Rebus 3 - L'Idillio di Recanati",
+        icons: [{ icon: "🌊", label: "MARE", len: 4 }, { icon: "⛰️", label: "COLLE", len: 5 }],
+        diagram: "4 5 = 9",
+        solution: "INFINITO",
+        hint: "Sempre caro mi fu quest'ermo..."
+      },
+      {
+        id: 4,
+        title: "Rebus 4 - I Promessi Sposi",
+        icons: [{ icon: "💍", label: "SPOSI", len: 5 }],
+        diagram: "5",
+        solution: "SPOSI",
+        hint: "I celebri promessi di Alessandro Manzoni."
+      }
+    ],
+
+    initRebus: function(container, data, missionId) {
+      const item = this.rebusDB[Math.floor(Math.random() * this.rebusDB.length)];
+      this.rebusState = {
+        item: item,
+        userAnswer: new Array(item.solution.length).fill(''),
+        isSolved: false
+      };
+      this.renderRebus(container);
+    },
+
+    renderRebus: function(container) {
+      const s = this.rebusState;
+      const it = s.item;
+
+      container.innerHTML = `
+        <div style="padding: 10px; max-width: 650px; margin: 0 auto; text-align: center;">
+          <h4 style="color: var(--accent-gold); margin: 0 0 10px 0;">${it.title}</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 18px;">
+            Diagramma: <strong style="color: #fff;">${it.diagram}</strong> &bull; ${it.hint}
+          </p>
+
+          <div class="rebus-container">
+            ${it.icons.map((ic, i) => `
+              <div class="rebus-box">
+                <span style="font-size: 3rem; margin-bottom: 4px;">${ic.icon}</span>
+                <span style="font-size: 0.85rem; font-weight: 800; color: var(--accent-gold); letter-spacing: 1px;">(${ic.len} lettere)</span>
+              </div>
+              ${i < it.icons.length - 1 ? '<span style="font-size: 1.8rem; font-weight: 800; color: var(--accent-gold);">+</span>' : ''}
+            `).join('')}
+          </div>
+
+          <!-- Caselle Risposta -->
+          <div style="margin-bottom: 20px;">
+            <div style="display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin-bottom: 10px;">
+              ${it.solution.split('').map((char, idx) => {
+                const val = s.userAnswer[idx] || '';
+                return `
+                  <input id="rebus-slot-${idx}" type="text" maxlength="1" value="${val}"
+                    class="letter-slot ${val ? 'filled' : ''}"
+                    style="outline: none; text-align: center; cursor: pointer;"
+                    oninput="EroiMinigames.inputRebusLetter(${idx}, this.value)"
+                    onkeydown="if(event.key==='Backspace'&&!this.value&&${idx}>0) document.getElementById('rebus-slot-'+(${idx}-1)).focus();">
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <button class="btn" style="background: #2ecc71; color: #000; font-weight: 800; padding: 8px 22px; border-radius: 20px;" onclick="EroiMinigames.verifyRebus()">
+              <i class="fa-solid fa-check"></i> Verifica Rebus
+            </button>
+            <button class="btn btn-secondary" style="background: rgba(245,197,60,0.15); border: 1px solid #f5c53c; color: #f5c53c; font-weight: 600; padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.hintRebus()">
+              <i class="fa-solid fa-lightbulb"></i> Aiuto Lettera
+            </button>
+            <button class="btn btn-secondary" style="padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.resetRebus()">
+              <i class="fa-solid fa-rotate-left"></i> Reset
+            </button>
+            <button class="btn btn-secondary" style="background: rgba(255,255,255,0.05); color: #aaa; padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.skipCurrent('rebus')">
+              <i class="fa-solid fa-forward-step"></i> Passa
+            </button>
+          </div>
+        </div>
+      `;
+    },
+
+    inputRebusLetter: function(idx, val) {
+      const s = this.rebusState;
+      const char = (val || '').toUpperCase().trim().slice(-1);
+      s.userAnswer[idx] = char;
+
+      const container = document.getElementById('minigame-content');
+      if (container) this.renderRebus(container);
+
+      if (char && idx < s.item.solution.length - 1) {
+        const nextInp = document.getElementById(`rebus-slot-${idx + 1}`);
+        if (nextInp) nextInp.focus();
+      }
+    },
+
+    hintRebus: function() {
+      const s = this.rebusState;
+      const emptyIdx = s.userAnswer.findIndex((val, i) => val !== s.item.solution[i]);
+      if (emptyIdx !== -1) {
+        s.userAnswer[emptyIdx] = s.item.solution[emptyIdx];
+        const container = document.getElementById('minigame-content');
+        if (container) this.renderRebus(container);
+        if (window.showToast) window.showToast('Lettera suggerita!', 'info');
+      }
+    },
+
+    resetRebus: function() {
+      const container = document.getElementById('minigame-content');
+      const data = getData(currentMissionId);
+      if (container) this.initRebus(container, data, currentMissionId);
+    },
+
+    verifyRebus: function() {
+      const s = this.rebusState;
+      const userStr = s.userAnswer.join('').toUpperCase();
+      if (userStr === s.item.solution.toUpperCase()) {
+        const container = document.getElementById('minigame-content');
+        if (container) {
+          container.innerHTML = `
+            <div style="padding: 25px; text-align: center; max-width: 500px; margin: 0 auto;">
+              <div style="font-size: 3rem; margin-bottom: 10px;">🎯</div>
+              <h2 style="color: var(--accent-gold); font-size: 1.8rem; margin: 0 0 10px 0; font-family: var(--font-heading);">
+                REBUS RISOLTO!
+              </h2>
+              <p style="font-size: 1.05rem; color: #f5f5f0; margin-bottom: 15px;">
+                Soluzione esatta: <strong style="color: #2ecc71;">${s.item.solution}</strong>
+              </p>
+              <div style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; border: 1px solid rgba(212,175,55,0.3); margin-bottom: 20px;">
+                <div style="font-size: 2rem; font-weight: 800; color: #2ecc71;">+2 PUNTI</div>
+              </div>
+              <button class="btn" style="background: var(--accent-gold); color: #000; font-weight: 800; padding: 10px 28px; border-radius: 20px;" onclick="EroiMinigames.rewardAndNext('rebus', 2, 10)">
+                Continua
+              </button>
+            </div>
+          `;
+        }
+      } else {
+        alert("La parola inserita non è corretta. Ricontrolla le lettere e riprova!");
+      }
+    },
+
+    // =====================================================
+    // MOTORE: CRITTOGRAFIE IN CODICE (BLOCCO 3)
+    // =====================================================
+    crittoState: {
+      item: null,
+      userMap: {},
+      isSolved: false
+    },
+
+    crittoDB: [
+      {
+        id: 1,
+        author: "Dante Alighieri",
+        plain: "L AMOR CHE MOVE IL SOLE",
+        shift: 3,
+        cipher: "O DPRO FKH PRYH LO VROH",
+        hint: "Cifrario di Cesare (ogni lettera è spostata di +3 posizioni nell'alfabeto: A->D, B->E...)"
+      },
+      {
+        id: 2,
+        author: "Giacomo Leopardi",
+        plain: "E IL NAUFRAGAR M E DOLCE",
+        shift: 1,
+        cipher: "F JM OBVGSBHBS N F EPMDF",
+        hint: "Cifrario a scorrimento (+1: A->B, B->C...)"
+      },
+      {
+        id: 3,
+        author: "Ugo Foscolo",
+        plain: "A ZACINTO MIA",
+        shift: 2,
+        cipher: "C BAEKPVQ OKC",
+        hint: "Cifrario a scorrimento (+2: A->C, B->D...)"
+      }
+    ],
+
+    initCrittografia: function(container, data, missionId) {
+      const item = this.crittoDB[Math.floor(Math.random() * this.crittoDB.length)];
+      this.crittoState = {
+        item: item,
+        userMap: {},
+        isSolved: false
+      };
+      this.renderCrittografia(container);
+    },
+
+    renderCrittografia: function(container) {
+      const s = this.crittoState;
+      const it = s.item;
+
+      const words = it.cipher.split(' ');
+      const plainWords = it.plain.split(' ');
+
+      container.innerHTML = `
+        <div style="padding: 10px; max-width: 680px; margin: 0 auto; text-align: center;">
+          <h4 style="color: var(--accent-gold); margin: 0 0 6px 0;"><i class="fa-solid fa-user-ninja"></i> Messaggio Cifrato di ${it.author}</h4>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px;">
+            ${it.hint}
+          </p>
+
+          <div class="crittografia-box">
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 14px;">
+              ${words.map((w, wIdx) => `
+                <div style="display: inline-flex; gap: 2px;">
+                  ${w.split('').map((char, cIdx) => {
+                    const mappedChar = s.userMap[char] || '';
+                    return `
+                      <div class="cipher-letter-box">
+                        <span style="font-size: 1.1rem; font-weight: 800; color: #f59e0b; margin-bottom: 2px;">${char}</span>
+                        <input type="text" maxlength="1" value="${mappedChar}"
+                          class="letter-slot ${mappedChar ? 'filled' : ''}"
+                          style="width: 32px; height: 36px; font-size: 1rem; outline: none; text-align: center;"
+                          oninput="EroiMinigames.inputCrittografiaLetter('${char}', this.value)">
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <button class="btn" style="background: #2ecc71; color: #000; font-weight: 800; padding: 8px 20px; border-radius: 20px;" onclick="EroiMinigames.verifyCrittografia()">
+              <i class="fa-solid fa-check"></i> Decodifica e Verifica
+            </button>
+            <button class="btn btn-secondary" style="background: rgba(245,197,60,0.15); border: 1px solid #f5c53c; color: #f5c53c; font-weight: 600; padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.hintCrittografia()">
+              <i class="fa-solid fa-lightbulb"></i> Decifra 1 Lettera
+            </button>
+            <button class="btn btn-secondary" style="padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.resetCrittografia()">
+              <i class="fa-solid fa-rotate-left"></i> Reset
+            </button>
+            <button class="btn btn-secondary" style="background: rgba(255,255,255,0.05); color: #aaa; padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.skipCurrent('crittografia')">
+              <i class="fa-solid fa-forward-step"></i> Passa
+            </button>
+          </div>
+        </div>
+      `;
+    },
+
+    inputCrittografiaLetter: function(cipherChar, val) {
+      const char = (val || '').toUpperCase().trim().slice(-1);
+      this.crittoState.userMap[cipherChar] = char;
+      const container = document.getElementById('minigame-content');
+      if (container) this.renderCrittografia(container);
+    },
+
+    hintCrittografia: function() {
+      const s = this.crittoState;
+      const cipher = s.item.cipher;
+      const plain = s.item.plain;
+
+      for (let i = 0; i < cipher.length; i++) {
+        const cChar = cipher[i];
+        const pChar = plain[i];
+        if (cChar !== ' ' && s.userMap[cChar] !== pChar) {
+          s.userMap[cChar] = pChar;
+          const container = document.getElementById('minigame-content');
+          if (container) this.renderCrittografia(container);
+          if (window.showToast) window.showToast(`Lettera '${cChar}' decifrata come '${pChar}'!`, 'info');
+          return;
+        }
+      }
+    },
+
+    resetCrittografia: function() {
+      const container = document.getElementById('minigame-content');
+      const data = getData(currentMissionId);
+      if (container) this.initCrittografia(container, data, currentMissionId);
+    },
+
+    verifyCrittografia: function() {
+      const s = this.crittoState;
+      const cipher = s.item.cipher;
+      const plain = s.item.plain;
+
+      let decoded = '';
+      for (let i = 0; i < cipher.length; i++) {
+        const c = cipher[i];
+        if (c === ' ') decoded += ' ';
+        else decoded += (s.userMap[c] || '_');
+      }
+
+      if (decoded === plain) {
+        const container = document.getElementById('minigame-content');
+        if (container) {
+          container.innerHTML = `
+            <div style="padding: 25px; text-align: center; max-width: 500px; margin: 0 auto;">
+              <div style="font-size: 3rem; margin-bottom: 10px;">🔐</div>
+              <h2 style="color: var(--accent-gold); font-size: 1.8rem; margin: 0 0 10px 0; font-family: var(--font-heading);">
+                MESSAGGIO SEGRETO DECIFRATO!
+              </h2>
+              <p style="font-size: 1.1rem; color: #2ecc71; font-weight: 700; margin-bottom: 15px;">
+                "${plain}"
+              </p>
+              <div style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; border: 1px solid rgba(212,175,55,0.3); margin-bottom: 20px;">
+                <div style="font-size: 2rem; font-weight: 800; color: #2ecc71;">+2 PUNTI</div>
+              </div>
+              <button class="btn" style="background: var(--accent-gold); color: #000; font-weight: 800; padding: 10px 28px; border-radius: 20px;" onclick="EroiMinigames.rewardAndNext('crittografia', 2, 10)">
+                Continua
+              </button>
+            </div>
+          `;
+        }
+      } else {
+        alert("Il testo decifrato contiene ancora degli errori. Controlla le lettere e riprova!");
+      }
+    },
+
+    // =====================================================
+    // MOTORE: INDOVINELLI LETTERARI (BLOCCO 3)
+    // =====================================================
+    riddleState: {
+      item: null,
+      revealedHints: 1,
+      userAnswer: ''
+    },
+
+    riddleDB: [
+      {
+        id: 1,
+        question: "Nacqui tra le colline marchigiane, ammirai una siepe e ascoltai il canto di una fanciulla dal telaio. Chi sono?",
+        hints: [
+          "Indizio 1: Scrissi il celebre 'Zibaldone' di pensieri filosofici.",
+          "Indizio 2: La mia città natale è Recanati.",
+          "Indizio 3: La mia poesia più famosa parla dell'Infinito."
+        ],
+        solution: "GIACOMO LEOPARDI",
+        aliases: ["LEOPARDI", "GIACOMO LEOPARDI"]
+      },
+      {
+        id: 2,
+        question: "Vissi in esilio tra Svizzera e Inghilterra. Scrissi sonetti alla mia isola natale e un carme solenne per i defunti. Chi sono?",
+        hints: [
+          "Indizio 1: Nacqui a Zante (Zacinto).",
+          "Indizio 2: Il mio protagonista epistolare si chiama Jacopo Ortis.",
+          "Indizio 3: Scrissi 'Dei Sepolcri'."
+        ],
+        solution: "UGO FOSCOLO",
+        aliases: ["FOSCOLO", "UGO FOSCOLO"]
+      },
+      {
+        id: 3,
+        question: "Rinnovai la lingua italiana 'sciacquando i panni in Arno' e raccontai la peste del Seicento a Milano. Chi sono?",
+        hints: [
+          "Indizio 1: Scrissi tragedie come l'Adelchi e il Conte di Carmagnola.",
+          "Indizio 2: I miei protagonisti sono Renzo e Lucia.",
+          "Indizio 3: Scrissi 'I Promessi Sposi'."
+        ],
+        solution: "ALESSANDRO MANZONI",
+        aliases: ["MANZONI", "ALESSANDRO MANZONI"]
+      }
+    ],
+
+    initIndovinello: function(container, data, missionId) {
+      const item = this.riddleDB[Math.floor(Math.random() * this.riddleDB.length)];
+      this.riddleState = {
+        item: item,
+        revealedHints: 1,
+        userAnswer: ''
+      };
+      this.renderIndovinello(container);
+    },
+
+    renderIndovinello: function(container) {
+      const s = this.riddleState;
+      const it = s.item;
+
+      container.innerHTML = `
+        <div style="padding: 10px; max-width: 650px; margin: 0 auto; text-align: center;">
+          <div class="riddle-card">
+            <span style="font-size: 2.2rem; display: block; margin-bottom: 8px;">🤔</span>
+            <h3 style="color: #fff; font-size: 1.25rem; line-height: 1.5; margin: 0 0 15px 0;">
+              "${it.question}"
+            </h3>
+
+            <div style="text-align: left; background: rgba(0,0,0,0.3); border-radius: 10px; padding: 12px; margin-bottom: 15px;">
+              <h5 style="color: var(--accent-gold); margin: 0 0 8px 0; font-size: 0.85rem;"><i class="fa-solid fa-lightbulb"></i> INDIZI SVELATI (${s.revealedHints}/${it.hints.length}):</h5>
+              ${it.hints.slice(0, s.revealedHints).map(h => `
+                <div style="font-size: 0.85rem; color: #e0e0e0; margin-bottom: 6px;">&bull; ${h}</div>
+              `).join('')}
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 10px;">
+              <input id="riddle-input" type="text" placeholder="Scrivi il nome dell'autore..."
+                value="${s.userAnswer}"
+                class="input-control"
+                style="max-width: 320px; padding: 10px 14px; border-radius: 12px; background: rgba(0,0,0,0.5); color: #fff; border: 1.5px solid var(--accent-gold); text-align: center; font-weight: 700;"
+                oninput="EroiMinigames.riddleState.userAnswer = this.value"
+                onkeydown="if(event.key==='Enter') EroiMinigames.verifyIndovinello()">
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <button class="btn" style="background: #2ecc71; color: #000; font-weight: 800; padding: 8px 22px; border-radius: 20px;" onclick="EroiMinigames.verifyIndovinello()">
+              <i class="fa-solid fa-check"></i> Rispondi
+            </button>
+            ${s.revealedHints < it.hints.length ? `
+              <button class="btn btn-secondary" style="background: rgba(245,197,60,0.15); border: 1px solid #f5c53c; color: #f5c53c; font-weight: 600; padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.unlockIndovinelloHint()">
+                <i class="fa-solid fa-plus"></i> Svela Prossimo Indizio
+              </button>
+            ` : ''}
+            <button class="btn btn-secondary" style="background: rgba(255,255,255,0.05); color: #aaa; padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.skipCurrent('indovinello')">
+              <i class="fa-solid fa-forward-step"></i> Passa
+            </button>
+          </div>
+        </div>
+      `;
+    },
+
+    unlockIndovinelloHint: function() {
+      const s = this.riddleState;
+      if (s.revealedHints < s.item.hints.length) {
+        s.revealedHints++;
+        const container = document.getElementById('minigame-content');
+        if (container) this.renderIndovinello(container);
+      }
+    },
+
+    resetIndovinello: function() {
+      const container = document.getElementById('minigame-content');
+      const data = getData(currentMissionId);
+      if (container) this.initIndovinello(container, data, currentMissionId);
+    },
+
+    verifyIndovinello: function() {
+      const s = this.riddleState;
+      const inp = (s.userAnswer || (document.getElementById('riddle-input') ? document.getElementById('riddle-input').value : '')).toUpperCase().trim();
+
+      const isMatch = s.item.aliases.some(al => inp.includes(al) || al.includes(inp) && inp.length > 4);
+
+      if (isMatch) {
+        const container = document.getElementById('minigame-content');
+        if (container) {
+          container.innerHTML = `
+            <div style="padding: 25px; text-align: center; max-width: 500px; margin: 0 auto;">
+              <div style="font-size: 3rem; margin-bottom: 10px;">💡</div>
+              <h2 style="color: var(--accent-gold); font-size: 1.8rem; margin: 0 0 10px 0; font-family: var(--font-heading);">
+                INDOVINELLO RISOLTO!
+              </h2>
+              <p style="font-size: 1.1rem; color: #2ecc71; font-weight: 700; margin-bottom: 15px;">
+                "${s.item.solution}"
+              </p>
+              <div style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; border: 1px solid rgba(212,175,55,0.3); margin-bottom: 20px;">
+                <div style="font-size: 2rem; font-weight: 800; color: #2ecc71;">+2 PUNTI</div>
+              </div>
+              <button class="btn" style="background: var(--accent-gold); color: #000; font-weight: 800; padding: 10px 28px; border-radius: 20px;" onclick="EroiMinigames.rewardAndNext('indovinello', 2, 10)">
+                Continua
+              </button>
+            </div>
+          `;
+        }
+      } else {
+        alert("Risposta non esatta! Rileggi gli indizi e riprova.");
+      }
+    },
+
+    // =====================================================
+    // MOTORE: ANAGRAMMI & SCIARADE (BLOCCO 3)
+    // =====================================================
+    anagrammaState: {
+      item: null,
+      availableTiles: [],
+      placedTiles: [],
+      isSolved: false
+    },
+
+    anagrammaDB: [
+      {
+        id: 1,
+        scrambled: "UGO FOSCOLO",
+        hint: "Celebre poeta e patriota preromantico (2 parole)",
+        solution: "UGO FOSCOLO"
+      },
+      {
+        id: 2,
+        scrambled: "L INFINITO",
+        hint: "Il celebre idillio dell'ermo colle",
+        solution: "L INFINITO"
+      },
+      {
+        id: 3,
+        scrambled: "DECAMERON",
+        hint: "Le 100 novelle di Giovanni Boccaccio",
+        solution: "DECAMERON"
+      },
+      {
+        id: 4,
+        scrambled: "MANZONI",
+        hint: "L'autore dei Promessi Sposi",
+        solution: "MANZONI"
+      }
+    ],
+
+    initAnagramma: function(container, data, missionId) {
+      const item = this.anagrammaDB[Math.floor(Math.random() * this.anagrammaDB.length)];
+      const letters = item.solution.replace(/\s+/g, '').split('').sort(() => Math.random() - 0.5);
+
+      this.anagrammaState = {
+        item: item,
+        availableTiles: letters.map((l, i) => ({ id: i, char: l })),
+        placedTiles: [],
+        isSolved: false
+      };
+      this.renderAnagramma(container);
+    },
+
+    renderAnagramma: function(container) {
+      const s = this.anagrammaState;
+      const it = s.item;
+
+      container.innerHTML = `
+        <div style="padding: 10px; max-width: 650px; margin: 0 auto; text-align: center;">
+          <h4 style="color: var(--accent-gold); margin: 0 0 6px 0;">Ricomponi l'Anagramma</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+            Indizio: <strong style="color: #fff;">${it.hint}</strong>
+          </p>
+
+          <!-- Lettere Posizionate -->
+          <div style="min-height: 55px; background: rgba(0,0,0,0.4); border: 1.5px dashed var(--accent-gold); border-radius: 12px; padding: 8px; margin-bottom: 18px; display: flex; justify-content: center; align-items: center; flex-wrap: wrap;">
+            ${s.placedTiles.length === 0 ? '<span style="color: #888; font-size: 0.85rem;">Clicca le lettere in basso per comporre la parola</span>' : ''}
+            ${s.placedTiles.map((t, idx) => `
+              <div class="anagram-tile" style="background: rgba(46,204,113,0.25); border-color: #2ecc71;" onclick="EroiMinigames.removeAnagramTile(${idx})">
+                ${t.char}
+              </div>
+            `).join('')}
+          </div>
+
+          <!-- Lettere Disponibili -->
+          <div style="margin-bottom: 20px;">
+            ${s.availableTiles.map((t, idx) => `
+              <div class="anagram-tile" onclick="EroiMinigames.clickAnagramTile(${idx})">
+                ${t.char}
+              </div>
+            `).join('')}
+          </div>
+
+          <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <button class="btn btn-secondary" style="padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.resetAnagramma()">
+              <i class="fa-solid fa-rotate-left"></i> Reset
+            </button>
+            <button class="btn btn-secondary" style="background: rgba(245,197,60,0.15); border: 1px solid #f5c53c; color: #f5c53c; font-weight: 600; padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.hintAnagramma()">
+              <i class="fa-solid fa-lightbulb"></i> Aiuto Prossima Lettera
+            </button>
+            <button class="btn btn-secondary" style="background: rgba(255,255,255,0.05); color: #aaa; padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.skipCurrent('anagramma')">
+              <i class="fa-solid fa-forward-step"></i> Passa
+            </button>
+          </div>
+        </div>
+      `;
+    },
+
+    clickAnagramTile: function(idx) {
+      const s = this.anagrammaState;
+      const tile = s.availableTiles.splice(idx, 1)[0];
+      s.placedTiles.push(tile);
+
+      const container = document.getElementById('minigame-content');
+      if (container) this.renderAnagramma(container);
+
+      // Check soluzione
+      const currentWord = s.placedTiles.map(t => t.char).join('');
+      const targetWord = s.item.solution.replace(/\s+/g, '');
+
+      if (currentWord === targetWord) {
+        setTimeout(() => {
+          if (container) {
+            container.innerHTML = `
+              <div style="padding: 25px; text-align: center; max-width: 500px; margin: 0 auto;">
+                <div style="font-size: 3rem; margin-bottom: 10px;">🔤</div>
+                <h2 style="color: var(--accent-gold); font-size: 1.8rem; margin: 0 0 10px 0; font-family: var(--font-heading);">
+                  ANAGRAMMA RISOLTO!
+                </h2>
+                <p style="font-size: 1.1rem; color: #2ecc71; font-weight: 700; margin-bottom: 15px;">
+                  "${s.item.solution}"
+                </p>
+                <div style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; border: 1px solid rgba(212,175,55,0.3); margin-bottom: 20px;">
+                  <div style="font-size: 2rem; font-weight: 800; color: #2ecc71;">+2 PUNTI</div>
+                </div>
+                <button class="btn" style="background: var(--accent-gold); color: #000; font-weight: 800; padding: 10px 28px; border-radius: 20px;" onclick="EroiMinigames.rewardAndNext('anagramma', 2, 10)">
+                  Continua
+                </button>
+              </div>
+            `;
+          }
+        }, 300);
+      }
+    },
+
+    removeAnagramTile: function(idx) {
+      const s = this.anagrammaState;
+      const tile = s.placedTiles.splice(idx, 1)[0];
+      s.availableTiles.push(tile);
+      const container = document.getElementById('minigame-content');
+      if (container) this.renderAnagramma(container);
+    },
+
+    hintAnagramma: function() {
+      const s = this.anagrammaState;
+      const targetWord = s.item.solution.replace(/\s+/g, '');
+      const nextNeededChar = targetWord[s.placedTiles.length];
+
+      if (nextNeededChar) {
+        const availIdx = s.availableTiles.findIndex(t => t.char === nextNeededChar);
+        if (availIdx !== -1) {
+          this.clickAnagramTile(availIdx);
+        }
+      }
+    },
+
+    resetAnagramma: function() {
+      const container = document.getElementById('minigame-content');
+      const data = getData(currentMissionId);
+      if (container) this.initAnagramma(container, data, currentMissionId);
+    },
+
+    // =====================================================
+    // MOTORE: TROVA LE DIFFERENZE (BLOCCO 3)
+    // =====================================================
+    diffState: {
+      item: null,
+      foundSpots: [],
+      totalSpots: 3
+    },
+
+    diffDB: [
+      {
+        id: 1,
+        title: "Ritratto di Ugo Foscolo",
+        imgA: "avatar_autori/Foscolo.png",
+        imgB: "avatar_autori/Foscolo.png",
+        spots: [
+          { id: 1, x: 50, y: 30, desc: "Sguardo e ciuffo neoclassico" },
+          { id: 2, x: 75, y: 70, desc: "Colletto della giacca" },
+          { id: 3, x: 25, y: 65, desc: "Ombra del carme dei Sepolcri" }
+        ]
+      },
+      {
+        id: 2,
+        title: "Ritratto di Giacomo Leopardi",
+        imgA: "avatar_autori/Leopardi.png",
+        imgB: "avatar_autori/Leopardi.png",
+        spots: [
+          { id: 1, x: 45, y: 25, desc: "Fronte pensierosa" },
+          { id: 2, x: 65, y: 60, desc: "Dettaglio dell'abito" },
+          { id: 3, x: 30, y: 75, desc: "Sfondo dell'ermo colle" }
+        ]
+      }
+    ],
+
+    initDifferenze: function(container, data, missionId) {
+      const item = this.diffDB[Math.floor(Math.random() * this.diffDB.length)];
+      this.diffState = {
+        item: item,
+        foundSpots: [],
+        totalSpots: item.spots.length
+      };
+      this.renderDifferenze(container);
+    },
+
+    renderDifferenze: function(container) {
+      const s = this.diffState;
+      const it = s.item;
+
+      container.innerHTML = `
+        <div style="padding: 10px; max-width: 680px; margin: 0 auto; text-align: center;">
+          <h4 style="color: var(--accent-gold); margin: 0 0 4px 0;">${it.title}</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
+            Clicca sull'immagine di destra per scovare le <strong style="color: #2ecc71;">${s.totalSpots} differenze</strong> nascoste! (Trovate: <strong style="color: #2ecc71;">${s.foundSpots.length}/${s.totalSpots}</strong>)
+          </p>
+
+          <div class="diff-container">
+            <!-- Immagine A (Originale) -->
+            <div>
+              <div style="font-size: 0.75rem; color: #888; margin-bottom: 4px; font-weight: 700;">ORIGINALE</div>
+              <div class="diff-box">
+                <img src="${it.imgA}" style="width: 100%; height: 100%; object-fit: cover;">
+              </div>
+            </div>
+
+            <!-- Immagine B (Con Differenze Cliccabili) -->
+            <div>
+              <div style="font-size: 0.75rem; color: var(--accent-gold); margin-bottom: 4px; font-weight: 700;">TROVA LE DIFFERENZE 🔍</div>
+              <div class="diff-box" style="border-color: var(--accent-gold);">
+                <img src="${it.imgB}" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.95;">
+                ${it.spots.map(sp => {
+                  const isFound = s.foundSpots.includes(sp.id);
+                  return `
+                    <div class="diff-spot ${isFound ? 'found' : ''}"
+                      style="left: calc(${sp.x}% - 22px); top: calc(${sp.y}% - 22px);"
+                      onclick="EroiMinigames.clickDiffSpot(${sp.id})">
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <button class="btn btn-secondary" style="padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.resetDifferenze()">
+              <i class="fa-solid fa-rotate-left"></i> Reset
+            </button>
+            <button class="btn btn-secondary" style="background: rgba(255,255,255,0.05); color: #aaa; padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.skipCurrent('differenze')">
+              <i class="fa-solid fa-forward-step"></i> Passa
+            </button>
+          </div>
+        </div>
+      `;
+    },
+
+    clickDiffSpot: function(spotId) {
+      const s = this.diffState;
+      if (s.foundSpots.includes(spotId)) return;
+
+      s.foundSpots.push(spotId);
+      const container = document.getElementById('minigame-content');
+      if (container) this.renderDifferenze(container);
+
+      if (window.showToast) window.showToast(`Differenza trovata! (${s.foundSpots.length}/${s.totalSpots})`, 'success');
+
+      if (s.foundSpots.length === s.totalSpots) {
+        setTimeout(() => {
+          if (container) {
+            container.innerHTML = `
+              <div style="padding: 25px; text-align: center; max-width: 500px; margin: 0 auto;">
+                <div style="font-size: 3rem; margin-bottom: 10px;">🔍</div>
+                <h2 style="color: var(--accent-gold); font-size: 1.8rem; margin: 0 0 10px 0; font-family: var(--font-heading);">
+                  TUTTE LE DIFFERENZE TROVATE!
+                </h2>
+                <p style="font-size: 1rem; color: #f5f5f0; margin-bottom: 15px;">
+                  Ottimo colpo d'occhio! Hai individuato tutti i dettagli modificati.
+                </p>
+                <div style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; border: 1px solid rgba(212,175,55,0.3); margin-bottom: 20px;">
+                  <div style="font-size: 2rem; font-weight: 800; color: #2ecc71;">+2 PUNTI</div>
+                </div>
+                <button class="btn" style="background: var(--accent-gold); color: #000; font-weight: 800; padding: 10px 28px; border-radius: 20px;" onclick="EroiMinigames.rewardAndNext('differenze', 2, 10)">
+                  Continua
+                </button>
+              </div>
+            `;
+          }
+        }, 400);
+      }
+    },
+
+    resetDifferenze: function() {
+      const container = document.getElementById('minigame-content');
+      const data = getData(currentMissionId);
+      if (container) this.initDifferenze(container, data, currentMissionId);
     },
 
     // =====================================================
