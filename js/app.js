@@ -4977,12 +4977,9 @@ window.renderSalaGiochiView = function() {
                             Sei connesso come Docente. Puoi avviare le sfide interattive tra le squadre della classe per la proiezione su LIM.
                         </p>
                     </div>
-                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                        <button type="button" class="btn" style="background:linear-gradient(135deg, #2ecc71, #27ae60); color:#000; font-weight:800; padding:8px 18px; border-radius:20px; font-size:0.85rem; border:none; box-shadow:0 4px 12px rgba(46,204,113,0.3);" onclick="window.EroiMinigames && window.EroiMinigames.openTeamSelection('mixed', document.getElementById('salagiochi-author-select')?.value || 'mixed')">
+                    <div>
+                        <button type="button" class="btn" style="background:linear-gradient(135deg, #2ecc71, #27ae60); color:#000; font-weight:800; padding:9px 20px; border-radius:20px; font-size:0.88rem; border:none; box-shadow:0 4px 12px rgba(46,204,113,0.3);" onclick="window.EroiMinigames && window.EroiMinigames.openTeamSelection('mixed', document.getElementById('salagiochi-author-select')?.value || 'mixed')">
                             <i class="fa-solid fa-play"></i> Sfida a Squadre per LIM
-                        </button>
-                        <button type="button" class="btn btn-secondary" style="padding:8px 14px; font-size:0.85rem; border-radius:20px;" onclick="const h = document.getElementById('salagiochi-history-section'); if(h){ h.style.display = (h.style.display==='none'?'block':'none'); if(h.style.display==='block' && window.renderMinigamesHistory) window.renderMinigamesHistory(); }">
-                            <i class="fa-solid fa-clock-rotate-left"></i> Storico Partite
                         </button>
                     </div>
                 </div>

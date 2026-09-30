@@ -1644,18 +1644,42 @@
 
     <!-- Modale Selezione Squadre per Minigiochi -->
     <div id="team-selector-modal" class="modal-wip" style="z-index: 5100; overflow-y:auto; display:none;" onclick="if(event.target===this) { this.style.display='none'; }">
-        <div class="modal-wip-content" style="max-width:400px; padding: 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px;">
-              <h3 style="font-family: var(--font-heading); color: var(--accent-gold); font-size: 1.1rem; margin:0;"><i class="fa-solid fa-users"></i> Scegli le Squadre</h3>
-              <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.8rem; border:none;" onclick="document.getElementById('team-selector-modal').style.display='none'">
+        <div class="modal-wip-content" style="max-width:440px; padding: 22px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 10px;">
+              <h3 style="font-family: var(--font-heading); color: var(--accent-gold); font-size: 1.15rem; margin:0;"><i class="fa-solid fa-users"></i> Scegli le Squadre</h3>
+              <button type="button" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.8rem; border:none;" onclick="document.getElementById('team-selector-modal').style.display='none'">
                 <i class="fa-solid fa-xmark"></i>
               </button>
             </div>
-            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">Seleziona le squadre della classe che si scontreranno. I turni si alterneranno automaticamente.</p>
-            <div id="team-selector-list" style="display:flex; flex-direction:column; gap:8px; max-height:200px; overflow-y:auto; margin-bottom:15px;">
-                <!-- Popolato da JS -->
+            
+            <!-- Filtro per Campionato -->
+            <div style="margin-bottom: 12px;">
+                <label style="display:block; font-size:0.75rem; color:var(--text-muted); font-weight:700; margin-bottom:5px; text-transform:uppercase; letter-spacing:0.5px;">
+                    <i class="fa-solid fa-trophy" style="color:var(--accent-gold);"></i> Filtra per Campionato:
+                </label>
+                <select id="team-selector-mode-filter" class="input-control" style="width: 100%; padding: 8px 12px; font-size: 0.82rem; border-radius: 8px; background: rgba(0,0,0,0.5); color: #fff; border: 1px solid rgba(255,255,255,0.2);" onchange="window.EroiMinigames && window.EroiMinigames.onFilterChange()">
+                    <option value="all">🌐 Tutti i Campionati / Classi</option>
+                    <option value="terze">📘 Età Contemporanea (Terze)</option>
+                    <option value="seconde">📙 Età Medievale e Moderna (Seconde)</option>
+                    <option value="avanzato">📒 Contemporanea & Internazionali (Avanzato)</option>
+                </select>
             </div>
-            <button class="btn" style="width:100%;" onclick="window.EroiMinigames.confirmTeamSelection()"><i class="fa-solid fa-play"></i> Inizia Sfida</button>
+
+            <!-- Controlli Rapidi Selezione -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; background:rgba(255,255,255,0.04); padding:6px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
+                <span id="team-selector-count" style="font-size:0.75rem; color:var(--accent-gold); font-weight:700;">0 squadre selezionate</span>
+                <div style="display:flex; gap:6px;">
+                    <button type="button" class="btn btn-secondary" style="padding:3px 8px; font-size:0.7rem; border-radius:6px; cursor:pointer;" onclick="window.EroiMinigames && window.EroiMinigames.toggleSelectAll(true)">Tutte</button>
+                    <button type="button" class="btn btn-secondary" style="padding:3px 8px; font-size:0.7rem; border-radius:6px; cursor:pointer;" onclick="window.EroiMinigames && window.EroiMinigames.toggleSelectAll(false)">Nessuna</button>
+                </div>
+            </div>
+
+            <div id="team-selector-list" style="display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto; margin-bottom:15px; padding-right:4px;">
+                <!-- Popolato dinamicamente da JS -->
+            </div>
+            <button type="button" class="btn" style="width:100%; font-weight:800; font-size:0.95rem; padding:10px; border-radius:10px; background:var(--accent-gold); color:#000;" onclick="window.EroiMinigames.confirmTeamSelection()">
+                <i class="fa-solid fa-play"></i> Inizia Sfida a Squadre
+            </button>
         </div>
     </div>
 

@@ -8604,12 +8604,16 @@
         
         const listDiv = document.getElementById('team-selector-list');
         const modal = document.getElementById('team-selector-modal');
+        const filterSelect = document.getElementById('team-selector-mode-filter');
+        const countSpan = document.getElementById('team-selector-count');
+        
         if (!listDiv || !modal) {
             if (type === 'manche') this.startMancheLegacy(missionId);
             else this.startMinigameDirect(type, missionId);
             return;
         }
 
+        if (filterSelect) filterSelect.value = 'all';
         modal.style.display = 'flex';
         listDiv.innerHTML = '<div style="text-align:center; padding:15px; color:var(--text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> Caricamento squadre in corso...</div>';
 
@@ -8627,6 +8631,7 @@
             
             if (myTeams.length === 0) {
                 listDiv.innerHTML = '<p style="font-size:0.85rem; color:var(--text-muted); text-align:center; padding:15px 0;">Nessuna squadra attiva trovata per questo account.<br>Crea prima delle squadre dal pannello docente per avviare la sfida.</p>';
+                if (countSpan) countSpan.textContent = '0 squadre trovate';
                 return;
             }
 
@@ -8634,18 +8639,75 @@
                 const teamId = t.docId || t.id;
                 const teamName = t.name || 'Squadra';
                 const teamClass = t.classe || t.className || '';
+                const modeKey = (t.mode || t.campionato || 'terze').toLowerCase();
+                
+                let modeBadge = '<span style="font-size:0.7rem; padding:2px 6px; border-radius:6px; background:rgba(141,160,63,0.2); color:#a3b846; border:1px solid rgba(141,160,63,0.4);">📘 Contemporanea</span>';
+                if (modeKey === 'seconde') {
+                    modeBadge = '<span style="font-size:0.7rem; padding:2px 6px; border-radius:6px; background:rgba(212,114,26,0.2); color:#e6832b; border:1px solid rgba(212,114,26,0.4);">📙 Medievale</span>';
+                } else if (modeKey === 'avanzato') {
+                    modeBadge = '<span style="font-size:0.7rem; padding:2px 6px; border-radius:6px; background:rgba(201,162,39,0.2); color:#deb431; border:1px solid rgba(201,162,39,0.4);">📒 Internazionali</span>';
+                }
+
                 return `
-                    <label style="display:flex; align-items:center; gap:10px; background:rgba(212,175,55,0.08); padding:10px 12px; border:1px solid rgba(212,175,55,0.25); border-radius:8px; cursor:pointer; margin-bottom:6px;">
-                        <input type="checkbox" class="team-selector-checkbox" value="${teamId}" data-name="${teamName}" checked style="accent-color:var(--accent-gold); width:18px; height:18px;">
-                        <span style="font-weight:bold; color:var(--text-light); font-size:0.95rem;">${teamName}</span>
-                        ${teamClass ? `<span style="font-size:0.75rem; color:var(--text-muted); margin-left:auto;">(${teamClass})</span>` : ''}
+                    <label class="team-selector-row" data-mode="${modeKey}" style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.04); padding:10px 12px; border:1px solid rgba(255,255,255,0.1); border-radius:8px; cursor:pointer; transition:background 0.2s;">
+                        <input type="checkbox" class="team-selector-checkbox" value="${teamId}" data-name="${teamName}" data-mode="${modeKey}" checked onchange="window.EroiMinigames && window.EroiMinigames.updateSelectedCount()" style="accent-color:var(--accent-gold); width:18px; height:18px;">
+                        <div style="display:flex; flex-direction:column; gap:2px; flex:1;">
+                            <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                                <span style="font-weight:bold; color:var(--text-light); font-size:0.92rem;">${teamName}</span>
+                                ${teamClass ? `<span style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">Classe ${teamClass}</span>` : ''}
+                            </div>
+                            <div style="margin-top:2px;">
+                                ${modeBadge}
+                            </div>
+                        </div>
                     </label>
                 `;
             }).join('');
 
+            this.updateSelectedCount();
+
         } catch (e) {
             console.error("Errore caricamento squadre per minigioco", e);
             listDiv.innerHTML = '<p style="color:red; font-size:0.8rem;">Errore caricamento squadre.</p>';
+        }
+    },
+
+    onFilterChange: function() {
+        const filterSelect = document.getElementById('team-selector-mode-filter');
+        const selectedMode = filterSelect ? filterSelect.value : 'all';
+        const rows = document.querySelectorAll('.team-selector-row');
+        
+        rows.forEach(row => {
+            const rowMode = row.dataset.mode || 'terze';
+            const cb = row.querySelector('.team-selector-checkbox');
+            if (selectedMode === 'all' || rowMode === selectedMode) {
+                row.style.display = 'flex';
+                if (cb) cb.checked = true;
+            } else {
+                row.style.display = 'none';
+                if (cb) cb.checked = false;
+            }
+        });
+
+        this.updateSelectedCount();
+    },
+
+    toggleSelectAll: function(selectAll) {
+        const rows = document.querySelectorAll('.team-selector-row');
+        rows.forEach(row => {
+            if (row.style.display !== 'none') {
+                const cb = row.querySelector('.team-selector-checkbox');
+                if (cb) cb.checked = !!selectAll;
+            }
+        });
+        this.updateSelectedCount();
+    },
+
+    updateSelectedCount: function() {
+        const countSpan = document.getElementById('team-selector-count');
+        const checkedBoxes = document.querySelectorAll('.team-selector-checkbox:checked');
+        if (countSpan) {
+            countSpan.textContent = `${checkedBoxes.length} squadr${checkedBoxes.length === 1 ? 'a selezionata' : 'e selezionate'}`;
         }
     },
 
