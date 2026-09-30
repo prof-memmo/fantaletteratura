@@ -8775,7 +8775,9 @@
         impiccato: '🎭 L\'Impiccato',
         puzzle: '🧩 Ricostruisci la Citazione',
         cloze: '📝 Testo Bucato (Cloze)',
-        versi: '📜 Riordina i Versi'
+        versi: '📜 Riordina i Versi',
+        memory: '🃏 Memory Letterario',
+        cruciverba: '✏️ Parole Crociate'
       };
       title.innerHTML = `<span style="color:#f5c53c;">${this.isMancheMode ? '🏆 MANCHE COMPLETA - ' : ''}${typeLabels[type] || type}</span> ${topicBadge}`;
 
@@ -8785,6 +8787,8 @@
         case 'cloze':     this.initCloze(content, data); break;
         case 'versi':     this.initVersi(content, data); break;
         case 'quiz':      this.initQuiz(content, data); break;
+        case 'memory':    this.initMemory(content, data, currentMissionId); break;
+        case 'cruciverba': this.initCruciverba(content, data, currentMissionId); break;
       }
     },
 
@@ -9500,6 +9504,614 @@
           return;
       }
       this.startMinigameDirect(type, currentMissionId);
+    },
+
+    // =====================================================
+    // MOTORE: MEMORY LETTERARIO (BLOCCO 2)
+    // =====================================================
+    memoryState: {
+      cards: [],
+      flipped: [],
+      matchedCount: 0,
+      totalPairs: 6,
+      moves: 0,
+      timer: 0,
+      timerInterval: null,
+      isLocked: false
+    },
+
+    memoryPairsDB: [
+      { id: 1, a: "Dante Alighieri", b: "La Divina Commedia", typeA: "Autore", typeB: "Opera" },
+      { id: 2, a: "Giacomo Leopardi", b: "L'Infinito (Canti)", typeA: "Autore", typeB: "Opera" },
+      { id: 3, a: "Alessandro Manzoni", b: "I Promessi Sposi", typeA: "Autore", typeB: "Opera" },
+      { id: 4, a: "Ugo Foscolo", b: "Dei Sepolcri", typeA: "Autore", typeB: "Opera" },
+      { id: 5, a: "Giovanni Boccaccio", b: "Il Decameron", typeA: "Autore", typeB: "Opera" },
+      { id: 6, a: "Francesco Petrarca", b: "Il Canzoniere", typeA: "Autore", typeB: "Opera" },
+      { id: 7, a: "Ludovico Ariosto", b: "L'Orlando Furioso", typeA: "Autore", typeB: "Opera" },
+      { id: 8, a: "Giovanni Verga", b: "I Malavoglia", typeA: "Autore", typeB: "Opera" },
+      { id: 9, a: "Luigi Pirandello", b: "Il fu Mattia Pascal", typeA: "Autore", typeB: "Opera" },
+      { id: 10, a: "Italo Svevo", b: "La coscienza di Zeno", typeA: "Autore", typeB: "Opera" },
+      { id: 11, a: "Italo Calvino", b: "Il barone rampante", typeA: "Autore", typeB: "Opera" },
+      { id: 12, a: "Eugenio Montale", b: "Ossi di seppia", typeA: "Autore", typeB: "Opera" },
+      { id: 13, a: "Giuseppe Ungaretti", b: "L'Allegria (Mattina)", typeA: "Autore", typeB: "Opera" },
+      { id: 14, a: "Giovanni Pascoli", b: "Myricae (X Agosto)", typeA: "Autore", typeB: "Opera" },
+      { id: 15, a: "Gabriele D'Annunzio", b: "Alcyone (La pioggia)", typeA: "Autore", typeB: "Opera" },
+      { id: 16, a: "Carlo Goldoni", b: "La locandiera", typeA: "Autore", typeB: "Opera" },
+      { id: 17, a: "Niccolò Machiavelli", b: "Il Principe", typeA: "Autore", typeB: "Opera" },
+      { id: 18, a: "Primo Levi", b: "Se questo è un uomo", typeA: "Autore", typeB: "Opera" },
+      { id: 19, a: "Elsa Morante", b: "La Storia", typeA: "Autore", typeB: "Opera" },
+      { id: 20, a: "Torquato Tasso", b: "Gerusalemme Liberata", typeA: "Autore", typeB: "Opera" }
+    ],
+
+    initMemory: function(container, data, missionId) {
+      if (this.memoryState.timerInterval) clearInterval(this.memoryState.timerInterval);
+
+      // Seleziona 6 coppie casuali
+      const shuffledPairs = [...this.memoryPairsDB].sort(() => Math.random() - 0.5).slice(0, 6);
+      
+      const cards = [];
+      shuffledPairs.forEach(p => {
+        cards.push({ pairId: p.id, text: p.a, type: p.typeA, isMatched: false });
+        cards.push({ pairId: p.id, text: p.b, type: p.typeB, isMatched: false });
+      });
+
+      // Mescola le 12 carte
+      cards.sort(() => Math.random() - 0.5);
+
+      this.memoryState = {
+        cards: cards,
+        flipped: [],
+        matchedCount: 0,
+        totalPairs: 6,
+        moves: 0,
+        timer: 0,
+        timerInterval: null,
+        isLocked: false
+      };
+
+      this.memoryState.timerInterval = setInterval(() => {
+        this.memoryState.timer++;
+        const timerEl = document.getElementById('memory-timer-display');
+        if (timerEl) {
+          const m = Math.floor(this.memoryState.timer / 60);
+          const s = this.memoryState.timer % 60;
+          timerEl.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+      }, 1000);
+
+      this.renderMemory(container);
+    },
+
+    renderMemory: function(container) {
+      const s = this.memoryState;
+      const m = Math.floor(s.timer / 60);
+      const sec = s.timer % 60;
+      const timeStr = `${m}:${sec < 10 ? '0' : ''}${sec}`;
+
+      container.innerHTML = `
+        <div style="padding: 10px; max-width: 680px; margin: 0 auto; text-align: center;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 10px 16px; background: rgba(0,0,0,0.3); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+            <div style="font-size: 0.85rem; color: #ccc;">
+              <i class="fa-solid fa-stopwatch" style="color: var(--accent-gold);"></i> Tempo: <strong id="memory-timer-display" style="color: #fff;">${timeStr}</strong>
+            </div>
+            <div style="font-size: 0.85rem; color: #ccc;">
+              <i class="fa-solid fa-arrows-rotate" style="color: var(--accent-gold);"></i> Mosse: <strong id="memory-moves-display" style="color: #fff;">${s.moves}</strong>
+            </div>
+            <div style="font-size: 0.85rem; color: #ccc;">
+              <i class="fa-solid fa-check-double" style="color: #2ecc71;"></i> Coppie: <strong id="memory-matched-display" style="color: #2ecc71;">${s.matchedCount}/${s.totalPairs}</strong>
+            </div>
+          </div>
+
+          <div class="memory-grid">
+            ${s.cards.map((card, idx) => {
+              const isFlipped = s.flipped.includes(idx);
+              const isMatched = card.isMatched;
+              const classes = `memory-card ${isFlipped ? 'flipped' : ''} ${isMatched ? 'matched' : ''}`;
+              const badgeColor = card.type === 'Autore' ? '#60a5fa' : '#f59e0b';
+
+              return `
+                <div class="${classes}" onclick="EroiMinigames.flipMemoryCard(${idx})">
+                  <div class="memory-card-inner memory-card-back">
+                    <i class="fa-solid fa-feather-pointed" style="opacity: 0.8;"></i>
+                  </div>
+                  <div class="memory-card-inner memory-card-front">
+                    <span style="font-size: 0.65rem; text-transform: uppercase; font-weight: 800; color: ${badgeColor}; margin-bottom: 4px; border: 1px solid ${badgeColor}; padding: 1px 6px; border-radius: 8px;">
+                      ${card.type}
+                    </span>
+                    <span style="font-size: 0.82rem; font-weight: 700; line-height: 1.2; color: #fff;">
+                      ${card.text}
+                    </span>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+
+          <div style="display: flex; justify-content: center; gap: 10px; margin-top: 18px;">
+            <button class="btn btn-secondary" style="padding: 6px 16px; font-size: 0.85rem;" onclick="EroiMinigames.resetMemory()">
+              <i class="fa-solid fa-rotate-left"></i> Ricomincia
+            </button>
+            <button class="btn btn-secondary" style="background: rgba(245,197,60,0.15); border: 1px solid #f5c53c; color: #f5c53c; font-weight: 600; padding: 6px 16px; font-size: 0.85rem;" onclick="EroiMinigames.hintMemory()">
+              <i class="fa-solid fa-lightbulb"></i> Aiuto Coppia
+            </button>
+            <button class="btn btn-secondary" style="background: rgba(255,255,255,0.05); color: #aaa; padding: 6px 16px; font-size: 0.85rem;" onclick="EroiMinigames.skipCurrent('memory')">
+              <i class="fa-solid fa-forward-step"></i> Passa
+            </button>
+          </div>
+        </div>
+      `;
+    },
+
+    flipMemoryCard: function(idx) {
+      const s = this.memoryState;
+      if (s.isLocked || s.cards[idx].isMatched || s.flipped.includes(idx)) return;
+
+      s.flipped.push(idx);
+      const container = document.getElementById('minigame-content');
+      if (container) this.renderMemory(container);
+
+      if (s.flipped.length === 2) {
+        s.moves++;
+        s.isLocked = true;
+        const [firstIdx, secondIdx] = s.flipped;
+        const cardA = s.cards[firstIdx];
+        const cardB = s.cards[secondIdx];
+
+        if (cardA.pairId === cardB.pairId) {
+          // MATCH!
+          cardA.isMatched = true;
+          cardB.isMatched = true;
+          s.matchedCount++;
+          s.flipped = [];
+          s.isLocked = false;
+
+          if (container) this.renderMemory(container);
+
+          if (s.matchedCount === s.totalPairs) {
+            if (s.timerInterval) clearInterval(s.timerInterval);
+            setTimeout(() => {
+              this.showMemoryVictory();
+            }, 600);
+          }
+        } else {
+          // NON MATCH: richiudi dopo 900ms
+          setTimeout(() => {
+            s.flipped = [];
+            s.isLocked = false;
+            if (container) this.renderMemory(container);
+          }, 900);
+        }
+      }
+    },
+
+    hintMemory: function() {
+      const s = this.memoryState;
+      if (s.isLocked) return;
+
+      // Trova la prima coppia non ancora matchata
+      const unmatchedCard = s.cards.find(c => !c.isMatched);
+      if (!unmatchedCard) return;
+
+      const matchingCards = s.cards.map((c, i) => ({ ...c, originalIdx: i }))
+        .filter(c => c.pairId === unmatchedCard.pairId && !c.isMatched);
+
+      if (matchingCards.length === 2) {
+        s.flipped = [matchingCards[0].originalIdx, matchingCards[1].originalIdx];
+        const container = document.getElementById('minigame-content');
+        if (container) this.renderMemory(container);
+
+        setTimeout(() => {
+          matchingCards[0].isMatched = true;
+          matchingCards[1].isMatched = true;
+          s.matchedCount++;
+          s.flipped = [];
+          if (container) this.renderMemory(container);
+          if (window.showToast) window.showToast('Coppia svelata!', 'info');
+
+          if (s.matchedCount === s.totalPairs) {
+            if (s.timerInterval) clearInterval(s.timerInterval);
+            setTimeout(() => { this.showMemoryVictory(); }, 600);
+          }
+        }, 1000);
+      }
+    },
+
+    resetMemory: function() {
+      const container = document.getElementById('minigame-content');
+      const data = getData(currentMissionId);
+      if (container) this.initMemory(container, data, currentMissionId);
+    },
+
+    showMemoryVictory: function() {
+      const container = document.getElementById('minigame-content');
+      if (!container) return;
+
+      const s = this.memoryState;
+      const m = Math.floor(s.timer / 60);
+      const sec = s.timer % 60;
+      const timeStr = `${m}:${sec < 10 ? '0' : ''}${sec}`;
+
+      container.innerHTML = `
+        <div style="padding: 25px; text-align: center; max-width: 500px; margin: 0 auto;">
+          <div style="font-size: 3rem; margin-bottom: 10px;">🏆</div>
+          <h2 style="color: var(--accent-gold); font-size: 1.8rem; margin: 0 0 10px 0; font-family: var(--font-heading);">
+            MEMORY COMPLETATO!
+          </h2>
+          <p style="font-size: 1rem; color: #f5f5f0; margin-bottom: 15px;">
+            Hai abbinato con successo tutti gli autori e i capolavori!
+          </p>
+          <div style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; border: 1px solid rgba(212,175,55,0.3); margin-bottom: 20px;">
+            <div style="font-size: 0.95rem; color: #ccc; margin-bottom: 6px;">Tempo impiegato: <strong>${timeStr}</strong></div>
+            <div style="font-size: 0.95rem; color: #ccc;">Mosse totali: <strong>${s.moves}</strong></div>
+            <div style="font-size: 2rem; font-weight: 800; color: #2ecc71; margin-top: 10px;">+2 PUNTI</div>
+          </div>
+          <button class="btn" style="background: var(--accent-gold); color: #000; font-weight: 800; padding: 10px 28px; border-radius: 20px;" onclick="EroiMinigames.rewardAndNext('memory', 2, 10)">
+            Continua
+          </button>
+        </div>
+      `;
+    },
+
+    // =====================================================
+    // MOTORE: PAROLE CROCIATE (BLOCCO 2)
+    // =====================================================
+    cruciverbaState: {
+      schema: null,
+      userGrid: [],
+      selectedR: 0,
+      selectedC: 0,
+      direction: 'across', // 'across' o 'down'
+      isSolved: false
+    },
+
+    cruciverbaSchemas: [
+      {
+        id: 1,
+        title: "I Grandi Classici della Letteratura",
+        rows: 6,
+        cols: 6,
+        // Griglia con lettere soluzione e '#' per caselle nere
+        solution: [
+          ['D', 'A', 'N', 'T', 'E', '#'],
+          ['E', '#', 'O', '#', 'R', '#'],
+          ['C', 'A', 'R', 'M', 'I', '#'],
+          ['A', '#', 'T', '#', 'S', '#'],
+          ['M', 'A', 'N', 'Z', 'O', 'N'],
+          ['#', '#', 'E', '#', '#', '#']
+        ],
+        numbers: [
+          [1, 0, 2, 0, 3, 0],
+          [0, 0, 0, 0, 0, 0],
+          [4, 0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0],
+          [5, 0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0]
+        ],
+        clues: {
+          across: [
+            { num: 1, text: "1 Orizz. - Il Sommo Poeta della Commedia (5 lettere)", answer: "DANTE", r: 0, c: 0, len: 5 },
+            { num: 4, text: "4 Orizz. - Componimenti poetici solenni come quelli di Foscolo (5 lettere)", answer: "CARMI", r: 2, c: 0, len: 5 },
+            { num: 5, text: "5 Orizz. - Il celebre autore dei Promessi Sposi (6 lettere)", answer: "MANZON", r: 4, c: 0, len: 6 }
+          ],
+          down: [
+            { num: 1, text: "1 Vert. - Inizio del titolo delle 100 novelle di Boccaccio (5 lettere)", answer: "DECAM", r: 0, c: 0, len: 5 },
+            { num: 2, text: "2 Vert. - L'ora scura e misteriosa dei poeti romantici (5 lettere)", answer: "NOTTE", r: 0, c: 2, len: 5 },
+            { num: 3, text: "3 Vert. - L'aggettivo del famoso 'colle' di Leopardi (4 lettere)", answer: "ERMO", r: 0, c: 4, len: 4 }
+          ]
+        }
+      },
+      {
+        id: 2,
+        title: "Personaggi & Capolavori",
+        rows: 5,
+        cols: 6,
+        solution: [
+          ['R', 'E', 'N', 'Z', 'O', '#'],
+          ['I', '#', '#', 'E', '#', '#'],
+          ['M', '#', 'O', 'N', 'D', 'E'],
+          ['A', '#', 'S', 'O', '#', '#'],
+          ['#', '#', 'S', '#', '#', '#']
+        ],
+        numbers: [
+          [1, 0, 0, 2, 0, 0],
+          [0, 0, 0, 0, 0, 0],
+          [3, 0, 4, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0]
+        ],
+        clues: {
+          across: [
+            { num: 1, text: "1 Orizz. - Il promesso sposo di Lucia (5 lettere)", answer: "RENZO", r: 0, c: 0, len: 5 },
+            { num: 3, text: "3 Orizz. - Si specchia in quelle del greco mar Zacinto (4 lettere)", answer: "ONDE", r: 2, c: 2, len: 4 }
+          ],
+          down: [
+            { num: 1, text: "1 Vert. - Accordo fonetico di fine verso (4 lettere)", answer: "RIMA", r: 0, c: 0, len: 4 },
+            { num: 2, text: "2 Vert. - Il cognome dell'inetto di Svevo (Coscienza di...) (4 lettere)", answer: "ZENO", r: 0, c: 3, len: 4 },
+            { num: 4, text: "4 Vert. - Quelli di seppia di Eugenio Montale (4 lettere)", answer: "OSSI", r: 2, c: 2, len: 3 }
+          ]
+        }
+      }
+    ],
+
+    initCruciverba: function(container, data, missionId) {
+      // Scegli uno schema
+      const schema = this.cruciverbaSchemas[Math.floor(Math.random() * this.cruciverbaSchemas.length)];
+      
+      const userGrid = [];
+      for (let r = 0; r < schema.rows; r++) {
+        userGrid[r] = [];
+        for (let c = 0; c < schema.cols; c++) {
+          userGrid[r][c] = (schema.solution[r][c] === '#') ? '#' : '';
+        }
+      }
+
+      this.cruciverbaState = {
+        schema: schema,
+        userGrid: userGrid,
+        selectedR: 0,
+        selectedC: 0,
+        direction: 'across',
+        isSolved: false
+      };
+
+      this.renderCruciverba(container);
+    },
+
+    renderCruciverba: function(container) {
+      const s = this.cruciverbaState;
+      const schema = s.schema;
+
+      // Trova la definizione attiva
+      let activeClueText = "Seleziona una casella bianca per iniziare";
+      const allClues = [...schema.clues.across, ...schema.clues.down];
+      
+      const activeClue = allClues.find(cl => {
+        if (s.direction === 'across') {
+          return cl.r === s.selectedR && s.selectedC >= cl.c && s.selectedC < cl.c + cl.len;
+        } else {
+          return cl.c === s.selectedC && s.selectedR >= cl.r && s.selectedR < cl.r + cl.len;
+        }
+      });
+
+      if (activeClue) activeClueText = activeClue.text;
+
+      container.innerHTML = `
+        <div style="padding: 10px; max-width: 680px; margin: 0 auto; text-align: center;">
+          <div style="margin-bottom: 12px; padding: 10px 14px; background: rgba(212,175,55,0.12); border: 1.5px solid var(--accent-gold); border-radius: 12px;">
+            <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--accent-gold); font-weight: 800; margin-bottom: 2px;">
+              <i class="fa-solid fa-pen"></i> Definizione Attiva:
+            </div>
+            <div style="font-size: 0.95rem; font-weight: 700; color: #fff;">
+              ${activeClueText}
+            </div>
+          </div>
+
+          <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-bottom: 18px; align-items: flex-start;">
+            <!-- Griglia Cruciverba -->
+            <div>
+              <div class="crossword-grid-container" style="grid-template-columns: repeat(${schema.cols}, 1fr);">
+                ${schema.solution.map((row, r) => row.map((solChar, c) => {
+                  if (solChar === '#') {
+                    return `<div class="cw-cell black"></div>`;
+                  }
+                  const num = schema.numbers[r][c];
+                  const userVal = s.userGrid[r][c] || '';
+                  const isSelected = (r === s.selectedR && c === s.selectedC);
+                  let isHighlighted = false;
+                  if (activeClue) {
+                    if (s.direction === 'across' && r === activeClue.r && c >= activeClue.c && c < activeClue.c + activeClue.len) isHighlighted = true;
+                    if (s.direction === 'down' && c === activeClue.c && r >= activeClue.r && r < activeClue.r + activeClue.len) isHighlighted = true;
+                  }
+
+                  const cellClass = `cw-cell ${isSelected ? 'active' : ''} ${isHighlighted && !isSelected ? 'highlight' : ''}`;
+
+                  return `
+                    <div class="${cellClass}" onclick="EroiMinigames.selectCruciverbaCell(${r}, ${c})">
+                      ${num > 0 ? `<span class="cw-cell-num">${num}</span>` : ''}
+                      <input id="cw-input-${r}-${c}" type="text" maxlength="1" value="${userVal}" 
+                        style="width: 100%; height: 100%; background: transparent; border: none; outline: none; text-align: center; font-weight: 800; font-size: inherit; color: inherit; text-transform: uppercase; cursor: pointer; padding: 0;"
+                        onfocus="EroiMinigames.selectCruciverbaCell(${r}, ${c})"
+                        oninput="EroiMinigames.inputCruciverbaCell(${r}, ${c}, this.value)"
+                        onkeydown="EroiMinigames.handleCruciverbaKey(event, ${r}, ${c})">
+                    </div>
+                  `;
+                }).join('')).join('')}
+              </div>
+            </div>
+
+            <!-- Colonna Definizioni -->
+            <div style="flex: 1; min-width: 260px; max-width: 320px; text-align: left; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; max-height: 260px; overflow-y: auto;">
+              <h5 style="color: var(--accent-gold); margin: 0 0 6px 0; font-size: 0.85rem;"><i class="fa-solid fa-arrow-right"></i> ORIZZONTALI</h5>
+              ${schema.clues.across.map(cl => {
+                const isActive = (s.direction === 'across' && activeClue && activeClue.num === cl.num);
+                return `<div class="cw-clue-item ${isActive ? 'active' : ''}" onclick="EroiMinigames.focusCruciverbaClue('across', ${cl.r}, ${cl.c})">${cl.text}</div>`;
+              }).join('')}
+
+              <h5 style="color: var(--accent-gold); margin: 12px 0 6px 0; font-size: 0.85rem;"><i class="fa-solid fa-arrow-down"></i> VERTICALI</h5>
+              ${schema.clues.down.map(cl => {
+                const isActive = (s.direction === 'down' && activeClue && activeClue.num === cl.num);
+                return `<div class="cw-clue-item ${isActive ? 'active' : ''}" onclick="EroiMinigames.focusCruciverbaClue('down', ${cl.r}, ${cl.c})">${cl.text}</div>`;
+              }).join('')}
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <button class="btn" style="background: #2ecc71; color: #000; font-weight: 800; padding: 8px 20px; border-radius: 20px;" onclick="EroiMinigames.verifyCruciverba()">
+              <i class="fa-solid fa-check"></i> Verifica Cruciverba
+            </button>
+            <button class="btn btn-secondary" style="background: rgba(245,197,60,0.15); border: 1px solid #f5c53c; color: #f5c53c; font-weight: 600; padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.hintCruciverba()">
+              <i class="fa-solid fa-lightbulb"></i> Svela Lettera
+            </button>
+            <button class="btn btn-secondary" style="padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.resetCruciverba()">
+              <i class="fa-solid fa-rotate-left"></i> Reset
+            </button>
+            <button class="btn btn-secondary" style="background: rgba(255,255,255,0.05); color: #aaa; padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.skipCurrent('cruciverba')">
+              <i class="fa-solid fa-forward-step"></i> Passa
+            </button>
+          </div>
+        </div>
+      `;
+    },
+
+    selectCruciverbaCell: function(r, c) {
+      const s = this.cruciverbaState;
+      if (s.userGrid[r][c] === '#') return;
+
+      if (s.selectedR === r && s.selectedC === c) {
+        // Toggle direzione (orizzontale <-> verticale) se ricliccata
+        s.direction = (s.direction === 'across') ? 'down' : 'across';
+      } else {
+        s.selectedR = r;
+        s.selectedC = c;
+      }
+
+      const container = document.getElementById('minigame-content');
+      if (container) this.renderCruciverba(container);
+
+      const input = document.getElementById(`cw-input-${r}-${c}`);
+      if (input) input.focus();
+    },
+
+    focusCruciverbaClue: function(dir, r, c) {
+      this.cruciverbaState.direction = dir;
+      this.cruciverbaState.selectedR = r;
+      this.cruciverbaState.selectedC = c;
+      const container = document.getElementById('minigame-content');
+      if (container) this.renderCruciverba(container);
+      const input = document.getElementById(`cw-input-${r}-${c}`);
+      if (input) input.focus();
+    },
+
+    inputCruciverbaCell: function(r, c, val) {
+      const s = this.cruciverbaState;
+      const upper = (val || '').toUpperCase().trim();
+      const lastChar = upper.length > 0 ? upper.slice(-1) : '';
+      s.userGrid[r][c] = lastChar;
+
+      // Avanza cursore
+      if (lastChar.length > 0) {
+        if (s.direction === 'across') {
+          let nextC = c + 1;
+          while (nextC < s.schema.cols && s.schema.solution[r][nextC] === '#') nextC++;
+          if (nextC < s.schema.cols) {
+            s.selectedC = nextC;
+            const container = document.getElementById('minigame-content');
+            if (container) this.renderCruciverba(container);
+            const nextInp = document.getElementById(`cw-input-${r}-${nextC}`);
+            if (nextInp) nextInp.focus();
+            return;
+          }
+        } else {
+          let nextR = r + 1;
+          while (nextR < s.schema.rows && s.schema.solution[nextR][c] === '#') nextR++;
+          if (nextR < s.schema.rows) {
+            s.selectedR = nextR;
+            const container = document.getElementById('minigame-content');
+            if (container) this.renderCruciverba(container);
+            const nextInp = document.getElementById(`cw-input-${nextR}-${c}`);
+            if (nextInp) nextInp.focus();
+            return;
+          }
+        }
+      }
+
+      const container = document.getElementById('minigame-content');
+      if (container) this.renderCruciverba(container);
+    },
+
+    handleCruciverbaKey: function(e, r, c) {
+      const s = this.cruciverbaState;
+      if (e.key === 'Backspace' && !s.userGrid[r][c]) {
+        // Torna indietro
+        if (s.direction === 'across' && c > 0) {
+          let prevC = c - 1;
+          while (prevC >= 0 && s.schema.solution[r][prevC] === '#') prevC--;
+          if (prevC >= 0) {
+            s.selectedC = prevC;
+            const container = document.getElementById('minigame-content');
+            if (container) this.renderCruciverba(container);
+            const inp = document.getElementById(`cw-input-${r}-${prevC}`);
+            if (inp) inp.focus();
+          }
+        } else if (s.direction === 'down' && r > 0) {
+          let prevR = r - 1;
+          while (prevR >= 0 && s.schema.solution[prevR][c] === '#') prevR--;
+          if (prevR >= 0) {
+            s.selectedR = prevR;
+            const container = document.getElementById('minigame-content');
+            if (container) this.renderCruciverba(container);
+            const inp = document.getElementById(`cw-input-${prevR}-${c}`);
+            if (inp) inp.focus();
+          }
+        }
+      }
+    },
+
+    hintCruciverba: function() {
+      const s = this.cruciverbaState;
+      const r = s.selectedR;
+      const c = s.selectedC;
+      if (s.schema.solution[r][c] && s.schema.solution[r][c] !== '#') {
+        s.userGrid[r][c] = s.schema.solution[r][c];
+        const container = document.getElementById('minigame-content');
+        if (container) this.renderCruciverba(container);
+        if (window.showToast) window.showToast('Lettera svelata!', 'info');
+      }
+    },
+
+    resetCruciverba: function() {
+      const container = document.getElementById('minigame-content');
+      const data = getData(currentMissionId);
+      if (container) this.initCruciverba(container, data, currentMissionId);
+    },
+
+    verifyCruciverba: function() {
+      const s = this.cruciverbaState;
+      const sol = s.schema.solution;
+      let allCorrect = true;
+      let emptyCount = 0;
+
+      for (let r = 0; r < s.schema.rows; r++) {
+        for (let c = 0; c < s.schema.cols; c++) {
+          if (sol[r][c] !== '#') {
+            const userChar = (s.userGrid[r][c] || '').toUpperCase();
+            if (!userChar) emptyCount++;
+            else if (userChar !== sol[r][c]) allCorrect = false;
+          }
+        }
+      }
+
+      if (emptyCount > 0) {
+        alert(`Ci sono ancora ${emptyCount} caselle vuote da completare!`);
+        return;
+      }
+
+      if (!allCorrect) {
+        alert("Alcune risposte non sono corrette. Ricontrolla le definizioni e riprova!");
+        return;
+      }
+
+      // VITTORIA
+      const container = document.getElementById('minigame-content');
+      if (container) {
+        container.innerHTML = `
+          <div style="padding: 25px; text-align: center; max-width: 500px; margin: 0 auto;">
+            <div style="font-size: 3rem; margin-bottom: 10px;">🏆</div>
+            <h2 style="color: var(--accent-gold); font-size: 1.8rem; margin: 0 0 10px 0; font-family: var(--font-heading);">
+              CRUCIVERBA RISOLTO!
+            </h2>
+            <p style="font-size: 1rem; color: #f5f5f0; margin-bottom: 15px;">
+              Complimenti! Tutte le definizioni e le parole crociate sono esatte.
+            </p>
+            <div style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; border: 1px solid rgba(212,175,55,0.3); margin-bottom: 20px;">
+              <div style="font-size: 2rem; font-weight: 800; color: #2ecc71;">+2 PUNTI</div>
+            </div>
+            <button class="btn" style="background: var(--accent-gold); color: #000; font-weight: 800; padding: 10px 28px; border-radius: 20px;" onclick="EroiMinigames.rewardAndNext('cruciverba', 2, 10)">
+              Continua
+            </button>
+          </div>
+        `;
+      }
     },
 
     // =====================================================
