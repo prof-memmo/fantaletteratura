@@ -901,17 +901,6 @@ window.openAuthorSchedaModal = function(authorId, modeKey = null) {
             <img src="${author.image}" onclick="if(window.openImageModal) window.openImageModal('${author.image}')" style="width:80px; height:80px; border-radius:50%; object-fit:cover; background:#fff; cursor:pointer; border: 2px solid var(--accent-gold); box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Clicca per ingrandire">
         </div>
         <div style="font-size:0.95rem; line-height:1.6; color:#e0e0e0; margin-bottom:10px;">${author.schedaHTML}</div>
-        <div style="margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:15px;">
-            <h4 style="color:var(--accent-gold); margin-bottom:10px;"><i class="fa-solid fa-gamepad"></i> Missioni Autore</h4>
-            <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
-                <button class="btn" style="padding:6px 12px; font-size:0.8rem; background:rgba(212,175,55,0.15); border:1px solid var(--accent-gold);" onclick="document.getElementById('scheda-autore-modal').style.display='none'; window.EroiMinigames.startMinigame('quiz', '${author.id}')"><i class="fa-solid fa-list-check"></i> Quiz</button>
-                <button class="btn" style="padding:6px 12px; font-size:0.8rem; background:rgba(212,175,55,0.15); border:1px solid var(--accent-gold);" onclick="document.getElementById('scheda-autore-modal').style.display='none'; window.EroiMinigames.startMinigame('impiccato', '${author.id}')"><i class="fa-solid fa-pen-nib"></i> Impiccato</button>
-                <button class="btn" style="padding:6px 12px; font-size:0.8rem; background:rgba(212,175,55,0.15); border:1px solid var(--accent-gold);" onclick="document.getElementById('scheda-autore-modal').style.display='none'; window.EroiMinigames.startMinigame('cloze', '${author.id}')"><i class="fa-solid fa-align-left"></i> Cloze</button>
-                <button class="btn" style="padding:6px 12px; font-size:0.8rem; background:rgba(212,175,55,0.15); border:1px solid var(--accent-gold);" onclick="document.getElementById('scheda-autore-modal').style.display='none'; window.EroiMinigames.startMinigame('puzzle', '${author.id}')"><i class="fa-solid fa-puzzle-piece"></i> Puzzle</button>
-                <button class="btn" style="padding:6px 12px; font-size:0.8rem; background:rgba(212,175,55,0.15); border:1px solid var(--accent-gold);" onclick="document.getElementById('scheda-autore-modal').style.display='none'; window.EroiMinigames.startMinigame('versi', '${author.id}')"><i class="fa-solid fa-align-justify"></i> Versi</button>
-            </div>
-            <button class="btn" style="width:100%; margin-top:10px; background:var(--accent-gold); color:var(--bg-dark);" onclick="document.getElementById('scheda-autore-modal').style.display='none'; window.EroiMinigames.startManche('${author.id}')"><i class="fa-solid fa-trophy"></i> Avvia Manche Completa</button>
-        </div>
     `;
     document.getElementById('scheda-autore-modal').style.display = 'block';
 };
@@ -4920,38 +4909,155 @@ window.switchDocenteTab = function(tabName) {
 };
 
 window.renderMinigamesHistory = async function() {
-    const tableBody = document.querySelector('#minigames-history-table tbody');
-    if (!tableBody) return;
+    const tableBodies = document.querySelectorAll('#minigames-history-table tbody, #salagiochi-history-table tbody');
+    if (!tableBodies || tableBodies.length === 0) return;
     
-    tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">Caricamento storico...</td></tr>';
+    tableBodies.forEach(tb => {
+        tb.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">Caricamento storico...</td></tr>';
+    });
     
     try {
         const logs = window.fanta_db && window.fanta_db.getMinigameLogs ? await window.fanta_db.getMinigameLogs() : [];
-        tableBody.innerHTML = '';
         
-        if (!logs || logs.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding: 20px;">Nessuna partita registrata.</td></tr>';
-            return;
-        }
-        
-        // Ordina per data decrescente
-        logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-        
-        logs.forEach(log => {
-            const date = new Date(log.timestamp);
-            const dateStr = date.toLocaleDateString('it-IT') + ' ' + date.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
+        tableBodies.forEach(tableBody => {
+            tableBody.innerHTML = '';
             
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td style="font-size:0.8rem; color:var(--text-muted);">${dateStr}</td>
-                <td><strong>${log.teamName || log.teamId}</strong></td>
-                <td><span class="badge" style="background:var(--accent-gold); color:var(--bg-dark);">${log.game}</span></td>
-                <td><strong style="color:var(--primary-color)">+${log.points} pt</strong></td>
-            `;
-            tableBody.appendChild(tr);
+            if (!logs || logs.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding: 20px;">Nessuna partita registrata.</td></tr>';
+                return;
+            }
+            
+            // Ordina per data decrescente
+            logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            logs.forEach(log => {
+                const date = new Date(log.timestamp);
+                const dateStr = date.toLocaleDateString('it-IT') + ' ' + date.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-size:0.8rem; color:var(--text-muted);">${dateStr}</td>
+                    <td><strong>${log.teamName || log.teamId}</strong></td>
+                    <td><span class="badge" style="background:var(--accent-gold); color:var(--bg-dark);">${log.game}</span></td>
+                    <td><strong style="color:var(--primary-color)">+${log.points} pt</strong></td>
+                `;
+                tableBody.appendChild(tr);
+            });
         });
     } catch (e) {
-        tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--danger-color); padding: 20px;">Errore nel caricamento.</td></tr>';
+        tableBodies.forEach(tb => {
+            tb.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--danger-color); padding: 20px;">Errore nel caricamento.</td></tr>';
+        });
+    }
+};
+
+/* =========================================
+   CONTROLLER SALA GIOCHI (HUB MINIGIOCHI)
+========================================= */
+
+window.renderSalaGiochiView = function() {
+    const banner = document.getElementById('salagiochi-role-banner');
+    const select = document.getElementById('salagiochi-author-select');
+    const historySec = document.getElementById('salagiochi-history-section');
+    
+    const isDocente = !!currentUserEmail;
+    const hasStudentCode = localStorage.getItem('fanta_active_team_code');
+    const userRole = (typeof currentUserRole !== 'undefined' ? currentUserRole : '') || localStorage.getItem('fanta_user_role') || (hasStudentCode && !isDocente ? 'studente' : '');
+
+    // 1. Render Banner Ruolo
+    if (banner) {
+        if (isDocente) {
+            banner.innerHTML = `
+                <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px;">
+                    <div>
+                        <div style="display:inline-flex; align-items:center; gap:6px; font-weight:800; color:var(--accent-gold); font-size:0.95rem; margin-bottom:4px;">
+                            <i class="fa-solid fa-graduation-cap"></i> Modalità Cattedra & Didattica
+                        </div>
+                        <p style="margin:0; font-size:0.85rem; color:#e0e0e0;">
+                            Sei connesso come Docente. Puoi avviare le sfide interattive tra le squadre della classe per la proiezione su LIM.
+                        </p>
+                    </div>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button type="button" class="btn" style="background:linear-gradient(135deg, #2ecc71, #27ae60); color:#000; font-weight:800; padding:8px 18px; border-radius:20px; font-size:0.85rem; border:none; box-shadow:0 4px 12px rgba(46,204,113,0.3);" onclick="window.EroiMinigames && window.EroiMinigames.openTeamSelection('mixed', document.getElementById('salagiochi-author-select')?.value || 'mixed')">
+                            <i class="fa-solid fa-play"></i> Sfida a Squadre per LIM
+                        </button>
+                        <button type="button" class="btn btn-secondary" style="padding:8px 14px; font-size:0.85rem; border-radius:20px;" onclick="const h = document.getElementById('salagiochi-history-section'); if(h){ h.style.display = (h.style.display==='none'?'block':'none'); if(h.style.display==='block' && window.renderMinigamesHistory) window.renderMinigamesHistory(); }">
+                            <i class="fa-solid fa-clock-rotate-left"></i> Storico Partite
+                        </button>
+                    </div>
+                </div>
+            `;
+            if (historySec) historySec.style.display = 'block';
+            if (typeof window.renderMinigamesHistory === 'function') {
+                window.renderMinigamesHistory();
+            }
+        } else if (userRole === 'studente' || hasStudentCode) {
+            banner.innerHTML = `
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="font-size:1.6rem; color:var(--accent-gold);"><i class="fa-solid fa-shield-halved"></i></div>
+                    <div>
+                        <div style="font-weight:800; color:var(--accent-gold); font-size:0.95rem; margin-bottom:2px;">
+                            Modalità Studente
+                        </div>
+                        <p style="margin:0; font-size:0.85rem; color:#e0e0e0;">
+                            I punti che conquisti nei minigiochi vengono assegnati alla tua squadra attiva!
+                        </p>
+                    </div>
+                </div>
+            `;
+            if (historySec) historySec.style.display = 'none';
+        } else {
+            banner.innerHTML = `
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="font-size:1.6rem; color:var(--accent-gold);"><i class="fa-solid fa-compass"></i></div>
+                    <div>
+                        <div style="font-weight:800; color:var(--accent-gold); font-size:0.95rem; margin-bottom:2px;">
+                            Modalità Viandante (Free Play)
+                        </div>
+                        <p style="margin:0; font-size:0.85rem; color:#e0e0e0;">
+                            Gioca ed esplora liberamente tutti i minigiochi! Registrati o accedi con il codice squadra per salvare i tuoi record.
+                        </p>
+                    </div>
+                </div>
+            `;
+            if (historySec) historySec.style.display = 'none';
+        }
+    }
+
+    // 2. Popola Selettore Autori se non già popolato
+    if (select && select.options.length <= 1) {
+        try {
+            const authorList = (typeof window.AUTHORS !== 'undefined' && Array.isArray(window.AUTHORS))
+                ? window.AUTHORS
+                : ((typeof AUTHORS !== 'undefined' && Array.isArray(AUTHORS)) ? AUTHORS : []);
+
+            authorList.forEach(a => {
+                if (a && a.id && a.name) {
+                    const opt = document.createElement('option');
+                    opt.value = a.id;
+                    opt.textContent = `✍️ ${a.name}`;
+                    select.appendChild(opt);
+                }
+            });
+        } catch(e) {
+            console.warn("Errore popolamento selettore autori sala giochi:", e);
+        }
+    }
+};
+
+window.avviaSalaGiochiGame = function(gameType) {
+    const authorSelect = document.getElementById('salagiochi-author-select');
+    const selectedAuthorId = authorSelect ? authorSelect.value : 'mixed';
+
+    if (!window.EroiMinigames) {
+        alert("Caricamento dei minigiochi in corso... Riprova tra un istante.");
+        return;
+    }
+
+    if (gameType === 'manche') {
+        window.EroiMinigames.startManche(selectedAuthorId);
+    } else {
+        window.EroiMinigames.startMinigame(gameType, selectedAuthorId);
     }
 };
 

@@ -348,6 +348,173 @@
                 <div id="schede-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; margin-top: 15px;"></div>
             </section>
 
+            <!-- VIEW: Sala Giochi -->
+            <section id="view-salagiochi" class="view">
+                <div class="salagiochi-header" style="margin-bottom: 20px; text-align: center;">
+                    <h2 class="mb-1" style="font-size: 1.8rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                        <i class="fa-solid fa-gamepad" style="color: var(--accent-gold);"></i> Sala Giochi Letteraria
+                    </h2>
+                    <p style="font-size: 0.9rem; color: var(--text-muted); max-width: 650px; margin: 0 auto;">
+                        Sfida te stesso o la tua classe con i 5 minigiochi didattici sui maestri della letteratura.
+                    </p>
+                </div>
+
+                <!-- Banner di Ruolo / Controlli Cattedra -->
+                <div id="salagiochi-role-banner" class="glass mb-2" style="padding: 16px; border-radius: 14px; border: 1px solid rgba(212,175,55,0.3); background: rgba(212,175,55,0.06);">
+                    <!-- Popolato dinamicamente da renderSalaGiochiView() in app.js -->
+                </div>
+
+                <!-- Pannello Selezione Argomento / Autore -->
+                <div class="glass mb-2" style="padding: 16px; border-radius: 14px;">
+                    <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;">
+                        <div>
+                            <span style="font-weight: 700; color: var(--accent-gold); font-size: 0.95rem;">
+                                <i class="fa-solid fa-sliders"></i> Scegli Argomento:
+                            </span>
+                            <span style="font-size: 0.8rem; color: var(--text-muted); margin-left: 6px;">(Misto o Autore dedicato)</span>
+                        </div>
+                        <div style="flex: 1; min-width: 240px; max-width: 360px;">
+                            <select id="salagiochi-author-select" class="input-control" style="width: 100%; padding: 8px 12px; font-size: 0.85rem; border-radius: 10px; background: rgba(0,0,0,0.4); color: #fff; border: 1px solid rgba(255,255,255,0.2);">
+                                <option value="mixed" selected>🎲 Modalità Mista (Tutti gli Autori)</option>
+                                <!-- Popolato dinamicamente con tutti gli autori -->
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Card: Manche Completa Gran Torneo -->
+                <div class="glass mb-2" style="padding: 18px; border-radius: 16px; background: linear-gradient(135deg, rgba(212,175,55,0.18), rgba(0,0,0,0.4)); border: 1.5px solid var(--accent-gold); text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.3);">
+                    <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 15px;">
+                        <div style="text-align: left; flex: 1; min-width: 250px;">
+                            <div style="display: inline-block; padding: 3px 10px; background: var(--accent-gold); color: #000; font-weight: 800; font-size: 0.7rem; border-radius: 20px; margin-bottom: 6px;">
+                                <i class="fa-solid fa-crown"></i> SFIDA COMPLETA
+                            </div>
+                            <h3 style="margin: 0 0 5px 0; font-size: 1.25rem; color: #fff;">Manche Completa (Gran Torneo)</h3>
+                            <p style="margin: 0; font-size: 0.85rem; color: #ccc;">Affronta in sequenza tutti i 5 giochi per conquistare fino a 20 punti per la tua squadra!</p>
+                        </div>
+                        <button type="button" class="btn" style="background: var(--accent-gold); color: #000; font-weight: 800; padding: 10px 24px; border-radius: 25px; border: none; box-shadow: 0 4px 15px rgba(212,175,55,0.4); font-size: 0.95rem; cursor: pointer;" onclick="window.avviaSalaGiochiGame('manche')">
+                            <i class="fa-solid fa-play"></i> Avvia Manche
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Griglia dei 5 Minigiochi Singoli -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin-bottom: 25px;">
+                    
+                    <!-- 1. Quiz -->
+                    <div class="glass" style="padding: 16px; border-radius: 14px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1); transition: transform 0.2s, border-color 0.2s;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <span style="font-size: 1.5rem; color: #60a5fa;"><i class="fa-solid fa-list-check"></i></span>
+                                <span style="font-size: 0.75rem; background: rgba(96,165,250,0.15); color: #60a5fa; border: 1px solid rgba(96,165,250,0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Max 2 pt</span>
+                            </div>
+                            <h4 style="margin: 0 0 6px 0; font-size: 1.05rem; color: #fff;">Quiz Letterario</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 15px;">
+                                Domande a risposta multipla su biografia, opere, correnti e poetica degli autori.
+                            </p>
+                        </div>
+                        <button type="button" class="btn btn-secondary" style="width: 100%; padding: 8px 12px; font-size: 0.85rem; border-radius: 10px; font-weight: 700;" onclick="window.avviaSalaGiochiGame('quiz')">
+                            <i class="fa-solid fa-play"></i> Gioca a Quiz
+                        </button>
+                    </div>
+
+                    <!-- 2. Impiccato -->
+                    <div class="glass" style="padding: 16px; border-radius: 14px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1); transition: transform 0.2s, border-color 0.2s;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <span style="font-size: 1.5rem; color: #f59e0b;"><i class="fa-solid fa-pen-nib"></i></span>
+                                <span style="font-size: 0.75rem; background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Max 2 pt</span>
+                            </div>
+                            <h4 style="margin: 0 0 6px 0; font-size: 1.05rem; color: #fff;">L'Impiccato</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 15px;">
+                                Indovina le parole chiave, i protagonisti e i titoli famosi lettera per lettera.
+                            </p>
+                        </div>
+                        <button type="button" class="btn btn-secondary" style="width: 100%; padding: 8px 12px; font-size: 0.85rem; border-radius: 10px; font-weight: 700;" onclick="window.avviaSalaGiochiGame('impiccato')">
+                            <i class="fa-solid fa-play"></i> Gioca a Impiccato
+                        </button>
+                    </div>
+
+                    <!-- 3. Cloze -->
+                    <div class="glass" style="padding: 16px; border-radius: 14px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1); transition: transform 0.2s, border-color 0.2s;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <span style="font-size: 1.5rem; color: #34d399;"><i class="fa-solid fa-align-left"></i></span>
+                                <span style="font-size: 0.75rem; background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid rgba(52,211,153,0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Max 2 pt</span>
+                            </div>
+                            <h4 style="margin: 0 0 6px 0; font-size: 1.05rem; color: #fff;">Testo Bucato (Cloze)</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 15px;">
+                                Completa i celebri brani e le poesie inserendo le parole mancanti.
+                            </p>
+                        </div>
+                        <button type="button" class="btn btn-secondary" style="width: 100%; padding: 8px 12px; font-size: 0.85rem; border-radius: 10px; font-weight: 700;" onclick="window.avviaSalaGiochiGame('cloze')">
+                            <i class="fa-solid fa-play"></i> Gioca a Cloze
+                        </button>
+                    </div>
+
+                    <!-- 4. Puzzle -->
+                    <div class="glass" style="padding: 16px; border-radius: 14px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1); transition: transform 0.2s, border-color 0.2s;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <span style="font-size: 1.5rem; color: #a78bfa;"><i class="fa-solid fa-puzzle-piece"></i></span>
+                                <span style="font-size: 0.75rem; background: rgba(167,139,250,0.15); color: #a78bfa; border: 1px solid rgba(167,139,250,0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Max 2 pt</span>
+                            </div>
+                            <h4 style="margin: 0 0 6px 0; font-size: 1.05rem; color: #fff;">Puzzle di Citazioni</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 15px;">
+                                Riordina le tessere di parole per ricomporre la citazione letteraria corretta.
+                            </p>
+                        </div>
+                        <button type="button" class="btn btn-secondary" style="width: 100%; padding: 8px 12px; font-size: 0.85rem; border-radius: 10px; font-weight: 700;" onclick="window.avviaSalaGiochiGame('puzzle')">
+                            <i class="fa-solid fa-play"></i> Gioca a Puzzle
+                        </button>
+                    </div>
+
+                    <!-- 5. Versi -->
+                    <div class="glass" style="padding: 16px; border-radius: 14px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1); transition: transform 0.2s, border-color 0.2s;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <span style="font-size: 1.5rem; color: #f43f5e;"><i class="fa-solid fa-align-justify"></i></span>
+                                <span style="font-size: 0.75rem; background: rgba(244,63,94,0.15); color: #f43f5e; border: 1px solid rgba(244,63,94,0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Max 2 pt</span>
+                            </div>
+                            <h4 style="margin: 0 0 6px 0; font-size: 1.05rem; color: #fff;">Riordina i Versi</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 15px;">
+                                Riconosci la struttura poetica e rimetti le strofe nel giusto ordine originale.
+                            </p>
+                        </div>
+                        <button type="button" class="btn btn-secondary" style="width: 100%; padding: 8px 12px; font-size: 0.85rem; border-radius: 10px; font-weight: 700;" onclick="window.avviaSalaGiochiGame('versi')">
+                            <i class="fa-solid fa-play"></i> Gioca a Versi
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- Sezione Storico Minigiochi (in Sala Giochi) -->
+                <div id="salagiochi-history-section" class="glass mb-2" style="padding: 16px; border-radius: 14px; display: none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
+                        <h4 style="color:var(--accent-gold); margin: 0;"><i class="fa-solid fa-clock-rotate-left"></i> Storico Minigiochi Registrati</h4>
+                        <button type="button" class="btn btn-secondary" style="padding: 4px 12px; font-size: 0.8rem;" onclick="if(window.renderMinigamesHistory) window.renderMinigamesHistory();">
+                            <i class="fa-solid fa-rotate"></i> Aggiorna
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="game-table" id="salagiochi-history-table">
+                            <thead>
+                                <tr>
+                                    <th>Data e Ora</th>
+                                    <th>Squadra</th>
+                                    <th>Gioco</th>
+                                    <th>Punti</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="4" style="text-align:center; color:#888;">Caricamento storico...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </section>
+
             <!-- VIEW: Privacy Policy -->
             <section id="view-privacy" class="view">
                 <h2 class="mb-2">Policy privacy</h2>
@@ -818,6 +985,10 @@
             <a href="#" class="tab-item" data-view="view-schede" data-tooltip="Esplora le Schede Autore">
                 <i class="fa-solid fa-file-lines"></i>
                 <span>Schede</span>
+            </a>
+            <a href="#" class="tab-item" data-view="view-salagiochi" data-tooltip="Sala Giochi e Minigiochi">
+                <i class="fa-solid fa-gamepad"></i>
+                <span>Sala Giochi</span>
             </a>
             <a href="https://prof-memmo.github.io/games/contatti.html" target="_blank" class="tab-item" data-tooltip="Inviaci un Messaggio">
                 <i class="fa-solid fa-envelope"></i>
