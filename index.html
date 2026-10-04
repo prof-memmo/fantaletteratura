@@ -39,6 +39,24 @@
                     <div class="user-menu-trigger" id="header-user-menu-trigger" onclick="event.stopPropagation(); window.toggleUserDropdown(event);">
                         <div class="user-avatar-circle">
                             <img id="header-user-avatar-img" src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png" alt="Avatar" onerror="this.src='https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png'">
+                            <script>
+                                (function(){
+                                    try {
+                                        var av = localStorage.getItem('fanta_user_avatar') || localStorage.getItem('hub_user_avatar');
+                                        if (av) {
+                                            var el = document.getElementById('header-user-avatar-img');
+                                            if (el) el.src = av;
+                                        }
+                                        var nm = localStorage.getItem('fanta_user_name') || localStorage.getItem('hub_user_name');
+                                        if (nm) {
+                                            var elN = document.getElementById('header-user-name');
+                                            if (elN) elN.textContent = nm;
+                                            var elT = document.getElementById('dropdown-user-title');
+                                            if (elT) elT.textContent = nm;
+                                        }
+                                    } catch(e){}
+                                })();
+                            </script>
                         </div>
                         <div class="user-trigger-text">
                             <span class="user-trigger-name" id="header-user-name">OSPITE</span>
@@ -1175,10 +1193,6 @@
                 <i class="fa-solid fa-lock"></i>
                 <span>Admin</span>
             </a>
-            <a href="#" class="tab-item" id="btn-toggle-music-popup" onclick="window.MusicPlayer && window.MusicPlayer.togglePopup(); return false;" data-tooltip="Lettore Musicale">
-                <i class="fa-solid fa-music"></i>
-                <span>Musica</span>
-            </a>
         </nav>
     </div>
 
@@ -1888,23 +1902,23 @@
     </script>
 
     <!-- Scripts -->
-    <script src="js/data.js?v=20261004_header_unificato"></script>
-    <script src="js/services/calendar-service.js?v=20261004_header_unificato"></script>
-    <script src="js/services/imprevisti-service.js?v=20261004_header_unificato"></script>
-    <script src="js/services/rules-service.js?v=20261004_header_unificato"></script>
-    <script src="js/services/miniguida-service.js?v=20261004_header_unificato"></script>
-    <script src="js/music.js?v=20261004_header_unificato"></script>
-    <script src="js/minigames.js?v=20261004_header_unificato"></script>
+    <script src="js/data.js?v=20261004_v3_zeroflicker"></script>
+    <script src="js/services/calendar-service.js?v=20261004_v3_zeroflicker"></script>
+    <script src="js/services/imprevisti-service.js?v=20261004_v3_zeroflicker"></script>
+    <script src="js/services/rules-service.js?v=20261004_v3_zeroflicker"></script>
+    <script src="js/services/miniguida-service.js?v=20261004_v3_zeroflicker"></script>
+    <script src="js/music.js?v=20261004_v3_zeroflicker"></script>
+    <script src="js/minigames.js?v=20261004_v3_zeroflicker"></script>
     <!-- Components -->
-    <script src="js/components/navbar.js?v=20261004_header_unificato"></script>
-    <script src="js/components/modals.js?v=20261004_header_unificato"></script>
+    <script src="js/components/navbar.js?v=20261004_v3_zeroflicker"></script>
+    <script src="js/components/modals.js?v=20261004_v3_zeroflicker"></script>
     <!-- Dashboard -->
-    <script src="js/dashboard/admin-logic.js?v=20261004_header_unificato"></script>
-    <script src="js/live-editor.js?v=20261004_header_unificato"></script>
-    <script src="js/app.js?v=20261004_header_unificato"></script>
+    <script src="js/dashboard/admin-logic.js?v=20261004_v3_zeroflicker"></script>
+    <script src="js/live-editor.js?v=20261004_v3_zeroflicker"></script>
+    <script src="js/app.js?v=20261004_v3_zeroflicker"></script>
     <!-- Modali condivisi ed Access Control ecosistema Prof. Memmo -->
     <script>window.HUB_GAME_ID = "fantaletteratura";</script>
-    <script src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/hub-subscription-guard.js?v=20260824_clean_minigames"></script>
-    <script src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/legal-modal.js?v=20260824_clean_minigames"></script>
+    <script src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/hub-subscription-guard.js?v=20261004_v3_zeroflicker"></script>
+    <script src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/legal-modal.js?v=20261004_v3_zeroflicker"></script>
 </body>
 </html>

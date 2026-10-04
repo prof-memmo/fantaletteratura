@@ -1960,14 +1960,20 @@ async function renderProfilo() {
             if (profAvatarImg) profAvatarImg.src = avatar;
             if (headerAvatarImg) headerAvatarImg.src = avatar;
             window.selectedFantaAvatar = avatar;
-            try { localStorage.setItem('fanta_user_avatar', avatar); } catch(e) {}
+            try { 
+                localStorage.setItem('fanta_user_avatar', avatar);
+                localStorage.setItem('hub_user_avatar', avatar);
+            } catch(e) {}
         }
         if (name) {
             if (profDisplayName) profDisplayName.textContent = name;
             if (fantaDdUsername) fantaDdUsername.textContent = name;
             if (headerUserName) headerUserName.textContent = name;
             if (dropdownUserTitle) dropdownUserTitle.textContent = name;
-            try { localStorage.setItem('fanta_user_name', name); } catch(e) {}
+            try { 
+                localStorage.setItem('fanta_user_name', name);
+                localStorage.setItem('hub_user_name', name);
+            } catch(e) {}
         }
     };
 
