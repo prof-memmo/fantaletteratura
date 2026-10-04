@@ -1960,17 +1960,22 @@ async function renderProfilo() {
             if (profAvatarImg) profAvatarImg.src = avatar;
             if (headerAvatarImg) headerAvatarImg.src = avatar;
             window.selectedFantaAvatar = avatar;
+            try { localStorage.setItem('fanta_user_avatar', avatar); } catch(e) {}
         }
         if (name) {
             if (profDisplayName) profDisplayName.textContent = name;
             if (fantaDdUsername) fantaDdUsername.textContent = name;
             if (headerUserName) headerUserName.textContent = name;
             if (dropdownUserTitle) dropdownUserTitle.textContent = name;
+            try { localStorage.setItem('fanta_user_name', name); } catch(e) {}
         }
     };
 
     if (profAvatarImg || headerAvatarImg) {
-        updateAllProfileDisplays(window.selectedFantaAvatar || 'assets/avatars/6.png', currentUserEmail ? (currentUserEmail === 'prof.memmo@gmail.com' ? 'Prof. Memmo' : currentUserEmail.split('@')[0]) : 'Docente');
+        const cachedAvatar = localStorage.getItem('fanta_user_avatar') || localStorage.getItem('hub_user_avatar') || window.selectedFantaAvatar || 'https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png';
+        const cachedName = localStorage.getItem('fanta_user_name') || (currentUserEmail ? (currentUserEmail === 'prof.memmo@gmail.com' ? 'Prof. Memmo' : currentUserEmail.split('@')[0]) : 'Docente');
+        
+        updateAllProfileDisplays(cachedAvatar, cachedName);
         
         if (window.db) {
             const authUser = window.auth && window.auth.currentUser;
@@ -5143,7 +5148,7 @@ window.avviaSalaGiochiGame = function(gameType) {
     }
 };
 
-window.selectedFantaAvatar = 'assets/avatars/6.png';
+window.selectedFantaAvatar = localStorage.getItem('fanta_user_avatar') || 'https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png';
 window.openEditProfileModal = async function() {
     const user = window.auth ? window.auth.currentUser : null;
     const modal = document.getElementById('edit-profile-modal');
@@ -5157,7 +5162,7 @@ window.openEditProfileModal = async function() {
     if (nameInput) nameInput.value = user ? (user.displayName || user.email.split('@')[0]) : '';
     if (schoolInput) schoolInput.value = '';
     
-    let currentAvatar = 'assets/avatars/6.png';
+    let currentAvatar = window.selectedFantaAvatar || 'https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png';
 
     if (user && window.db) {
         try {
