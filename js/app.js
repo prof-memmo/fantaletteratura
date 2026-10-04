@@ -1117,7 +1117,17 @@ function checkLoginSession() {
 
     fanta_db.onAuthStateChanged(async (user) => {
         if (!user) {
-            // Mostra il login locale su FantaLetteratura senza reindirizzare
+            // Mostra stato Ospite nell'header
+            const loginHubBtn = document.getElementById('btn-login-hub-dropdown');
+            const profileBtn = document.getElementById('btn-profile-dropdown');
+            const inviteBtn = document.getElementById('btn-invite-dropdown');
+            const bottomRow = document.getElementById('dropdown-bottom-row');
+            if (loginHubBtn) loginHubBtn.style.display = 'flex';
+            if (profileBtn) profileBtn.style.display = 'none';
+            if (inviteBtn) inviteBtn.style.display = 'none';
+            if (bottomRow) bottomRow.style.display = 'none';
+
+            // Mostra la home di benvenuto
             if(typeof window.navigateTo === 'function') {
                 window.navigateTo('view-welcome');
             } else {
@@ -1449,6 +1459,33 @@ window.testConnessioneAdmin = async function() {
 async function logoutDocente() {
     await fanta_db.logout();
     currentUserEmail = null;
+    window.currentUserEmail = null;
+    
+    // Header Unificato: Reimposta a stato Ospite
+    const headerUserName = document.getElementById('header-user-name');
+    const headerUserRole = document.getElementById('header-user-role');
+    const dropdownTitle = document.getElementById('dropdown-user-title');
+    const dropdownSubtitle = document.getElementById('dropdown-user-subtitle');
+    const headerAvatar = document.getElementById('header-user-avatar-img');
+    const loginHubBtn = document.getElementById('btn-login-hub-dropdown');
+    const profileBtn = document.getElementById('btn-profile-dropdown');
+    const inviteBtn = document.getElementById('btn-invite-dropdown');
+    const bottomRow = document.getElementById('dropdown-bottom-row');
+    const notifBadge = document.getElementById('header-notification-badge');
+
+    if (headerUserName) headerUserName.textContent = 'OSPITE';
+    if (headerUserRole) headerUserRole.textContent = 'NON REGISTRATO';
+    if (dropdownTitle) dropdownTitle.textContent = 'OSPITE';
+    if (dropdownSubtitle) dropdownSubtitle.textContent = 'NON AUTENTICATO';
+    if (headerAvatar) headerAvatar.src = 'https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png';
+    if (loginHubBtn) loginHubBtn.style.display = 'flex';
+    if (profileBtn) profileBtn.style.display = 'none';
+    if (inviteBtn) inviteBtn.style.display = 'none';
+    if (bottomRow) bottomRow.style.display = 'none';
+    if (notifBadge) notifBadge.style.display = 'none';
+
+    if (typeof window.closeUserDropdown === 'function') window.closeUserDropdown();
+
     const loginSec = document.getElementById('login-section');
     const loggedSec = document.getElementById('logged-in-section');
     if(loginSec) loginSec.style.display = 'block';
@@ -1505,8 +1542,21 @@ function setLoggedIn(email, role = '') {
     }
     window.currentUserRole = currentUserRole;
     
-    // Sidebar and menu-btn removed
-    
+    const isTeacher = currentUserRole === 'docente' || currentUserRole === 'teacher' || email === 'prof.memmo@gmail.com';
+    const isFantamico = currentUserRole === 'fantamico' || currentUserRole === 'viandante' || currentUserRole === 'guest';
+    const isStudent = currentUserRole === 'studente';
+
+    // Header Unificato: Mostra voci utente autenticato nel dropdown
+    const loginHubBtn = document.getElementById('btn-login-hub-dropdown');
+    const profileBtn = document.getElementById('btn-profile-dropdown');
+    const inviteBtn = document.getElementById('btn-invite-dropdown');
+    const bottomRow = document.getElementById('dropdown-bottom-row');
+
+    if (loginHubBtn) loginHubBtn.style.display = 'none';
+    if (profileBtn) profileBtn.style.display = 'flex';
+    if (inviteBtn) inviteBtn.style.display = isTeacher ? 'flex' : 'none';
+    if (bottomRow) bottomRow.style.display = 'flex';
+
     const loginSec = document.getElementById('login-section');
     const loggedSec = document.getElementById('logged-in-section');
     if(loginSec) loginSec.style.display = 'none';
@@ -1515,16 +1565,25 @@ function setLoggedIn(email, role = '') {
     const loggedWelc = document.getElementById('logged-in-welcome');
     const loggedInNormalContent = document.getElementById('logged-in-normal-content');
     
-    const isTeacher = currentUserRole === 'docente' || currentUserRole === 'teacher' || email === 'prof.memmo@gmail.com';
-    const isFantamico = currentUserRole === 'fantamico' || currentUserRole === 'viandante' || currentUserRole === 'guest';
-    const isStudent = currentUserRole === 'studente';
-    
+    // Aggiorna etichette di ruolo
+    const headerRoleEl = document.getElementById('header-user-role');
+    const dropdownRoleEl = document.getElementById('dropdown-user-subtitle');
+    let roleText = 'DOCENTE REGISTRATO';
+    if (isTeacher) roleText = (email === 'prof.memmo@gmail.com' ? 'AMMINISTRATORE' : 'DOCENTE REGISTRATO');
+    else if (isFantamico) roleText = 'FANTAMICO';
+    else if (isStudent) roleText = 'STUDENTE';
+    if (headerRoleEl) headerRoleEl.textContent = roleText;
+    if (dropdownRoleEl) dropdownRoleEl.textContent = roleText;
+
     if (loggedWelc) {
         if (isTeacher) loggedWelc.textContent = "Bentornato, Prof!";
         else if (isFantamico) loggedWelc.textContent = "Ciao, Viandante!";
         else if (isStudent) loggedWelc.textContent = "Ciao, Studente!";
         else loggedWelc.textContent = "Benvenuto!";
     }
+    
+    if (typeof renderProfilo === 'function') renderProfilo();
+    if (typeof renderNotifiche === 'function') renderNotifiche();
     if (loggedInNormalContent) {
         if (isStudent) {
             loggedInNormalContent.innerHTML = `
@@ -1892,9 +1951,27 @@ async function renderProfilo() {
     const profAvatarImg = document.getElementById('profilo-avatar-img');
     const profDisplayName = document.getElementById('profilo-display-name');
     const fantaDdUsername = document.getElementById('fanta-dd-username');
+    const headerAvatarImg = document.getElementById('header-user-avatar-img');
+    const headerUserName = document.getElementById('header-user-name');
+    const dropdownUserTitle = document.getElementById('dropdown-user-title');
 
-    if (profAvatarImg) {
-        profAvatarImg.src = window.selectedFantaAvatar || 'assets/avatars/6.png';
+    const updateAllProfileDisplays = (avatar, name) => {
+        if (avatar) {
+            if (profAvatarImg) profAvatarImg.src = avatar;
+            if (headerAvatarImg) headerAvatarImg.src = avatar;
+            window.selectedFantaAvatar = avatar;
+        }
+        if (name) {
+            if (profDisplayName) profDisplayName.textContent = name;
+            if (fantaDdUsername) fantaDdUsername.textContent = name;
+            if (headerUserName) headerUserName.textContent = name;
+            if (dropdownUserTitle) dropdownUserTitle.textContent = name;
+        }
+    };
+
+    if (profAvatarImg || headerAvatarImg) {
+        updateAllProfileDisplays(window.selectedFantaAvatar || 'assets/avatars/6.png', currentUserEmail ? (currentUserEmail === 'prof.memmo@gmail.com' ? 'Prof. Memmo' : currentUserEmail.split('@')[0]) : 'Docente');
+        
         if (window.db) {
             const authUser = window.auth && window.auth.currentUser;
             const uid = authUser ? authUser.uid : null;
@@ -1908,14 +1985,7 @@ async function renderProfilo() {
                         const hData = hDoc.data() || {};
                         const hAvatar = hData.avatar || (hData.anagrafica && hData.anagrafica.avatar);
                         const hName = hData.nome || hData.name || (hData.anagrafica && hData.anagrafica.nome);
-                        if (hAvatar) {
-                            profAvatarImg.src = hAvatar;
-                            window.selectedFantaAvatar = hAvatar;
-                        }
-                        if (hName) {
-                            if (profDisplayName) profDisplayName.textContent = hName;
-                            if (fantaDdUsername) fantaDdUsername.textContent = hName;
-                        }
+                        updateAllProfileDisplays(hAvatar, hName);
                         loadedFromHub = true;
                     }
                 } catch(eHub) {
@@ -1928,13 +1998,8 @@ async function renderProfilo() {
                 window.db.collection('fanta_users').doc(currentUserEmail.toLowerCase()).get().then(d => {
                     if (d.exists) {
                         const data = d.data() || {};
-                        if (data.avatar) {
-                            profAvatarImg.src = data.avatar;
-                            window.selectedFantaAvatar = data.avatar;
-                        }
-                        const nameToShow = data.nome || data.name || currentUserEmail.split('@')[0];
-                        if (profDisplayName) profDisplayName.textContent = nameToShow;
-                        if (fantaDdUsername) fantaDdUsername.textContent = nameToShow;
+                        const nameToShow = data.nome || data.name || (currentUserEmail === 'prof.memmo@gmail.com' ? 'Prof. Memmo' : currentUserEmail.split('@')[0]);
+                        updateAllProfileDisplays(data.avatar, nameToShow);
                     }
                 }).catch(() => {});
             }
@@ -2511,7 +2576,27 @@ async function renderNotifiche() {
         
         const totalNotifications = pendingInvites.length + unseenSchede.length + pendingMissions.length + unseenMissions.length;
         
-        // Aggiorna Badge Campanella
+        // Aggiorna Badge Header Globale
+        const headerBadge = document.getElementById('header-notification-badge');
+        const dropdownBadge = document.getElementById('dropdown-notif-badge');
+        if (headerBadge) {
+            if (totalNotifications > 0) {
+                headerBadge.textContent = totalNotifications;
+                headerBadge.style.display = 'inline-flex';
+            } else {
+                headerBadge.style.display = 'none';
+            }
+        }
+        if (dropdownBadge) {
+            if (totalNotifications > 0) {
+                dropdownBadge.textContent = totalNotifications;
+                dropdownBadge.style.display = 'inline-flex';
+            } else {
+                dropdownBadge.style.display = 'none';
+            }
+        }
+
+        // Aggiorna Badge Campanella Admin / Locale
         if(badge) {
             if(totalNotifications > 0) {
                 badge.textContent = totalNotifications;
@@ -5184,10 +5269,18 @@ window.saveProfileData = async function() {
         window.selectedFantaAvatar = chosenAvatar;
         const profAvatarImg = document.getElementById('profilo-avatar-img');
         if (profAvatarImg) profAvatarImg.src = chosenAvatar;
+        const headerAvatarImg = document.getElementById('header-user-avatar-img');
+        if (headerAvatarImg) headerAvatarImg.src = chosenAvatar;
+        
         const profDisplayName = document.getElementById('profilo-display-name');
         const fantaDdUsername = document.getElementById('fanta-dd-username');
+        const headerUserName = document.getElementById('header-user-name');
+        const dropdownUserTitle = document.getElementById('dropdown-user-title');
+
         if (profDisplayName) profDisplayName.textContent = nameInput;
         if (fantaDdUsername) fantaDdUsername.textContent = nameInput;
+        if (headerUserName) headerUserName.textContent = nameInput;
+        if (dropdownUserTitle) dropdownUserTitle.textContent = nameInput;
 
         alert('Profilo e avatar aggiornati con successo in tutto l\'ecosistema!');
         document.getElementById('edit-profile-modal').style.display = 'none';
@@ -5198,10 +5291,30 @@ window.saveProfileData = async function() {
     }
 };
 
+/* =========================================
+   HEADER USER DROPDOWN CONTROLLERS
+========================================= */
+window.toggleUserDropdown = function(e) {
+    if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+    const dd = document.getElementById('header-user-dropdown');
+    if (!dd) return;
+    if (dd.classList.contains('hidden')) {
+        dd.classList.remove('hidden');
+    } else {
+        dd.classList.add('hidden');
+    }
+};
+
+window.closeUserDropdown = function() {
+    const dd = document.getElementById('header-user-dropdown');
+    if (dd) dd.classList.add('hidden');
+};
+
 // Chiusura automatica dropdown al click esterno
 window.addEventListener('click', () => {
-    const dd = document.getElementById('fanta-user-dropdown');
-    if (dd && dd.style.display !== 'none') {
-        dd.style.display = 'none';
+    window.closeUserDropdown();
+    const ddOld = document.getElementById('fanta-user-dropdown');
+    if (ddOld && ddOld.style.display !== 'none') {
+        ddOld.style.display = 'none';
     }
 });

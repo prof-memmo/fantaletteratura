@@ -8,39 +8,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Fantaletteratura - Admin</title>
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=20260824_clean_minigames">
+    <link rel="stylesheet" href="css/style.css?v=20261004_header_unificato">
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="no-sidebar">
     <div id="app-container" style="display:none;">
-        <!-- Top Navigation -->
-        <header class="top-nav glass" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <a href="index.html" class="btn btn-secondary" style="margin: 0; padding: 6px 14px; font-size: 0.85rem; text-decoration: none; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; font-weight: 600;">
-                    <i class="fa-solid fa-house"></i> <span class="hide-mobile">Home Gioco</span>
-                </a>
-                <div class="page-title" id="page-title" style="margin: 0; font-weight: 800; font-size: 1.1rem; color: var(--accent-gold);">
-                    <i class="fa-solid fa-shield-halved"></i> Pannello Admin
+        <!-- HEADER DELL'ECOSISTEMA (BRAND UNIFORME) -->
+        <header class="app-header" id="main-app-header">
+            <!-- Sinistra: Logo Fantaletteratura Header -->
+            <div class="header-left">
+                <img src="assets/branding/fantaletteratura-header.png" alt="Logo Fantaletteratura" class="header-game-logo" onclick="window.location.href='index.html'">
+            </div>
+
+            <!-- Centro: Logo Avatar Prof. Memmo -->
+            <div class="header-center-logo">
+                <div class="header-prof-logo-wrapper" onclick="window.location.href='index.html'" title="Home Fantaletteratura">
+                    <img src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png" class="header-prof-logo" alt="Prof. Memmo Logo">
                 </div>
             </div>
-            
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <!-- Pulsante Musica -->
-                <button class="btn btn-secondary" style="width: 36px; height: 36px; padding: 0; border-radius: 50%; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; margin: 0; cursor: pointer;" onclick="window.MusicPlayer && window.MusicPlayer.togglePopup(); return false;" data-tooltip="Lettore Musicale">
-                    <i class="fa-solid fa-music"></i>
-                </button>
-                
-                <!-- Campanella Notifiche con Badge -->
-                <button class="btn btn-secondary" style="width: 36px; height: 36px; padding: 0; border-radius: 50%; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; position: relative; margin: 0; cursor: pointer;" onclick="apriNotificheModal()">
-                    <i class="fa-solid fa-bell"></i>
-                    <span id="notification-badge" style="display: none; position: absolute; top: -3px; right: -3px; background: #e63946; color: white; font-size: 0.6rem; font-weight: bold; width: 16px; height: 16px; border-radius: 50%; align-items: center; justify-content: center; border: 1.5px solid var(--bg-dark);">0</span>
-                </button>
-                
-                <!-- Pulsante Esci -->
-                <button class="btn btn-secondary" style="width: auto; padding: 8px 15px; border-radius: 20px; font-size: 0.8rem; margin: 0; display: flex; align-items: center; gap: 6px;" onclick="logoutDocente()">
-                    <i class="fa-solid fa-right-from-bracket"></i> <span class="hide-mobile">Esci</span>
-                </button>
+
+            <!-- Destra: Pillola Profilo Utente & Dropdown Menu -->
+            <div class="header-right">
+                <div class="user-menu-container" id="header-user-container">
+                    <div class="user-menu-trigger" id="header-user-menu-trigger" onclick="event.stopPropagation(); window.toggleUserDropdown(event);">
+                        <div class="user-avatar-circle">
+                            <img id="header-user-avatar-img" src="assets/avatars/6.png" alt="Avatar">
+                        </div>
+                        <div class="user-trigger-text">
+                            <span class="user-trigger-name" id="header-user-name">PROF. MEMMO</span>
+                            <span class="user-trigger-role" id="header-user-role">AMMINISTRATORE</span>
+                        </div>
+                        <span id="header-notification-badge" class="badge-notif-pill" style="display: none;">0</span>
+                        <span class="user-trigger-chevron"><i class="fa-solid fa-chevron-down"></i></span>
+                    </div>
+
+                    <!-- Dropdown Card -->
+                    <div class="user-dropdown hidden" id="header-user-dropdown" onclick="event.stopPropagation()">
+                        <div class="dropdown-user-header">
+                            <div class="dropdown-user-title" id="dropdown-user-title">PROF. MEMMO</div>
+                            <div class="dropdown-user-subtitle" id="dropdown-user-subtitle">AMMINISTRATORE</div>
+                        </div>
+
+                        <button class="dropdown-pill-btn" onclick="window.location.href='index.html'">
+                            <i class="fa-solid fa-house"></i> Home Gioco
+                        </button>
+
+                        <button class="dropdown-pill-btn" onclick="window.closeUserDropdown(); window.openEditProfileModal ? window.openEditProfileModal() : null;">
+                            <i class="fa-solid fa-user-gear"></i> Modifica Profilo
+                        </button>
+
+                        <div class="dropdown-split-row">
+                            <button class="dropdown-pill-btn" onclick="window.open('privacy.html', '_blank')">
+                                <i class="fa-solid fa-shield"></i> Privacy
+                            </button>
+                            <button class="dropdown-pill-btn" onclick="window.open('termini.html', '_blank')">
+                                <i class="fa-solid fa-scroll"></i> Termini
+                            </button>
+                        </div>
+
+                        <div class="dropdown-bottom-row">
+                            <button class="dropdown-pill-btn btn-notifiche-pill" onclick="window.closeUserDropdown(); apriNotificheModal();">
+                                <i class="fa-solid fa-bell"></i> Notifiche <span id="notification-badge" class="badge-notif-pill" style="display:none;">0</span>
+                            </button>
+                            <button class="dropdown-pill-btn btn-esci-pill" onclick="window.closeUserDropdown(); logoutDocente();">
+                                <i class="fa-solid fa-power-off"></i> Esci
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </header>
 

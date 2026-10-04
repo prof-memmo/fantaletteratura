@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Fantaletteratura</title>
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=20260930_salagiochi_v2">
+    <link rel="stylesheet" href="css/style.css?v=20261004_header_unificato">
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -19,7 +19,80 @@
 </head>
 <body class="no-sidebar">
     <div id="app-container">
-        <!-- SIDEBAR REMOVED AS REQUESTED -->
+        <!-- HEADER DELL'ECOSISTEMA (BRAND UNIFORME) -->
+        <header class="app-header" id="main-app-header">
+            <!-- Sinistra: Logo Fantaletteratura Header -->
+            <div class="header-left">
+                <img src="assets/branding/fantaletteratura-header.png" alt="Logo Fantaletteratura" class="header-game-logo" onclick="navigateTo('view-welcome')">
+            </div>
+
+            <!-- Centro: Logo Avatar Prof. Memmo -->
+            <div class="header-center-logo">
+                <div class="header-prof-logo-wrapper" onclick="navigateTo('view-welcome')" title="Home Fantaletteratura">
+                    <img src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png" class="header-prof-logo" alt="Prof. Memmo Logo">
+                </div>
+            </div>
+
+            <!-- Destra: Pillola Profilo Utente & Dropdown Menu -->
+            <div class="header-right">
+                <div class="user-menu-container" id="header-user-container">
+                    <div class="user-menu-trigger" id="header-user-menu-trigger" onclick="event.stopPropagation(); window.toggleUserDropdown(event);">
+                        <div class="user-avatar-circle">
+                            <img id="header-user-avatar-img" src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png" alt="Avatar" onerror="this.src='https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png'">
+                        </div>
+                        <div class="user-trigger-text">
+                            <span class="user-trigger-name" id="header-user-name">OSPITE</span>
+                            <span class="user-trigger-role" id="header-user-role">NON REGISTRATO</span>
+                        </div>
+                        <span id="header-notification-badge" class="badge-notif-pill" style="display: none;">0</span>
+                        <span class="user-trigger-chevron"><i class="fa-solid fa-chevron-down"></i></span>
+                    </div>
+
+                    <!-- Dropdown Card -->
+                    <div class="user-dropdown hidden" id="header-user-dropdown" onclick="event.stopPropagation()">
+                        <div class="dropdown-user-header">
+                            <div class="dropdown-user-title" id="dropdown-user-title">OSPITE</div>
+                            <div class="dropdown-user-subtitle" id="dropdown-user-subtitle">NON AUTENTICATO</div>
+                        </div>
+
+                        <!-- Golden Pill Login Button (visibile per ospiti) -->
+                        <button class="dropdown-pill-btn" id="btn-login-hub-dropdown" style="background: linear-gradient(135deg, var(--primary-color) 0%, #68792b 100%); color: #0f1108; font-weight: 800;" onclick="window.location.href='https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html?redirect=fantaletteratura'">
+                            <i class="fa-solid fa-right-to-bracket"></i> Accedi tramite Hub
+                        </button>
+
+                        <button class="dropdown-pill-btn" id="btn-profile-dropdown" style="display: none;" onclick="window.closeUserDropdown(); window.openEditProfileModal();">
+                            <i class="fa-solid fa-user-gear"></i> Modifica Profilo
+                        </button>
+
+                        <button class="dropdown-pill-btn" id="btn-invite-dropdown" style="display: none;" onclick="window.closeUserDropdown(); openInviteModal();">
+                            <i class="fa-solid fa-paper-plane"></i> Invita un Collega
+                        </button>
+
+                        <div class="dropdown-split-row">
+                            <button class="dropdown-pill-btn" onclick="window.closeUserDropdown(); window.openSharedModal ? window.openSharedModal('privacy') : (window.openLegalModal ? window.openLegalModal('privacy') : null);">
+                                <i class="fa-solid fa-shield"></i> Privacy
+                            </button>
+                            <button class="dropdown-pill-btn" onclick="window.closeUserDropdown(); window.openSharedModal ? window.openSharedModal('termini') : (window.openLegalModal ? window.openLegalModal('terms') : null);">
+                                <i class="fa-solid fa-scroll"></i> Termini
+                            </button>
+                        </div>
+
+                        <button class="dropdown-pill-btn" onclick="window.closeUserDropdown(); if(window.showContattiModal) window.showContattiModal(); else window.open('https://prof-memmo.github.io/games/contatti.html', '_blank');">
+                            <i class="fa-solid fa-envelope"></i> Contatti
+                        </button>
+
+                        <div class="dropdown-bottom-row" id="dropdown-bottom-row" style="display: none;">
+                            <button class="dropdown-pill-btn btn-notifiche-pill" onclick="window.closeUserDropdown(); apriNotificheModal();">
+                                <i class="fa-solid fa-bell"></i> Notifiche <span id="dropdown-notif-badge" class="badge-notif-pill" style="display:none;">0</span>
+                            </button>
+                            <button class="dropdown-pill-btn btn-esci-pill" onclick="window.closeUserDropdown(); logoutDocente();">
+                                <i class="fa-solid fa-power-off"></i> Esci
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
 
         <!-- VIEWS -->
         <main id="main-content">
@@ -766,54 +839,19 @@
 
                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; flex-wrap: wrap;">
                       <div style="display: flex; align-items: center; gap: 12px;">
-                          <h2 style="margin: 0;">Pannello Docente</h2>
-                      </div>
-                      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                          <!-- User Profile Dropdown Trigger & Modal -->
-                          <div style="position: relative; z-index: 100;">
-                              <div onclick="event.stopPropagation(); const dd = document.getElementById('fanta-user-dropdown'); dd.style.display = dd.style.display === 'flex' ? 'none' : 'flex';" style="display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.4); border: 1.5px solid var(--accent-gold); padding: 4px 12px 4px 4px; border-radius: 30px; cursor: pointer; color: white;">
-                                  <img id="profilo-avatar-img" src="assets/avatars/6.png" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--accent-gold); background: #ffffff; padding: 1px;">
-                                  <span id="profilo-display-name" style="font-size: 0.85rem; font-weight: 700; max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Profilo</span>
-                                  <span style="font-size: 0.65rem; color: var(--accent-gold);">▼</span>
-                              </div>
-
-                              <div id="fanta-user-dropdown" onclick="event.stopPropagation()" style="display: none; position: absolute; top: calc(100% + 8px); right: 0; background: #1a1614; border: 1px solid var(--accent-gold); border-radius: 12px; padding: 14px; width: 240px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); flex-direction: column; gap: 8px; z-index: 1000;">
-                                  <div style="font-size: 0.85rem; font-weight: 700; color: var(--accent-gold); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px; margin-bottom: 2px;">
-                                      <span id="fanta-dd-username">Docente</span><br>
-                                      <span style="font-size: 0.72rem; color: #888; font-weight: normal; text-transform: uppercase;">Docente Registrato</span>
-                                  </div>
-
-                                  <button class="btn btn-secondary" onclick="document.getElementById('fanta-user-dropdown').style.display='none'; window.openEditProfileModal();" style="width: 100%; border-radius: 8px; padding: 8px; font-size: 0.8rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #ccc; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 8px;">
-                                      <i class="fa-solid fa-user-gear"></i> Modifica Profilo
-                                  </button>
-
-                                  <button class="btn btn-secondary" onclick="document.getElementById('fanta-user-dropdown').style.display='none'; openInviteModal();" style="width: 100%; border-radius: 8px; padding: 8px; font-size: 0.8rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #ccc; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 8px;">
-                                      <i class="fa-solid fa-paper-plane" style="color:#ffffff;"></i> Invita un Collega
-                                  </button>
-
-                                  <div style="display: flex; gap: 6px; width: 100%;">
-                                      <button class="btn btn-secondary" onclick="document.getElementById('fanta-user-dropdown').style.display='none'; window.openSharedModal ? window.openSharedModal('privacy') : (window.openLegalModal ? window.openLegalModal('privacy') : null);" style="flex: 1; border-radius: 8px; padding: 8px; font-size: 0.8rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #ccc; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                                          <i class="fa-solid fa-shield"></i> Privacy
-                                      </button>
-                                      <button class="btn btn-secondary" onclick="document.getElementById('fanta-user-dropdown').style.display='none'; window.openSharedModal ? window.openSharedModal('termini') : (window.openLegalModal ? window.openLegalModal('terms') : null);" style="flex: 1; border-radius: 8px; padding: 8px; font-size: 0.8rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #ccc; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                                          <i class="fa-solid fa-scroll"></i> Termini
-                                      </button>
-                                  </div>
-
-                                  <button class="btn btn-secondary" onclick="document.getElementById('fanta-user-dropdown').style.display='none'; if(window.showContattiModal) window.showContattiModal(); else window.open('https://prof-memmo.github.io/games/contatti.html', '_blank');" style="width: 100%; border-radius: 8px; padding: 8px; font-size: 0.8rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #ccc; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 8px;">
-                                      <i class="fa-solid fa-envelope"></i> Contatti
-                                  </button>
-
-                                  <div style="display: flex; gap: 6px; width: 100%; margin-top: 4px;">
-                                      <button class="btn btn-secondary" onclick="document.getElementById('fanta-user-dropdown').style.display='none'; apriNotificheModal();" style="flex: 1; border-radius: 8px; padding: 8px; font-size: 0.78rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #ccc; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                                          <i class="fa-solid fa-bell"></i> Notifiche
-                                      </button>
-                                      <button class="btn btn-danger" onclick="document.getElementById('fanta-user-dropdown').style.display='none'; logoutDocente();" style="flex: 1; border-radius: 8px; padding: 8px; font-size: 0.78rem; background: #dc2626; border: none; color: white; cursor: pointer; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                                          <i class="fa-solid fa-power-off"></i> Esci
-                                      </button>
-                                  </div>
-                              </div>
+                          <img id="profilo-avatar-img" src="assets/avatars/6.png" alt="Avatar" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-color); background: #ffffff; padding: 1px;">
+                          <div>
+                              <h2 style="margin: 0; font-size: 1.3rem;">Pannello Docente</h2>
+                              <span id="profilo-display-name" style="font-size: 0.85rem; color: var(--primary-color); font-weight: 700;">Docente</span>
                           </div>
+                      </div>
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                          <button class="btn btn-secondary" onclick="window.openEditProfileModal();" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 20px; width: auto; margin: 0;">
+                              <i class="fa-solid fa-user-gear"></i> Modifica
+                          </button>
+                          <button class="btn" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 20px; width: auto; background: var(--primary-color); color: #000; font-weight: 700; margin: 0;" onclick="openInviteModal();">
+                              <i class="fa-solid fa-paper-plane"></i> Invita
+                          </button>
                       </div>
                   </div>
                   <input type="text" id="profilo-email" class="input-control mb-2" value="" readonly style="background: rgba(255,255,255,0.05); color: #aaa;">
@@ -1865,20 +1903,20 @@
     </script>
 
     <!-- Scripts -->
-    <script src="js/data.js?v=20260930_salagiochi_v2"></script>
-    <script src="js/services/calendar-service.js?v=20260930_salagiochi_v2"></script>
-    <script src="js/services/imprevisti-service.js?v=20260930_salagiochi_v2"></script>
-    <script src="js/services/rules-service.js?v=20260930_salagiochi_v2"></script>
-    <script src="js/services/miniguida-service.js?v=20260930_salagiochi_v2"></script>
-    <script src="js/music.js?v=20260930_salagiochi_v2"></script>
-    <script src="js/minigames.js?v=20260930_salagiochi_v2"></script>
+    <script src="js/data.js?v=20261004_header_unificato"></script>
+    <script src="js/services/calendar-service.js?v=20261004_header_unificato"></script>
+    <script src="js/services/imprevisti-service.js?v=20261004_header_unificato"></script>
+    <script src="js/services/rules-service.js?v=20261004_header_unificato"></script>
+    <script src="js/services/miniguida-service.js?v=20261004_header_unificato"></script>
+    <script src="js/music.js?v=20261004_header_unificato"></script>
+    <script src="js/minigames.js?v=20261004_header_unificato"></script>
     <!-- Components -->
-    <script src="js/components/navbar.js?v=20260930_salagiochi_v2"></script>
-    <script src="js/components/modals.js?v=20260930_salagiochi_v2"></script>
+    <script src="js/components/navbar.js?v=20261004_header_unificato"></script>
+    <script src="js/components/modals.js?v=20261004_header_unificato"></script>
     <!-- Dashboard -->
-    <script src="js/dashboard/admin-logic.js?v=20260930_salagiochi_v2"></script>
-    <script src="js/live-editor.js?v=20260930_salagiochi_v2"></script>
-    <script src="js/app.js?v=20260930_salagiochi_v2"></script>
+    <script src="js/dashboard/admin-logic.js?v=20261004_header_unificato"></script>
+    <script src="js/live-editor.js?v=20261004_header_unificato"></script>
+    <script src="js/app.js?v=20261004_header_unificato"></script>
     <!-- Modali condivisi ed Access Control ecosistema Prof. Memmo -->
     <script>window.HUB_GAME_ID = "fantaletteratura";</script>
     <script src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/hub-subscription-guard.js?v=20260824_clean_minigames"></script>

@@ -7,15 +7,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Privacy Policy - Fantaletteratura</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=20261004_header_unificato">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div id="app-container">
-        <header class="top-nav glass">
-            <a href="index.html" class="menu-btn" style="text-decoration:none; color:inherit; display:flex; align-items:center; justify-content:center;"><i class="fa-solid fa-arrow-left"></i></a>
-            <div class="page-title">Privacy Policy</div>
-            <div style="width: 24px;"></div>
+        <!-- HEADER DELL'ECOSISTEMA (BRAND UNIFORME) -->
+        <header class="app-header" id="main-app-header">
+            <!-- Sinistra: Logo Fantaletteratura Header -->
+            <div class="header-left">
+                <img src="assets/branding/fantaletteratura-header.png" alt="Logo Fantaletteratura" class="header-game-logo" onclick="window.location.href='index.html'">
+            </div>
+
+            <!-- Centro: Logo Avatar Prof. Memmo -->
+            <div class="header-center-logo">
+                <div class="header-prof-logo-wrapper" onclick="window.location.href='index.html'" title="Home Fantaletteratura">
+                    <img src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png" class="header-prof-logo" alt="Prof. Memmo Logo">
+                </div>
+            </div>
+
+            <!-- Destra: Ritorno al Gioco -->
+            <div class="header-right">
+                <a href="index.html" class="btn" style="background: var(--primary-color); color: #000; font-weight: 800; font-size: 0.8rem; padding: 7px 16px; border-radius: 50px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-arrow-left"></i> Torna al Gioco
+                </a>
+            </div>
         </header>
 
         <main id="main-content" style="padding: 20px; padding-bottom: 80px;">

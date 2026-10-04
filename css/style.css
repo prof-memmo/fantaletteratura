@@ -24,6 +24,325 @@
     --font-body: 'Julius Sans One', sans-serif;
 }
 
+/* ==========================================
+   HEADER DELL'ECOSISTEMA UNIFICATO
+   ========================================== */
+.app-header {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 75px;
+    background: #000000;
+    border-bottom: 1.5px solid rgba(141, 160, 63, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 2500;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-game-logo {
+    height: 52px;
+    width: auto;
+    object-fit: contain;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.header-game-logo:hover {
+    transform: scale(1.03);
+}
+
+.header-center-logo {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.header-prof-logo-wrapper {
+    pointer-events: auto;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+}
+
+.header-prof-logo-wrapper:hover {
+    transform: scale(1.08);
+}
+
+.header-prof-logo {
+    height: 48px;
+    width: auto;
+    object-fit: contain;
+    opacity: 0.95;
+    transition: opacity 0.2s ease;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* ==========================================
+   USER MENU TRIGGER PILL & DROPDOWN
+   ========================================== */
+.user-menu-container {
+    position: relative;
+    z-index: 2600;
+}
+
+.user-menu-trigger {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #080c04;
+    padding: 4px 14px 4px 5px;
+    border-radius: 50px;
+    border: 1.8px solid var(--primary-color);
+    cursor: pointer;
+    color: #fff;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.6);
+    user-select: none;
+}
+
+.user-menu-trigger:hover {
+    background: #141c0a;
+    border-color: var(--primary-hover);
+    box-shadow: 0 0 15px rgba(141, 160, 63, 0.4);
+}
+
+.user-avatar-circle {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1.5px solid var(--primary-color);
+    flex-shrink: 0;
+}
+
+.user-avatar-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-trigger-text {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    line-height: 1.15;
+}
+
+.user-trigger-name {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    max-width: 140px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-trigger-role {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.user-trigger-chevron {
+    font-size: 0.7rem;
+    color: var(--primary-color);
+    margin-left: 2px;
+}
+
+.badge-notif-pill {
+    background: #e63946;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 12px;
+    margin-left: 2px;
+    box-shadow: 0 0 8px rgba(230, 57, 70, 0.8);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Dropdown Card */
+.user-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 290px;
+    background: #11160a;
+    border: 1.8px solid var(--primary-color);
+    border-radius: 18px;
+    padding: 16px 14px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.95);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 3000;
+    backdrop-filter: blur(15px);
+}
+
+.user-dropdown.hidden {
+    display: none !important;
+}
+
+.dropdown-user-header {
+    text-align: left;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-user-title {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dropdown-user-subtitle {
+    font-size: 0.72rem;
+    color: #888;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-top: 2px;
+}
+
+/* Pill Action Buttons inside Dropdown */
+.dropdown-pill-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 9px 12px;
+    border-radius: 50px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1.5px solid var(--primary-color);
+    color: #ffffff;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.15s ease;
+}
+
+.dropdown-pill-btn:hover {
+    background: rgba(141, 160, 63, 0.2);
+    border-color: var(--primary-hover);
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.dropdown-pill-btn i {
+    font-size: 0.85rem;
+}
+
+.dropdown-split-row {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+}
+
+.dropdown-split-row .dropdown-pill-btn {
+    flex: 1;
+}
+
+.dropdown-bottom-row {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    margin-top: 2px;
+}
+
+.dropdown-pill-btn.btn-notifiche-pill {
+    flex: 1.2;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1.5px solid var(--primary-color);
+    color: #ffffff;
+    position: relative;
+}
+
+.dropdown-pill-btn.btn-notifiche-pill:hover {
+    background: rgba(141, 160, 63, 0.25);
+}
+
+.dropdown-pill-btn.btn-esci-pill {
+    flex: 1;
+    background: var(--primary-color);
+    border: 1.5px solid var(--primary-color);
+    color: #0f1108;
+    font-weight: 800;
+}
+
+.dropdown-pill-btn.btn-esci-pill:hover {
+    background: var(--primary-hover);
+    border-color: var(--primary-hover);
+    color: #000;
+}
+
+@media (max-width: 768px) {
+    .app-header {
+        height: 65px;
+        padding: 0 12px;
+    }
+    .header-game-logo {
+        height: 42px;
+    }
+    .header-prof-logo {
+        height: 40px;
+    }
+    .user-trigger-text {
+        display: none;
+    }
+    .user-menu-trigger {
+        padding: 4px;
+        border-radius: 50%;
+    }
+    .user-avatar-circle {
+        width: 32px;
+        height: 32px;
+    }
+    .user-trigger-chevron {
+        display: none;
+    }
+}
+
 * {
     font-family: 'Julius Sans One', sans-serif;
 }
