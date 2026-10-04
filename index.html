@@ -1,27 +1,124 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
+    <!-- Favicon & Touch Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png?v=3">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=3">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Fantaletteratura</title>
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=20260824_clean_minigames">
+    <link rel="stylesheet" href="css/style.css?v=20261004_header_unificato">
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <!-- Icone per Safari e Dispositivi Mobili -->
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-fanta.png?v=6">
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon-fanta.png?v=2">
   <link rel="manifest" href="manifest.json">
   <script>window.HUB_GAME_ID = "fantaletteratura";</script>
   <script src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/hub-subscription-guard.js?v=20260823e_subscription_guard"></script>
 </head>
 <body class="no-sidebar">
     <div id="app-container">
-        <!-- SIDEBAR REMOVED AS REQUESTED -->
+        <!-- HEADER DELL'ECOSISTEMA (BRAND UNIFORME) -->
+        <header class="app-header" id="main-app-header">
+            <!-- Sinistra: Logo Fantaletteratura Header -->
+            <div class="header-left">
+                <img src="assets/branding/fantaletteratura-header.png" alt="Logo Fantaletteratura" class="header-game-logo" onclick="navigateTo('view-welcome')">
+            </div>
+
+            <!-- Centro: Logo Avatar Prof. Memmo -->
+            <div class="header-center-logo">
+                <div class="header-prof-logo-wrapper" onclick="navigateTo('view-welcome')" title="Home Fantaletteratura">
+                    <img src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png" class="header-prof-logo" alt="Prof. Memmo Logo">
+                </div>
+            </div>
+
+            <!-- Destra: Pillola Profilo Utente & Dropdown Menu -->
+            <div class="header-right">
+                <div class="user-menu-container" id="header-user-container">
+                    <div class="user-menu-trigger" id="header-user-menu-trigger" onclick="event.stopPropagation(); window.toggleUserDropdown(event);">
+                        <div class="user-avatar-circle">
+                            <img id="header-user-avatar-img" src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png" alt="Avatar" onerror="this.src='https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png'">
+                            <script>
+                                (function(){
+                                    try {
+                                        var av = localStorage.getItem('fanta_user_avatar') || localStorage.getItem('hub_user_avatar');
+                                        if (av) {
+                                            var el = document.getElementById('header-user-avatar-img');
+                                            if (el) el.src = av;
+                                        }
+                                        var nm = localStorage.getItem('fanta_user_name') || localStorage.getItem('hub_user_name');
+                                        if (nm) {
+                                            var elN = document.getElementById('header-user-name');
+                                            if (elN) elN.textContent = nm;
+                                            var elT = document.getElementById('dropdown-user-title');
+                                            if (elT) elT.textContent = nm;
+                                        }
+                                    } catch(e){}
+                                })();
+                            </script>
+                        </div>
+                        <div class="user-trigger-text">
+                            <span class="user-trigger-name" id="header-user-name">OSPITE</span>
+                            <span class="user-trigger-role" id="header-user-role">NON REGISTRATO</span>
+                        </div>
+                        <span id="header-notification-badge" class="badge-notif-pill" style="display: none;">0</span>
+                        <span class="user-trigger-chevron"><i class="fa-solid fa-chevron-down"></i></span>
+                    </div>
+
+                    <!-- Dropdown Card -->
+                    <div class="user-dropdown hidden" id="header-user-dropdown" onclick="event.stopPropagation()">
+                        <div class="dropdown-user-header">
+                            <div class="dropdown-user-title" id="dropdown-user-title">OSPITE</div>
+                            <div class="dropdown-user-subtitle" id="dropdown-user-subtitle">NON AUTENTICATO</div>
+                        </div>
+
+                        <!-- Golden Pill Login Button (visibile per ospiti) -->
+                        <button class="dropdown-pill-btn" id="btn-login-hub-dropdown" style="background: linear-gradient(135deg, var(--primary-color) 0%, #68792b 100%); color: #0f1108; font-weight: 800;" onclick="window.location.href='https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html?redirect=fantaletteratura'">
+                            <i class="fa-solid fa-right-to-bracket"></i> Accedi tramite Hub
+                        </button>
+
+                        <button class="dropdown-pill-btn" id="btn-profile-dropdown" style="display: none;" onclick="window.closeUserDropdown(); window.openEditProfileModal();">
+                            <i class="fa-solid fa-user-gear"></i> Modifica Profilo
+                        </button>
+
+                        <button class="dropdown-pill-btn" id="btn-invite-dropdown" style="display: none;" onclick="window.closeUserDropdown(); openInviteModal();">
+                            <i class="fa-solid fa-paper-plane"></i> Invita un Collega
+                        </button>
+
+                        <div class="dropdown-split-row">
+                            <button class="dropdown-pill-btn" onclick="window.closeUserDropdown(); window.openSharedModal ? window.openSharedModal('privacy') : (window.openLegalModal ? window.openLegalModal('privacy') : null);">
+                                <i class="fa-solid fa-shield"></i> Privacy
+                            </button>
+                            <button class="dropdown-pill-btn" onclick="window.closeUserDropdown(); window.openSharedModal ? window.openSharedModal('termini') : (window.openLegalModal ? window.openLegalModal('terms') : null);">
+                                <i class="fa-solid fa-scroll"></i> Termini
+                            </button>
+                        </div>
+
+                        <button class="dropdown-pill-btn" onclick="window.closeUserDropdown(); if(window.showContattiModal) window.showContattiModal(); else window.open('https://prof-memmo.github.io/games/contatti.html', '_blank');">
+                            <i class="fa-solid fa-envelope"></i> Contatti
+                        </button>
+
+                        <div class="dropdown-bottom-row" id="dropdown-bottom-row" style="display: none;">
+                            <button class="dropdown-pill-btn btn-notifiche-pill" onclick="window.closeUserDropdown(); apriNotificheModal();">
+                                <i class="fa-solid fa-bell"></i> Notifiche <span id="dropdown-notif-badge" class="badge-notif-pill" style="display:none;">0</span>
+                            </button>
+                            <button class="dropdown-pill-btn btn-esci-pill" onclick="window.closeUserDropdown(); logoutDocente();">
+                                <i class="fa-solid fa-power-off"></i> Esci
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
 
         <!-- VIEWS -->
         <main id="main-content">
+            
+            <!-- BANNER BOLLETTINO IMPREVISTI & MERCATO (READ-ONLY PER STUDENTI) -->
+            <div id="student-imprevisti-banner" style="display:none; margin: 10px auto 18px auto; max-width: 900px; padding: 0 15px;">
+                <!-- Popolato dinamicamente da JS quando un evento è attivo -->
+            </div>
             
             <!-- VIEW: Pausa Obbligatoria -->
             <section id="view-pausa-obbligatoria" class="view" style="display: none;">
@@ -54,7 +151,7 @@
 
                 <h1 class="text-center">Benvenuto in Fantaletteratura!<br>Clicca sul pulsante, crea la tua squadra e completa le missioni!</h1>
                 <div class="logo-container">
-                    <img src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/games/fantaletteratura-badge.png" alt="Logo Fantaletteratura" class="logo-circle fanta-logo-glow">
+                    <img src="assets/branding/fantaletteratura-badge.png?v=20261004_v2" alt="Logo Fantaletteratura" class="logo-circle fanta-logo-glow">
                 </div>
                 <div class="glass" style="padding: 20px; margin-top: 20px; max-width: 440px; margin-left: auto; margin-right: auto; text-align: center;" id="login-section">
                     <p class="text-center" style="font-size: 0.95rem; color: #fff; margin-bottom: 18px; font-weight: 500;">Accedi o registrati per iniziare a giocare.</p>
@@ -182,10 +279,6 @@
                         <label>Nome della squadra</label>
                         <input type="text" class="input-control" placeholder="Es: I Promessi Sposi">
                     </div>
-                    <div class="input-group">
-                        <label>Classe</label>
-                        <input type="text" id="team-classe-input" class="input-control" placeholder="Es: 3A">
-                    </div>
 
                     <!-- SELEZIONE MODALITÀ -->
                     <label style="margin-bottom: 12px; display: block; font-size:0.9rem; color:var(--text-muted);">Scegli la modalità di gioco per questa squadra</label>
@@ -204,47 +297,45 @@
                         </button>
                     </div>
 
-                    <!-- SLOT AUTORI (nascosti finché non si sceglie modalità) -->
-                    <div id="author-slots-section" style="display:none;">
-                        <label style="margin-bottom: 10px; display: block;">Seleziona le 5 Star</label>
-                        <div style="display:flex; flex-direction:column; gap:10px; margin-bottom: 20px;">
-                            <div class="author-slot-wrapper">
-                                <button class="btn btn-secondary author-slot-btn" data-slot="1" style="display:flex; justify-content:space-between; align-items:center;"><span class="slot-name"><i class="fa-solid fa-plus"></i> Scegli la 1ª star</span> <span class="slot-cost text-primary"></span></button>
-                                <button class="author-remove-btn" data-slot="1" onclick="removeAuthorFromSlot(1)" title="Rimuovi autore"><i class="fa-solid fa-xmark"></i></button>
+                    <!-- SELEZIONE ROSTER & GRIGLIA AUTORI (nascosti finché non si sceglie modalità) -->
+                    <div id="author-slots-section" style="display:none; margin-top:25px;">
+                        
+                        <!-- Le 5 Star Selezionate (Roster) -->
+                        <div class="roster-panel glass" style="padding:15px; border-radius:14px; margin-bottom:20px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                                <label style="margin:0; font-weight:700; font-size:1.05rem; display:flex; align-items:center; gap:8px;">
+                                    <i class="fa-solid fa-star text-gold"></i> Le tue 5 Star
+                                </label>
+                                <span id="roster-count-badge" class="badge" style="background:rgba(245,197,60,0.15); color:#f5c53c; border:1px solid rgba(245,197,60,0.3); font-weight:700; font-size:0.85rem; padding:4px 10px; border-radius:20px;">
+                                    <span id="roster-count">0</span> / 5 Scelte
+                                </span>
                             </div>
-                            <div class="author-slot-wrapper">
-                                <button class="btn btn-secondary author-slot-btn" data-slot="2" style="display:flex; justify-content:space-between; align-items:center;"><span class="slot-name"><i class="fa-solid fa-plus"></i> Scegli la 2ª star</span> <span class="slot-cost text-primary"></span></button>
-                                <button class="author-remove-btn" data-slot="2" onclick="removeAuthorFromSlot(2)" title="Rimuovi autore"><i class="fa-solid fa-xmark"></i></button>
-                            </div>
-                            <div class="author-slot-wrapper">
-                                <button class="btn btn-secondary author-slot-btn" data-slot="3" style="display:flex; justify-content:space-between; align-items:center;"><span class="slot-name"><i class="fa-solid fa-plus"></i> Scegli la 3ª star</span> <span class="slot-cost text-primary"></span></button>
-                                <button class="author-remove-btn" data-slot="3" onclick="removeAuthorFromSlot(3)" title="Rimuovi autore"><i class="fa-solid fa-xmark"></i></button>
-                            </div>
-                            <div class="author-slot-wrapper">
-                                <button class="btn btn-secondary author-slot-btn" data-slot="4" style="display:flex; justify-content:space-between; align-items:center;"><span class="slot-name"><i class="fa-solid fa-plus"></i> Scegli la 4ª star</span> <span class="slot-cost text-primary"></span></button>
-                                <button class="author-remove-btn" data-slot="4" onclick="removeAuthorFromSlot(4)" title="Rimuovi autore"><i class="fa-solid fa-xmark"></i></button>
-                            </div>
-                            <div class="author-slot-wrapper">
-                                <button class="btn btn-secondary author-slot-btn" data-slot="5" style="display:flex; justify-content:space-between; align-items:center;"><span class="slot-name"><i class="fa-solid fa-plus"></i> Scegli la 5ª star</span> <span class="slot-cost text-primary"></span></button>
-                                <button class="author-remove-btn" data-slot="5" onclick="removeAuthorFromSlot(5)" title="Rimuovi autore"><i class="fa-solid fa-xmark"></i></button>
+                            
+                            <div id="roster-slots-grid" class="roster-slots-grid">
+                                <!-- Inseriti dinamicamente da JS: 5 slot compatti con miniatura, nome, costo e pulsante rimuovi ✕ -->
                             </div>
                         </div>
-                        <button class="btn" id="btn-save-team" disabled>Salva Squadra</button>
-                    </div>
-                </div>
 
-                <!-- Modale per scelta Star -->
-                <div id="author-selector-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-dark); z-index:2000; overflow-y:auto;">
-                    <div style="padding: 15px; position: sticky; top: 0; background:var(--bg-dark); z-index:10; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center;">
-                        <h3 style="margin:0;">Scegli una star</h3>
-                        <button class="btn-secondary" id="close-author-modal" style="padding: 5px 15px; width:auto; border-radius:20px; border:none;"><i class="fa-solid fa-xmark"></i></button>
-                    </div>
-                    <div style="padding: 15px;">
-                        <div class="input-group">
-                            <input type="text" id="search-author" class="input-control" placeholder="Cerca autore..." style="margin-bottom: 15px;">
+                        <!-- Filtro e Ricerca Autori -->
+                        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
+                            <label style="margin:0; font-weight:600; font-size:0.95rem; color:var(--text-muted);">
+                                <i class="fa-solid fa-users"></i> Scegli gli autori per la tua squadra:
+                            </label>
+                            <div class="input-group" style="margin-bottom:0; max-width:280px; width:100%;">
+                                <input type="text" id="search-author" class="input-control" placeholder="🔍 Cerca autore..." style="padding:8px 12px; font-size:0.9rem;">
+                            </div>
                         </div>
-                        <div id="author-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px;">
+
+                        <!-- Griglia Autori Diretta -->
+                        <div id="author-grid" class="author-direct-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 14px; margin-bottom: 25px;">
                             <!-- Inseriti JS -->
+                        </div>
+
+                        <!-- Pulsante Salva Squadra -->
+                        <div style="position:sticky; bottom:20px; z-index:100; padding:10px 0; background:linear-gradient(to top, var(--bg-dark) 80%, transparent);">
+                            <button class="btn" id="btn-save-team" style="width:100%; font-size:1.1rem; padding:14px; font-weight:bold; box-shadow:0 4px 20px rgba(0,0,0,0.4);" disabled>
+                                <i class="fa-solid fa-check"></i> Salva Squadra
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -252,30 +343,25 @@
 
             <!-- VIEW: Regolamento -->
             <section id="view-regolamento" class="view">
-
-                <div class="glass" style="padding: 20px;">
-                    <div class="text-center mb-2">
-                        <img src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/games/fantaletteratura-badge.png" alt="Logo Fantaletteratura" class="fanta-logo-glow" style="max-height: 120px; width: auto; display: block; margin: 0 auto 15px;">
+                <div id="view-regolamento-content">
+                    <div class="glass" style="padding: 28px 24px; border-radius: 16px; max-width: 900px; margin: 0 auto;">
+                        <div class="text-center mb-4">
+                            <img src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/games/fantaletteratura-badge.png" alt="Logo Fantaletteratura" class="fanta-logo-glow" style="max-height: 120px; width: auto; display: block; margin: 0 auto 14px; filter: drop-shadow(0 0 15px rgba(212,175,55,0.4));">
+                            <h2 style="font-size: 1.6rem; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 4px 0; color: #fff; font-weight: 700;">Regolamento</h2>
+                        </div>
+                        <ul class="rules-list" style="list-style-type: disc; padding-left: 24px; margin: 20px 0 0 0; line-height: 1.85; font-size: 0.95rem; color: #f1f5f9;">
+                            <li style="margin-bottom: 16px; text-align: left;"><strong style="color: #fff; text-transform: uppercase;">Cos'è FantaLetteratura e Profilo Centrale:</strong> Come tutti i giochi dell'ecosistema Prof. Memmo, FantaLetteratura nasce da una libera interpretazione e ha scopo puramente ludico e culturale. Il gioco permette a scuole, classi, docenti e Viandanti di formare la propria squadra ideale acquistando 5 grandi autori della storia letteraria per sfidarsi nel corso dell'anno scolastico. L'accesso, la gestione del proprio account, dei piani e delle classi avvengono tramite il Profilo Centrale unico nel portale vetrina dell'ecosistema.</li>
+                            <li style="margin-bottom: 16px; text-align: left;"><strong style="color: #fff; text-transform: uppercase;">Formazione Squadre, Classi e Docenti Collaboratori:</strong> Le classi e gli elenchi studenti vengono creati e gestiti dal Profilo Docente Centrale e sincronizzati automaticamente nel gioco. In base al piano attivo, il docente titolare può comporre le squadre della propria classe, avviare il draft alla LIM e aggiungere Docenti Collaboratori tramite email per condividere la gestione didattica. I Viandanti possono iscrivere e gestire autonomamente la propria squadra personale. Ogni squadra dispone di un budget iniziale proporzionato alla modalità scelta per acquistare e schierare la propria rosa di 5 autori.</li>
+                            <li style="margin-bottom: 16px; text-align: left;"><strong style="color: #fff; text-transform: uppercase;">Schede Autore, Bonus/Malus e Calendario Social:</strong> Per ogni autore schierato saranno attribuiti bonus e malus legati alla vita, alle opere e alle vicende biografiche dell'autore, pubblicate dal Game Master da ottobre a giugno. I relativi punti saranno attribuiti e visibili nella pagina "Schede" al momento della pubblicazione e sblocco da parte del Game Master. I giocatori riceveranno apposita notifica sul sito ed è possibile seguire ogni uscita passo dopo passo anche attraverso i canali social ufficiali del Prof. Memmo.</li>
+                            <li style="margin-bottom: 16px; text-align: left;"><strong style="color: #fff; text-transform: uppercase;">⚡ Imprevisti Letterari e 🔁 Finestre di Mercato:</strong> Durante l'anno scolastico verranno pubblicati eventi speciali e imprevisti storici/letterari autentici tramite il Bollettino della Gazzetta (annunciati anche sui canali social), che assegneranno bonus o malus dinamici agli autori schierati nelle rose. Sono inoltre previste sessioni ufficiali di riparazione (sessione autunnale e sessione primaverile) in cui ogni squadra potrà effettuare 1 cambio nella propria rosa di 5 autori per ottimizzare la propria strategia di gioco.</li>
+                            <li style="margin-bottom: 16px; text-align: left;"><strong style="color: #fff; text-transform: uppercase;">Missioni Didattiche (+5 Punti):</strong> Esistono bonus dinamici che possono essere caricati in "Missioni" (riservati esclusivamente a docenti e studenti) e formeranno un'apposita graduatoria. I bonus dinamici sono legati ad attività di classe, approfondimenti, performance e scoperte e hanno un valore standard di 5 punti per ogni missione approvata.</li>
+                            <li style="margin-bottom: 16px; text-align: left;"><strong style="color: #fff; text-transform: uppercase;">Minigiochi Didattici in Classe:</strong> I docenti possono sfidare le squadre della classe tramite appositi minigiochi interattivi (Quiz, Impiccato, Cloze, Puzzle e Versi) proiettabili alla LIM o giocabili dagli studenti. Le manche consentono di verificare le conoscenze sugli autori e sulle opere studiate, accumulando punti extra per la classe e tenendo traccia dei progressi nello storico delle sfide.</li>
+                            <li style="margin-bottom: 16px; text-align: left;"><strong style="color: #fff; text-transform: uppercase;">Tornei Interscolastici e Privati:</strong> Docenti e Viandanti possono creare o partecipare ai tornei. I docenti possono invitare colleghi tramite Codice Invito per gareggiare tra classi o istituti scolastici diversi, mentre i Viandanti possono creare tornei dedicati per sfidarsi tra loro e scalare graduatorie riservate!</li>
+                            <li style="margin-bottom: 16px; text-align: left;"><strong style="color: #fff; text-transform: uppercase;">Classifiche e Vittoria Finale:</strong> Il gioco si articola in Classifiche ufficiali: Classifica Autori (calcolata sui punti dei 5 autori e aperta a tutti), Classifica Missioni (riservata alle sole attività didattiche scolastiche) e Classifica Globale (che somma autori e missioni per decretare le classi campionesse, con graduatorie distinte per le scuole e per i Viandanti). Vince chi, nella prima settimana di Giugno alla chiusura dell'anno scolastico, ha totalizzato il maggior numero di punti.</li>
+                            <li style="margin-bottom: 16px; text-align: left;"><strong style="color: #fff; text-transform: uppercase;">Benessere degli Studenti e Riposo Digitale:</strong> A tutela del benessere visivo e cognitivo degli studenti, dopo 45 minuti di permanenza sulla piattaforma ogni sessione verrà temporaneamente bloccata per una Pausa obbligatoria di 15 minuti (Diritto al riposo digitale). Agli studenti non è permesso completare più di 2 sessioni di studio giornaliere (max 90 minuti al giorno complessivi). Questa limitazione oraria non si applica ai profili dei docenti né a quelli dei Viandanti.</li>
+                            <li style="margin-bottom: 16px; text-align: left;"><strong style="color: #fff; text-transform: uppercase;">Codice Etico e Aggiornamenti del Regolamento:</strong> Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma sempre rispettoso, che anima il gioco. Nessun bonus o malus può essere interpretato come un'esortazione a compiere atti illeciti o irrispettosi nei confronti di altri individui o della collettività. Il regolamento potrà subire variazioni e integrazioni ufficiali da parte del Team.</li>
+                        </ul>
                     </div>
-                    <h2 class="text-center mb-2">Regolamento<br>Fantaletteratura</h2>
-                    <ul class="rules-list" style="font-size: 0.95rem; line-height: 1.5; padding-left: 20px;">
-                        <li>Il gioco nasce da una libera interpretazione e ha scopo puramente ludico e didattico.</li>
-                        <li><strong>Diritto al riposo digitale:</strong> Dopo 45 minuti di permanenza sulla piattaforma, ogni studente verrà bloccato e forzato a una Pausa di 15 minuti.</li>
-                        <li><strong>Limite Sessioni:</strong> Non è permesso completare più di 2 sessioni di studio giornaliere (max 90 minuti/giorno).</li>
-                        <li>Ogni classe/scuola forma una squadra (anche i Fantamici possono iscrivere e gestire le proprie squadre personali).</li>
-                        <li>Ogni squadra ha un budget iniziale proporzionato alla modalità scelta per acquistare 5 autori.</li>
-                        <li>Per ogni artista saranno attribuiti bonus e malus in base alla scheda autore.</li>
-                        <li>I punteggi saranno aggiornati mensilmente per uno o più autori e per le missioni.</li>
-                        <li>I bonus e i malus sono fissi perché legati alla vita e alle opere dell'autore raccolte in una scheda segretissima!</li>
-                        <li>La scheda sarà mostrata solo nel riepilogo mensile nella pagina "Schede" quando il Game Master le sbloccherà assieme ai punti.</li>
-                        <li>Esistono bonus dinamici che possono essere caricati in "Missioni" (riservati solo a docenti e studenti) e formeranno un'altra classifica.</li>
-                        <li>I bonus dinamici sono legati ad attività di classe, approfondimenti, performance e scoperte e hanno un valore di 5 punti.</li>
-                        <li>Esistono tre Classifiche: Autori, Missioni e Globale. La classifica Missioni e i relativi bonus dinamici sono riservati solo a docenti e studenti.</li>
-                        <li><strong>Novità Tornei:</strong> Docenti e Fantamici possono creare o partecipare ai tornei. I docenti possono invitare colleghi tramite Codice Invito per gareggiare tra classi o scuole diverse, mentre i Fantamici possono creare tornei dedicati per sfidarsi tra loro!</li>
-                        <li>Vince chi, nella prima settimana di Giugno, ha totalizzato il maggior numero di punti.</li>
-                        <li>Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma sempre rispettoso che anima il gioco. Nessun bonus o malus può essere interpretato come un'esortazione a compiere atti illeciti o irrispettosi nei confronti di altri individui o della collettività.</li>
-                        <li>Il regolamento potrà subire variazioni</li>
-                    </ul>
                 </div>
             </section>
 
@@ -286,8 +372,19 @@
                     <p style="font-style: italic; font-size: 0.9rem;">"La cosa importante è non smettere mai di domandare. La curiosità ha il suo motivo di esistere. Non si può fare altro che restare stupiti quando si contemplano i misteri dell'eternità, della vita, della struttura meravigliosa della realtà. È sufficiente se si cerca di comprendere soltanto un poco di questo mistero tutti i giorni. Non perdere mai una sacra curiosità."</p>
                     <h4 class="text-primary mt-2">Albert Einstein</h4>
                 </div>
-                <h2 class="text-center mb-2">Classifiche</h2>
-                <h3 class="text-center mb-2">Scegli la modalità</h3>
+                <h2 class="text-center mb-2">Classifiche Ufficiali</h2>
+
+                <!-- Selettore Categoria: Scuole vs Viandanti -->
+                <div class="leaderboard-target-tabs" style="display:flex; gap:10px; justify-content:center; margin-bottom:22px; flex-wrap:wrap;">
+                    <button type="button" class="btn" id="lb-target-scuola" onclick="selectLeaderboardTarget('scuola')" style="flex:1; min-width:200px; max-width:260px; padding:12px 16px; border-radius:25px; font-weight:700; background:var(--primary-color);">
+                        <i class="fa-solid fa-school"></i> 🏫 Campionato Scuole
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="lb-target-viandante" onclick="selectLeaderboardTarget('viandante')" style="flex:1; min-width:200px; max-width:260px; padding:12px 16px; border-radius:25px; font-weight:700; opacity:0.75;">
+                        <i class="fa-solid fa-compass"></i> 🧭 Campionato Viandanti
+                    </button>
+                </div>
+
+                <h3 class="text-center mb-2" id="lb-choose-mode-title">1. Scegli il Campionato</h3>
                 <div class="leaderboard-mode-tabs" style="margin-bottom:20px;">
                     <button class="lb-mode-tab" id="lb-tab-terze" onclick="selectLeaderboardMode('terze')">📘 Contemporanea: Autori Italiani</button>
                     <button class="lb-mode-tab" id="lb-tab-seconde" onclick="selectLeaderboardMode('seconde')">📙 Età Medievale e Moderna</button>
@@ -296,8 +393,10 @@
                 <div id="lb-type-buttons" class="card-list" style="display: none; flex-direction: column; gap: 12px;">
                     <h4 class="text-center mb-1" id="lb-mode-selected-label" style="color:var(--text-muted); font-size:0.9rem;"></h4>
                     <button class="btn" id="lb-btn-autori" onclick="showLeaderboard('autori')"><i class="fa-solid fa-feather"></i> Classifica Autori</button>
-                    <button class="btn" id="lb-btn-missioni" onclick="showLeaderboard('missioni')"><i class="fa-solid fa-scroll"></i> Classifica Missioni</button>
-                    <button class="btn" id="lb-btn-globale" onclick="showLeaderboard('globale')"><i class="fa-solid fa-trophy"></i> Classifica Globale</button>
+                    <button class="btn" id="lb-btn-missioni" onclick="showLeaderboard('missioni')"><i class="fa-solid fa-scroll"></i> Classifica Missioni Didattiche</button>
+                    <button class="btn" id="lb-btn-minigiochi" onclick="showLeaderboard('minigiochi')" style="display:none;"><i class="fa-solid fa-gamepad"></i> Classifica Minigiochi</button>
+                    <button class="btn" id="lb-btn-globale" onclick="showLeaderboard('globale')"><i class="fa-solid fa-trophy"></i> Classifica Globale Campionato</button>
+                    <button class="btn" id="lb-btn-nazionale" onclick="showLeaderboard('nazionale')" style="background:linear-gradient(135deg, #10b981, #047857);"><i class="fa-solid fa-flag"></i> 🇮🇹 Classifica Globale Nazionale</button>
                 </div>
             </section>
 
@@ -321,10 +420,339 @@
             <section id="view-schede" class="view">
 
                 <h2 class="mb-2"><i class="fa-solid fa-scroll"></i> Tutte le schede</h2>
-                <div class="input-group">
-                    <input type="text" class="input-control" placeholder="Cerca scheda...">
+
+                <!-- Tabs Modalità / Campionato -->
+                <div class="schede-mode-tabs" style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
+                    <button type="button" class="btn btn-secondary schede-tab-btn active" id="schede-tab-terze" onclick="switchSchedeMode('terze')" style="flex:1; min-width:180px; padding:10px 14px; font-size:0.85rem; border-radius:20px; font-weight:700;">
+                        📘 Contemporanea: Autori Italiani
+                    </button>
+                    <button type="button" class="btn btn-secondary schede-tab-btn" id="schede-tab-seconde" onclick="switchSchedeMode('seconde')" style="flex:1; min-width:180px; padding:10px 14px; font-size:0.85rem; border-radius:20px; font-weight:700;">
+                        📙 Età Medievale e Moderna
+                    </button>
+                    <button type="button" class="btn btn-secondary schede-tab-btn" id="schede-tab-avanzato" onclick="switchSchedeMode('avanzato')" style="flex:1; min-width:180px; padding:10px 14px; font-size:0.85rem; border-radius:20px; font-weight:700;">
+                        📒 Contemporanea: Autori Italiani e Internazionali
+                    </button>
+                </div>
+
+                <div class="input-group" style="margin-bottom: 15px;">
+                    <input type="text" id="search-scheda-input" class="input-control" placeholder="🔍 Cerca scheda...">
                 </div>
                 <div id="schede-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; margin-top: 15px;"></div>
+            </section>
+
+            <!-- VIEW: Sala Giochi -->
+            <section id="view-salagiochi" class="view">
+                <div class="salagiochi-header" style="margin-bottom: 20px; text-align: center;">
+                    <h2 class="mb-1" style="font-size: 1.8rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                        <i class="fa-solid fa-gamepad" style="color: var(--accent-gold);"></i> Sala Giochi Letteraria
+                    </h2>
+                    <p style="font-size: 0.9rem; color: var(--text-muted); max-width: 650px; margin: 0 auto;">
+                        Sfida te stesso o la tua classe con i 5 minigiochi didattici sui maestri della letteratura.
+                    </p>
+                </div>
+
+                <!-- Banner di Ruolo / Controlli Cattedra -->
+                <div id="salagiochi-role-banner" class="glass mb-2" style="padding: 16px; border-radius: 14px; border: 1px solid rgba(212,175,55,0.3); background: rgba(212,175,55,0.06);">
+                    <!-- Popolato dinamicamente da renderSalaGiochiView() in app.js -->
+                </div>
+
+                <!-- Pannello Selezione Argomento / Autore -->
+                <div class="glass mb-2" style="padding: 16px; border-radius: 14px;">
+                    <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;">
+                        <div>
+                            <span style="font-weight: 700; color: var(--accent-gold); font-size: 0.95rem;">
+                                <i class="fa-solid fa-sliders"></i> Scegli Argomento:
+                            </span>
+                            <span style="font-size: 0.8rem; color: var(--text-muted); margin-left: 6px;">(Misto o Autore dedicato)</span>
+                        </div>
+                        <div style="flex: 1; min-width: 240px; max-width: 360px;">
+                            <select id="salagiochi-author-select" class="input-control" style="width: 100%; padding: 8px 12px; font-size: 0.85rem; border-radius: 10px; background: rgba(0,0,0,0.4); color: #fff; border: 1px solid rgba(255,255,255,0.2);">
+                                <option value="mixed" selected>🎲 Modalità Mista (Tutti gli Autori)</option>
+                                <!-- Popolato dinamicamente con tutti gli autori -->
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Card: Manche Completa Gran Torneo -->
+                <div class="glass mb-2" style="padding: 18px; border-radius: 16px; background: linear-gradient(135deg, rgba(212,175,55,0.18), rgba(0,0,0,0.4)); border: 1.5px solid var(--accent-gold); text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.3);">
+                    <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 15px;">
+                        <div style="display: flex; align-items: center; gap: 16px; text-align: left; flex: 1; min-width: 250px;">
+                            <div style="width: 64px; height: 64px; border-radius: 16px; background: rgba(212,175,55,0.2); border: 1.5px solid var(--accent-gold); display: flex; align-items: center; justify-content: center; padding: 6px; flex-shrink: 0; box-shadow: 0 4px 12px rgba(212,175,55,0.3);">
+                                <img src="assets/icone-giochi/6.png?v=2" alt="Manche Completa" style="max-width: 100%; max-height: 100%; object-fit: contain; aspect-ratio: 1/1;">
+                            </div>
+                            <div>
+                                <div style="display: inline-block; padding: 3px 10px; background: var(--accent-gold); color: #000; font-weight: 800; font-size: 0.7rem; border-radius: 20px; margin-bottom: 4px;">
+                                    <i class="fa-solid fa-crown"></i> SFIDA COMPLETA
+                                </div>
+                                <h3 style="margin: 0 0 4px 0; font-size: 1.25rem; color: #fff;">Manche Completa (Gran Torneo)</h3>
+                                <p style="margin: 0; font-size: 0.85rem; color: #ccc;">Affronta in sequenza tutti i giochi per conquistare fino a 20 punti per la tua squadra!</p>
+                            </div>
+                        </div>
+                        <button type="button" class="btn" style="background: var(--accent-gold); color: #000; font-weight: 800; padding: 10px 24px; border-radius: 25px; border: none; box-shadow: 0 4px 15px rgba(212,175,55,0.4); font-size: 0.95rem; cursor: pointer;" onclick="window.avviaSalaGiochiGame('manche')">
+                            <i class="fa-solid fa-play"></i> Avvia Manche
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Griglia dei 5 Minigiochi Singoli -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin-bottom: 25px;">
+                    
+                    <!-- 1. Quiz -->
+                    <div class="glass" style="padding: 16px; border-radius: 14px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1); transition: transform 0.2s, border-color 0.2s;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(96,165,250,0.12); border: 1px solid rgba(96,165,250,0.3); display: flex; align-items: center; justify-content: center; padding: 6px; flex-shrink: 0;">
+                                    <img src="assets/icone-giochi/1.png?v=2" alt="Quiz Letterario" style="max-width: 100%; max-height: 100%; object-fit: contain; aspect-ratio: 1/1;">
+                                </div>
+                                <span style="font-size: 0.75rem; background: rgba(96,165,250,0.15); color: #60a5fa; border: 1px solid rgba(96,165,250,0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Max 2 pt</span>
+                            </div>
+                            <h4 style="margin: 0 0 6px 0; font-size: 1.05rem; color: #fff;">Quiz Letterario</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 15px;">
+                                Domande a risposta multipla su biografia, opere, correnti e poetica degli autori.
+                            </p>
+                        </div>
+                        <button type="button" class="btn btn-secondary" style="width: 100%; padding: 8px 12px; font-size: 0.85rem; border-radius: 10px; font-weight: 700;" onclick="window.avviaSalaGiochiGame('quiz')">
+                            <i class="fa-solid fa-play"></i> Gioca a Quiz
+                        </button>
+                    </div>
+
+                    <!-- 2. Impiccato -->
+                    <div class="glass" style="padding: 16px; border-radius: 14px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1); transition: transform 0.2s, border-color 0.2s;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); display: flex; align-items: center; justify-content: center; padding: 6px; flex-shrink: 0;">
+                                    <img src="assets/icone-giochi/2.png?v=2" alt="L'Impiccato" style="max-width: 100%; max-height: 100%; object-fit: contain; aspect-ratio: 1/1;">
+                                </div>
+                                <span style="font-size: 0.75rem; background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Max 2 pt</span>
+                            </div>
+                            <h4 style="margin: 0 0 6px 0; font-size: 1.05rem; color: #fff;">L'Impiccato</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 15px;">
+                                Indovina le parole chiave, i protagonisti e i titoli famosi lettera per lettera.
+                            </p>
+                        </div>
+                        <button type="button" class="btn btn-secondary" style="width: 100%; padding: 8px 12px; font-size: 0.85rem; border-radius: 10px; font-weight: 700;" onclick="window.avviaSalaGiochiGame('impiccato')">
+                            <i class="fa-solid fa-play"></i> Gioca a Impiccato
+                        </button>
+                    </div>
+
+                    <!-- 3. Cloze -->
+                    <div class="glass" style="padding: 16px; border-radius: 14px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1); transition: transform 0.2s, border-color 0.2s;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(52,211,153,0.12); border: 1px solid rgba(52,211,153,0.3); display: flex; align-items: center; justify-content: center; padding: 6px; flex-shrink: 0;">
+                                    <img src="assets/icone-giochi/3.png?v=2" alt="Testo Bucato" style="max-width: 100%; max-height: 100%; object-fit: contain; aspect-ratio: 1/1;">
+                                </div>
+                                <span style="font-size: 0.75rem; background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid rgba(52,211,153,0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Max 2 pt</span>
+                            </div>
+                            <h4 style="margin: 0 0 6px 0; font-size: 1.05rem; color: #fff;">Testo Bucato (Cloze)</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 15px;">
+                                Completa i celebri brani e le poesie inserendo le parole mancanti.
+                            </p>
+                        </div>
+                        <button type="button" class="btn btn-secondary" style="width: 100%; padding: 8px 12px; font-size: 0.85rem; border-radius: 10px; font-weight: 700;" onclick="window.avviaSalaGiochiGame('cloze')">
+                            <i class="fa-solid fa-play"></i> Gioca a Cloze
+                        </button>
+                    </div>
+
+                    <!-- 4. Puzzle -->
+                    <div class="glass" style="padding: 16px; border-radius: 14px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1); transition: transform 0.2s, border-color 0.2s;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.3); display: flex; align-items: center; justify-content: center; padding: 6px; flex-shrink: 0;">
+                                    <img src="assets/icone-giochi/4.png?v=2" alt="Puzzle di Citazioni" style="max-width: 100%; max-height: 100%; object-fit: contain; aspect-ratio: 1/1;">
+                                </div>
+                                <span style="font-size: 0.75rem; background: rgba(167,139,250,0.15); color: #a78bfa; border: 1px solid rgba(167,139,250,0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Max 2 pt</span>
+                            </div>
+                            <h4 style="margin: 0 0 6px 0; font-size: 1.05rem; color: #fff;">Puzzle di Citazioni</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 15px;">
+                                Riordina le tessere di parole per ricomporre la citazione letteraria corretta.
+                            </p>
+                        </div>
+                        <button type="button" class="btn btn-secondary" style="width: 100%; padding: 8px 12px; font-size: 0.85rem; border-radius: 10px; font-weight: 700;" onclick="window.avviaSalaGiochiGame('puzzle')">
+                            <i class="fa-solid fa-play"></i> Gioca a Puzzle
+                        </button>
+                    </div>
+
+                    <!-- 5. Versi -->
+                    <div class="glass" style="padding: 16px; border-radius: 14px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1); transition: transform 0.2s, border-color 0.2s;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(244,63,94,0.12); border: 1px solid rgba(244,63,94,0.3); display: flex; align-items: center; justify-content: center; padding: 6px; flex-shrink: 0;">
+                                    <img src="assets/icone-giochi/5.png?v=2" alt="Riordina i Versi" style="max-width: 100%; max-height: 100%; object-fit: contain; aspect-ratio: 1/1;">
+                                </div>
+                                <span style="font-size: 0.75rem; background: rgba(244,63,94,0.15); color: #f43f5e; border: 1px solid rgba(244,63,94,0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Max 2 pt</span>
+                            </div>
+                            <h4 style="margin: 0 0 6px 0; font-size: 1.05rem; color: #fff;">Riordina i Versi</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 15px;">
+                                Riconosci la struttura poetica e rimetti le strofe nel giusto ordine originale.
+                            </p>
+                        </div>
+                        <button type="button" class="btn btn-secondary" style="width: 100%; padding: 8px 12px; font-size: 0.85rem; border-radius: 10px; font-weight: 700;" onclick="window.avviaSalaGiochiGame('versi')">
+                            <i class="fa-solid fa-play"></i> Gioca a Versi
+                        </button>
+                    </div>
+
+                    <!-- 6. Memory Letterario -->
+                    <div class="glass" style="padding: 16px; border-radius: 14px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1); transition: transform 0.2s, border-color 0.2s;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(168,85,247,0.12); border: 1px solid rgba(168,85,247,0.3); display: flex; align-items: center; justify-content: center; padding: 6px; flex-shrink: 0;">
+                                    <img src="assets/icone-giochi/7.png?v=2" alt="Memory Letterario" style="max-width: 100%; max-height: 100%; object-fit: contain; aspect-ratio: 1/1;">
+                                </div>
+                                <span style="font-size: 0.75rem; background: rgba(168,85,247,0.15); color: #a855f7; border: 1px solid rgba(168,85,247,0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Max 2 pt</span>
+                            </div>
+                            <h4 style="margin: 0 0 6px 0; font-size: 1.05rem; color: #fff;">Memory Letterario</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 15px;">
+                                Abbina le coppie nascoste tra autori celebri, capolavori, opere e protagonisti.
+                            </p>
+                        </div>
+                        <button type="button" class="btn btn-secondary" style="width: 100%; padding: 8px 12px; font-size: 0.85rem; border-radius: 10px; font-weight: 700;" onclick="window.avviaSalaGiochiGame('memory')">
+                            <i class="fa-solid fa-play"></i> Gioca a Memory
+                        </button>
+                    </div>
+
+                    <!-- 7. Parole Crociate (Cruciverba) -->
+                    <div class="glass" style="padding: 16px; border-radius: 14px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1); transition: transform 0.2s, border-color 0.2s;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(234,179,8,0.12); border: 1px solid rgba(234,179,8,0.3); display: flex; align-items: center; justify-content: center; padding: 6px; flex-shrink: 0;">
+                                    <img src="assets/icone-giochi/8.png?v=2" alt="Parole Crociate" style="max-width: 100%; max-height: 100%; object-fit: contain; aspect-ratio: 1/1;">
+                                </div>
+                                <span style="font-size: 0.75rem; background: rgba(234,179,8,0.15); color: #eab308; border: 1px solid rgba(234,179,8,0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Max 2 pt</span>
+                            </div>
+                            <h4 style="margin: 0 0 6px 0; font-size: 1.05rem; color: #fff;">Parole Crociate</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 15px;">
+                                Risolvi il mini-cruciverba con definizioni su autori, personaggi, titoli e poetica.
+                            </p>
+                        </div>
+                        <button type="button" class="btn btn-secondary" style="width: 100%; padding: 8px 12px; font-size: 0.85rem; border-radius: 10px; font-weight: 700;" onclick="window.avviaSalaGiochiGame('cruciverba')">
+                            <i class="fa-solid fa-play"></i> Gioca a Cruciverba
+                        </button>
+                    </div>
+
+                    <!-- 8. Rebus Letterari -->
+                    <div class="glass" style="padding: 16px; border-radius: 14px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1); transition: transform 0.2s, border-color 0.2s;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(249,115,22,0.12); border: 1px solid rgba(249,115,22,0.3); display: flex; align-items: center; justify-content: center; padding: 6px; flex-shrink: 0;">
+                                    <img src="assets/icone-giochi/9.png?v=2" alt="Rebus Letterari" style="max-width: 100%; max-height: 100%; object-fit: contain; aspect-ratio: 1/1;">
+                                </div>
+                                <span style="font-size: 0.75rem; background: rgba(249,115,22,0.15); color: #f97316; border: 1px solid rgba(249,115,22,0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Max 2 pt</span>
+                            </div>
+                            <h4 style="margin: 0 0 6px 0; font-size: 1.05rem; color: #fff;">Rebus Letterari</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 15px;">
+                                Decifra l'enigma visivo combinando le illustrazioni e le lettere grafiche.
+                            </p>
+                        </div>
+                        <button type="button" class="btn btn-secondary" style="width: 100%; padding: 8px 12px; font-size: 0.85rem; border-radius: 10px; font-weight: 700;" onclick="window.avviaSalaGiochiGame('rebus')">
+                            <i class="fa-solid fa-play"></i> Gioca a Rebus
+                        </button>
+                    </div>
+
+                    <!-- 9. Crittografie -->
+                    <div class="glass" style="padding: 16px; border-radius: 14px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1); transition: transform 0.2s, border-color 0.2s;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(20,184,166,0.12); border: 1px solid rgba(20,184,166,0.3); display: flex; align-items: center; justify-content: center; padding: 6px; flex-shrink: 0;">
+                                    <img src="assets/icone-giochi/10.png?v=2" alt="Crittografie" style="max-width: 100%; max-height: 100%; object-fit: contain; aspect-ratio: 1/1;">
+                                </div>
+                                <span style="font-size: 0.75rem; background: rgba(20,184,166,0.15); color: #14b8a6; border: 1px solid rgba(20,184,166,0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Max 2 pt</span>
+                            </div>
+                            <h4 style="margin: 0 0 6px 0; font-size: 1.05rem; color: #fff;">Crittografie</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 15px;">
+                                Decodifica le celebri citazioni e sentenze segrete cifrate in codice.
+                            </p>
+                        </div>
+                        <button type="button" class="btn btn-secondary" style="width: 100%; padding: 8px 12px; font-size: 0.85rem; border-radius: 10px; font-weight: 700;" onclick="window.avviaSalaGiochiGame('crittografia')">
+                            <i class="fa-solid fa-play"></i> Gioca a Crittografia
+                        </button>
+                    </div>
+
+                    <!-- 10. Indovinelli -->
+                    <div class="glass" style="padding: 16px; border-radius: 14px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1); transition: transform 0.2s, border-color 0.2s;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(236,72,153,0.12); border: 1px solid rgba(236,72,153,0.3); display: flex; align-items: center; justify-content: center; padding: 6px; flex-shrink: 0;">
+                                    <img src="assets/icone-giochi/11.png?v=2" alt="Indovinelli" style="max-width: 100%; max-height: 100%; object-fit: contain; aspect-ratio: 1/1;">
+                                </div>
+                                <span style="font-size: 0.75rem; background: rgba(236,72,153,0.15); color: #ec4899; border: 1px solid rgba(236,72,153,0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Max 2 pt</span>
+                            </div>
+                            <h4 style="margin: 0 0 6px 0; font-size: 1.05rem; color: #fff;">Indovinelli Letterari</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 15px;">
+                                "Chi sono?": risolvi gli enigmi poetici e biografici scoprendo gli indizi progressivi.
+                            </p>
+                        </div>
+                        <button type="button" class="btn btn-secondary" style="width: 100%; padding: 8px 12px; font-size: 0.85rem; border-radius: 10px; font-weight: 700;" onclick="window.avviaSalaGiochiGame('indovinello')">
+                            <i class="fa-solid fa-play"></i> Gioca a Indovinelli
+                        </button>
+                    </div>
+
+                    <!-- 11. Anagrammi & Sciarade -->
+                    <div class="glass" style="padding: 16px; border-radius: 14px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1); transition: transform 0.2s, border-color 0.2s;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.3); display: flex; align-items: center; justify-content: center; padding: 6px; flex-shrink: 0;">
+                                    <img src="assets/icone-giochi/12.png?v=2" alt="Anagrammi" style="max-width: 100%; max-height: 100%; object-fit: contain; aspect-ratio: 1/1;">
+                                </div>
+                                <span style="font-size: 0.75rem; background: rgba(99,102,241,0.15); color: #6366f1; border: 1px solid rgba(99,102,241,0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Max 2 pt</span>
+                            </div>
+                            <h4 style="margin: 0 0 6px 0; font-size: 1.05rem; color: #fff;">Anagrammi & Sciarade</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 15px;">
+                                Riordina le lettere mescolate per svelare pseudonimi, opere e termini d'autore.
+                            </p>
+                        </div>
+                        <button type="button" class="btn btn-secondary" style="width: 100%; padding: 8px 12px; font-size: 0.85rem; border-radius: 10px; font-weight: 700;" onclick="window.avviaSalaGiochiGame('anagramma')">
+                            <i class="fa-solid fa-play"></i> Gioca ad Anagrammi
+                        </button>
+                    </div>
+
+                    <!-- 12. Trova le Differenze -->
+                    <div class="glass" style="padding: 16px; border-radius: 14px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1); transition: transform 0.2s, border-color 0.2s;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); display: flex; align-items: center; justify-content: center; padding: 6px; flex-shrink: 0;">
+                                    <img src="assets/icone-giochi/13.png?v=2" alt="Trova le Differenze" style="max-width: 100%; max-height: 100%; object-fit: contain; aspect-ratio: 1/1;">
+                                </div>
+                                <span style="font-size: 0.75rem; background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Max 2 pt</span>
+                            </div>
+                            <h4 style="margin: 0 0 6px 0; font-size: 1.05rem; color: #fff;">Trova le Differenze</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 15px;">
+                                Confronta i due ritratti o illustrazioni storiche e scova i dettagli modificati.
+                            </p>
+                        </div>
+                        <button type="button" class="btn btn-secondary" style="width: 100%; padding: 8px 12px; font-size: 0.85rem; border-radius: 10px; font-weight: 700;" onclick="window.avviaSalaGiochiGame('differenze')">
+                            <i class="fa-solid fa-play"></i> Trova le Differenze
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- Sezione Storico Minigiochi (in Sala Giochi) -->
+                <div id="salagiochi-history-section" class="glass mb-2" style="padding: 16px; border-radius: 14px; display: none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
+                        <h4 style="color:var(--accent-gold); margin: 0;"><i class="fa-solid fa-clock-rotate-left"></i> Storico Minigiochi Registrati</h4>
+                        <button type="button" class="btn btn-secondary" style="padding: 4px 12px; font-size: 0.8rem;" onclick="if(window.renderMinigamesHistory) window.renderMinigamesHistory();">
+                            <i class="fa-solid fa-rotate"></i> Aggiorna
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="game-table" id="salagiochi-history-table">
+                            <thead>
+                                <tr>
+                                    <th>Data e Ora</th>
+                                    <th>Squadra</th>
+                                    <th>Gioco</th>
+                                    <th>Punti</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="4" style="text-align:center; color:#888;">Caricamento storico...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </section>
 
             <!-- VIEW: Privacy Policy -->
@@ -426,59 +854,9 @@
 
              <!-- VIEW: Profilo -->
              <section id="view-profilo" class="view">
-
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; flex-wrap: wrap;">
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                          <h2 style="margin: 0;">Pannello Docente</h2>
-                      </div>
-                      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                          <!-- User Profile Dropdown Trigger & Modal -->
-                          <div style="position: relative; z-index: 100;">
-                              <div onclick="event.stopPropagation(); const dd = document.getElementById('fanta-user-dropdown'); dd.style.display = dd.style.display === 'flex' ? 'none' : 'flex';" style="display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.4); border: 1.5px solid var(--accent-gold); padding: 4px 12px 4px 4px; border-radius: 30px; cursor: pointer; color: white;">
-                                  <img id="profilo-avatar-img" src="assets/avatars/6.png" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--accent-gold); background: #ffffff; padding: 1px;">
-                                  <span id="profilo-display-name" style="font-size: 0.85rem; font-weight: 700; max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Profilo</span>
-                                  <span style="font-size: 0.65rem; color: var(--accent-gold);">▼</span>
-                              </div>
-
-                              <div id="fanta-user-dropdown" onclick="event.stopPropagation()" style="display: none; position: absolute; top: calc(100% + 8px); right: 0; background: #1a1614; border: 1px solid var(--accent-gold); border-radius: 12px; padding: 14px; width: 240px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); flex-direction: column; gap: 8px; z-index: 1000;">
-                                  <div style="font-size: 0.85rem; font-weight: 700; color: var(--accent-gold); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px; margin-bottom: 2px;">
-                                      <span id="fanta-dd-username">Docente</span><br>
-                                      <span style="font-size: 0.72rem; color: #888; font-weight: normal; text-transform: uppercase;">Docente Registrato</span>
-                                  </div>
-
-                                  <button class="btn btn-secondary" onclick="document.getElementById('fanta-user-dropdown').style.display='none'; window.openEditProfileModal();" style="width: 100%; border-radius: 8px; padding: 8px; font-size: 0.8rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #ccc; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 8px;">
-                                      <i class="fa-solid fa-user-gear"></i> Modifica Profilo
-                                  </button>
-
-                                  <button class="btn btn-secondary" onclick="document.getElementById('fanta-user-dropdown').style.display='none'; openInviteModal();" style="width: 100%; border-radius: 8px; padding: 8px; font-size: 0.8rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #ccc; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 8px;">
-                                      <i class="fa-solid fa-paper-plane" style="color:#ffffff;"></i> Invita un Collega
-                                  </button>
-
-                                  <div style="display: flex; gap: 6px; width: 100%;">
-                                      <button class="btn btn-secondary" onclick="document.getElementById('fanta-user-dropdown').style.display='none'; window.openSharedModal ? window.openSharedModal('privacy') : (window.openLegalModal ? window.openLegalModal('privacy') : null);" style="flex: 1; border-radius: 8px; padding: 8px; font-size: 0.8rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #ccc; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                                          <i class="fa-solid fa-shield"></i> Privacy
-                                      </button>
-                                      <button class="btn btn-secondary" onclick="document.getElementById('fanta-user-dropdown').style.display='none'; window.openSharedModal ? window.openSharedModal('termini') : (window.openLegalModal ? window.openLegalModal('terms') : null);" style="flex: 1; border-radius: 8px; padding: 8px; font-size: 0.8rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #ccc; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                                          <i class="fa-solid fa-scroll"></i> Termini
-                                      </button>
-                                  </div>
-
-                                  <button class="btn btn-secondary" onclick="document.getElementById('fanta-user-dropdown').style.display='none'; if(window.showContattiModal) window.showContattiModal(); else window.open('https://prof-memmo.github.io/games/contatti.html', '_blank');" style="width: 100%; border-radius: 8px; padding: 8px; font-size: 0.8rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #ccc; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 8px;">
-                                      <i class="fa-solid fa-envelope"></i> Contatti
-                                  </button>
-
-                                  <div style="display: flex; gap: 6px; width: 100%; margin-top: 4px;">
-                                      <button class="btn btn-secondary" onclick="document.getElementById('fanta-user-dropdown').style.display='none'; apriNotificheModal();" style="flex: 1; border-radius: 8px; padding: 8px; font-size: 0.78rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #ccc; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                                          <i class="fa-solid fa-bell"></i> Notifiche
-                                      </button>
-                                      <button class="btn btn-danger" onclick="document.getElementById('fanta-user-dropdown').style.display='none'; logoutDocente();" style="flex: 1; border-radius: 8px; padding: 8px; font-size: 0.78rem; background: #dc2626; border: none; color: white; cursor: pointer; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                                          <i class="fa-solid fa-power-off"></i> Esci
-                                      </button>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
+                  <h2 class="mb-2" style="font-size: 1.4rem; color: var(--primary-color); display: flex; align-items: center; gap: 10px;">
+                      <i class="fa-solid fa-chalkboard-user"></i> Pannello Docente
+                  </h2>
                   <input type="text" id="profilo-email" class="input-control mb-2" value="" readonly style="background: rgba(255,255,255,0.05); color: #aaa;">
 
                   <!-- TABS HEADER -->
@@ -486,6 +864,7 @@
                       <button class="btn admin-tab-btn active" id="btn-tab-gestione" onclick="switchDocenteTab('gestione')" style="flex:1; min-width: 140px; padding: 8px; font-size: 0.85rem; border-radius: 8px;"><i class="fa-solid fa-users"></i> Gestione Utenti</button>
                       <button class="btn admin-tab-btn" id="btn-tab-composizione" onclick="switchDocenteTab('composizione')" style="flex:1; min-width: 140px; padding: 8px; font-size: 0.85rem; background: var(--bg-dark); color: var(--text-main); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;"><i class="fa-solid fa-people-group"></i> Composizione Squadre</button>
                       <button class="btn admin-tab-btn" id="btn-tab-giochi" onclick="switchDocenteTab('giochi')" style="flex:1; min-width: 140px; padding: 8px; font-size: 0.85rem; background: var(--bg-dark); color: var(--text-main); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;"><i class="fa-solid fa-gamepad"></i> Giochi in Classe</button>
+                      <button class="btn admin-tab-btn" id="btn-tab-regolamento" onclick="switchDocenteTab('regolamento')" style="flex:1; min-width: 140px; padding: 8px; font-size: 0.85rem; background: var(--bg-dark); color: var(--text-main); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;"><i class="fa-solid fa-scroll"></i> Regolamento</button>
                   </div>
 
                   <!-- TAB: COMPOSIZIONE SQUADRE -->
@@ -557,15 +936,12 @@
                              <button type="button" class="btn" style="flex:1; min-width:200px; margin-bottom:0; background: linear-gradient(135deg, #2ecc71, #27ae60) !important; color: #fff !important; font-weight: 800; border: none; box-shadow: 0 4px 10px rgba(46, 204, 113, 0.35);" onclick="navigateTo('view-presentazioni'); window.initPresentazioniTab();"><i class="fa-solid fa-desktop"></i> Genera Presentazione LIM</button>
                          </div>
                          
-                         <!-- Associazione collaboratore via codice squadra -->
-                         <div style="display: flex; gap: 8px; margin-bottom: 20px; width: 100%;">
-                             <input type="text" id="unisciti-squadra-codice" placeholder="Unisciti a una squadra come collaboratore con il Codice (es. ALFA24)" class="input-control" style="margin: 0; padding: 8px 12px; font-size: 0.8rem; border-radius: 12px; flex: 1;">
-                             <button type="button" class="btn" style="width: auto; padding: 8px 15px; font-size: 0.8rem; border-radius: 12px; margin: 0; white-space: nowrap; background:rgba(141,160,63,0.15); border-color:var(--primary-color);" onclick="window.uniscitiComeCollaboratore()">
-                                 <i class="fa-solid fa-user-plus"></i> Unisciti
+                         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:15px; margin-bottom:10px;">
+                             <h3 class="text-primary" style="margin:0;"><i class="fa-solid fa-users"></i> Le tue Squadre e Classifiche</h3>
+                             <button type="button" class="btn btn-secondary" onclick="switchDocenteTab('composizione')" style="width:auto; padding:6px 14px; font-size:0.8rem; border-radius:8px; border:1px solid var(--accent-gold); color:var(--accent-gold); cursor:pointer;">
+                                 <i class="fa-solid fa-people-group"></i> Componi Squadre per Classe
                              </button>
                          </div>
-                         
-                         <h3 class="mt-2 text-primary">Gestione Utenti, Classi e Squadre</h3>
                          <div id="profilo-squadre-list" style="padding: 10px 0; color: var(--text-muted); font-size: 0.9rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px;">
                              <div class="glass" style="padding:20px; text-align:center; grid-column: 1 / -1; width: 100%;"><i>Nessuna squadra creata. Premi il tasto sopra per iniziare!</i></div>
                          </div>
@@ -634,6 +1010,13 @@
                                    </tbody>
                                </table>
                            </div>
+                       </div>
+                   </div>
+
+                   <!-- TAB: REGOLAMENTO DOCENTI -->
+                   <div id="tab-docente-regolamento" class="docente-tab-content" style="display: none;">
+                       <div id="docente-regolamento-container">
+                           <!-- Popolato dinamicamente da RulesService -->
                        </div>
                    </div>
             </section>
@@ -793,6 +1176,10 @@
                 <i class="fa-solid fa-file-lines"></i>
                 <span>Schede</span>
             </a>
+            <a href="#" class="tab-item" data-view="view-salagiochi" data-tooltip="Sala Giochi e Minigiochi">
+                <i class="fa-solid fa-gamepad"></i>
+                <span>Sala Giochi</span>
+            </a>
             <a href="https://prof-memmo.github.io/games/contatti.html" target="_blank" class="tab-item" data-tooltip="Inviaci un Messaggio">
                 <i class="fa-solid fa-envelope"></i>
                 <span>Contatti</span>
@@ -805,10 +1192,6 @@
             <a href="admin.html" class="tab-item hidden" id="tab-item-admin" data-tooltip="Pannello Gestione Admin">
                 <i class="fa-solid fa-lock"></i>
                 <span>Admin</span>
-            </a>
-            <a href="#" class="tab-item" id="btn-toggle-music-popup" onclick="window.MusicPlayer && window.MusicPlayer.togglePopup(); return false;" data-tooltip="Lettore Musicale">
-                <i class="fa-solid fa-music"></i>
-                <span>Musica</span>
             </a>
         </nav>
     </div>
@@ -1059,6 +1442,40 @@
         </div>
     </div>
 
+    <!-- MODAL: Assegnazione Multipla Studenti a Squadra -->
+    <div id="modal-assegna-multipli" class="modal-wip" style="z-index:3500; display:none;" onclick="if(event.target===this)this.style.display='none'">
+        <div class="modal-wip-content glass" style="max-width:460px; padding:22px; border-radius:18px; border:1px solid rgba(212,175,55,0.3); background:var(--bg-dark); box-shadow: 0 20px 50px rgba(0,0,0,0.7);">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px;">
+                <div>
+                    <div style="font-family:var(--font-heading); font-size:1.15rem; color:var(--accent-gold); display:flex; align-items:center; gap:8px;">
+                        <i class="fa-solid fa-users-gear"></i> Assegna Studenti
+                    </div>
+                    <div id="modal-assegna-team-name" style="font-size:0.85rem; color:#fff; font-weight:700; margin-top:2px;"></div>
+                </div>
+                <button type="button" class="btn btn-secondary" style="padding:4px 10px; width:auto; border-radius:12px; margin:0; cursor:pointer;" onclick="document.getElementById('modal-assegna-multipli').style.display='none'"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; font-size:0.8rem;">
+                <span id="modal-assegna-slots-info" style="color:var(--text-muted);"></span>
+                <span id="modal-assegna-selected-count" style="color:var(--primary-color); font-weight:700;">0 selezionati</span>
+            </div>
+
+            <div id="modal-assegna-studenti-list" style="max-height:280px; overflow-y:auto; display:flex; flex-direction:column; gap:6px; margin-bottom:16px; padding-right:4px;">
+                <!-- Popolato dinamicamente da JS -->
+            </div>
+
+            <input type="hidden" id="modal-assegna-target-team-id">
+            <input type="hidden" id="modal-assegna-max-allowed">
+
+            <div style="display:flex; gap:10px;">
+                <button type="button" class="btn" id="btn-conferma-assegna-multipli" style="flex:2; background:linear-gradient(135deg, var(--accent-gold), #b89628); color:#1a1614; font-weight:800; cursor:pointer;" onclick="window.confermaAssegnazioneMultipla()">
+                    <i class="fa-solid fa-check"></i> Assegna Selezionati
+                </button>
+                <button type="button" class="btn btn-secondary" style="flex:1; cursor:pointer;" onclick="document.getElementById('modal-assegna-multipli').style.display='none'">Annulla</button>
+            </div>
+        </div>
+    </div>
+
     <div id="presentation-overlay" style="display: none;">
         <!-- Sfondo Video o Immagine -->
         <video id="pres-bg-video" autoplay loop muted playsinline style="display: none;"></video>
@@ -1265,18 +1682,42 @@
 
     <!-- Modale Selezione Squadre per Minigiochi -->
     <div id="team-selector-modal" class="modal-wip" style="z-index: 5100; overflow-y:auto; display:none;" onclick="if(event.target===this) { this.style.display='none'; }">
-        <div class="modal-wip-content" style="max-width:400px; padding: 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px;">
-              <h3 style="font-family: var(--font-heading); color: var(--accent-gold); font-size: 1.1rem; margin:0;"><i class="fa-solid fa-users"></i> Scegli le Squadre</h3>
-              <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.8rem; border:none;" onclick="document.getElementById('team-selector-modal').style.display='none'">
+        <div class="modal-wip-content" style="max-width:440px; padding: 22px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 10px;">
+              <h3 style="font-family: var(--font-heading); color: var(--accent-gold); font-size: 1.15rem; margin:0;"><i class="fa-solid fa-users"></i> Scegli le Squadre</h3>
+              <button type="button" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.8rem; border:none;" onclick="document.getElementById('team-selector-modal').style.display='none'">
                 <i class="fa-solid fa-xmark"></i>
               </button>
             </div>
-            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">Seleziona le squadre della classe che si scontreranno. I turni si alterneranno automaticamente.</p>
-            <div id="team-selector-list" style="display:flex; flex-direction:column; gap:8px; max-height:200px; overflow-y:auto; margin-bottom:15px;">
-                <!-- Popolato da JS -->
+            
+            <!-- Filtro per Campionato -->
+            <div style="margin-bottom: 12px;">
+                <label style="display:block; font-size:0.75rem; color:var(--text-muted); font-weight:700; margin-bottom:5px; text-transform:uppercase; letter-spacing:0.5px;">
+                    <i class="fa-solid fa-trophy" style="color:var(--accent-gold);"></i> Filtra per Campionato:
+                </label>
+                <select id="team-selector-mode-filter" class="input-control" style="width: 100%; padding: 8px 12px; font-size: 0.82rem; border-radius: 8px; background: rgba(0,0,0,0.5); color: #fff; border: 1px solid rgba(255,255,255,0.2);" onchange="window.EroiMinigames && window.EroiMinigames.onFilterChange()">
+                    <option value="all">🌐 Tutti i Campionati / Classi</option>
+                    <option value="terze">📘 Età Contemporanea (Terze)</option>
+                    <option value="seconde">📙 Età Medievale e Moderna (Seconde)</option>
+                    <option value="avanzato">📒 Contemporanea & Internazionali (Avanzato)</option>
+                </select>
             </div>
-            <button class="btn" style="width:100%;" onclick="window.EroiMinigames.confirmTeamSelection()"><i class="fa-solid fa-play"></i> Inizia Sfida</button>
+
+            <!-- Controlli Rapidi Selezione -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; background:rgba(255,255,255,0.04); padding:6px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
+                <span id="team-selector-count" style="font-size:0.75rem; color:var(--accent-gold); font-weight:700;">0 squadre selezionate</span>
+                <div style="display:flex; gap:6px;">
+                    <button type="button" class="btn btn-secondary" style="padding:3px 8px; font-size:0.7rem; border-radius:6px; cursor:pointer;" onclick="window.EroiMinigames && window.EroiMinigames.toggleSelectAll(true)">Tutte</button>
+                    <button type="button" class="btn btn-secondary" style="padding:3px 8px; font-size:0.7rem; border-radius:6px; cursor:pointer;" onclick="window.EroiMinigames && window.EroiMinigames.toggleSelectAll(false)">Nessuna</button>
+                </div>
+            </div>
+
+            <div id="team-selector-list" style="display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto; margin-bottom:15px; padding-right:4px;">
+                <!-- Popolato dinamicamente da JS -->
+            </div>
+            <button type="button" class="btn" style="width:100%; font-weight:800; font-size:0.95rem; padding:10px; border-radius:10px; background:var(--accent-gold); color:#000;" onclick="window.EroiMinigames.confirmTeamSelection()">
+                <i class="fa-solid fa-play"></i> Inizia Sfida a Squadre
+            </button>
         </div>
     </div>
 
@@ -1361,31 +1802,31 @@
     <div id="modal-miniguida" class="modal-overlay" style="display: none; align-items: center; justify-content: center; z-index: 9999; background: rgba(15,23,42,0.8); backdrop-filter: blur(4px); position: fixed; inset: 0; padding: 20px;">
         <div class="modal-content" style="background: white; border-radius: 24px; width: 100%; max-width: 900px; display: flex; overflow: hidden; position: relative; max-height: 90vh; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
             <div style="width: 33%; background: #f8fafc; display: flex; align-items: flex-end; justify-content: center; border-right: 2px solid #f1f5f9; padding-top: 20px;" class="hide-mobile">
-                <img src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png" alt="Prof Memmo" style="width: 120%; object-fit: contain; mix-blend-mode: multiply; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));">
+                <img src="assets/prof_memmo_full.jpg" onerror="this.src='https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-full.jpg';" alt="Prof Memmo" style="width: 120%; object-fit: contain; mix-blend-mode: multiply; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));">
             </div>
             <div style="flex: 1; padding: 30px 40px; display: flex; flex-direction: column; position: relative; min-height: 450px;">
                 <button onclick="closeMiniguida()" style="position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; border-radius: 50%; border: none; background: #f1f5f9; color: #475569; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s;"><i class="fa-solid fa-xmark"></i></button>
                 
-                <h2 style="font-size: 2rem; font-weight: 900; color: var(--primary-color); margin-bottom: 30px; text-align: center; text-transform: uppercase; border-bottom: 4px solid rgba(168, 85, 247, 0.2); padding-bottom: 10px; display: inline-block; margin-left: auto; margin-right: auto;">Come si gioca?</h2>
+                <h2 id="miniguida-title" style="font-size: 2rem; font-weight: 900; color: var(--primary-color); margin-bottom: 30px; text-align: center; text-transform: uppercase; border-bottom: 4px solid rgba(168, 85, 247, 0.2); padding-bottom: 10px; display: inline-block; margin-left: auto; margin-right: auto;">Come si gioca?</h2>
                 
                 <div id="miniguida-step-0" class="miniguida-step" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; animation: fadeIn 0.3s ease-out;">
-                    <i class="fa-solid fa-users" style="font-size: 5rem; color: var(--primary-color); margin-bottom: 20px;"></i>
-                    <p style="font-size: 1.3rem; color: #475569; line-height: 1.6; font-weight: 500;">Crea la tua squadra acquistando gli autori con i tuoi <strong>fiorini</strong> e <strong>lire</strong>.</p>
+                    <i class="fa-solid fa-pen-nib" style="font-size: 5rem; color: var(--primary-color); margin-bottom: 20px;"></i>
+                    <p style="font-size: 1.25rem; color: #475569; line-height: 1.6; font-weight: 500;">✍️ <strong>Crea la tua Rosa di 5 Autori:</strong><br>Scegli e acquista i tuoi 5 autori preferiti della storia letteraria (<em>da Dante a Pirandello, da Calvino a Leopardi</em>).</p>
                 </div>
                 
                 <div id="miniguida-step-1" class="miniguida-step" style="flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; animation: fadeIn 0.3s ease-out;">
-                    <i class="fa-solid fa-star" style="font-size: 5rem; color: #f59e0b; margin-bottom: 20px;"></i>
-                    <p style="font-size: 1.3rem; color: #475569; line-height: 1.6; font-weight: 500;">Guadagna punti quando i tuoi autori vengono trattati a lezione o compaiono in verifica.</p>
+                    <i class="fa-solid fa-dice" style="font-size: 5rem; color: #f59e0b; margin-bottom: 20px;"></i>
+                    <p style="font-size: 1.25rem; color: #475569; line-height: 1.6; font-weight: 500;">🎲 <strong>Bonus, Malus &amp; Imprevisti:</strong><br>Guadagna o perdi punti durante l'anno scolastico in base agli eventi storici e alle vicende biografiche degli autori.</p>
                 </div>
                 
                 <div id="miniguida-step-2" class="miniguida-step" style="flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; animation: fadeIn 0.3s ease-out;">
-                    <i class="fa-solid fa-gamepad" style="font-size: 5rem; color: #ec4899; margin-bottom: 20px;"></i>
-                    <p style="font-size: 1.3rem; color: #475569; line-height: 1.6; font-weight: 500;">Completa le missioni speciali e partecipa ai <strong>minigiochi</strong> per bonus extra!</p>
+                    <i class="fa-solid fa-puzzle-piece" style="font-size: 5rem; color: #ec4899; margin-bottom: 20px;"></i>
+                    <p style="font-size: 1.25rem; color: #475569; line-height: 1.6; font-weight: 500;">🧩 <strong>Minigiochi Letterari alla LIM:</strong><br>Sfida le altre squadre della classe con <em>Quiz, Cloze, Versi e Puzzle</em> per conquistare punti extra.</p>
                 </div>
 
                 <div id="miniguida-step-3" class="miniguida-step" style="flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; animation: fadeIn 0.3s ease-out;">
-                    <i class="fa-solid fa-handshake-angle" style="font-size: 5rem; color: #10b981; margin-bottom: 20px;"></i>
-                    <p style="font-size: 1.3rem; color: #475569; line-height: 1.6; font-weight: 500;"><strong>Collabora</strong> con i compagni e sviluppa le tue competenze critiche e letterarie.</p>
+                    <i class="fa-solid fa-trophy" style="font-size: 5rem; color: #10b981; margin-bottom: 20px;"></i>
+                    <p style="font-size: 1.25rem; color: #475569; line-height: 1.6; font-weight: 500;">🏆 <strong>Scala la Classifica:</strong><br>Completa le missioni didattiche del docente e porta la tua fanta-squadra in vetta al <strong>Campionato Letterario</strong>!</p>
                 </div>
                 
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
@@ -1418,16 +1859,28 @@
         const totalMiniguidaSteps = 4;
         
         function openMiniguida() {
+            if (window.FantaMiniguidaService) {
+                window.FantaMiniguidaService.openModal();
+                return;
+            }
             document.getElementById('modal-miniguida').style.display = 'flex';
             currentMiniguidaStep = 0;
             updateMiniguidaView();
         }
         
         function closeMiniguida() {
+            if (window.FantaMiniguidaService) {
+                window.FantaMiniguidaService.closeModal();
+                return;
+            }
             document.getElementById('modal-miniguida').style.display = 'none';
         }
         
         function nextMiniguidaStep() {
+            if (window.FantaMiniguidaService) {
+                window.FantaMiniguidaService.nextStep();
+                return;
+            }
             if (currentMiniguidaStep < totalMiniguidaSteps - 1) {
                 currentMiniguidaStep++;
                 updateMiniguidaView();
@@ -1438,29 +1891,34 @@
         
         function updateMiniguidaView() {
             for (let i = 0; i < totalMiniguidaSteps; i++) {
-                document.getElementById('miniguida-step-' + i).style.display = i === currentMiniguidaStep ? 'flex' : 'none';
-                const dot = document.getElementById('miniguida-dots').children[i];
-                dot.style.background = i === currentMiniguidaStep ? 'var(--primary-color)' : '#e2e8f0';
+                const el = document.getElementById('miniguida-step-' + i);
+                if (el) el.style.display = i === currentMiniguidaStep ? 'flex' : 'none';
+                const dot = document.getElementById('miniguida-dots')?.children[i];
+                if (dot) dot.style.background = i === currentMiniguidaStep ? 'var(--primary-color)' : '#e2e8f0';
             }
-            document.getElementById('miniguida-next-btn').innerText = currentMiniguidaStep === totalMiniguidaSteps - 1 ? 'GIOCA!' : 'AVANTI';
+            const nextBtn = document.getElementById('miniguida-next-btn');
+            if (nextBtn) nextBtn.innerText = currentMiniguidaStep === totalMiniguidaSteps - 1 ? 'GIOCA!' : 'AVANTI';
         }
     </script>
 
     <!-- Scripts -->
-    <script src="js/data.js?v=20260824_clean_minigames"></script>
-    <script src="js/services/calendar-service.js?v=20260824_clean_minigames"></script>
-    <script src="js/music.js?v=20260824_clean_minigames"></script>
-    <script src="js/minigames.js?v=20260824_clean_minigames"></script>
+    <script src="js/data.js?v=20261004_v3_zeroflicker"></script>
+    <script src="js/services/calendar-service.js?v=20261004_v3_zeroflicker"></script>
+    <script src="js/services/imprevisti-service.js?v=20261004_v3_zeroflicker"></script>
+    <script src="js/services/rules-service.js?v=20261004_v3_zeroflicker"></script>
+    <script src="js/services/miniguida-service.js?v=20261004_v3_zeroflicker"></script>
+    <script src="js/music.js?v=20261004_v3_zeroflicker"></script>
+    <script src="js/minigames.js?v=20261004_v3_zeroflicker"></script>
     <!-- Components -->
-    <script src="js/components/navbar.js?v=20260824_clean_minigames"></script>
-    <script src="js/components/modals.js?v=20260824_clean_minigames"></script>
+    <script src="js/components/navbar.js?v=20261004_v3_zeroflicker"></script>
+    <script src="js/components/modals.js?v=20261004_v3_zeroflicker"></script>
     <!-- Dashboard -->
-    <script src="js/dashboard/admin-logic.js?v=20260824_clean_minigames"></script>
-    <script src="js/live-editor.js?v=20260824_clean_minigames"></script>
-    <script src="js/app.js?v=20260824_clean_minigames"></script>
+    <script src="js/dashboard/admin-logic.js?v=20261004_v3_zeroflicker"></script>
+    <script src="js/live-editor.js?v=20261004_v3_zeroflicker"></script>
+    <script src="js/app.js?v=20261004_v3_zeroflicker"></script>
     <!-- Modali condivisi ed Access Control ecosistema Prof. Memmo -->
     <script>window.HUB_GAME_ID = "fantaletteratura";</script>
-    <script src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/hub-subscription-guard.js?v=20260824_clean_minigames"></script>
-    <script src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/legal-modal.js?v=20260824_clean_minigames"></script>
+    <script src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/hub-subscription-guard.js?v=20261004_v3_zeroflicker"></script>
+    <script src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/legal-modal.js?v=20261004_v3_zeroflicker"></script>
 </body>
 </html>

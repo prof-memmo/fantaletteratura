@@ -1,43 +1,100 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
+    <!-- Favicon & Touch Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png?v=3">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=3">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Fantaletteratura - Admin</title>
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=20260824_clean_minigames">
+    <link rel="stylesheet" href="css/style.css?v=20261004_header_unificato">
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="no-sidebar">
     <div id="app-container" style="display:none;">
-        <!-- Top Navigation -->
-        <header class="top-nav glass" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <a href="index.html" class="btn btn-secondary" style="margin: 0; padding: 6px 14px; font-size: 0.85rem; text-decoration: none; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; font-weight: 600;">
-                    <i class="fa-solid fa-house"></i> <span class="hide-mobile">Home Gioco</span>
-                </a>
-                <div class="page-title" id="page-title" style="margin: 0; font-weight: 800; font-size: 1.1rem; color: var(--accent-gold);">
-                    <i class="fa-solid fa-shield-halved"></i> Pannello Admin
+        <!-- HEADER DELL'ECOSISTEMA (BRAND UNIFORME) -->
+        <header class="app-header" id="main-app-header">
+            <!-- Sinistra: Logo Fantaletteratura Header -->
+            <div class="header-left">
+                <img src="assets/branding/fantaletteratura-header.png" alt="Logo Fantaletteratura" class="header-game-logo" onclick="window.location.href='index.html'">
+            </div>
+
+            <!-- Centro: Logo Avatar Prof. Memmo -->
+            <div class="header-center-logo">
+                <div class="header-prof-logo-wrapper" onclick="window.location.href='index.html'" title="Home Fantaletteratura">
+                    <img src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png" class="header-prof-logo" alt="Prof. Memmo Logo">
                 </div>
             </div>
-            
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <!-- Pulsante Musica -->
-                <button class="btn btn-secondary" style="width: 36px; height: 36px; padding: 0; border-radius: 50%; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; margin: 0; cursor: pointer;" onclick="window.MusicPlayer && window.MusicPlayer.togglePopup(); return false;" data-tooltip="Lettore Musicale">
-                    <i class="fa-solid fa-music"></i>
-                </button>
-                
-                <!-- Campanella Notifiche con Badge -->
-                <button class="btn btn-secondary" style="width: 36px; height: 36px; padding: 0; border-radius: 50%; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; position: relative; margin: 0; cursor: pointer;" onclick="apriNotificheModal()">
-                    <i class="fa-solid fa-bell"></i>
-                    <span id="notification-badge" style="display: none; position: absolute; top: -3px; right: -3px; background: #e63946; color: white; font-size: 0.6rem; font-weight: bold; width: 16px; height: 16px; border-radius: 50%; align-items: center; justify-content: center; border: 1.5px solid var(--bg-dark);">0</span>
-                </button>
-                
-                <!-- Pulsante Esci -->
-                <button class="btn btn-secondary" style="width: auto; padding: 8px 15px; border-radius: 20px; font-size: 0.8rem; margin: 0; display: flex; align-items: center; gap: 6px;" onclick="logoutDocente()">
-                    <i class="fa-solid fa-right-from-bracket"></i> <span class="hide-mobile">Esci</span>
-                </button>
+
+            <!-- Destra: Pillola Profilo Utente & Dropdown Menu -->
+            <div class="header-right">
+                <div class="user-menu-container" id="header-user-container">
+                    <div class="user-menu-trigger" id="header-user-menu-trigger" onclick="event.stopPropagation(); window.toggleUserDropdown(event);">
+                        <div class="user-avatar-circle">
+                            <img id="header-user-avatar-img" src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png" alt="Avatar" onerror="this.src='https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png'">
+                            <script>
+                                (function(){
+                                    try {
+                                        var av = localStorage.getItem('fanta_user_avatar') || localStorage.getItem('hub_user_avatar');
+                                        if (av) {
+                                            var el = document.getElementById('header-user-avatar-img');
+                                            if (el) el.src = av;
+                                        }
+                                        var nm = localStorage.getItem('fanta_user_name') || localStorage.getItem('hub_user_name');
+                                        if (nm) {
+                                            var elN = document.getElementById('header-user-name');
+                                            if (elN) elN.textContent = nm;
+                                            var elT = document.getElementById('dropdown-user-title');
+                                            if (elT) elT.textContent = nm;
+                                        }
+                                    } catch(e){}
+                                })();
+                            </script>
+                        </div>
+                        <div class="user-trigger-text">
+                            <span class="user-trigger-name" id="header-user-name">PROF. MEMMO</span>
+                            <span class="user-trigger-role" id="header-user-role">AMMINISTRATORE</span>
+                        </div>
+                        <span id="header-notification-badge" class="badge-notif-pill" style="display: none;">0</span>
+                        <span class="user-trigger-chevron"><i class="fa-solid fa-chevron-down"></i></span>
+                    </div>
+
+                    <!-- Dropdown Card -->
+                    <div class="user-dropdown hidden" id="header-user-dropdown" onclick="event.stopPropagation()">
+                        <div class="dropdown-user-header">
+                            <div class="dropdown-user-title" id="dropdown-user-title">PROF. MEMMO</div>
+                            <div class="dropdown-user-subtitle" id="dropdown-user-subtitle">AMMINISTRATORE</div>
+                        </div>
+
+                        <button class="dropdown-pill-btn" onclick="window.location.href='index.html'">
+                            <i class="fa-solid fa-house"></i> Home Gioco
+                        </button>
+
+                        <button class="dropdown-pill-btn" onclick="window.closeUserDropdown(); window.openEditProfileModal ? window.openEditProfileModal() : null;">
+                            <i class="fa-solid fa-user-gear"></i> Modifica Profilo
+                        </button>
+
+                        <div class="dropdown-split-row">
+                            <button class="dropdown-pill-btn" onclick="window.open('privacy.html', '_blank')">
+                                <i class="fa-solid fa-shield"></i> Privacy
+                            </button>
+                            <button class="dropdown-pill-btn" onclick="window.open('termini.html', '_blank')">
+                                <i class="fa-solid fa-scroll"></i> Termini
+                            </button>
+                        </div>
+
+                        <div class="dropdown-bottom-row">
+                            <button class="dropdown-pill-btn btn-notifiche-pill" onclick="window.closeUserDropdown(); apriNotificheModal();">
+                                <i class="fa-solid fa-bell"></i> Notifiche <span id="notification-badge" class="badge-notif-pill" style="display:none;">0</span>
+                            </button>
+                            <button class="dropdown-pill-btn btn-esci-pill" onclick="window.closeUserDropdown(); logoutDocente();">
+                                <i class="fa-solid fa-power-off"></i> Esci
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -47,11 +104,14 @@
             <div class="admin-main-nav-container" id="admin-main-nav">
                 <button class="btn admin-tab-btn active" data-target="admin-view-autori"><i class="fa-solid fa-feather"></i> Autori</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-calendario"><i class="fa-solid fa-calendar-days"></i> Calendario</button>
+                <button class="btn admin-tab-btn" data-target="admin-view-imprevisti" onclick="window.renderAdminImprevisti()"><i class="fa-solid fa-scroll"></i> Imprevisti &amp; Mercato</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-docenti"><i class="fa-solid fa-users"></i> Gestione Utenti e Classi</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-squadre"><i class="fa-solid fa-users-rectangle"></i> Squadre</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-missioni"><i class="fa-solid fa-scroll"></i> Missioni</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-tornei"><i class="fa-solid fa-trophy"></i> Tornei</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-classifica"><i class="fa-solid fa-ranking-star"></i> Classifica Globale</button>
+                <button class="btn admin-tab-btn" data-target="admin-view-regolamento" onclick="window.renderAdminRegolamento()"><i class="fa-solid fa-scroll"></i> Regolamento</button>
+                <button class="btn admin-tab-btn" data-target="admin-view-miniguida" onclick="window.renderAdminMiniguida()"><i class="fa-solid fa-chalkboard-user"></i> Miniguida</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-impostazioni"><i class="fa-solid fa-gear"></i> Impostazioni</button>
             </div>
 
@@ -85,8 +145,8 @@
             <section id="admin-view-calendario" class="admin-view" style="display:none;">
                 <div style="padding: 0 15px 15px 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                     <div>
-                        <h2 style="margin: 0;"><i class="fa-solid fa-calendar-days" style="color: var(--accent-gold);"></i> Calendario</h2>
-                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">Le schede e i punteggi degli autori si validano automaticamente alle date previste per ogni Reel. Puoi modificare le date o forzare/bloccare le uscite.</p>
+                        <h2 style="margin: 0;"><i class="fa-solid fa-calendar-days" style="color: var(--accent-gold);"></i> Calendario &amp; Imprevisti</h2>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">Le schede e i punteggi degli autori si validano automaticamente alle date previste. Puoi impostare le <strong>Carte Imprevisto Ufficiali</strong> e abilitare le <strong>Finestre di Mercato (1 Cambio)</strong> per ogni turno.</p>
                     </div>
                     <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 14px; border-radius: 12px;" onclick="window.renderAdminCalendario()"><i class="fa-solid fa-rotate"></i> Ricarica</button>
                 </div>
@@ -138,6 +198,77 @@
                     <!-- VISTA 2: ELENCO CRONOLOGICO DETTAGLIATO -->
                     <div id="admin-calendar-releases-list" style="display: none; flex-direction: column; gap: 12px;">
                         <!-- Popolato da JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: Pannello Super-Admin - Gestione Imprevisti & Mercato (Indipendente dai Gironi) -->
+            <section id="admin-view-imprevisti" class="admin-view" style="display:none;">
+                <div style="padding: 0 15px 15px 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div style="flex: 1; min-width: 260px;">
+                        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px; flex-wrap: wrap;">
+                            <span style="background: rgba(234, 179, 8, 0.15); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.3); font-size: 0.68rem; font-weight: bold; padding: 2px 7px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+                                <i class="fa-solid fa-shield-halved"></i> Super-Admin Esclusivo
+                            </span>
+                            <span style="background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3); font-size: 0.68rem; font-weight: bold; padding: 2px 7px; border-radius: 6px;">
+                                ⛓️ Slegato dai Gironi
+                            </span>
+                        </div>
+                        <h2 style="margin: 0; font-size: 1.3rem;"><i class="fa-solid fa-scroll" style="color: var(--accent-gold);"></i> Imprevisti &amp; Mercato</h2>
+                        <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 3px; line-height: 1.3;">Pianifica gli eventi letterari indipendenti lungo l'anno scolastico. Gli studenti visualizzeranno solo l'evento attivo del giorno in modalità read-only.</p>
+                    </div>
+                    <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                        <button class="btn btn-secondary" style="width: auto; margin: 0; font-size: 0.75rem; padding: 5px 11px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px;" onclick="window.renderAdminImprevisti()" title="Ricarica dati da Cloud">
+                            <i class="fa-solid fa-rotate"></i> Ricarica
+                        </button>
+                        <button class="btn btn-secondary" style="width: auto; margin: 0; font-size: 0.75rem; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--accent-gold); color: var(--accent-gold); display: inline-flex; align-items: center; gap: 5px;" onclick="window.openCustomImprevistoModal()">
+                            <i class="fa-solid fa-plus"></i> Nuovo Imprevisto
+                        </button>
+                        <button class="btn" style="width: auto; margin: 0; background: var(--accent-gold); color: var(--bg-dark); font-weight: bold; font-size: 0.75rem; padding: 5px 13px; border-radius: 20px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;" onclick="window.distribuisciImprevistiStagionali()">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> 🪄 Distribuisci a Tutto l'Anno
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SEZIONE 1: MAZZO DI CARTE LETTERARIE (LORE ARCHIVE) -->
+                <div class="glass" style="padding: 16px; margin: 0 15px 20px 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <h3 style="margin: 0; font-size: 1.05rem; color: var(--accent-gold); display: flex; align-items: center; gap: 6px;">
+                                <i class="fa-solid fa-layer-group"></i> Mazzo di Carte Letterarie (Lore Reale Autentico)
+                            </h3>
+                            <span id="deck-count-badge" style="font-size: 0.75rem; background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 10px; color: var(--text-light);">14 Carte</span>
+                        </div>
+                        <span style="font-size: 0.78rem; color: var(--text-muted);">Clicca su una carta per programmarla nel calendario</span>
+                    </div>
+
+                    <div id="admin-deck-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; max-height: 380px; overflow-y: auto; padding-right: 4px;">
+                        <!-- Popolato dinamicamente da ImprevistiService.getDeck() -->
+                    </div>
+                </div>
+
+                <!-- SEZIONE 2: TIMELINE & TABELLA DELL'ANNO -->
+                <div class="glass" style="padding: 16px; margin: 0 15px 20px 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
+                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                            <h3 style="margin: 0; font-size: 1.05rem; color: #fff; display: flex; align-items: center; gap: 6px;">
+                                <i class="fa-solid fa-timeline" style="color: var(--accent-gold);"></i> Timeline degli Imprevisti Programmati
+                            </h3>
+                            <div class="admin-mode-filter" style="margin: 0;">
+                                <button class="admin-mode-filter-btn f-all active" id="btn-timeline-filter-all" onclick="window.filterImprevistiTimeline('all')">📅 Tutti</button>
+                                <button class="admin-mode-filter-btn f-green" id="btn-timeline-filter-active" onclick="window.filterImprevistiTimeline('active')">⚡ Attivi</button>
+                                <button class="admin-mode-filter-btn f-gold" id="btn-timeline-filter-scheduled" onclick="window.filterImprevistiTimeline('scheduled')">⏳ Programmati</button>
+                                <button class="admin-mode-filter-btn f-orange" id="btn-timeline-filter-archived" onclick="window.filterImprevistiTimeline('archived')">📜 Storico</button>
+                            </div>
+                        </div>
+                        <div style="font-size: 0.8rem; color: #4ade80; display: flex; align-items: center; gap: 5px;">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Sincronizzazione Firestore Attiva
+                        </div>
+                    </div>
+
+                    <!-- Lista Timeline Eventi Programmati -->
+                    <div id="admin-imprevisti-timeline-list" style="display: flex; flex-direction: column; gap: 12px;">
+                        <!-- Popolato dinamicamente da JS -->
                     </div>
                 </div>
             </section>
@@ -231,9 +362,15 @@
             <section id="admin-view-classifica" class="admin-view" style="display:none;">
                 <h2 style="padding: 0 15px;">Classifica Globale</h2>
                 <div class="glass" style="padding: 15px; margin: 0 15px 20px 15px;">
+                    <!-- Filtro Categoria: Scuole vs Viandanti -->
+                    <div class="admin-target-filter" style="margin-bottom:12px; display:flex; gap:8px; flex-wrap:wrap;">
+                        <button class="btn admin-target-filter-btn" id="admin-target-all" onclick="window.setAdminClassificaTarget('all')" style="padding:6px 14px; font-size:0.85rem; border-radius:15px; font-weight:700; background:var(--primary-color);">🌐 Tutte le squadre</button>
+                        <button class="btn btn-secondary admin-target-filter-btn" id="admin-target-scuole" onclick="window.setAdminClassificaTarget('scuola')" style="padding:6px 14px; font-size:0.85rem; border-radius:15px; font-weight:700;">🏫 Solo Scuole</button>
+                        <button class="btn btn-secondary admin-target-filter-btn" id="admin-target-viandanti" onclick="window.setAdminClassificaTarget('viandante')" style="padding:6px 14px; font-size:0.85rem; border-radius:15px; font-weight:700;">🧭 Solo Viandanti</button>
+                    </div>
                     <!-- Filtro modalità -->
                     <div class="admin-mode-filter" style="margin-bottom:15px;">
-                        <button class="admin-mode-filter-btn f-all" onclick="window.renderAdminClassifica('all')">Tutte le modalità</button>
+                        <button class="admin-mode-filter-btn f-all" onclick="window.renderAdminClassifica('all')">Tutte le epoche</button>
                         <button class="admin-mode-filter-btn f-green" onclick="window.renderAdminClassifica('terze')">📘 Contemporanea: Autori Italiani</button>
                         <button class="admin-mode-filter-btn f-orange" onclick="window.renderAdminClassifica('seconde')">📙 Età Medievale e Moderna</button>
                         <button class="admin-mode-filter-btn f-gold" onclick="window.renderAdminClassifica('avanzato')">📒 Contemporanea: Autori Italiani e Internazionali</button>
@@ -334,20 +471,34 @@
                     </div>
 
                     <!-- Danger Zone: Archiviazione Annuale Classifiche -->
-                    <div id="admin-master-area" style="display:none; margin-bottom: 25px; padding: 15px; border: 1px solid var(--danger-color); border-radius: 12px; background: rgba(231, 76, 60, 0.1);">
+                    <div id="admin-master-area" style="margin-bottom: 25px; padding: 15px; border: 1px solid var(--danger-color); border-radius: 12px; background: rgba(231, 76, 60, 0.1);">
                         <h3 class="text-danger" style="margin-top:0; font-size: 1.05rem;"><i class="fa-solid fa-box-archive"></i> Archiviazione Annuale Fantaletteratura</h3>
-                        <p style="font-size: 0.85rem; margin-bottom: 15px;">Salva una "fotografia" della classifica finale e archivia le squadre dell'anno scolastico in corso. Potrà essere ripristinata dall'Archivio Storico in caso di necessità.</p>
-                        <button type="button" class="btn text-danger" style="background: transparent; border: 1px solid var(--danger-color); width:auto; padding:8px 18px; font-size:0.85rem;" onclick="window.archiviaAnnoCorrente()"><i class="fa-solid fa-box-archive"></i> Esegui Archiviazione Anno</button>
+                        <p style="font-size: 0.85rem; margin-bottom: 15px;">Salva una "fotografia" della classifica finale e archivia selettivamente solo le squadre dello scorso anno, lasciando attive quelle create per il nuovo anno scolastico.</p>
+                        <button type="button" id="btn-open-archive-modal" class="btn text-danger" style="background: transparent; border: 1px solid var(--danger-color); width:auto; padding:8px 18px; font-size:0.85rem; cursor:pointer;" onclick="if(window.openArchiveSelectionModal) window.openArchiveSelectionModal(); else alert('Inizializzazione in corso, riprova tra un secondo...');"><i class="fa-solid fa-box-archive"></i> Esegui Archiviazione Anno</button>
                     </div>
 
                     <!-- Archivio Storico -->
-                    <div id="admin-historical-archives-area" style="display:none; padding: 15px; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; background: rgba(255, 255, 255, 0.02);">
+                    <div id="admin-historical-archives-area" style="padding: 15px; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; background: rgba(255, 255, 255, 0.02);">
                         <h3 style="color: var(--accent-gold); margin-top:0; font-size: 1.05rem;"><i class="fa-solid fa-clock-rotate-left"></i> Archivio Storico</h3>
                         <p style="font-size: 0.85rem; margin-bottom: 15px; color: var(--text-muted);">Consulta le classifiche degli anni passati o ripristina un anno archiviato per errore.</p>
                         <div id="admin-historical-archives-list">
                             <p style="font-size: 0.85rem; color: var(--text-muted);">Caricamento archivio in corso...</p>
                         </div>
                     </div>
+                </div>
+            </section>
+
+            <!-- VIEW: Pannello Super-Admin / Docente - Regolamento Dinamico -->
+            <section id="admin-view-regolamento" class="admin-view" style="display:none;">
+                <div id="admin-regolamento-container">
+                    <!-- Popolato dinamicamente da RulesService -->
+                </div>
+            </section>
+
+            <!-- VIEW: Pannello Super-Admin / Docente - Miniguida Dinamica -->
+            <section id="admin-view-miniguida" class="admin-view" style="display:none;">
+                <div id="fanta-miniguida-editor-container">
+                    <!-- Popolato dinamicamente da MiniguidaService -->
                 </div>
             </section>
 
@@ -726,20 +877,83 @@
     <script src="js/services/activities.js"></script>
     <script src="js/services/users.js"></script>
 
-    <!-- Modale Selezione Squadre per Minigiochi -->
-    <div id="team-selector-modal" class="modal-wip" style="z-index: 5100; overflow-y:auto; display:none;" onclick="if(event.target===this) { this.style.display='none'; }">
-        <div class="modal-wip-content" style="max-width:400px; padding: 20px;">
+    <!-- Modale Archiviazione Selettiva per Anno -->
+    <div id="selective-archive-modal" class="modal-wip" style="z-index: 5200; overflow-y:auto; display:none;" onclick="if(event.target===this) { this.style.display='none'; }">
+        <div class="modal-wip-content" style="max-width:650px; width:90%; padding: 25px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px;">
-              <h3 style="font-family: var(--font-heading); color: var(--accent-gold); font-size: 1.1rem; margin:0;"><i class="fa-solid fa-users"></i> Scegli le Squadre</h3>
-              <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.8rem; border:none;" onclick="document.getElementById('team-selector-modal').style.display='none'">
+              <h3 style="font-family: var(--font-heading); color: var(--accent-gold); font-size: 1.2rem; margin:0;"><i class="fa-solid fa-box-archive"></i> Archiviazione Annuale Selettiva</h3>
+              <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.8rem; border:none;" onclick="document.getElementById('selective-archive-modal').style.display='none'">
                 <i class="fa-solid fa-xmark"></i>
               </button>
             </div>
-            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">Seleziona le squadre della classe che si scontreranno. I turni si alterneranno automaticamente.</p>
-            <div id="team-selector-list" style="display:flex; flex-direction:column; gap:8px; max-height:200px; overflow-y:auto; margin-bottom:15px;">
+            
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">
+                Seleziona quali squadre archiviare. Le squadre deselezionate (es. create per il nuovo anno) <strong>rimarranno attive</strong>.
+            </p>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; font-size:0.85rem; font-weight:700; color:var(--text-light); margin-bottom:5px;">Nome Etichetta Archivio:</label>
+                <input type="text" id="archive-name-input" class="form-control" style="width:100%; background:rgba(0,0,0,0.3); border:1px solid rgba(212,175,55,0.3); color:#fff; padding:8px 12px; border-radius:6px;" value="Archivio_2025_2026">
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom: 10px;">
+                <span style="font-size:0.8rem; font-weight:700; color:var(--accent-gold);">Squadre Attive Rilevate:</span>
+                <div style="display:flex; gap:6px;">
+                    <button type="button" class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem;" onclick="window.selectAllArchiveTeams(true)">Tutte</button>
+                    <button type="button" class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem; background:rgba(212,175,55,0.15); border-color:var(--accent-gold); color:var(--accent-gold);" onclick="window.selectOnlyOldArchiveTeams()">Solo Vecchie (Escludi Oggi)</button>
+                    <button type="button" class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem;" onclick="window.selectAllArchiveTeams(false)">Nessuna</button>
+                </div>
+            </div>
+
+            <div id="archive-teams-selector-list" style="display:flex; flex-direction:column; gap:8px; max-height:280px; overflow-y:auto; margin-bottom:20px; border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:10px; background:rgba(0,0,0,0.25);">
                 <!-- Popolato da JS -->
             </div>
-            <button class="btn" style="width:100%;" onclick="window.EroiMinigames.confirmTeamSelection()"><i class="fa-solid fa-play"></i> Inizia Sfida</button>
+
+            <div style="display:flex; gap:10px; justify-content:flex-end;">
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('selective-archive-modal').style.display='none'">Annulla</button>
+                <button type="button" class="btn text-danger" style="background:rgba(231,76,60,0.15); border:1px solid var(--danger-color); font-weight:700;" onclick="window.confirmSelectiveArchive()"><i class="fa-solid fa-box-archive"></i> Archivia Squadre Selezionate</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modale Selezione Squadre per Minigiochi -->
+    <div id="team-selector-modal" class="modal-wip" style="z-index: 5100; overflow-y:auto; display:none;" onclick="if(event.target===this) { this.style.display='none'; }">
+        <div class="modal-wip-content" style="max-width:440px; padding: 22px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 10px;">
+              <h3 style="font-family: var(--font-heading); color: var(--accent-gold); font-size: 1.15rem; margin:0;"><i class="fa-solid fa-users"></i> Scegli le Squadre</h3>
+              <button type="button" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.8rem; border:none;" onclick="document.getElementById('team-selector-modal').style.display='none'">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+            
+            <!-- Filtro per Campionato -->
+            <div style="margin-bottom: 12px;">
+                <label style="display:block; font-size:0.75rem; color:var(--text-muted); font-weight:700; margin-bottom:5px; text-transform:uppercase; letter-spacing:0.5px;">
+                    <i class="fa-solid fa-trophy" style="color:var(--accent-gold);"></i> Filtra per Campionato:
+                </label>
+                <select id="team-selector-mode-filter" class="input-control" style="width: 100%; padding: 8px 12px; font-size: 0.82rem; border-radius: 8px; background: rgba(0,0,0,0.5); color: #fff; border: 1px solid rgba(255,255,255,0.2);" onchange="window.EroiMinigames && window.EroiMinigames.onFilterChange()">
+                    <option value="all">🌐 Tutti i Campionati / Classi</option>
+                    <option value="terze">📘 Età Contemporanea (Terze)</option>
+                    <option value="seconde">📙 Età Medievale e Moderna (Seconde)</option>
+                    <option value="avanzato">📒 Contemporanea & Internazionali (Avanzato)</option>
+                </select>
+            </div>
+
+            <!-- Controlli Rapidi Selezione -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; background:rgba(255,255,255,0.04); padding:6px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
+                <span id="team-selector-count" style="font-size:0.75rem; color:var(--accent-gold); font-weight:700;">0 squadre selezionate</span>
+                <div style="display:flex; gap:6px;">
+                    <button type="button" class="btn btn-secondary" style="padding:3px 8px; font-size:0.7rem; border-radius:6px; cursor:pointer;" onclick="window.EroiMinigames && window.EroiMinigames.toggleSelectAll(true)">Tutte</button>
+                    <button type="button" class="btn btn-secondary" style="padding:3px 8px; font-size:0.7rem; border-radius:6px; cursor:pointer;" onclick="window.EroiMinigames && window.EroiMinigames.toggleSelectAll(false)">Nessuna</button>
+                </div>
+            </div>
+
+            <div id="team-selector-list" style="display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto; margin-bottom:15px; padding-right:4px;">
+                <!-- Popolato dinamicamente da JS -->
+            </div>
+            <button type="button" class="btn" style="width:100%; font-weight:800; font-size:0.95rem; padding:10px; border-radius:10px; background:var(--accent-gold); color:#000;" onclick="window.EroiMinigames.confirmTeamSelection()">
+                <i class="fa-solid fa-play"></i> Inizia Sfida a Squadre
+            </button>
         </div>
     </div>
 
@@ -757,6 +971,101 @@
               </button>
             </div>
             <div id="minigame-content" class="minigame-modal-body"><!-- Contenuto dinamico del mini-gioco --></div>
+        </div>
+    </div>
+
+    <!-- MODALE EDITOR / PROGRAMMATORE IMPREVISTI (SUPER-ADMIN) -->
+    <div id="modal-imprevisto-editor" class="modal-wip" style="display:none; z-index: 5500;" onclick="if(event.target===this) window.closeImprevistoModal()">
+        <div class="modal-wip-content" style="max-width: 540px; width: 92%; padding: 24px; text-align: left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-scroll" style="color: var(--accent-gold); font-size: 1.2rem;"></i>
+                    <h3 id="imprevisto-modal-title" style="margin: 0; font-size: 1.15rem; color: #fff;">Programma Imprevisto</h3>
+                </div>
+                <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.85rem; border-radius: 50%;" onclick="window.closeImprevistoModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="form-imprevisto-editor" onsubmit="window.submitImprevistoModal(event)">
+                <input type="hidden" id="imp-form-id" value="">
+                <input type="hidden" id="imp-form-card-id" value="">
+
+                <!-- Data Programmata -->
+                <div style="margin-bottom: 14px;">
+                    <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; font-weight: bold;">
+                        <i class="fa-solid fa-calendar-day" style="color: var(--accent-gold);"></i> Data di Attivazione nel Campionato:
+                    </label>
+                    <input type="date" id="imp-form-date" required style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 12px; border-radius: 8px; font-family: monospace; font-size: 0.95rem;">
+                </div>
+
+                <!-- Titolo Evento -->
+                <div style="margin-bottom: 14px;">
+                    <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; font-weight: bold;">
+                        Titolo Imprevisto / Evento:
+                    </label>
+                    <input type="text" id="imp-form-title" required placeholder="es. ⚜️ Dante cacciato da Firenze" style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 0.9rem;">
+                </div>
+
+                <!-- Sottotitolo / Motivo -->
+                <div style="margin-bottom: 14px;">
+                    <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">
+                        Sottotitolo / Tema Storico:
+                    </label>
+                    <input type="text" id="imp-form-subtitle" placeholder="es. L'esilio e la condanna al rogo" style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 0.85rem;">
+                </div>
+
+                <!-- Lore Letterario Reale -->
+                <div style="margin-bottom: 14px;">
+                    <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; font-weight: bold;">
+                        Lore Storico-Letterario Autentico (Spiegazione per gli studenti):
+                    </label>
+                    <textarea id="imp-form-lore" rows="3" placeholder="Descrivi l'avvenimento letterario reale e l'impatto sul campionato..." style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 0.82rem; line-height: 1.4;"></textarea>
+                </div>
+
+                <!-- Target Autore / Gruppo -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+                    <div>
+                        <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; font-weight: bold;">
+                            Autore Target:
+                        </label>
+                        <select id="imp-form-author" style="width: 100%; background: rgba(20,20,30,0.95); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 10px; border-radius: 8px; font-size: 0.85rem;">
+                            <option value="">-- Evento Globale / Nessuno --</option>
+                            <!-- Popolato da JS -->
+                        </select>
+                    </div>
+
+                    <div>
+                        <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; font-weight: bold;">
+                            Effetto Punti:
+                        </label>
+                        <div style="display: flex; gap: 6px;">
+                            <select id="imp-form-effect-type" style="width: 60%; background: rgba(20,20,30,0.95); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 6px; border-radius: 8px; font-size: 0.8rem;">
+                                <option value="bonus">➕ Bonus</option>
+                                <option value="malus">➖ Malus</option>
+                                <option value="market">🔁 Mercato</option>
+                            </select>
+                            <input type="number" id="imp-form-points" value="0" style="width: 40%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 8px; border-radius: 8px; font-size: 0.85rem; text-align: center;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Opzione Finestra di Mercato (1 Cambio) -->
+                <div style="margin-bottom: 20px; background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.25); padding: 10px 14px; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="imp-form-is-market" style="width: 18px; height: 18px; cursor: pointer;">
+                    <label for="imp-form-is-market" style="font-size: 0.85rem; color: #93c5fd; font-weight: 600; cursor: pointer;">
+                        <i class="fa-solid fa-repeat"></i> Abilita Finestra di Mercato (1 Cambio Rosa per tutte le squadre)
+                    </label>
+                </div>
+
+                <!-- Bottoni Azione -->
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" class="btn btn-secondary" onclick="window.closeImprevistoModal()">Annulla</button>
+                    <button type="submit" class="btn" style="background: var(--accent-gold); color: var(--bg-dark); font-weight: bold; border: none; padding: 8px 18px; border-radius: 10px;">
+                        <i class="fa-solid fa-floppy-disk"></i> Salva Imprevisto
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -779,20 +1088,30 @@
     </div>
 
     <!-- Scripts -->
-    <script src="js/data.js?v=20260824_clean_minigames"></script>
-    <script src="js/services/calendar-service.js?v=20260824_clean_minigames"></script>
-    <script src="js/music.js?v=20260824_clean_minigames"></script>
-    <script src="js/minigames.js?v=20260824_clean_minigames"></script>
+    <script src="js/data.js?v=20261004_v3_zeroflicker"></script>
+    <script src="js/services/calendar-service.js?v=20261004_v3_zeroflicker"></script>
+    <script src="js/services/imprevisti-service.js?v=20261004_v3_zeroflicker"></script>
+    <script src="js/services/rules-service.js?v=20261004_v3_zeroflicker"></script>
+    <script src="js/services/miniguida-service.js?v=20261004_v3_zeroflicker"></script>
+    <script src="js/music.js?v=20261004_v3_zeroflicker"></script>
+    <script src="js/minigames.js?v=20261004_v3_zeroflicker"></script>
     <!-- Components -->
-    <script src="js/components/navbar.js?v=20260824_clean_minigames"></script>
-    <script src="js/components/modals.js?v=20260824_clean_minigames"></script>
+    <script src="js/components/navbar.js?v=20261004_v3_zeroflicker"></script>
+    <script src="js/components/modals.js?v=20261004_v3_zeroflicker"></script>
     <!-- Dashboard -->
-    <script src="js/dashboard/admin-logic.js?v=20260824_clean_minigames"></script>
+    <script src="js/dashboard/admin-logic.js?v=20261004_v3_zeroflicker"></script>
+    <script>
+        window.renderAdminMiniguida = function() {
+            if (window.FantaMiniguidaService) {
+                window.FantaMiniguidaService.renderAdminEditor('fanta-miniguida-editor-container');
+            }
+        };
+    </script>
     <!-- Live Editor -->
-    <script src="js/live-editor.js?v=20260824_clean_minigames"></script>
-    <script src="js/app.js?v=20260824_clean_minigames"></script>
+    <script src="js/live-editor.js?v=20261004_v3_zeroflicker"></script>
+    <script src="js/app.js?v=20261004_v3_zeroflicker"></script>
     <!-- Modali condivisi ed Access Control ecosistema Prof. Memmo -->
     <script>window.HUB_GAME_ID = "fantaletteratura";</script>
-    <script src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/hub-subscription-guard.js?v=20260824_clean_minigames"></script>
+    <script src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/hub-subscription-guard.js?v=20261004_v3_zeroflicker"></script>
 </body>
 </html>

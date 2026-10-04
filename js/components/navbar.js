@@ -20,7 +20,7 @@ function navigateTo(viewId, pushHistory = true) {
     }
 
     // ACCESSO E PROTEZIONE NAVIGAZIONE
-    const isPublicView = ['view-welcome', 'view-onboarding', 'view-regolamento'].includes(viewId);
+    const isPublicView = ['view-welcome', 'view-onboarding', 'view-regolamento', 'view-salagiochi'].includes(viewId);
     const hasStudentCode = localStorage.getItem('fanta_active_team_code');
     const isDocente = !!currentUserEmail;
 
@@ -78,9 +78,22 @@ function navigateTo(viewId, pushHistory = true) {
     if(viewId === 'view-profilo') {
         renderProfilo();
     }
+    if(viewId === 'view-regolamento') {
+        if(window.RulesService) {
+            window.RulesService.renderPublicView('view-regolamento-content');
+        }
+    }
     if(viewId === 'view-schede') {
+        if(typeof populateSchede === 'function') {
+            populateSchede(window.currentSchedeMode || 'terze');
+        }
         if(typeof window.segnaTuttiAutoriRivelatiComeVisti === 'function') {
             window.segnaTuttiAutoriRivelatiComeVisti();
+        }
+    }
+    if(viewId === 'view-salagiochi') {
+        if(typeof window.renderSalaGiochiView === 'function') {
+            window.renderSalaGiochiView();
         }
     }
 

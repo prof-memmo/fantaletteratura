@@ -129,6 +129,21 @@ function initApp() {
     // 1. Navigation setup
     setupNavigation();
     
+    // Inizializzazione Regolamento Dinamico Centralizzato
+    if (window.RulesService) {
+        window.RulesService.init();
+        window.RulesService.subscribe(() => {
+            const pubContainer = document.getElementById('view-regolamento-content');
+            if (pubContainer && document.getElementById('view-regolamento') && document.getElementById('view-regolamento').classList.contains('active')) {
+                window.RulesService.renderPublicView('view-regolamento-content');
+            }
+            const docContainer = document.getElementById('docente-regolamento-container');
+            if (docContainer && document.getElementById('tab-docente-regolamento') && document.getElementById('tab-docente-regolamento').style.display !== 'none') {
+                window.RulesService.renderDocenteTab('docente-regolamento-container');
+            }
+        });
+    }
+    
     // 2. Data Initialization
     populateAuthorSelects(window.currentAdminMode || 'terze');
     populateSchede(window.currentAdminMode || 'terze');
@@ -208,12 +223,7 @@ function selectTeamMode(modeId) {
 
     // Reset any previous selection
     teamSelection = { 1: null, 2: null, 3: null, 4: null, 5: null };
-    document.querySelectorAll('.author-slot-btn').forEach(btn => {
-        const ord = ['1ª','2ª','3ª','4ª','5ª'];
-        const slot = btn.dataset.slot;
-        btn.innerHTML = `<span class="slot-name"><i class="fa-solid fa-plus"></i> Scegli la ${ord[slot-1]} star</span> <span class="slot-cost text-primary"></span>`;
-    });
-    document.querySelectorAll('.author-remove-btn').forEach(b => b.classList.remove('visible'));
+    renderRosterSlots();
     calculateBudget();
 
     // Re-populate author grid for this mode
@@ -223,6 +233,42 @@ function selectTeamMode(modeId) {
 /* ─────────────────────────────────────────────────────────────
    LEADERBOARD MODE SELECTION
 ───────────────────────────────────────────────────────────── */
+let currentLeaderboardTarget = 'scuola';
+
+window.selectLeaderboardTarget = function(target) {
+    currentLeaderboardTarget = target || 'scuola';
+    const btnScuola = document.getElementById('lb-target-scuola');
+    const btnViandante = document.getElementById('lb-target-viandante');
+    const btnMissioni = document.getElementById('lb-btn-missioni');
+    const btnMinigiochi = document.getElementById('lb-btn-minigiochi');
+
+    if (btnScuola && btnViandante) {
+        if (currentLeaderboardTarget === 'scuola') {
+            btnScuola.classList.remove('btn-secondary');
+            btnScuola.style.background = 'var(--primary-color)';
+            btnScuola.style.opacity = '1';
+            btnViandante.classList.add('btn-secondary');
+            btnViandante.style.background = 'transparent';
+            btnViandante.style.opacity = '0.75';
+            if (btnMissioni) btnMissioni.style.display = 'block';
+            if (btnMinigiochi) btnMinigiochi.style.display = 'none';
+        } else {
+            btnViandante.classList.remove('btn-secondary');
+            btnViandante.style.background = '#8b5cf6';
+            btnViandante.style.opacity = '1';
+            btnScuola.classList.add('btn-secondary');
+            btnScuola.style.background = 'transparent';
+            btnScuola.style.opacity = '0.75';
+            if (btnMissioni) btnMissioni.style.display = 'none';
+            if (btnMinigiochi) btnMinigiochi.style.display = 'block';
+        }
+    }
+
+    if (currentLeaderboardMode) {
+        selectLeaderboardMode(currentLeaderboardMode);
+    }
+};
+
 function selectLeaderboardMode(modeId) {
     const mode = GAME_MODES[modeId];
     if (!mode) return;
@@ -250,20 +296,158 @@ function selectLeaderboardMode(modeId) {
 
     // Update button colors based on mode
     const btnColor = mode.colorPrimary;
-    ['lb-btn-autori','lb-btn-missioni','lb-btn-globale'].forEach(id => {
+    ['lb-btn-autori','lb-btn-missioni','lb-btn-minigiochi','lb-btn-globale'].forEach(id => {
         const btn = document.getElementById(id);
         if (btn) btn.style.background = btnColor + ' !important';
     });
 
+    // Toggle missioni vs minigiochi in base al target
+    const btnMissioni = document.getElementById('lb-btn-missioni');
+    const btnMinigiochi = document.getElementById('lb-btn-minigiochi');
+    if (currentLeaderboardTarget === 'viandante') {
+        if (btnMissioni) btnMissioni.style.display = 'none';
+        if (btnMinigiochi) btnMinigiochi.style.display = 'block';
+    } else {
+        if (btnMissioni) btnMissioni.style.display = 'block';
+        if (btnMinigiochi) btnMinigiochi.style.display = 'none';
+    }
+
     // Update label
     const label = document.getElementById('lb-mode-selected-label');
-    if (label) label.textContent = `${mode.emoji} ${mode.label}`;
+    const targetTxt = currentLeaderboardTarget === 'viandante' ? '🧭 Campionato Viandanti' : '🏫 Campionato Scuole';
+    if (label) label.textContent = `${targetTxt} — ${mode.emoji} ${mode.label}`;
 }
 
+
+function renderRosterSlots() {
+    const container = document.getElementById('roster-slots-grid');
+    const countSpan = document.getElementById('roster-count');
+    if (!container) return;
+
+    const modeKey = currentTeamMode || 'terze';
+    const modeCfg = GAME_MODES[modeKey] || GAME_MODES.terze;
+    const pool = modeCfg.authors || AUTHORS;
+    const currency = modeCfg.currencyLabel || 'lire';
+
+    let filledCount = 0;
+    let html = '';
+
+    for (let slot = 1; slot <= 5; slot++) {
+        const authorId = teamSelection[slot];
+        if (authorId) {
+            filledCount++;
+            const author = pool.find(a => a.id === authorId) || { name: 'Autore', cost: 0, image: '' };
+            const price = (author.cost || author.points || 0).toLocaleString();
+            html += `
+                <div class="roster-slot-card filled">
+                    <button class="slot-remove-btn" onclick="removeAuthorFromSlot(${slot})" title="Rimuovi ${author.name}">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <img src="${author.image || 'assets/avatar-default.png'}" alt="${author.name}" class="slot-thumb">
+                    <div class="slot-author-name" title="${author.name}">${author.name}</div>
+                    <div class="slot-author-cost">${price} ${currency}</div>
+                </div>
+            `;
+        } else {
+            html += `
+                <div class="roster-slot-card empty">
+                    <div class="slot-empty-icon"><i class="fa-regular fa-star"></i></div>
+                    <div class="slot-empty-title">${slot}ª Star</div>
+                </div>
+            `;
+        }
+    }
+
+    container.innerHTML = html;
+    if (countSpan) countSpan.textContent = filledCount;
+}
+
+function updateAuthorCardsSelection() {
+    const selectedIds = Object.values(teamSelection).filter(val => val !== null);
+    document.querySelectorAll('#author-grid .author-card').forEach(card => {
+        const id = card.dataset.id;
+        if (selectedIds.includes(id)) {
+            card.classList.add('is-selected');
+        } else {
+            card.classList.remove('is-selected');
+        }
+    });
+}
+
+function toggleAuthorSelection(authorId, modeId) {
+    const modeKey = modeId || currentTeamMode || 'terze';
+    const modeCfg = GAME_MODES[modeKey] || GAME_MODES.terze;
+    const pool = modeCfg.authors || AUTHORS;
+    const author = pool.find(a => a.id === authorId);
+
+    // Controlla se l'autore è Fuori Mercato
+    const isFuoriMercato = Boolean(
+        author && (
+            author.isPointsRevealed === true ||
+            (window.CalendarService && typeof window.CalendarService.isAuthorReleased === 'function' && window.CalendarService.isAuthorReleased(authorId))
+        )
+    );
+    
+    // Check if already selected -> remove
+    for (let slot = 1; slot <= 5; slot++) {
+        if (teamSelection[slot] === authorId) {
+            teamSelection[slot] = null;
+            renderRosterSlots();
+            updateAuthorCardsSelection();
+            calculateBudget();
+            return;
+        }
+    }
+
+    // Se l'autore è fuori mercato, impedisce l'acquisto e apre la scheda didattica
+    if (isFuoriMercato) {
+        if (typeof window.openAuthorSchedaModal === 'function') {
+            window.openAuthorSchedaModal(authorId, modeKey);
+        }
+        return;
+    }
+
+    // Not selected -> find first available slot
+    let freeSlot = null;
+    for (let slot = 1; slot <= 5; slot++) {
+        if (!teamSelection[slot]) {
+            freeSlot = slot;
+            break;
+        }
+    }
+
+    if (!freeSlot) {
+        alert("Hai già selezionato tutte le 5 Star! Clicca su una Star nel pannello in alto (✕) per sostituirla.");
+        return;
+    }
+
+    teamSelection[freeSlot] = authorId;
+    renderRosterSlots();
+    updateAuthorCardsSelection();
+    calculateBudget();
+}
+
+function removeAuthorFromSlot(slot) {
+    teamSelection[slot] = null;
+    renderRosterSlots();
+    updateAuthorCardsSelection();
+    calculateBudget();
+}
+
+// Global hook for external callers (e.g. LIM / draft)
+window.updateSlotsUI = function() {
+    renderRosterSlots();
+    updateAuthorCardsSelection();
+};
 
 function populateAuthorSelects(modeId) {
     const grid = document.getElementById('author-grid');
     if(!grid) return;
+
+    // Assicura l'applicazione delle validazioni del calendario prima del rendering
+    if (window.CalendarService && typeof window.CalendarService.applyCalendarValidations === 'function') {
+        window.CalendarService.applyCalendarValidations();
+    }
 
     // Determine which author pool to use
     const modeKey = modeId || currentTeamMode || 'terze';
@@ -272,38 +456,78 @@ function populateAuthorSelects(modeId) {
     const currency = modeCfg.currencyLabel || 'lire';
     
     grid.innerHTML = '';
-    // Sort logic update: use cost or points
+    // Sort by cost or points descending
     const sortedAuthors = [...pool].sort((a, b) => (b.cost || b.points || 0) - (a.cost || a.points || 0));
+
+    // Controllo fine stagione: quanti autori sono ancora acquistabili
+    const availableAuthorsCount = sortedAuthors.filter(a => !(
+        a.isPointsRevealed === true ||
+        (window.CalendarService && typeof window.CalendarService.isAuthorReleased === 'function' && window.CalendarService.isAuthorReleased(a.id))
+    )).length;
+
+    let warningBanner = document.getElementById('season-end-warning');
+    if (availableAuthorsCount < 5) {
+        if (!warningBanner) {
+            warningBanner = document.createElement('div');
+            warningBanner.id = 'season-end-warning';
+            warningBanner.style.cssText = 'background: rgba(220, 53, 69, 0.2); border: 1px solid #e63946; color: #ffccd2; padding: 12px 16px; border-radius: 10px; margin-bottom: 15px; font-size: 0.9rem; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.4);';
+            grid.parentNode.insertBefore(warningBanner, grid);
+        }
+        warningBanner.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> <strong>Attenzione (Fine Stagione):</strong> Restano solo <strong>${availableAuthorsCount}</strong> autori disponibili all'acquisto per questo campionato. Non è più possibile formare una rosa completa da 5. Contatta il docente o l'amministratore.`;
+        warningBanner.style.display = 'block';
+    } else if (warningBanner) {
+        warningBanner.style.display = 'none';
+    }
     
     sortedAuthors.forEach(author => {
+        const isFuoriMercato = Boolean(
+            author.isPointsRevealed === true ||
+            (window.CalendarService && typeof window.CalendarService.isAuthorReleased === 'function' && window.CalendarService.isAuthorReleased(author.id))
+        );
+
         const card = document.createElement('div');
         const isInternationalClass = author.isInternational ? 'card-international' : '';
-        card.className = `author-card glass ${isInternationalClass}`;
+        const fuoriMercatoClass = isFuoriMercato ? 'card-fuori-mercato' : '';
+        
+        card.className = `author-card glass ${isInternationalClass} ${fuoriMercatoClass}`.trim();
         card.dataset.id = author.id;
-        card.innerHTML = `
-            <div class="author-image-wrapper">
-                <img src="${author.image}" alt="${author.name}">
-            </div>
-            <div class="author-name" style="font-family: var(--font-heading); font-weight:bold; font-size:1.1rem; color:#f5c53c;">${author.name}</div>
-            <div class="text-primary" style="font-size:0.9rem; font-weight:600;">${author.cost || author.points} ${currency}</div>
-        `;
-        card.addEventListener('click', () => {
-            selectAuthorForSlot(author.id, modeKey);
-        });
-        grid.appendChild(card);
-    });
+        const price = (author.cost || author.points || 0).toLocaleString();
+        
+        if (isFuoriMercato) {
+            card.innerHTML = `
+                <div class="fuori-mercato-badge">
+                    <span class="badge-title"><i class="fa-solid fa-lock"></i> FUORI MERCATO</span>
+                    <span class="badge-sub">Disponibile nella prossima stagione</span>
+                </div>
+                <div class="author-image-wrapper">
+                    <img src="${author.image}" alt="${author.name}">
+                </div>
+                <div class="author-name" style="font-family: var(--font-heading); font-weight:bold; font-size:1.05rem; margin-bottom:4px;">${author.name}</div>
+                <div class="price-tag text-primary" style="font-size:0.85rem; font-weight:700;">${price} ${currency}</div>
+                <div class="fuori-mercato-didattica-hint"><i class="fa-solid fa-book-open"></i> Consulta scheda</div>
+            `;
+            
+            card.addEventListener('click', () => {
+                if (typeof window.openAuthorSchedaModal === 'function') {
+                    window.openAuthorSchedaModal(author.id, modeKey);
+                }
+            });
+        } else {
+            card.innerHTML = `
+                <div class="author-check-badge"><i class="fa-solid fa-check"></i></div>
+                <div class="author-image-wrapper">
+                    <img src="${author.image}" alt="${author.name}">
+                </div>
+                <div class="author-name" style="font-family: var(--font-heading); font-weight:bold; font-size:1.05rem; color:#f5c53c; margin-bottom:4px;">${author.name}</div>
+                <div class="text-primary" style="font-size:0.85rem; font-weight:700;">${price} ${currency}</div>
+            `;
+            
+            card.addEventListener('click', () => {
+                toggleAuthorSelection(author.id, modeKey);
+            });
+        }
 
-    // Setup slot buttons — attach once, track current modeId via closure later
-    document.querySelectorAll('.author-slot-btn').forEach(btn => {
-        // Remove old listeners by cloning
-        const newBtn = btn.cloneNode(true);
-        btn.parentNode.replaceChild(newBtn, btn);
-        newBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            activeSlot = newBtn.dataset.slot;
-            document.getElementById('author-selector-modal').style.display = 'block';
-            updateGridDisabledState();
-        });
+        grid.appendChild(card);
     });
 
     // Search filter
@@ -311,9 +535,10 @@ function populateAuthorSelects(modeId) {
     if (searchInput) {
         const newInput = searchInput.cloneNode(true);
         searchInput.parentNode.replaceChild(newInput, searchInput);
+        newInput.value = '';
         newInput.addEventListener('input', () => {
-            const q = newInput.value.toLowerCase();
-            document.querySelectorAll('.author-card').forEach(card => {
+            const q = newInput.value.toLowerCase().trim();
+            document.querySelectorAll('#author-grid .author-card').forEach(card => {
                 const nameDiv = card.querySelector('.author-name');
                 const name = nameDiv ? nameDiv.textContent.toLowerCase() : '';
                 card.style.display = name.includes(q) ? '' : 'none';
@@ -321,76 +546,8 @@ function populateAuthorSelects(modeId) {
         });
     }
 
-    const closeBtn = document.getElementById('close-author-modal');
-    if(closeBtn) {
-        const newClose = closeBtn.cloneNode(true);
-        closeBtn.parentNode.replaceChild(newClose, closeBtn);
-        newClose.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('author-selector-modal').style.display = 'none';
-            activeSlot = null;
-        });
-    }
-}
-
-function updateGridDisabledState() {
-    // Disable authors already selected in other slots
-    const selectedIds = Object.values(teamSelection).filter(val => val !== null);
-    document.querySelectorAll('.author-card').forEach(card => {
-        if (selectedIds.includes(card.dataset.id)) {
-            card.style.opacity = '0.3';
-            card.style.pointerEvents = 'none';
-        } else {
-            card.style.opacity = '1';
-            card.style.pointerEvents = 'auto';
-        }
-    });
-}
-
-function selectAuthorForSlot(authorId, modeId) {
-    if (!activeSlot) return;
-    teamSelection[activeSlot] = authorId;
-
-    // Determine which author pool
-    const mode = modeId ? GAME_MODES[modeId] : (currentTeamMode ? GAME_MODES[currentTeamMode] : null);
-    const pool = (mode && mode.authors && mode.authors.length > 0) ? mode.authors : AUTHORS;
-    const author = pool.find(a => a.id === authorId);
-    if (!author) return;
-    
-    // Determine mode configuration for currency
-    const modeKey = modeId || currentTeamMode || 'terze';
-    const modeCfg = GAME_MODES[modeKey] || GAME_MODES.terze;
-    const currency = modeCfg.currencyLabel || 'lire';
-    const price = author.cost || author.points || 0;
-    
-    // Update button UI
-    const btn = document.querySelector(`.author-slot-btn[data-slot="${activeSlot}"]`);
-    if(btn) {
-        btn.innerHTML = `<div style="display:flex; align-items:center; gap:10px;">
-                            <img src="${author.image}" style="width:30px; height:30px; object-fit:cover; border-radius:50%; background:#fff;"> 
-                            <span>${author.name}</span>
-                         </div> 
-                         <span class="text-primary">${price} ${currency}</span>`;
-    }
-
-    // Show remove button for this slot
-    const removeBtn = document.querySelector(`.author-remove-btn[data-slot="${activeSlot}"]`);
-    if (removeBtn) removeBtn.classList.add('visible');
-
-    document.getElementById('author-selector-modal').style.display = 'none';
-    calculateBudget();
-}
-
-function removeAuthorFromSlot(slot) {
-    teamSelection[slot] = null;
-    const ord = ['1ª','2ª','3ª','4ª','5ª'];
-    const btn = document.querySelector(`.author-slot-btn[data-slot="${slot}"]`);
-    if (btn) {
-        btn.innerHTML = `<span class="slot-name"><i class="fa-solid fa-plus"></i> Scegli la ${ord[slot-1]} star</span> <span class="slot-cost text-primary"></span>`;
-    }
-    const removeBtn = document.querySelector(`.author-remove-btn[data-slot="${slot}"]`);
-    if (removeBtn) removeBtn.classList.remove('visible');
-    calculateBudget();
+    renderRosterSlots();
+    updateAuthorCardsSelection();
 }
 
 function setupBudgetCalculator() {
@@ -622,52 +779,88 @@ async function showLeaderboard(type) {
     const title = document.getElementById('leaderboard-title');
     listContainer.innerHTML = '<p class="text-center">Caricamento classifica...</p>';
 
+    const target = currentLeaderboardTarget || 'scuola';
+    const isViandanteTarget = target === 'viandante';
+    const targetBadge = isViandanteTarget
+        ? '<span class="badge" style="background:#8b5cf6; color:#fff; font-size:0.75rem; margin-left:8px; padding:4px 8px; border-radius:12px; font-weight:700;">🧭 Viandanti</span>'
+        : '<span class="badge" style="background:var(--primary-color); color:#fff; font-size:0.75rem; margin-left:8px; padding:4px 8px; border-radius:12px; font-weight:700;">🏫 Scuole</span>';
+
     // Determine current mode
     const modeId = currentLeaderboardMode || 'terze';
     const mode = GAME_MODES[modeId];
-    const pool = (mode && mode.authors && mode.authors.length > 0) ? mode.authors : AUTHORS;
-    const modeBadge = mode ? `<span class="mode-badge ${mode.colorClass}" style="font-size:0.75rem; margin-left:8px;">${mode.emoji} ${mode.shortLabel}</span>` : '';
+    const modeBadge = (type !== 'nazionale' && mode) ? `<span class="mode-badge ${mode.colorClass}" style="font-size:0.75rem; margin-left:8px;">${mode.emoji} ${mode.shortLabel}</span>` : '';
 
-    // Filter teams by mode
-    let allTeams = (await getAllTeams()).filter(t => (t.mode || 'terze') === modeId);
+    const allDbTeams = await getAllTeams();
+    
+    // Filtro rigoroso su target (scuola vs viandante)
+    let filteredTeams = allDbTeams.filter(t => (t.teamType || 'scuola') === target);
+    if (type !== 'nazionale') {
+        filteredTeams = filteredTeams.filter(t => (t.mode || 'terze') === modeId);
+    }
     listContainer.innerHTML = '';
 
     // Calcola punteggi
-    let calculated = allTeams.map(team => {
+    let calculated = filteredTeams.map(team => {
+        const teamModeKey = team.mode || 'terze';
+        const teamModeCfg = GAME_MODES[teamModeKey] || GAME_MODES.terze;
+        const teamPool = (teamModeCfg && teamModeCfg.authors) ? teamModeCfg.authors : AUTHORS;
+
         let authPoints = 0;
-        team.authors.forEach(aid => {
-            const author = pool.find(a => a.id === aid);
-            if(author && author.isPointsRevealed) {
-                authPoints += author.points;
-            }
-        });
-        let missionPoints = (team.missionsCompleted || 0) * 5;
+        if (team.authors && Array.isArray(team.authors)) {
+            team.authors.forEach(aid => {
+                const author = teamPool.find(a => a.id === aid);
+                if (author && author.isPointsRevealed) {
+                    authPoints += (author.points || 0);
+                }
+            });
+        }
+
+        const missionPoints = (team.missionsCompleted || 0) * 5;
+        const minigamePts = (team.minigamePoints || 0);
+        const displayName = isViandanteTarget 
+            ? `${team.name} <small style="color:var(--text-muted); font-size:0.8rem;">(Viandante)</small>`
+            : `${team.name} ${team.classe ? '(' + team.classe + ')' : ''}`;
+
         return {
-            team: team.name + ' (' + (team.classe || '') + ')',
+            team: displayName,
             autori: authPoints,
             missioni: missionPoints,
-            totale: authPoints + missionPoints,
-            mode: team.mode || 'terze'
+            minigiochi: minigamePts,
+            totale: isViandanteTarget ? (authPoints + minigamePts) : (authPoints + missionPoints),
+            mode: teamModeKey,
+            modeInfo: teamModeCfg
         };
     });
 
     let data = [];
-    if(type === 'globale') {
-        title.innerHTML = 'Classifica <span class="text-primary">Globale</span>' + modeBadge;
+    if (type === 'nazionale') {
+        title.innerHTML = `🇮🇹 Classifica Globale Nazionale ${targetBadge}`;
+        calculated.sort((a,b) => b.totale - a.totale);
+        data = calculated.map((t, idx) => ({ 
+            rank: idx+1, 
+            team: t.team + (t.modeInfo ? ` <span class="mode-badge ${t.modeInfo.colorClass}" style="font-size:0.7rem; padding:2px 6px;">${t.modeInfo.emoji}</span>` : ''), 
+            points: t.totale 
+        }));
+    } else if (type === 'globale') {
+        title.innerHTML = 'Classifica <span class="text-primary">Globale</span>' + modeBadge + targetBadge;
         calculated.sort((a,b) => b.totale - a.totale);
         data = calculated.map((t, idx) => ({ rank: idx+1, team: t.team, points: t.totale }));
-    } else if(type === 'autori') {
-        title.innerHTML = 'Classifica <span class="text-primary">Autori</span>' + modeBadge;
+    } else if (type === 'autori') {
+        title.innerHTML = 'Classifica <span class="text-primary">Autori</span>' + modeBadge + targetBadge;
         calculated.sort((a,b) => b.autori - a.autori);
         data = calculated.map((t, idx) => ({ rank: idx+1, team: t.team, points: t.autori }));
-    } else if(type === 'missioni') {
-        title.innerHTML = 'Classifica <span class="text-primary">Missioni</span>' + modeBadge;
+    } else if (type === 'missioni') {
+        title.innerHTML = 'Classifica <span class="text-primary">Missioni Didattiche</span>' + modeBadge + targetBadge;
         calculated.sort((a,b) => b.missioni - a.missioni);
         data = calculated.map((t, idx) => ({ rank: idx+1, team: t.team, points: t.missioni }));
+    } else if (type === 'minigiochi') {
+        title.innerHTML = 'Classifica <span class="text-primary">Minigiochi</span>' + modeBadge + targetBadge;
+        calculated.sort((a,b) => b.minigiochi - a.minigiochi);
+        data = calculated.map((t, idx) => ({ rank: idx+1, team: t.team, points: t.minigiochi }));
     }
 
     if (data.length === 0) {
-        listContainer.innerHTML = '<p class="text-muted" style="text-align:center; padding:20px;"><i>Nessuna squadra in questa modalità ancora.</i></p>';
+        listContainer.innerHTML = `<p class="text-muted" style="text-align:center; padding:20px;"><i>Nessuna squadra registrata per questa graduatoria.</i></p>`;
     } else {
         data.forEach(item => {
             const template = `
@@ -708,17 +901,6 @@ window.openAuthorSchedaModal = function(authorId, modeKey = null) {
             <img src="${author.image}" onclick="if(window.openImageModal) window.openImageModal('${author.image}')" style="width:80px; height:80px; border-radius:50%; object-fit:cover; background:#fff; cursor:pointer; border: 2px solid var(--accent-gold); box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Clicca per ingrandire">
         </div>
         <div style="font-size:0.95rem; line-height:1.6; color:#e0e0e0; margin-bottom:10px;">${author.schedaHTML}</div>
-        <div style="margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:15px;">
-            <h4 style="color:var(--accent-gold); margin-bottom:10px;"><i class="fa-solid fa-gamepad"></i> Missioni Autore</h4>
-            <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
-                <button class="btn" style="padding:6px 12px; font-size:0.8rem; background:rgba(212,175,55,0.15); border:1px solid var(--accent-gold);" onclick="document.getElementById('scheda-autore-modal').style.display='none'; window.EroiMinigames.startMinigame('quiz', '${author.id}')"><i class="fa-solid fa-list-check"></i> Quiz</button>
-                <button class="btn" style="padding:6px 12px; font-size:0.8rem; background:rgba(212,175,55,0.15); border:1px solid var(--accent-gold);" onclick="document.getElementById('scheda-autore-modal').style.display='none'; window.EroiMinigames.startMinigame('impiccato', '${author.id}')"><i class="fa-solid fa-pen-nib"></i> Impiccato</button>
-                <button class="btn" style="padding:6px 12px; font-size:0.8rem; background:rgba(212,175,55,0.15); border:1px solid var(--accent-gold);" onclick="document.getElementById('scheda-autore-modal').style.display='none'; window.EroiMinigames.startMinigame('cloze', '${author.id}')"><i class="fa-solid fa-align-left"></i> Cloze</button>
-                <button class="btn" style="padding:6px 12px; font-size:0.8rem; background:rgba(212,175,55,0.15); border:1px solid var(--accent-gold);" onclick="document.getElementById('scheda-autore-modal').style.display='none'; window.EroiMinigames.startMinigame('puzzle', '${author.id}')"><i class="fa-solid fa-puzzle-piece"></i> Puzzle</button>
-                <button class="btn" style="padding:6px 12px; font-size:0.8rem; background:rgba(212,175,55,0.15); border:1px solid var(--accent-gold);" onclick="document.getElementById('scheda-autore-modal').style.display='none'; window.EroiMinigames.startMinigame('versi', '${author.id}')"><i class="fa-solid fa-align-justify"></i> Versi</button>
-            </div>
-            <button class="btn" style="width:100%; margin-top:10px; background:var(--accent-gold); color:var(--bg-dark);" onclick="document.getElementById('scheda-autore-modal').style.display='none'; window.EroiMinigames.startManche('${author.id}')"><i class="fa-solid fa-trophy"></i> Avvia Manche Completa</button>
-        </div>
     `;
     document.getElementById('scheda-autore-modal').style.display = 'block';
 };
@@ -754,19 +936,61 @@ window.openImageModal = function(src) {
     };
 };
 
+window.currentSchedeMode = 'terze';
+
+window.switchSchedeMode = function(modeKey) {
+    window.currentSchedeMode = modeKey || 'terze';
+    populateSchede(window.currentSchedeMode);
+};
+
 function populateSchede(modeId = null) {
     const grid = document.getElementById('schede-grid');
     if(!grid) return;
     
+    // Assicura l'applicazione delle validazioni del calendario prima del rendering
+    if (window.CalendarService && typeof window.CalendarService.applyCalendarValidations === 'function') {
+        window.CalendarService.applyCalendarValidations();
+    }
+
+    const modeKey = modeId || window.currentSchedeMode || currentTeamMode || 'terze';
+    window.currentSchedeMode = modeKey;
+
+    // Aggiorna stato attivo dei pulsanti tab
+    document.querySelectorAll('.schede-tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+        btn.style.background = '';
+        btn.style.color = '';
+        btn.style.borderColor = '';
+    });
+    const activeBtn = document.getElementById(`schede-tab-${modeKey}`);
+    if (activeBtn) {
+        activeBtn.classList.add('active');
+        activeBtn.style.background = 'var(--primary-color)';
+        activeBtn.style.color = 'var(--bg-dark)';
+        activeBtn.style.borderColor = 'var(--primary-color)';
+    }
+
     grid.innerHTML = '';
 
-    const modeKey = modeId || currentTeamMode || 'terze';
     const modeCfg = GAME_MODES[modeKey] || GAME_MODES.terze;
     const pool = modeCfg.authors || AUTHORS;
     const revealedAuthors = pool.filter(a => a.isSchedaRevealed);
 
     if(revealedAuthors.length === 0) {
-        grid.innerHTML = '<p class="text-muted" style="grid-column: 1/-1; text-align: center; padding: 20px 0;">In attesa della prima scheda... i professori le pubblicheranno a breve!</p>';
+        let dateMsg = "I professori le pubblicheranno a breve!";
+        if (modeKey === 'terze') {
+            dateMsg = "Prima uscita in programma per Martedì 13 Ottobre 2026 (Foscolo, Manzoni, Leopardi).";
+        } else if (modeKey === 'avanzato') {
+            dateMsg = "Prima uscita in programma per Martedì 13 Ottobre 2026 con gli autori internazionali.";
+        }
+        
+        grid.innerHTML = `
+            <div class="glass" style="grid-column: 1/-1; text-align: center; padding: 30px 20px; border-radius: 14px; border: 1px dashed rgba(255,255,255,0.15);">
+                <i class="fa-solid fa-hourglass-half" style="font-size: 2rem; color: var(--accent-gold); margin-bottom: 12px; display: block;"></i>
+                <div style="font-weight: 700; font-size: 1.05rem; margin-bottom: 6px; color: #fff;">In attesa della prima scheda per questo campionato</div>
+                <div class="text-muted" style="font-size: 0.88rem; max-width: 500px; margin: 0 auto;">${dateMsg}</div>
+            </div>
+        `;
         return;
     }
 
@@ -800,6 +1024,19 @@ function populateSchede(modeId = null) {
         // Conserva l'ordine cronologico (dal primo autore studiato all'ultimo)
         grid.insertAdjacentHTML('beforeend', card); 
     });
+
+    // Search filter
+    const searchInput = document.getElementById('search-scheda-input') || document.querySelector('#view-schede input.input-control');
+    if (searchInput) {
+        searchInput.oninput = function() {
+            const q = searchInput.value.toLowerCase().trim();
+            grid.querySelectorAll('.author-card').forEach(card => {
+                const nameDiv = card.querySelector('div[style*="font-family"]') || card;
+                const name = nameDiv ? nameDiv.textContent.toLowerCase() : '';
+                card.style.display = name.includes(q) ? '' : 'none';
+            });
+        };
+    }
 }
 
 /* =========================================
@@ -880,7 +1117,17 @@ function checkLoginSession() {
 
     fanta_db.onAuthStateChanged(async (user) => {
         if (!user) {
-            // Mostra il login locale su FantaLetteratura senza reindirizzare
+            // Mostra stato Ospite nell'header
+            const loginHubBtn = document.getElementById('btn-login-hub-dropdown');
+            const profileBtn = document.getElementById('btn-profile-dropdown');
+            const inviteBtn = document.getElementById('btn-invite-dropdown');
+            const bottomRow = document.getElementById('dropdown-bottom-row');
+            if (loginHubBtn) loginHubBtn.style.display = 'flex';
+            if (profileBtn) profileBtn.style.display = 'none';
+            if (inviteBtn) inviteBtn.style.display = 'none';
+            if (bottomRow) bottomRow.style.display = 'none';
+
+            // Mostra la home di benvenuto
             if(typeof window.navigateTo === 'function') {
                 window.navigateTo('view-welcome');
             } else {
@@ -1212,6 +1459,33 @@ window.testConnessioneAdmin = async function() {
 async function logoutDocente() {
     await fanta_db.logout();
     currentUserEmail = null;
+    window.currentUserEmail = null;
+    
+    // Header Unificato: Reimposta a stato Ospite
+    const headerUserName = document.getElementById('header-user-name');
+    const headerUserRole = document.getElementById('header-user-role');
+    const dropdownTitle = document.getElementById('dropdown-user-title');
+    const dropdownSubtitle = document.getElementById('dropdown-user-subtitle');
+    const headerAvatar = document.getElementById('header-user-avatar-img');
+    const loginHubBtn = document.getElementById('btn-login-hub-dropdown');
+    const profileBtn = document.getElementById('btn-profile-dropdown');
+    const inviteBtn = document.getElementById('btn-invite-dropdown');
+    const bottomRow = document.getElementById('dropdown-bottom-row');
+    const notifBadge = document.getElementById('header-notification-badge');
+
+    if (headerUserName) headerUserName.textContent = 'OSPITE';
+    if (headerUserRole) headerUserRole.textContent = 'NON REGISTRATO';
+    if (dropdownTitle) dropdownTitle.textContent = 'OSPITE';
+    if (dropdownSubtitle) dropdownSubtitle.textContent = 'NON AUTENTICATO';
+    if (headerAvatar) headerAvatar.src = 'https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png';
+    if (loginHubBtn) loginHubBtn.style.display = 'flex';
+    if (profileBtn) profileBtn.style.display = 'none';
+    if (inviteBtn) inviteBtn.style.display = 'none';
+    if (bottomRow) bottomRow.style.display = 'none';
+    if (notifBadge) notifBadge.style.display = 'none';
+
+    if (typeof window.closeUserDropdown === 'function') window.closeUserDropdown();
+
     const loginSec = document.getElementById('login-section');
     const loggedSec = document.getElementById('logged-in-section');
     if(loginSec) loginSec.style.display = 'block';
@@ -1259,15 +1533,30 @@ window.onclick = function(event) {
 
 function setLoggedIn(email, role = '') {
     currentUserEmail = email;
+    window.currentUserEmail = email;
     if (role) {
         localStorage.setItem('fanta_user_role', role);
         currentUserRole = role;
     } else {
         currentUserRole = localStorage.getItem('fanta_user_role') || '';
     }
+    window.currentUserRole = currentUserRole;
     
-    // Sidebar and menu-btn removed
-    
+    const isTeacher = currentUserRole === 'docente' || currentUserRole === 'teacher' || email === 'prof.memmo@gmail.com';
+    const isFantamico = currentUserRole === 'fantamico' || currentUserRole === 'viandante' || currentUserRole === 'guest';
+    const isStudent = currentUserRole === 'studente';
+
+    // Header Unificato: Mostra voci utente autenticato nel dropdown
+    const loginHubBtn = document.getElementById('btn-login-hub-dropdown');
+    const profileBtn = document.getElementById('btn-profile-dropdown');
+    const inviteBtn = document.getElementById('btn-invite-dropdown');
+    const bottomRow = document.getElementById('dropdown-bottom-row');
+
+    if (loginHubBtn) loginHubBtn.style.display = 'none';
+    if (profileBtn) profileBtn.style.display = 'flex';
+    if (inviteBtn) inviteBtn.style.display = isTeacher ? 'flex' : 'none';
+    if (bottomRow) bottomRow.style.display = 'flex';
+
     const loginSec = document.getElementById('login-section');
     const loggedSec = document.getElementById('logged-in-section');
     if(loginSec) loginSec.style.display = 'none';
@@ -1276,16 +1565,25 @@ function setLoggedIn(email, role = '') {
     const loggedWelc = document.getElementById('logged-in-welcome');
     const loggedInNormalContent = document.getElementById('logged-in-normal-content');
     
-    const isTeacher = currentUserRole === 'docente' || currentUserRole === 'teacher' || email === 'prof.memmo@gmail.com';
-    const isFantamico = currentUserRole === 'fantamico' || currentUserRole === 'viandante' || currentUserRole === 'guest';
-    const isStudent = currentUserRole === 'studente';
-    
+    // Aggiorna etichette di ruolo
+    const headerRoleEl = document.getElementById('header-user-role');
+    const dropdownRoleEl = document.getElementById('dropdown-user-subtitle');
+    let roleText = 'DOCENTE REGISTRATO';
+    if (isTeacher) roleText = (email === 'prof.memmo@gmail.com' ? 'AMMINISTRATORE' : 'DOCENTE REGISTRATO');
+    else if (isFantamico) roleText = 'FANTAMICO';
+    else if (isStudent) roleText = 'STUDENTE';
+    if (headerRoleEl) headerRoleEl.textContent = roleText;
+    if (dropdownRoleEl) dropdownRoleEl.textContent = roleText;
+
     if (loggedWelc) {
         if (isTeacher) loggedWelc.textContent = "Bentornato, Prof!";
         else if (isFantamico) loggedWelc.textContent = "Ciao, Viandante!";
         else if (isStudent) loggedWelc.textContent = "Ciao, Studente!";
         else loggedWelc.textContent = "Benvenuto!";
     }
+    
+    if (typeof renderProfilo === 'function') renderProfilo();
+    if (typeof renderNotifiche === 'function') renderNotifiche();
     if (loggedInNormalContent) {
         if (isStudent) {
             loggedInNormalContent.innerHTML = `
@@ -1305,6 +1603,7 @@ function setLoggedIn(email, role = '') {
                         const snap = await window.db.collection('fanta_teams').get();
                         snap.forEach(d => {
                             const data = d.data();
+                            if (data.status === 'archived' || data.archivedYear) return;
                             if (Array.isArray(data.members)) {
                                 if (data.members.some(m => (typeof m === 'object' ? (m.uid || m.id) : m) === uid)) {
                                     assignedTeam = { docId: d.id, id: data.id || d.id, ...data };
@@ -1314,6 +1613,7 @@ function setLoggedIn(email, role = '') {
                     }
 
                     if (assignedTeam) {
+                        window.currentUserTeamId = assignedTeam.docId || assignedTeam.id;
                         const authors = Array.isArray(assignedTeam.authors) ? assignedTeam.authors : [];
                         const isDraftComplete = assignedTeam.draftCompleted || authors.length === 5;
 
@@ -1436,6 +1736,9 @@ function setLoggedIn(email, role = '') {
 function setLoggedOut() {
     currentUserEmail = null;
     currentUserRole = null;
+    window.currentUserEmail = null;
+    window.currentUserRole = null;
+    window.currentUserTeamId = null;
     localStorage.removeItem('fanta_user_role');
     
     // Sidebar and menu-btn removed
@@ -1455,10 +1758,31 @@ function setLoggedOut() {
     if (adminMenuItem) adminMenuItem.style.display = 'none';
 }
 
+window.getTeamType = function(team) {
+    if (!team) return 'scuola';
+    if (team.teamType === 'viandante' || team.teamType === 'scuola') {
+        return team.teamType;
+    }
+    if (team.isViandante === true) return 'viandante';
+    if (team.userRole === 'viandante' || team.userRole === 'fantamico' || team.role === 'viandante') return 'viandante';
+    if (team.classe && team.classe.trim() !== '' && team.classe !== 'Nessuna' && team.classe !== 'Viandante') {
+        return 'scuola';
+    }
+    if (team.docenteId || team.classCode || team.schoolName || team.assignedStudentUid) {
+        return 'scuola';
+    }
+    return 'viandante';
+};
+
 async function getAllTeams(includeTest = false) {
     try {
         const dbTeams = await fanta_db.getTeams();
-        return dbTeams.filter(t => t.status !== 'archived' && (includeTest || (!t.isTest && t.classCode !== 'TEST-MEMMO')));
+        return dbTeams
+            .filter(t => t.status !== 'archived' && (includeTest || (!t.isTest && t.classCode !== 'TEST-MEMMO')))
+            .map(t => {
+                t.teamType = window.getTeamType(t);
+                return t;
+            });
     } catch (e) {
         console.error("Errore recupero squadre da Firebase:", e);
         return [];
@@ -1510,10 +1834,11 @@ function setupTeamSave() {
         // --- Fine Controllo Limiti ---
 
         const teamNameInput = document.querySelector('#view-squadra input[placeholder="Es: I Promessi Sposi"]').value.trim();
-        const teamClasseInput = document.getElementById('team-classe-input').value.trim();
+        const clsEl = document.getElementById('team-classe-input');
+        const teamClasseInput = (clsEl ? clsEl.value.trim() : '') || (typeof currentUserClasse !== 'undefined' ? currentUserClasse : '') || (window.currentUserClass || '') || '';
         
-        if(!teamNameInput || !teamClasseInput) {
-            alert("Inserisci il nome e la classe della squadra!");
+        if(!teamNameInput) {
+            alert("Inserisci il nome della squadra!");
             return;
         }
 
@@ -1560,22 +1885,27 @@ function setupTeamSave() {
             return;
         }
 
+        const isViandanteUser = currentUserRole === 'viandante' || currentUserRole === 'fantamico' || currentUserRole === 'guest' || !teamClasseInput || teamClasseInput.trim() === '';
         const newTeam = {
             id: 't' + Date.now(),
             name: teamNameInput,
-            classe: teamClasseInput,
+            classe: isViandanteUser ? '' : teamClasseInput,
             ownerEmail: currentUserEmail,
             authors: authorsSelected,
             missionsCompleted: 0,
-            mode: currentTeamMode
+            minigamePoints: 0,
+            mode: currentTeamMode,
+            teamType: isViandanteUser ? 'viandante' : 'scuola'
         };
 
         // Salvataggio su Firebase
         fanta_db.saveTeam(newTeam).then(() => {
             alert("Squadra creata con successo!");
             // Reset form
-            document.querySelector('#view-squadra input[placeholder="Es: I Promessi Sposi"]').value = "";
-            document.getElementById('team-classe-input').value = "";
+            const nameInp = document.querySelector('#view-squadra input[placeholder="Es: I Promessi Sposi"]');
+            if (nameInp) nameInp.value = "";
+            const clsInp = document.getElementById('team-classe-input');
+            if (clsInp) clsInp.value = "";
             teamSelection = { 1: null, 2: null, 3: null, 4: null, 5: null };
             calculateBudget();
             
@@ -1587,8 +1917,10 @@ function setupTeamSave() {
         });
         
         // Reset form
-        document.querySelector('#view-squadra input[placeholder="Es: I Promessi Sposi"]').value = "";
-        document.getElementById('team-classe-input').value = "";
+        const nameInp2 = document.querySelector('#view-squadra input[placeholder="Es: I Promessi Sposi"]');
+        if (nameInp2) nameInp2.value = "";
+        const clsInp2 = document.getElementById('team-classe-input');
+        if (clsInp2) clsInp2.value = "";
         currentTeamMode = null;
         teamSelection = { 1: null, 2: null, 3: null, 4: null, 5: null };
 
@@ -1604,12 +1936,8 @@ function setupTeamSave() {
         if (budgetContainer) budgetContainer.style.display = 'none';
         if (slotsSection) slotsSection.style.display = 'none';
 
-        document.querySelectorAll('.author-slot-btn').forEach(btn => {
-            const ord = ['1ª','2ª','3ª','4ª','5ª'];
-            const slot = btn.dataset.slot;
-            btn.innerHTML = `<span class="slot-name"><i class="fa-solid fa-plus"></i> Scegli la ${ord[slot-1]} star</span> <span class="slot-cost text-primary"></span>`;
-        });
-        document.querySelectorAll('.author-remove-btn').forEach(b => b.classList.remove('visible'));
+        renderRosterSlots();
+        updateAuthorCardsSelection();
         calculateBudget();
         
         renderProfilo();
@@ -1623,9 +1951,38 @@ async function renderProfilo() {
     const profAvatarImg = document.getElementById('profilo-avatar-img');
     const profDisplayName = document.getElementById('profilo-display-name');
     const fantaDdUsername = document.getElementById('fanta-dd-username');
+    const headerAvatarImg = document.getElementById('header-user-avatar-img');
+    const headerUserName = document.getElementById('header-user-name');
+    const dropdownUserTitle = document.getElementById('dropdown-user-title');
 
-    if (profAvatarImg) {
-        profAvatarImg.src = window.selectedFantaAvatar || 'assets/avatars/6.png';
+    const updateAllProfileDisplays = (avatar, name) => {
+        if (avatar) {
+            if (profAvatarImg) profAvatarImg.src = avatar;
+            if (headerAvatarImg) headerAvatarImg.src = avatar;
+            window.selectedFantaAvatar = avatar;
+            try { 
+                localStorage.setItem('fanta_user_avatar', avatar);
+                localStorage.setItem('hub_user_avatar', avatar);
+            } catch(e) {}
+        }
+        if (name) {
+            if (profDisplayName) profDisplayName.textContent = name;
+            if (fantaDdUsername) fantaDdUsername.textContent = name;
+            if (headerUserName) headerUserName.textContent = name;
+            if (dropdownUserTitle) dropdownUserTitle.textContent = name;
+            try { 
+                localStorage.setItem('fanta_user_name', name);
+                localStorage.setItem('hub_user_name', name);
+            } catch(e) {}
+        }
+    };
+
+    if (profAvatarImg || headerAvatarImg) {
+        const cachedAvatar = localStorage.getItem('fanta_user_avatar') || localStorage.getItem('hub_user_avatar') || window.selectedFantaAvatar || 'https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png';
+        const cachedName = localStorage.getItem('fanta_user_name') || (currentUserEmail ? (currentUserEmail === 'prof.memmo@gmail.com' ? 'Prof. Memmo' : currentUserEmail.split('@')[0]) : 'Docente');
+        
+        updateAllProfileDisplays(cachedAvatar, cachedName);
+        
         if (window.db) {
             const authUser = window.auth && window.auth.currentUser;
             const uid = authUser ? authUser.uid : null;
@@ -1639,14 +1996,7 @@ async function renderProfilo() {
                         const hData = hDoc.data() || {};
                         const hAvatar = hData.avatar || (hData.anagrafica && hData.anagrafica.avatar);
                         const hName = hData.nome || hData.name || (hData.anagrafica && hData.anagrafica.nome);
-                        if (hAvatar) {
-                            profAvatarImg.src = hAvatar;
-                            window.selectedFantaAvatar = hAvatar;
-                        }
-                        if (hName) {
-                            if (profDisplayName) profDisplayName.textContent = hName;
-                            if (fantaDdUsername) fantaDdUsername.textContent = hName;
-                        }
+                        updateAllProfileDisplays(hAvatar, hName);
                         loadedFromHub = true;
                     }
                 } catch(eHub) {
@@ -1659,13 +2009,8 @@ async function renderProfilo() {
                 window.db.collection('fanta_users').doc(currentUserEmail.toLowerCase()).get().then(d => {
                     if (d.exists) {
                         const data = d.data() || {};
-                        if (data.avatar) {
-                            profAvatarImg.src = data.avatar;
-                            window.selectedFantaAvatar = data.avatar;
-                        }
-                        const nameToShow = data.nome || data.name || currentUserEmail.split('@')[0];
-                        if (profDisplayName) profDisplayName.textContent = nameToShow;
-                        if (fantaDdUsername) fantaDdUsername.textContent = nameToShow;
+                        const nameToShow = data.nome || data.name || (currentUserEmail === 'prof.memmo@gmail.com' ? 'Prof. Memmo' : currentUserEmail.split('@')[0]);
+                        updateAllProfileDisplays(data.avatar, nameToShow);
                     }
                 }).catch(() => {});
             }
@@ -1865,25 +2210,29 @@ async function renderProfilo() {
                 `;
             }
 
-            // Studenti iscritti a questa squadra
-            const studentiArr = allStudentsMap[team.id] || [];
-            if (studentiArr.length > 0) {
-                const studentiRows = studentiArr.map(s => `
-                    <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.03);">
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <i class="fa-solid fa-graduation-cap" style="color:var(--text-muted); font-size:0.8rem;"></i>
-                            <span style="font-size:0.8rem; font-weight:500; color:var(--text-main);">${s.email}</span>
+            // Studenti iscritti/assegnati a questa squadra (da team.members o fallback allStudentsMap)
+            const membersList = Array.isArray(team.members) && team.members.length > 0 
+                ? team.members 
+                : (allStudentsMap[team.id] || []);
+
+            if (membersList.length > 0) {
+                const studentiRows = membersList.map(m => {
+                    const mName = typeof m === 'object' ? (m.displayName || m.name || m.nickname || m.email) : m;
+                    const mAvatar = typeof m === 'object' && m.avatar ? (m.avatar.includes('/') ? m.avatar : `assets/avatars/${m.avatar}`) : 'assets/avatars/6.png';
+                    return `
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.03);">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <img src="${mAvatar}" style="width:18px; height:18px; border-radius:50%; object-fit:cover;">
+                                <span style="font-size:0.8rem; font-weight:500; color:var(--text-main);">${mName}</span>
+                            </div>
                         </div>
-                        <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.7rem; width:auto; border-radius:10px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1);"
-                            onclick="profiloSpostaStudente('${s.email}', '${team.id}', '${team.name}')">
-                            <i class="fa-solid fa-right-left"></i> Sposta
-                        </button>
-                    </div>`).join('');
+                    `;
+                }).join('');
 
                 studentiSection = `
                     <details style="margin-top:6px; margin-bottom:6px; width:100%; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px;">
                         <summary style="font-size:0.78rem; cursor:pointer; color:var(--primary-color); font-weight:600; user-select:none; margin-bottom:6px; display:flex; align-items:center; gap:5px;">
-                            <i class="fa-solid fa-users"></i> Studenti Iscritti (${studentiArr.length}/5)
+                            <i class="fa-solid fa-users"></i> Studenti Assegnati (${membersList.length}/5)
                         </summary>
                         <div style="padding-left:4px; max-height: 200px; overflow-y: auto;">
                             ${studentiRows}
@@ -1893,35 +2242,30 @@ async function renderProfilo() {
             } else {
                 studentiSection = `
                     <div style="font-size:0.75rem; color:var(--text-muted); padding:8px 0; border-top:1px solid rgba(255,255,255,0.05); width:100%;">
-                        <i class="fa-solid fa-circle-info"></i> Nessuno studente ancora iscritto (0/5).
+                        <i class="fa-solid fa-circle-info"></i> Nessuno studente ancora assegnato (0/5).
                     </div>
                 `;
             }
 
-            // Sezione codice (mostrata per docenti)
-            codiceSection = `
-                <div style="width:100%; margin-bottom:8px; padding:8px 10px; border-radius:8px; background:rgba(141, 160, 63, 0.04); border:1px dashed rgba(141, 160, 63, 0.3); display:flex; justify-content:space-between; align-items:center; gap:10px;">
-                    <div style="display:flex; flex-direction:column; gap:4px; flex-grow:1;">
-                        <span style="font-size:0.68rem; text-transform:uppercase; color:var(--text-muted); font-weight:600; letter-spacing:0.5px;">Codice Studenti</span>
-                        <span class="join-code-badge" style="margin:0; font-size:1rem; padding:3px 8px; width:fit-content; text-align:center; font-weight:bold;">${team.joinCode || '---'}</span>
-                    </div>
-                    <button class="btn" style="width:auto; padding:6px 12px; font-size:0.75rem; border-radius:12px; height:fit-content;" onclick="shareInvite({type:'student', code:'${team.joinCode}', teamName:'${team.name.replace(/'/g, "\\'")}'})">
-                        <i class="fa-solid fa-share-nodes"></i> Condividi
-                    </button>
-                </div>`;
+            // Nessun codiceSection: i codici squadra non servono più con il flusso unificato dell'Hub
+            codiceSection = '';
 
-            // Sezione Azioni Docente
+            // Sezione Azioni Docente con link rapido a Composizione
             azioniSection = `
                 <div style="display:flex; flex-wrap:wrap; gap:8px; width:100%; margin-top:4px; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px;">
-                    <button class="btn btn-secondary" style="flex:1; min-width:80px; padding:5px 8px; font-size:0.72rem; border-radius:8px; background:rgba(255,255,255,0.03);" 
+                    <button class="btn btn-secondary" style="flex:1; min-width:90px; padding:6px 8px; font-size:0.75rem; border-radius:8px; background:rgba(212,175,55,0.12); border:1px solid var(--accent-gold); color:var(--accent-gold);" 
+                        onclick="switchDocenteTab('composizione');">
+                        <i class="fa-solid fa-people-group"></i> Componi
+                    </button>
+                    <button class="btn btn-secondary" style="flex:1; min-width:80px; padding:6px 8px; font-size:0.75rem; border-radius:8px; background:rgba(255,255,255,0.03);" 
                         onclick="docenteModificaSquadra('${team.id}', '${team.name.replace(/'/g, "\\'")}', '${(team.classe || '').replace(/'/g, "\\'")}')">
                         <i class="fa-solid fa-pen-to-square"></i> Modifica
                     </button>
-                    <button class="btn btn-secondary" style="flex:1.2; min-width:110px; padding:5px 8px; font-size:0.72rem; border-radius:8px; background:rgba(141,160,63,0.15); border-color:var(--primary-color);"
+                    <button class="btn btn-secondary" style="flex:1.2; min-width:100px; padding:6px 8px; font-size:0.75rem; border-radius:8px; background:rgba(141,160,63,0.15); border-color:var(--primary-color);"
                         onclick="window.apriCollaboratori('${team.id}', '${team.name.replace(/'/g, "\\'")}')">
                         <i class="fa-solid fa-user-plus"></i> Collaboratori
                     </button>
-                    <button class="btn btn-danger" style="flex:1; min-width:80px; padding:5px 8px; font-size:0.72rem; border-radius:8px; background:rgba(230, 57, 70, 0.1); border:1px solid rgba(230, 57, 70, 0.2); color:#e63946;" 
+                    <button class="btn btn-danger" style="flex:1; min-width:80px; padding:6px 8px; font-size:0.75rem; border-radius:8px; background:rgba(230, 57, 70, 0.1); border:1px solid rgba(230, 57, 70, 0.2); color:#e63946;" 
                         onclick="docenteEliminaSquadra('${team.id}', '${team.name.replace(/'/g, "\\'")}')">
                         <i class="fa-solid fa-trash-can"></i> Elimina
                     </button>
@@ -1930,11 +2274,11 @@ async function renderProfilo() {
             // Per il Viandante / Giocatore Singolo: interfaccia pulita senza codici studenti né collaboratori
             azioniSection = `
                 <div style="display:flex; flex-wrap:wrap; gap:8px; width:100%; margin-top:4px; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px;">
-                    <button class="btn btn-secondary" style="flex:1; min-width:80px; padding:5px 8px; font-size:0.72rem; border-radius:8px; background:rgba(255,255,255,0.03);" 
+                    <button class="btn btn-secondary" style="flex:1; min-width:80px; padding:6px 8px; font-size:0.75rem; border-radius:8px; background:rgba(255,255,255,0.03);" 
                         onclick="docenteModificaSquadra('${team.id}', '${team.name.replace(/'/g, "\\'")}', '${(team.classe || '').replace(/'/g, "\\'")}')">
                         <i class="fa-solid fa-pen-to-square"></i> Modifica
                     </button>
-                    <button class="btn btn-danger" style="flex:1; min-width:80px; padding:5px 8px; font-size:0.72rem; border-radius:8px; background:rgba(230, 57, 70, 0.1); border:1px solid rgba(230, 57, 70, 0.2); color:#e63946;" 
+                    <button class="btn btn-danger" style="flex:1; min-width:80px; padding:6px 8px; font-size:0.75rem; border-radius:8px; background:rgba(230, 57, 70, 0.1); border:1px solid rgba(230, 57, 70, 0.2); color:#e63946;" 
                         onclick="docenteEliminaSquadra('${team.id}', '${team.name.replace(/'/g, "\\'")}')">
                         <i class="fa-solid fa-trash-can"></i> Elimina
                     </button>
@@ -2243,7 +2587,27 @@ async function renderNotifiche() {
         
         const totalNotifications = pendingInvites.length + unseenSchede.length + pendingMissions.length + unseenMissions.length;
         
-        // Aggiorna Badge Campanella
+        // Aggiorna Badge Header Globale
+        const headerBadge = document.getElementById('header-notification-badge');
+        const dropdownBadge = document.getElementById('dropdown-notif-badge');
+        if (headerBadge) {
+            if (totalNotifications > 0) {
+                headerBadge.textContent = totalNotifications;
+                headerBadge.style.display = 'inline-flex';
+            } else {
+                headerBadge.style.display = 'none';
+            }
+        }
+        if (dropdownBadge) {
+            if (totalNotifications > 0) {
+                dropdownBadge.textContent = totalNotifications;
+                dropdownBadge.style.display = 'inline-flex';
+            } else {
+                dropdownBadge.style.display = 'none';
+            }
+        }
+
+        // Aggiorna Badge Campanella Admin / Locale
         if(badge) {
             if(totalNotifications > 0) {
                 badge.textContent = totalNotifications;
@@ -2803,15 +3167,15 @@ async function renderTornei() {
 async function renderMissioniUtente() {
     if(!currentUserEmail) return;
     
-    // 1. Popola la select delle squadre nel modale
+    // 1. Popola la select delle squadre nel modale (solo squadre scolastiche per Articolo 5)
     const select = document.getElementById('missione-squadra-select');
     const allTeams = await getAllTeams();
-    const myTeams = allTeams.filter(t => t.ownerEmail === currentUserEmail);
+    const myTeams = allTeams.filter(t => t.ownerEmail === currentUserEmail && (t.teamType || (window.getTeamType ? window.getTeamType(t) : 'scuola')) === 'scuola');
     
     if(select) {
-        select.innerHTML = '<option value="">-- Seleziona una squadra --</option>';
+        select.innerHTML = '<option value="">-- Seleziona una squadra scolastica --</option>';
         myTeams.forEach(t => {
-            select.innerHTML += `<option value="${t.id}">${t.name} (${t.classe})</option>`;
+            select.innerHTML += `<option value="${t.id}">${t.name} (${t.classe || 'Classe'})</option>`;
         });
     }
     
@@ -2848,6 +3212,10 @@ async function renderMissioniUtente() {
 }
 
 function openNuovaMissioneModal() {
+    if (currentUserRole === 'viandante' || currentUserRole === 'fantamico') {
+        alert("Le Missioni Didattiche (+5 Punti) sono riservate esclusivamente a docenti e studenti per attività di classe (Articolo 5 del Regolamento).");
+        return;
+    }
     const modal = document.getElementById('nuova-missione-modal');
     if(modal) {
         modal.style.display = 'block';
@@ -2857,12 +3225,16 @@ function openNuovaMissioneModal() {
 
 async function inviaMissione(event) {
     if(event) event.preventDefault();
+    if (currentUserRole === 'viandante' || currentUserRole === 'fantamico') {
+        alert("Le Missioni Didattiche (+5 Punti) sono riservate esclusivamente a docenti e studenti per attività di classe (Articolo 5 del Regolamento).");
+        return;
+    }
     const select = document.getElementById('missione-squadra-select');
     const input = document.getElementById('missione-titolo-input');
     
     if(!select || !input) return;
     
-    if(!select.value) { alert("Seleziona la squadra che ha svolto l'attività!"); return; }
+    if(!select.value) { alert("Seleziona la squadra scolastica che ha svolto l'attività!"); return; }
     if(!input.value.trim()) { alert("Inserisci una breve descrizione della missione svolta!"); return; }
     
     const missionData = {
@@ -4103,24 +4475,31 @@ window.renderDocenteClassTeamsAndStudents = async function() {
         } catch (_) {}
     }
 
-    // Filtra per includere solo gli effettivi studenti ed escludere docenti, admin e prof.memmo
+    // Filtra per includere solo gli effettivi studenti ed escludere docenti, admin, prof.memmo e archiviati
     students = students.filter(s => {
         const sEmail = (s.email || '').toLowerCase();
         const sRole = (s.role || '').toLowerCase();
-        return sEmail !== 'prof.memmo@gmail.com' && sRole !== 'docente' && sRole !== 'teacher' && sRole !== 'admin' && (sRole === 'studente' || !sRole);
+        const isArchived = s.status === 'archived' || !!s.archivedYear;
+        return !isArchived && sEmail !== 'prof.memmo@gmail.com' && sRole !== 'docente' && sRole !== 'teacher' && sRole !== 'admin' && (sRole === 'studente' || !sRole);
     });
 
-    // 2. Carica squadre della classe da fanta_teams
+    // 2. Carica squadre della classe da fanta_teams (escludendo archiviate)
     let classTeams = [];
     try {
         const queryByClassId = await window.db.collection('fanta_teams').where('classId', '==', classId).get();
-        queryByClassId.forEach(d => classTeams.push({ docId: d.id, id: d.data().id || d.id, ...d.data() }));
+        queryByClassId.forEach(d => {
+            const data = d.data();
+            if (data.status !== 'archived' && !data.archivedYear) {
+                classTeams.push({ docId: d.id, id: data.id || d.id, ...data });
+            }
+        });
 
         if (classCode) {
             const queryByCode = await window.db.collection('fanta_teams').where('classCode', '==', classCode).get();
             queryByCode.forEach(d => {
-                if (!classTeams.some(t => t.docId === d.id)) {
-                    classTeams.push({ docId: d.id, id: d.data().id || d.id, ...d.data() });
+                const data = d.data();
+                if (data.status !== 'archived' && !data.archivedYear && !classTeams.some(t => t.docId === d.id)) {
+                    classTeams.push({ docId: d.id, id: data.id || d.id, ...data });
                 }
             });
         }
@@ -4128,6 +4507,7 @@ window.renderDocenteClassTeamsAndStudents = async function() {
         console.error("Errore fetch squadre classe:", err);
     }
 
+    // Mappa degli studenti già assegnati a una squadra
     // Mappa degli studenti già assegnati a una squadra
     const assignedMap = new Map(); // studentUid -> teamName
     classTeams.forEach(t => {
@@ -4138,6 +4518,10 @@ window.renderDocenteClassTeamsAndStudents = async function() {
             });
         }
     });
+
+    // Salva in cache per la modale di assegnazione rapida
+    window._currentClassStudentsCache = students;
+    window._currentAssignedMapCache = assignedMap;
 
     // 3. Render Pool Studenti
     const countEl = document.getElementById('docente-class-student-count');
@@ -4194,7 +4578,7 @@ window.renderDocenteClassTeamsAndStudents = async function() {
         return;
     }
 
-    // Lista studenti non ancora assegnati per il dropdown
+    // Lista studenti non ancora assegnati
     const unassignedStudents = students.filter(s => !assignedMap.has(s.studentId || s.uid || s.id));
 
     teamsList.innerHTML = classTeams.map(team => {
@@ -4203,6 +4587,7 @@ window.renderDocenteClassTeamsAndStudents = async function() {
         const authors = Array.isArray(team.authors) ? team.authors : [];
         const isDraftComplete = team.draftCompleted || authors.length === 5;
         const modeLabel = team.mode === 'seconde' ? '📙 Medievale' : (team.mode === 'avanzato' ? '📒 Avanzato' : '📘 Contemporanea');
+        const slotsAvailable = 5 - members.length;
 
         return `
             <div class="glass" style="padding: 18px; border-radius: 12px; border: 1px solid rgba(212,175,55,0.2); background: rgba(0,0,0,0.35); display:flex; flex-direction:column; justify-content:space-between; gap:14px;">
@@ -4213,7 +4598,6 @@ window.renderDocenteClassTeamsAndStudents = async function() {
                             <h4 style="margin:0; font-size:1.05rem; color:#ffffff; font-family:var(--font-heading);">${team.name || 'Squadra'}</h4>
                             <div style="display:flex; gap:6px; align-items:center; margin-top:4px;">
                                 <span style="font-size:0.72rem; padding:2px 8px; border-radius:10px; background:rgba(255,255,255,0.08); color:var(--accent-gold);">${modeLabel}</span>
-                                ${team.joinCode ? `<span style="font-size:0.72rem; padding:2px 8px; border-radius:10px; background:rgba(212,175,55,0.15); color:#fef08a; font-weight:700;">Codice: ${team.joinCode}</span>` : ''}
                             </div>
                         </div>
                         <button class="btn-secondary" onclick="window.eliminaSquadraClasse('${teamDocId}', '${(team.name||'').replace(/'/g, "\\'")}')" title="Elimina Squadra" style="padding:4px 8px; border-radius:8px; color:#ef4444; border-color:rgba(239,68,68,0.4); font-size:0.75rem; cursor:pointer;">
@@ -4229,7 +4613,7 @@ window.renderDocenteClassTeamsAndStudents = async function() {
                         <div style="display:flex; flex-direction:column; gap:6px;">
                             ${members.length === 0 ? `<div style="font-size:0.78rem; color:#94a3b8; font-style:italic;">Nessuno studente assegnato.</div>` : members.map(m => {
                                 const mUid = typeof m === 'object' ? (m.studentId || m.uid || m.id) : m;
-                                const mName = typeof m === 'object' ? (m.name || m.displayName || m.email) : (students.find(s => (s.studentId||s.uid||s.id) === mUid)?.name || 'Studente');
+                                const mName = typeof m === 'object' ? (m.displayName || m.name || m.nickname || m.email) : (students.find(s => (s.studentId||s.uid||s.id) === mUid)?.name || 'Studente');
                                 const mAvatar = typeof m === 'object' && m.avatar ? (m.avatar.includes('/') ? m.avatar : `assets/avatars/${m.avatar}`) : 'assets/avatars/6.png';
                                 return `
                                     <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.3); padding:4px 8px; border-radius:6px;">
@@ -4245,18 +4629,22 @@ window.renderDocenteClassTeamsAndStudents = async function() {
                             }).join('')}
                         </div>
 
-                        <!-- Dropdown per assegnare nuovi studenti -->
-                        ${members.length < 5 && unassignedStudents.length > 0 ? `
-                            <div style="display:flex; gap:6px; margin-top:8px;">
-                                <select id="assign-select-${teamDocId}" class="input-control" style="margin:0; padding:4px 8px; font-size:0.75rem; border-radius:6px; background:rgba(0,0,0,0.5); color:#fff; flex:1;">
-                                    <option value="">+ Aggiungi studente...</option>
-                                    ${unassignedStudents.map(s => `<option value="${s.studentId || s.uid || s.id}">${s.name || s.displayName || s.nickname || s.email}</option>`).join('')}
-                                </select>
-                                <button type="button" class="btn btn-secondary" onclick="window.onAssegnaClick('${teamDocId}')" style="margin:0; padding:4px 10px; font-size:0.75rem; white-space:nowrap; border-radius:6px;">
-                                    Assegna
+                        <!-- Assegnazione Multipla Rapida -->
+                        ${slotsAvailable > 0 && unassignedStudents.length > 0 ? `
+                            <div style="margin-top:10px; display:flex; flex-direction:column; gap:6px;">
+                                <button type="button" class="btn btn-secondary" onclick="window.apriAssegnazioneMultipla('${teamDocId}', '${(team.name||'Squadra').replace(/'/g, "\\'")}', ${slotsAvailable})" style="margin:0; padding:8px 12px; font-size:0.8rem; font-weight:700; width:100% !important; border-radius:8px; background:rgba(141,160,63,0.22); border:1px solid var(--accent-gold); color:#fef08a; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+                                    <i class="fa-solid fa-user-plus"></i> + Seleziona Studenti (${slotsAvailable} ${slotsAvailable === 1 ? 'posto libero' : 'posti liberi'})
                                 </button>
+                                <select class="input-control" onchange="if(this.value){ window.assegnaSingoloStudente('${teamDocId}', this.value); }" style="margin:0; padding:5px 8px; font-size:0.74rem; border-radius:6px; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.1); color:#aaa; width:100%; cursor:pointer;">
+                                    <option value="">⚡ oppure aggiungi al volo singolo...</option>
+                                    ${unassignedStudents.map(s => `<option value="${s.studentId || s.uid || s.id}">+ ${s.name || s.displayName || s.nickname || s.email}</option>`).join('')}
+                                </select>
                             </div>
-                        ` : ''}
+                        ` : (members.length >= 5 ? `
+                            <div style="font-size:0.75rem; color:#86efac; margin-top:6px; font-style:italic;">
+                                <i class="fa-solid fa-check"></i> Squadra al completo (5/5 membri)
+                            </div>
+                        ` : '')}
                     </div>
 
                     <!-- Stato 5 Star -->
@@ -4274,7 +4662,7 @@ window.renderDocenteClassTeamsAndStudents = async function() {
                         ` : `
                             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
                                 <span style="font-size:0.75rem; color:#fbbf24;">⏳ In attesa della scelta dei 5 autori</span>
-                                <button type="button" class="btn btn-secondary" onclick="window.avviaDraftDocenteLIM('${teamDocId}')" style="padding:4px 8px; font-size:0.72rem; border-radius:6px; border-color:var(--accent-gold); color:var(--accent-gold); cursor:pointer;">
+                                <button type="button" class="btn btn-secondary" onclick="window.avviaDraftDocenteLIM('${teamDocId}')" style="padding:4px 8px; font-size:0.72rem; border-radius:6px; border-color:var(--accent-gold); color:var(--accent-gold); cursor:pointer; width:auto !important;">
                                     <i class="fa-solid fa-wand-magic-sparkles"></i> Scegli Autori alla LIM
                                 </button>
                             </div>
@@ -4341,23 +4729,149 @@ window.creaNuovaSquadraClasse = async function() {
     }
 };
 
-window.onAssegnaClick = async function(teamDocId) {
-    const select = document.getElementById(`assign-select-${teamDocId}`);
-    if (!select || !select.value) return;
+window.apriAssegnazioneMultipla = function(teamDocId, teamName, maxAllowed) {
+    const modal = document.getElementById('modal-assegna-multipli');
+    if (!modal) return;
 
-    const studentUid = select.value;
+    const nameEl = document.getElementById('modal-assegna-team-name');
+    const slotsEl = document.getElementById('modal-assegna-slots-info');
+    const countEl = document.getElementById('modal-assegna-selected-count');
+    const listEl = document.getElementById('modal-assegna-studenti-list');
+    const teamIdInput = document.getElementById('modal-assegna-target-team-id');
+    const maxInput = document.getElementById('modal-assegna-max-allowed');
+
+    if (nameEl) nameEl.textContent = teamName;
+    if (slotsEl) slotsEl.innerHTML = `<i class="fa-solid fa-chair"></i> Posti disponibili nel gruppo: <strong>${maxAllowed}</strong>`;
+    if (teamIdInput) teamIdInput.value = teamDocId;
+    if (maxInput) maxInput.value = maxAllowed;
+
     const cls = window.currentComposizioneClass;
-    let studentObj = { uid: studentUid, name: 'Studente' };
+    const students = window._currentClassStudentsCache || (cls && cls.students) || [];
+    const assignedMap = window._currentAssignedMapCache || new Map();
+    const unassigned = students.filter(s => !assignedMap.has(s.studentId || s.uid || s.id));
+
+    if (unassigned.length === 0) {
+        listEl.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem; text-align:center; padding:15px;">Tutti gli studenti della classe sono già stati assegnati!</div>';
+        if (countEl) countEl.textContent = '0 selezionati';
+        modal.style.display = 'flex';
+        return;
+    }
+
+    listEl.innerHTML = unassigned.map(s => {
+        const sUid = s.studentId || s.uid || s.id;
+        const sName = s.displayName || s.name || s.nickname || s.email || 'Studente';
+        const sAvatar = s.avatar ? (s.avatar.includes('/') ? s.avatar : `assets/avatars/${s.avatar}`) : 'assets/avatars/6.png';
+        return `
+            <label style="display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.04); padding:8px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.08); cursor:pointer; transition:all 0.2s;" class="student-select-row">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <img src="${sAvatar}" style="width:24px; height:24px; border-radius:50%; object-fit:cover;">
+                    <span style="font-size:0.85rem; font-weight:600; color:#fff;">${sName}</span>
+                </div>
+                <input type="checkbox" class="student-batch-checkbox" value="${sUid}" data-name="${sName.replace(/"/g, '&quot;')}" data-avatar="${sAvatar}" onchange="window._aggiornaConteggioMultipli(${maxAllowed})" style="width:18px; height:18px; accent-color:var(--primary-color); cursor:pointer;">
+            </label>
+        `;
+    }).join('');
+
+    window._aggiornaConteggioMultipli(maxAllowed);
+    modal.style.display = 'flex';
+};
+
+window._aggiornaConteggioMultipli = function(maxAllowed) {
+    const checkboxes = document.querySelectorAll('.student-batch-checkbox');
+    const checked = document.querySelectorAll('.student-batch-checkbox:checked');
+    const countEl = document.getElementById('modal-assegna-selected-count');
+    const btn = document.getElementById('btn-conferma-assegna-multipli');
+
+    const numChecked = checked.length;
+    if (countEl) {
+        countEl.textContent = `${numChecked}/${maxAllowed} selezionati`;
+        countEl.style.color = numChecked > 0 ? 'var(--accent-gold)' : 'var(--text-muted)';
+    }
+
+    checkboxes.forEach(cb => {
+        const label = cb.closest('label');
+        if (!cb.checked) {
+            cb.disabled = (numChecked >= maxAllowed);
+            if (label) {
+                label.style.opacity = (numChecked >= maxAllowed) ? '0.4' : '1';
+                label.style.borderColor = 'rgba(255,255,255,0.08)';
+                label.style.background = 'rgba(255,255,255,0.04)';
+            }
+        } else {
+            cb.disabled = false;
+            if (label) {
+                label.style.opacity = '1';
+                label.style.borderColor = 'var(--primary-color)';
+                label.style.background = 'rgba(141,160,63,0.15)';
+            }
+        }
+    });
+
+    if (btn) {
+        btn.disabled = (numChecked === 0);
+        btn.innerHTML = `<i class="fa-solid fa-check"></i> Assegna ${numChecked} ${numChecked === 1 ? 'Studente' : 'Studenti'}`;
+    }
+};
+
+window.confermaAssegnazioneMultipla = async function() {
+    const teamDocId = document.getElementById('modal-assegna-target-team-id')?.value;
+    if (!teamDocId) return;
+
+    const checkedBoxes = Array.from(document.querySelectorAll('.student-batch-checkbox:checked'));
+    if (checkedBoxes.length === 0) {
+        alert("Seleziona almeno uno studente da assegnare.");
+        return;
+    }
+
+    const studentsToAdd = checkedBoxes.map(cb => ({
+        uid: cb.value,
+        studentId: cb.value,
+        name: cb.getAttribute('data-name') || 'Studente',
+        avatar: cb.getAttribute('data-avatar') || '6.png'
+    }));
+
+    try {
+        const btn = document.getElementById('btn-conferma-assegna-multipli');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Assegnazione in corso...'; }
+
+        await window.db.collection('fanta_teams').doc(teamDocId).update({
+            members: firebase.firestore.FieldValue.arrayUnion(...studentsToAdd)
+        });
+
+        document.getElementById('modal-assegna-multipli').style.display = 'none';
+        await window.renderDocenteClassTeamsAndStudents();
+    } catch (err) {
+        console.error("Errore assegnazione multipla:", err);
+        alert("Errore durante l'assegnazione: " + err.message);
+    }
+};
+
+window.assegnaSingoloStudente = async function(teamDocId, studentUid) {
+    if (!studentUid) return;
+    const cls = window.currentComposizioneClass;
+    let studentObj = { uid: studentUid, studentId: studentUid, name: 'Studente' };
 
     if (cls && Array.isArray(cls.students)) {
-        const s = cls.students.find(x => (x.uid || x.id) === studentUid);
-        if (s) studentObj = { uid: studentUid, name: s.displayName || s.name || s.email, avatar: s.avatar || '6.png' };
+        const s = cls.students.find(x => (x.studentId || x.uid || x.id) === studentUid);
+        if (s) {
+            studentObj = {
+                uid: s.studentId || s.uid || s.id,
+                studentId: s.studentId || s.uid || s.id,
+                name: s.displayName || s.name || s.nickname || s.email || 'Studente',
+                avatar: s.avatar || '6.png'
+            };
+        }
     } else {
         try {
             const userSnap = await window.db.collection('hub_users').doc(studentUid).get();
             if (userSnap.exists) {
                 const ud = userSnap.data();
-                studentObj = { uid: studentUid, name: ud.displayName || ud.name || ud.email, avatar: ud.avatar || '6.png' };
+                studentObj = {
+                    uid: studentUid,
+                    studentId: studentUid,
+                    name: ud.displayName || ud.name || ud.nickname || ud.email || 'Studente',
+                    avatar: ud.avatar || '6.png'
+                };
             }
         } catch (_) {}
     }
@@ -4369,18 +4883,26 @@ window.onAssegnaClick = async function(teamDocId) {
         await window.renderDocenteClassTeamsAndStudents();
     } catch (err) {
         console.error("Errore assegnazione studente:", err);
-        alert("Errore durante l'assegnazione dello studente.");
+        alert("Errore durante l'assegnazione dello studente: " + (err.message || err));
+    }
+};
+
+window.onAssegnaClick = function(teamDocId) {
+    const select = document.getElementById(`assign-select-${teamDocId}`);
+    if (select && select.value) {
+        window.assegnaSingoloStudente(teamDocId, select.value);
     }
 };
 
 window.rimuoviStudenteDaSquadra = async function(teamDocId, studentUid) {
+    if (!confirm("Vuoi rimuovere questo studente dalla squadra?")) return;
     try {
         const teamDoc = await window.db.collection('fanta_teams').doc(teamDocId).get();
         if (!teamDoc.exists) return;
 
         const members = teamDoc.data().members || [];
         const updatedMembers = members.filter(m => {
-            const uid = typeof m === 'object' ? (m.uid || m.id) : m;
+            const uid = typeof m === 'object' ? (m.studentId || m.uid || m.id) : m;
             return uid !== studentUid;
         });
 
@@ -4388,6 +4910,7 @@ window.rimuoviStudenteDaSquadra = async function(teamDocId, studentUid) {
         await window.renderDocenteClassTeamsAndStudents();
     } catch (err) {
         console.error("Errore rimozione studente:", err);
+        alert("Errore durante la rimozione dello studente.");
     }
 };
 
@@ -4474,46 +4997,164 @@ window.switchDocenteTab = function(tabName) {
         window.loadDocenteClassiComposizione();
     } else if (tabName === 'storico') {
         window.renderMinigamesHistory();
+    } else if (tabName === 'regolamento') {
+        if (window.RulesService) {
+            window.RulesService.renderDocenteTab('docente-regolamento-container');
+        }
     }
 };
 
 window.renderMinigamesHistory = async function() {
-    const tableBody = document.querySelector('#minigames-history-table tbody');
-    if (!tableBody) return;
+    const tableBodies = document.querySelectorAll('#minigames-history-table tbody, #salagiochi-history-table tbody');
+    if (!tableBodies || tableBodies.length === 0) return;
     
-    tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">Caricamento storico...</td></tr>';
+    tableBodies.forEach(tb => {
+        tb.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">Caricamento storico...</td></tr>';
+    });
     
     try {
         const logs = window.fanta_db && window.fanta_db.getMinigameLogs ? await window.fanta_db.getMinigameLogs() : [];
-        tableBody.innerHTML = '';
         
-        if (!logs || logs.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding: 20px;">Nessuna partita registrata.</td></tr>';
-            return;
-        }
-        
-        // Ordina per data decrescente
-        logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-        
-        logs.forEach(log => {
-            const date = new Date(log.timestamp);
-            const dateStr = date.toLocaleDateString('it-IT') + ' ' + date.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
+        tableBodies.forEach(tableBody => {
+            tableBody.innerHTML = '';
             
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td style="font-size:0.8rem; color:var(--text-muted);">${dateStr}</td>
-                <td><strong>${log.teamName || log.teamId}</strong></td>
-                <td><span class="badge" style="background:var(--accent-gold); color:var(--bg-dark);">${log.game}</span></td>
-                <td><strong style="color:var(--primary-color)">+${log.points} pt</strong></td>
-            `;
-            tableBody.appendChild(tr);
+            if (!logs || logs.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding: 20px;">Nessuna partita registrata.</td></tr>';
+                return;
+            }
+            
+            // Ordina per data decrescente
+            logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            logs.forEach(log => {
+                const date = new Date(log.timestamp);
+                const dateStr = date.toLocaleDateString('it-IT') + ' ' + date.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-size:0.8rem; color:var(--text-muted);">${dateStr}</td>
+                    <td><strong>${log.teamName || log.teamId}</strong></td>
+                    <td><span class="badge" style="background:var(--accent-gold); color:var(--bg-dark);">${log.game}</span></td>
+                    <td><strong style="color:var(--primary-color)">+${log.points} pt</strong></td>
+                `;
+                tableBody.appendChild(tr);
+            });
         });
     } catch (e) {
-        tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--danger-color); padding: 20px;">Errore nel caricamento.</td></tr>';
+        tableBodies.forEach(tb => {
+            tb.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--danger-color); padding: 20px;">Errore nel caricamento.</td></tr>';
+        });
     }
 };
 
-window.selectedFantaAvatar = 'assets/avatars/6.png';
+/* =========================================
+   CONTROLLER SALA GIOCHI (HUB MINIGIOCHI)
+========================================= */
+
+window.renderSalaGiochiView = function() {
+    const banner = document.getElementById('salagiochi-role-banner');
+    const select = document.getElementById('salagiochi-author-select');
+    const historySec = document.getElementById('salagiochi-history-section');
+    
+    const isDocente = !!currentUserEmail;
+    const hasStudentCode = localStorage.getItem('fanta_active_team_code');
+    const userRole = (typeof currentUserRole !== 'undefined' ? currentUserRole : '') || localStorage.getItem('fanta_user_role') || (hasStudentCode && !isDocente ? 'studente' : '');
+
+    // 1. Render Banner Ruolo
+    if (banner) {
+        if (isDocente) {
+            banner.innerHTML = `
+                <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px;">
+                    <div>
+                        <div style="display:inline-flex; align-items:center; gap:6px; font-weight:800; color:var(--accent-gold); font-size:0.95rem; margin-bottom:4px;">
+                            <i class="fa-solid fa-graduation-cap"></i> Modalità Cattedra & Didattica
+                        </div>
+                        <p style="margin:0; font-size:0.85rem; color:#e0e0e0;">
+                            Sei connesso come Docente. Puoi avviare le sfide interattive tra le squadre della classe per la proiezione su LIM.
+                        </p>
+                    </div>
+                    <div>
+                        <button type="button" class="btn" style="background:linear-gradient(135deg, #2ecc71, #27ae60); color:#000; font-weight:800; padding:9px 20px; border-radius:20px; font-size:0.88rem; border:none; box-shadow:0 4px 12px rgba(46,204,113,0.3);" onclick="window.EroiMinigames && window.EroiMinigames.openTeamSelection('mixed', document.getElementById('salagiochi-author-select')?.value || 'mixed')">
+                            <i class="fa-solid fa-play"></i> Sfida a Squadre per LIM
+                        </button>
+                    </div>
+                </div>
+            `;
+            if (historySec) historySec.style.display = 'block';
+            if (typeof window.renderMinigamesHistory === 'function') {
+                window.renderMinigamesHistory();
+            }
+        } else if (userRole === 'studente' || hasStudentCode) {
+            banner.innerHTML = `
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="font-size:1.6rem; color:var(--accent-gold);"><i class="fa-solid fa-shield-halved"></i></div>
+                    <div>
+                        <div style="font-weight:800; color:var(--accent-gold); font-size:0.95rem; margin-bottom:2px;">
+                            Modalità Studente
+                        </div>
+                        <p style="margin:0; font-size:0.85rem; color:#e0e0e0;">
+                            I punti che conquisti nei minigiochi vengono assegnati alla tua squadra attiva!
+                        </p>
+                    </div>
+                </div>
+            `;
+            if (historySec) historySec.style.display = 'none';
+        } else {
+            banner.innerHTML = `
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="font-size:1.6rem; color:var(--accent-gold);"><i class="fa-solid fa-compass"></i></div>
+                    <div>
+                        <div style="font-weight:800; color:var(--accent-gold); font-size:0.95rem; margin-bottom:2px;">
+                            Modalità Viandante (Free Play)
+                        </div>
+                        <p style="margin:0; font-size:0.85rem; color:#e0e0e0;">
+                            Gioca ed esplora liberamente tutti i minigiochi! Registrati o accedi con il codice squadra per salvare i tuoi record.
+                        </p>
+                    </div>
+                </div>
+            `;
+            if (historySec) historySec.style.display = 'none';
+        }
+    }
+
+    // 2. Popola Selettore Autori se non già popolato
+    if (select && select.options.length <= 1) {
+        try {
+            const authorList = (typeof window.AUTHORS !== 'undefined' && Array.isArray(window.AUTHORS))
+                ? window.AUTHORS
+                : ((typeof AUTHORS !== 'undefined' && Array.isArray(AUTHORS)) ? AUTHORS : []);
+
+            authorList.forEach(a => {
+                if (a && a.id && a.name) {
+                    const opt = document.createElement('option');
+                    opt.value = a.id;
+                    opt.textContent = `✍️ ${a.name}`;
+                    select.appendChild(opt);
+                }
+            });
+        } catch(e) {
+            console.warn("Errore popolamento selettore autori sala giochi:", e);
+        }
+    }
+};
+
+window.avviaSalaGiochiGame = function(gameType) {
+    const authorSelect = document.getElementById('salagiochi-author-select');
+    const selectedAuthorId = authorSelect ? authorSelect.value : 'mixed';
+
+    if (!window.EroiMinigames) {
+        alert("Caricamento dei minigiochi in corso... Riprova tra un istante.");
+        return;
+    }
+
+    if (gameType === 'manche') {
+        window.EroiMinigames.startManche(selectedAuthorId);
+    } else {
+        window.EroiMinigames.startMinigame(gameType, selectedAuthorId);
+    }
+};
+
+window.selectedFantaAvatar = localStorage.getItem('fanta_user_avatar') || 'https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png';
 window.openEditProfileModal = async function() {
     const user = window.auth ? window.auth.currentUser : null;
     const modal = document.getElementById('edit-profile-modal');
@@ -4527,7 +5168,7 @@ window.openEditProfileModal = async function() {
     if (nameInput) nameInput.value = user ? (user.displayName || user.email.split('@')[0]) : '';
     if (schoolInput) schoolInput.value = '';
     
-    let currentAvatar = 'assets/avatars/6.png';
+    let currentAvatar = window.selectedFantaAvatar || 'https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png';
 
     if (user && window.db) {
         try {
@@ -4639,10 +5280,18 @@ window.saveProfileData = async function() {
         window.selectedFantaAvatar = chosenAvatar;
         const profAvatarImg = document.getElementById('profilo-avatar-img');
         if (profAvatarImg) profAvatarImg.src = chosenAvatar;
+        const headerAvatarImg = document.getElementById('header-user-avatar-img');
+        if (headerAvatarImg) headerAvatarImg.src = chosenAvatar;
+        
         const profDisplayName = document.getElementById('profilo-display-name');
         const fantaDdUsername = document.getElementById('fanta-dd-username');
+        const headerUserName = document.getElementById('header-user-name');
+        const dropdownUserTitle = document.getElementById('dropdown-user-title');
+
         if (profDisplayName) profDisplayName.textContent = nameInput;
         if (fantaDdUsername) fantaDdUsername.textContent = nameInput;
+        if (headerUserName) headerUserName.textContent = nameInput;
+        if (dropdownUserTitle) dropdownUserTitle.textContent = nameInput;
 
         alert('Profilo e avatar aggiornati con successo in tutto l\'ecosistema!');
         document.getElementById('edit-profile-modal').style.display = 'none';
@@ -4653,10 +5302,30 @@ window.saveProfileData = async function() {
     }
 };
 
+/* =========================================
+   HEADER USER DROPDOWN CONTROLLERS
+========================================= */
+window.toggleUserDropdown = function(e) {
+    if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+    const dd = document.getElementById('header-user-dropdown');
+    if (!dd) return;
+    if (dd.classList.contains('hidden')) {
+        dd.classList.remove('hidden');
+    } else {
+        dd.classList.add('hidden');
+    }
+};
+
+window.closeUserDropdown = function() {
+    const dd = document.getElementById('header-user-dropdown');
+    if (dd) dd.classList.add('hidden');
+};
+
 // Chiusura automatica dropdown al click esterno
 window.addEventListener('click', () => {
-    const dd = document.getElementById('fanta-user-dropdown');
-    if (dd && dd.style.display !== 'none') {
-        dd.style.display = 'none';
+    window.closeUserDropdown();
+    const ddOld = document.getElementById('fanta-user-dropdown');
+    if (ddOld && ddOld.style.display !== 'none') {
+        ddOld.style.display = 'none';
     }
 });

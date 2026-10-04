@@ -118,11 +118,31 @@ async function setupAdminPanel() {
     };
 
     let currentAdminDocentiFilter = 'tutti';
+    
+    function getCanonicalEmail(emailOrId) {
+        if (!emailOrId) return '';
+        let em = String(emailOrId).toLowerCase().trim();
+        if (em.endsWith('@gmail.com')) {
+            const parts = em.split('@');
+            em = parts[0].replace(/\./g, '') + '@gmail.com';
+        }
+        return em;
+    }
+
     window.setAdminDocentiFilter = function(f) {
         currentAdminDocentiFilter = f;
         const searchInput = document.getElementById('admin-docenti-search');
         if(searchInput) searchInput.value = '';
         window.renderAdminDocenti();
+    };
+
+    window.filtraDocentiPerScuola = function(schoolName) {
+        window.setAdminDocentiFilter('teacher');
+        const searchInput = document.getElementById('admin-docenti-search');
+        if (searchInput) {
+            searchInput.value = schoolName;
+        }
+        window.renderAdminDocenti(schoolName);
     };
 
     window.sortAdminDocenti = function(col) {
@@ -141,21 +161,62 @@ async function setupAdminPanel() {
         const statsContainer = document.getElementById('admin-docenti-stats');
         if (!list) return;
         
-        // Fetch all users to get counts
+        // Fetch all users and deduplicate canonical accounts
         const snapshotAll = await window.db.collection('fanta_users').get();
-        const allUsers = snapshotAll.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const userMap = new Map();
+        snapshotAll.docs.forEach(doc => {
+            const data = doc.data();
+            const rawEmail = (data.email || doc.id || '').trim();
+            const key = getCanonicalEmail(rawEmail);
+            if (!key) return;
+
+            if (!userMap.has(key)) {
+                userMap.set(key, {
+                    id: doc.id,
+                    docIds: [doc.id],
+                    ...data,
+                    email: data.email || (doc.id.includes('@') ? doc.id : rawEmail)
+                });
+            } else {
+                const existing = userMap.get(key);
+                existing.docIds.push(doc.id);
+                userMap.set(key, {
+                    ...existing,
+                    ...data,
+                    id: existing.id,
+                    docIds: existing.docIds,
+                    email: existing.email || data.email,
+                    name: (data.name && data.name !== 'Senza Nome') ? data.name : (existing.name || 'Senza Nome'),
+                    school: (data.school || data.scuola || existing.school || existing.scuola || '').trim(),
+                    scuola: (data.school || data.scuola || existing.school || existing.scuola || '').trim(),
+                    role: (data.role || existing.role || 'student'),
+                    createdAt: existing.createdAt || data.createdAt,
+                    joinedAt: existing.joinedAt || data.joinedAt
+                });
+            }
+        });
+        const allUsers = Array.from(userMap.values());
         
+        const isTeacher = (u) => u.role === 'teacher' || u.role === 'docente' || u.role === 'admin';
+        const isGuest = (u) => u.role === 'guest';
+        const isArchived = (u) => u.status === 'archived' || !!u.archivedYear;
+        const isStudentActive = (u) => !isTeacher(u) && !isGuest(u) && !isArchived(u);
+        const isStudentArchived = (u) => !isTeacher(u) && !isGuest(u) && isArchived(u);
+
         const scuoleSet = new Set();
         allUsers.forEach(u => {
-            let sc = (u.school || u.scuola || '').trim();
-            if (sc && sc.toUpperCase() !== 'N/A' && sc.toUpperCase() !== 'N/D') scuoleSet.add(sc.toLowerCase());
+            if (!isArchived(u)) {
+                let sc = (u.school || u.scuola || '').trim();
+                if (sc && sc.toUpperCase() !== 'N/A' && sc.toUpperCase() !== 'N/D') scuoleSet.add(sc.toLowerCase());
+            }
         });
 
         const counts = {
-            tutti: allUsers.length,
-            teacher: allUsers.filter(u => u.role === 'teacher' || u.role === 'docente' || u.role === 'admin').length,
-            student: allUsers.filter(u => u.role !== 'teacher' && u.role !== 'docente' && u.role !== 'admin' && u.role !== 'guest').length,
-            guest: allUsers.filter(u => u.role === 'guest').length,
+            tutti: allUsers.filter(u => !isArchived(u)).length,
+            teacher: allUsers.filter(u => isTeacher(u)).length,
+            student: allUsers.filter(u => isStudentActive(u)).length,
+            guest: allUsers.filter(u => isGuest(u) && !isArchived(u)).length,
+            archived: allUsers.filter(u => isArchived(u)).length,
             scuole: scuoleSet.size
         };
         
@@ -163,7 +224,7 @@ async function setupAdminPanel() {
             statsContainer.innerHTML = `
                 <div class="admin-stat-card ${currentAdminDocentiFilter === 'tutti' ? 'active' : ''}" onclick="window.setAdminDocentiFilter('tutti')">
                     <div class="stat-value">${counts.tutti}</div>
-                    <div class="stat-label">TUTTI</div>
+                    <div class="stat-label">TUTTI ATTIVI</div>
                 </div>
                 <div class="admin-stat-card ${currentAdminDocentiFilter === 'teacher' ? 'active' : ''}" onclick="window.setAdminDocentiFilter('teacher')">
                     <div class="stat-value">${counts.teacher}</div>
@@ -171,41 +232,158 @@ async function setupAdminPanel() {
                 </div>
                 <div class="admin-stat-card ${currentAdminDocentiFilter === 'student' ? 'active' : ''}" onclick="window.setAdminDocentiFilter('student')">
                     <div class="stat-value">${counts.student}</div>
-                    <div class="stat-label">STUDENTI</div>
+                    <div class="stat-label">STUDENTI ATTIVI</div>
                 </div>
-                <div class="admin-stat-card ${currentAdminDocentiFilter === 'guest' ? 'active' : ''}" onclick="window.setAdminDocentiFilter('guest')">
-                    <div class="stat-value">${counts.guest}</div>
-                    <div class="stat-label">FANTAMICI</div>
+                <div class="admin-stat-card ${currentAdminDocentiFilter === 'archived' ? 'active' : ''}" onclick="window.setAdminDocentiFilter('archived')">
+                    <div class="stat-value" style="color: #94a3b8;">${counts.archived}</div>
+                    <div class="stat-label">ARCHIVIATI (READ-ONLY)</div>
                 </div>
                 <div class="admin-stat-card ${currentAdminDocentiFilter === 'scuole' ? 'active' : ''}" onclick="window.setAdminDocentiFilter('scuole')">
-                    <div class="stat-value" style="color: #ec4899;">${counts.scuole}</div>
+                    <div class="stat-value">${counts.scuole}</div>
                     <div class="stat-label">SCUOLE ATTIVE</div>
                 </div>
             `;
         }
 
-        list.innerHTML = '<p class="text-center">Caricamento iscritti...</p>';
+        list.innerHTML = '<p class="text-center">Caricamento...</p>';
         
-        let users = allUsers;
-        if (currentAdminDocentiFilter !== 'tutti') {
-            if (currentAdminDocentiFilter === 'student') {
-                users = allUsers.filter(u => u.role !== 'teacher' && u.role !== 'docente' && u.role !== 'admin' && u.role !== 'guest');
-            } else if (currentAdminDocentiFilter === 'teacher') {
-                users = allUsers.filter(u => u.role === 'teacher' || u.role === 'docente' || u.role === 'admin');
-            } else if (currentAdminDocentiFilter === 'guest') {
-                users = allUsers.filter(u => u.role === 'guest');
-            } else if (currentAdminDocentiFilter === 'scuole') {
-                users = allUsers.filter(u => {
+        // --- VISTA DEDICATA SCUOLE ATTIVE ---
+        if (currentAdminDocentiFilter === 'scuole') {
+            let allTeams = [];
+            try {
+                if (typeof getAllTeams === 'function') {
+                    allTeams = await getAllTeams();
+                }
+            } catch (e) {
+                console.warn("Recupero squadre per scuole:", e);
+            }
+
+            const schoolGroups = {};
+            allUsers.forEach(u => {
+                if (!isArchived(u)) {
                     let sc = (u.school || u.scuola || '').trim();
-                    return sc && sc.toUpperCase() !== 'N/A' && sc.toUpperCase() !== 'N/D';
+                    if (sc && sc.toUpperCase() !== 'N/A' && sc.toUpperCase() !== 'N/D') {
+                        const normKey = sc.toLowerCase();
+                        if (!schoolGroups[normKey]) {
+                            schoolGroups[normKey] = {
+                                name: sc,
+                                docenti: [],
+                                studenti: [],
+                                teams: []
+                            };
+                        }
+                        if (isTeacher(u)) {
+                            schoolGroups[normKey].docenti.push(u);
+                        } else {
+                            schoolGroups[normKey].studenti.push(u);
+                        }
+                    }
+                }
+            });
+
+            // Associa squadre alle scuole tramite docenti
+            allTeams.forEach(t => {
+                const ownerEmail = (t.ownerEmail || '').toLowerCase();
+                const teacherMatch = allUsers.find(u => (u.email || '').toLowerCase() === ownerEmail);
+                if (teacherMatch) {
+                    const sc = (teacherMatch.school || teacherMatch.scuola || '').trim().toLowerCase();
+                    if (schoolGroups[sc]) {
+                        schoolGroups[sc].teams.push(t);
+                    }
+                }
+            });
+
+            let schoolsList = Object.values(schoolGroups);
+
+            if (filterText) {
+                const q = filterText.toLowerCase();
+                schoolsList = schoolsList.filter(s => {
+                    const nameMatch = s.name.toLowerCase().includes(q);
+                    const docMatch = s.docenti.some(d => (d.name || '').toLowerCase().includes(q) || (d.email || '').toLowerCase().includes(q));
+                    return nameMatch || docMatch;
                 });
             }
+
+            if (schoolsList.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #888; padding: 20px;">Nessuna scuola attiva trovata con i filtri correnti.</p>';
+                return;
+            }
+
+            list.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:2px solid var(--accent-gold); font-size:0.8rem; text-transform:uppercase; color:var(--accent-gold);">
+                    <div style="display:flex; gap:15px; width:100%;">
+                        <div style="flex: 2;">Scuola</div>
+                        <div style="flex: 3;">Docenti Coinvolti</div>
+                        <div style="flex: 2;">Squadre / Attività</div>
+                        <div style="flex: 1; text-align:right;">Azioni</div>
+                    </div>
+                </div>
+            `;
+
+            schoolsList.forEach(s => {
+                const docentiHtml = s.docenti.length > 0
+                    ? s.docenti.map(d => `
+                        <div style="margin-bottom: 4px; display:flex; align-items:center; gap:6px;">
+                            <i class="fa-solid fa-chalkboard-user" style="color:var(--accent-gold); font-size:0.75rem;"></i>
+                            <span style="font-weight:600; color:#fff; font-size:0.85rem;">${d.name || 'Docente'}</span>
+                            <span style="font-size:0.75rem; color:#888;">(${d.email})</span>
+                        </div>
+                    `).join('')
+                    : '<i style="color:#888; font-size:0.8rem;">Nessun docente registrato</i>';
+
+                const teamsCount = s.teams.length;
+                const docEmails = s.docenti.map(d => d.email).filter(Boolean).join(',');
+
+                list.innerHTML += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 10px; border-bottom:1px solid rgba(255,255,255,0.05);">
+                        <div style="display:flex; gap:15px; width:100%; align-items:center;">
+                            <div style="flex: 2;">
+                                <div style="font-weight: 700; color: #fff; font-size: 0.95rem; display:flex; align-items:center; gap:8px;">
+                                    <i class="fa-solid fa-school" style="color:var(--primary-color);"></i>
+                                    ${s.name}
+                                </div>
+                                <div style="font-size:0.75rem; color:#888; margin-top:4px;">
+                                    ${s.docenti.length} ${s.docenti.length === 1 ? 'Docente' : 'Docenti'} &bull; ${s.studenti.length} Studenti Attivi
+                                </div>
+                            </div>
+                            <div style="flex: 3;">
+                                ${docentiHtml}
+                            </div>
+                            <div style="flex: 2;">
+                                <span class="badge" style="background: rgba(141,160,63,0.15); color: var(--primary-color); border: 1px solid var(--primary-color); padding: 4px 10px; border-radius: 12px; font-size: 0.78rem; font-weight:600;">
+                                    <i class="fa-solid fa-users-rectangle"></i> ${teamsCount} ${teamsCount === 1 ? 'Squadra' : 'Squadre'}
+                                </span>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:8px; flex: 1; justify-content:flex-end;">
+                                ${docEmails ? `<a href="mailto:${docEmails}" title="Scrivi ai docenti di ${s.name}" class="btn btn-secondary" style="padding:4px 8px; font-size:0.8rem; width:auto; text-decoration:none;"><i class="fa-solid fa-envelope"></i></a>` : ''}
+                                <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem; width:auto;" onclick="window.filtraDocentiPerScuola('${s.name.replace(/'/g, "\\'")}')" title="Vedi i docenti">
+                                    <i class="fa-solid fa-users"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            return;
+        }
+        
+        let users = allUsers;
+        if (currentAdminDocentiFilter === 'tutti') {
+            users = allUsers.filter(u => !isArchived(u));
+        } else if (currentAdminDocentiFilter === 'student') {
+            users = allUsers.filter(u => isStudentActive(u));
+        } else if (currentAdminDocentiFilter === 'teacher') {
+            users = allUsers.filter(u => isTeacher(u));
+        } else if (currentAdminDocentiFilter === 'guest') {
+            users = allUsers.filter(u => isGuest(u) && !isArchived(u));
+        } else if (currentAdminDocentiFilter === 'archived') {
+            users = allUsers.filter(u => isArchived(u));
         }
         
         list.innerHTML = '';
         let filteredUsers = users.filter(u => {
             const q = filterText.toLowerCase();
-            return (u.email || '').toLowerCase().includes(q) || (u.name || '').toLowerCase().includes(q) || (u.school || u.scuola || '').toLowerCase().includes(q);
+            return (u.email || '').toLowerCase().includes(q) || (u.name || '').toLowerCase().includes(q) || (u.school || u.scuola || '').toLowerCase().includes(q) || (u.archivedYear || '').toLowerCase().includes(q);
         });
 
         if (filteredUsers.length === 0) {
@@ -234,7 +412,7 @@ async function setupAdminPanel() {
         list.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:2px solid var(--accent-gold); font-size:0.8rem; text-transform:uppercase; color:var(--accent-gold);">
                 <div style="display:flex; gap:15px; width:100%;">
-                    <div style="cursor:pointer; flex: 1;" onclick="window.sortAdminDocenti('role')">Ruolo <i class="fa-solid fa-sort" style="margin-left:5px; color:#888;"></i></div>
+                    <div style="cursor:pointer; flex: 1;" onclick="window.sortAdminDocenti('role')">Ruolo / Stato <i class="fa-solid fa-sort" style="margin-left:5px; color:#888;"></i></div>
                     <div style="cursor:pointer; flex: 2;" onclick="window.sortAdminDocenti('email')">Utente <i class="fa-solid fa-sort" style="margin-left:5px; color:#888;"></i></div>
                     <div style="cursor:pointer; flex: 1;" onclick="window.sortAdminDocenti('date')">Data Iscrizione <i class="fa-solid fa-sort" style="margin-left:5px; color:#888;"></i></div>
                     <div style="flex: 1; text-align:right;">Azioni</div>
@@ -247,25 +425,45 @@ async function setupAdminPanel() {
             let dataStr = dataIsc ? (dataIsc.toDate ? dataIsc.toDate().toLocaleDateString() : new Date(dataIsc).toLocaleDateString()) : 'N/D';
             const userEmail = (u.email || u.id || '').toLowerCase();
             const schoolBadge = (u.school || u.scuola) ? `<span style="font-size:0.7rem; color:#888; display:block;"><i class="fa-solid fa-school"></i> ${u.school || u.scuola}</span>` : '';
+            const isSuperAdminUser = getCanonicalEmail(userEmail) === 'profmemmo@gmail.com' || userEmail === 'guglielmo.piersanti@padregemelli.net';
+            const userIsArchived = isArchived(u);
+            const archiveYearLabel = u.archivedYear ? `Archivio ${u.archivedYear}` : 'Archiviato';
+            const archiveBadge = userIsArchived 
+                ? `<span class="badge" style="background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3); font-size: 0.68rem; padding: 2px 7px; border-radius: 10px; font-weight: 700; margin-left: 6px; display: inline-flex; align-items: center; gap: 4px;"><i class="fa-solid fa-lock"></i> ${archiveYearLabel} (Read-Only)</span>`
+                : '';
 
-            list.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:12px 10px; border-bottom:1px solid rgba(255,255,255,0.05);">
+            let roleControlHtml = '';
+            if (userIsArchived) {
+                roleControlHtml = `
+                    <select class="input-field" style="padding: 4px 8px; font-size: 0.75rem; border-radius: 8px; background: rgba(0,0,0,0.25); color: #888; border: 1px dashed rgba(255,255,255,0.15); cursor: not-allowed;" disabled title="Account archiviato in sola lettura">
+                        <option selected>🔒 Studente (Archiviato)</option>
+                    </select>
+                `;
+            } else {
+                roleControlHtml = `
+                    <select class="input-field" style="padding: 4px 8px; font-size: 0.75rem; border-radius: 8px; background: rgba(0,0,0,0.4); color: #fff; border: 1px solid rgba(255,255,255,0.2);" onchange="window.cambiaRuoloFantaUser('${userEmail}', this.value)" ${isSuperAdminUser ? 'disabled' : ''}>
+                        <option value="student" ${!isTeacher(u) && !isGuest(u) ? 'selected' : ''}>Studente</option>
+                        <option value="teacher" ${isTeacher(u) ? 'selected' : ''}>Docente</option>
+                        <option value="guest" ${isGuest(u) ? 'selected' : ''}>Fantamico</option>
+                    </select>
+                `;
+            }
+
+            list.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:12px 10px; border-bottom:1px solid rgba(255,255,255,0.05); ${userIsArchived ? 'opacity: 0.85; background: rgba(255,255,255,0.01);' : ''}">
                 <div style="display:flex; gap:15px; width:100%; align-items:center;">
                     <div style="flex: 1;">
-                        <select class="input-field" style="padding: 4px 8px; font-size: 0.75rem; border-radius: 8px; background: rgba(0,0,0,0.4); color: #fff; border: 1px solid rgba(255,255,255,0.2);" onchange="window.cambiaRuoloFantaUser('${userEmail}', this.value)" ${userEmail === 'prof.memmo@gmail.com' ? 'disabled' : ''}>
-                            <option value="student" ${u.role !== 'teacher' && u.role !== 'docente' && u.role !== 'admin' && u.role !== 'guest' ? 'selected' : ''}>Studente</option>
-                            <option value="teacher" ${u.role === 'teacher' || u.role === 'docente' || u.role === 'admin' ? 'selected' : ''}>Docente</option>
-                            <option value="guest" ${u.role === 'guest' ? 'selected' : ''}>Fantamico</option>
-                        </select>
+                        ${roleControlHtml}
                     </div>
                     <div style="flex: 2;">
                         <span style="font-weight: 700; color: #fff;">${u.name || 'Senza Nome'}</span>
+                        ${archiveBadge}
                         <div style="font-size:0.8rem; color:#aaa;">${userEmail}</div>
                         ${schoolBadge}
                     </div>
                     <div style="flex: 1;"><span style="font-size:0.75rem; color:#888;"><i class="fa-solid fa-calendar-days"></i> ${dataStr}</span></div>
                     <div style="display:flex; align-items:center; gap:10px; flex: 1; justify-content:flex-end;">
                         <a href="mailto:${userEmail}" title="Scrivi a ${u.name || 'Senza Nome'}" style="color:var(--accent-gold); text-decoration:none; font-size: 1rem;"><i class="fa-solid fa-envelope"></i></a>
-                        ${userEmail !== 'prof.memmo@gmail.com' ? `
+                        ${!isSuperAdminUser ? `
                             <button class="btn btn-secondary text-danger" style="padding:4px 8px; font-size:0.75rem; width:auto; background:var(--bg-card); border-color:var(--danger-color); cursor:pointer;" onclick="eliminaDocente('${userEmail}')" title="Elimina Utente"><i class="fa-solid fa-trash"></i></button>
                         ` : ''}
                     </div>
@@ -276,10 +474,29 @@ async function setupAdminPanel() {
 
     window.cambiaRuoloFantaUser = async function(email, newRole) {
         try {
-            await window.db.collection('fanta_users').doc(email.toLowerCase()).update({
-                role: newRole,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            const canonical = getCanonicalEmail(email);
+            const snapshotAll = await window.db.collection('fanta_users').get();
+            const batch = window.db.batch();
+            let matched = 0;
+            snapshotAll.docs.forEach(doc => {
+                const data = doc.data();
+                const rawEmail = (data.email || doc.id || '').trim();
+                if (getCanonicalEmail(rawEmail) === canonical || doc.id.toLowerCase() === email.toLowerCase()) {
+                    batch.update(doc.ref, {
+                        role: newRole,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    matched++;
+                }
             });
+            if (matched > 0) {
+                await batch.commit();
+            } else {
+                await window.db.collection('fanta_users').doc(email.toLowerCase()).set({
+                    role: newRole,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+            }
             window.renderAdminDocenti();
         } catch(e) {
             console.error("Errore cambio ruolo:", e);
@@ -290,7 +507,23 @@ async function setupAdminPanel() {
     window.eliminaDocente = async function(email) {
         if(!confirm(`Sei sicuro di voler eliminare l'account ${email}?`)) return;
         try {
-            await window.db.collection('fanta_users').doc(email.toLowerCase()).delete();
+            const canonical = getCanonicalEmail(email);
+            const snapshotAll = await window.db.collection('fanta_users').get();
+            const batch = window.db.batch();
+            let matched = 0;
+            snapshotAll.docs.forEach(doc => {
+                const data = doc.data();
+                const rawEmail = (data.email || doc.id || '').trim();
+                if (getCanonicalEmail(rawEmail) === canonical || doc.id.toLowerCase() === email.toLowerCase()) {
+                    batch.delete(doc.ref);
+                    matched++;
+                }
+            });
+            if (matched > 0) {
+                await batch.commit();
+            } else {
+                await window.db.collection('fanta_users').doc(email.toLowerCase()).delete();
+            }
             window.renderAdminDocenti();
         } catch (e) {
             console.error(e);
@@ -673,38 +906,93 @@ async function setupAdminPanel() {
         }
     };
 
+    let currentAdminTargetFilter = 'all';
+    let currentAdminModeFilter = 'all';
+
+    window.setAdminClassificaTarget = function(target) {
+        currentAdminTargetFilter = target || 'all';
+        const btnAll = document.getElementById('admin-target-all');
+        const btnScuole = document.getElementById('admin-target-scuole');
+        const btnViandanti = document.getElementById('admin-target-viandanti');
+
+        [btnAll, btnScuole, btnViandanti].forEach(b => {
+            if (b) {
+                b.classList.add('btn-secondary');
+                b.style.background = 'transparent';
+            }
+        });
+
+        if (target === 'all' && btnAll) {
+            btnAll.classList.remove('btn-secondary');
+            btnAll.style.background = 'var(--primary-color)';
+        } else if (target === 'scuola' && btnScuole) {
+            btnScuole.classList.remove('btn-secondary');
+            btnScuole.style.background = 'var(--primary-color)';
+        } else if (target === 'viandante' && btnViandanti) {
+            btnViandanti.classList.remove('btn-secondary');
+            btnViandanti.style.background = '#8b5cf6';
+        }
+
+        window.renderAdminClassifica(currentAdminModeFilter);
+    };
+
     window.renderAdminClassifica = async function(modeFilter) {
+        if (modeFilter) currentAdminModeFilter = modeFilter;
         const list = document.getElementById('admin-classifica-list');
         if (!list) return;
-        list.innerHTML = '';
+        list.innerHTML = '<p style="padding:10px; color:var(--text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> Caricamento classifica...</p>';
 
         let teams = await getAllTeams();
-        if (modeFilter && modeFilter !== 'all') {
-            teams = teams.filter(t => (t.mode || 'terze') === modeFilter);
+        if (currentAdminTargetFilter && currentAdminTargetFilter !== 'all') {
+            teams = teams.filter(t => (t.teamType || (window.getTeamType ? window.getTeamType(t) : 'scuola')) === currentAdminTargetFilter);
+        }
+        if (currentAdminModeFilter && currentAdminModeFilter !== 'all') {
+            teams = teams.filter(t => (t.mode || 'terze') === currentAdminModeFilter);
         }
 
         let calc = teams.map(team => {
-            // Use the right author pool for this team's mode
-            const tm = team.mode ? GAME_MODES[team.mode] : null;
+            const tmKey = team.mode || 'terze';
+            const tm = GAME_MODES[tmKey];
             const pool = (tm && tm.authors && tm.authors.length > 0) ? tm.authors : AUTHORS;
             let authPts = 0;
-            team.authors.forEach(aid => {
-                const a = pool.find(x => x.id === aid);
-                if(a && a.isPointsRevealed) authPts += a.points;
-            });
-            const modeInfo = team.mode ? GAME_MODES[team.mode] : null;
-            const badge = modeInfo ? `<span class="mode-badge ${modeInfo.colorClass}">${modeInfo.emoji}</span>` : '';
-            return { name: team.name, badge, total: authPts + (team.missionsCompleted * 5) };
+            if (team.authors && Array.isArray(team.authors)) {
+                team.authors.forEach(aid => {
+                    const a = pool.find(x => x.id === aid);
+                    if(a && a.isPointsRevealed) authPts += a.points;
+                });
+            }
+            const modeInfo = tm || null;
+            const modeBadge = modeInfo ? `<span class="mode-badge ${modeInfo.colorClass}">${modeInfo.emoji}</span>` : '';
+            const tType = team.teamType || (window.getTeamType ? window.getTeamType(team) : 'scuola');
+            const targetBadge = tType === 'viandante' 
+                ? `<span class="badge" style="background:#8b5cf6; color:#fff; font-size:0.7rem; padding:2px 6px; border-radius:10px;">🧭 Viandante</span>` 
+                : `<span class="badge" style="background:var(--primary-color); color:#fff; font-size:0.7rem; padding:2px 6px; border-radius:10px;">🏫 Scuola</span>`;
+
+            const missionPts = (team.missionsCompleted || 0) * 5;
+            const minigamePts = (team.minigamePoints || 0);
+            const total = tType === 'viandante' ? (authPts + minigamePts) : (authPts + missionPts);
+
+            return { 
+                name: team.name + (team.classe ? ` (${team.classe})` : ''), 
+                modeBadge, 
+                targetBadge, 
+                total 
+            };
         }).sort((a,b) => b.total - a.total);
 
         if (calc.length === 0) {
-            list.innerHTML = '<i>Nessuna squadra in questa modalità.</i>';
+            list.innerHTML = '<i style="display:block; padding:10px;">Nessuna squadra trovata con questi filtri.</i>';
             return;
         }
 
+        list.innerHTML = '';
         calc.forEach((t, i) => {
-            list.innerHTML += `<div style="display:flex; justify-content:space-between; padding:8px 10px; font-size:0.9rem;">
-                <span>${i + 1}. ${t.badge} ${t.name}</span><span style="font-weight:bold; color:var(--primary-color);">${t.total} pt</span>
+            list.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; font-size:0.9rem; border-bottom:1px solid rgba(255,255,255,0.05);">
+                <div>
+                    <span style="font-weight:700; color:var(--text-muted); min-width:24px; display:inline-block;">${i + 1}.</span> 
+                    ${t.modeBadge} ${t.targetBadge} <strong style="margin-left:5px;">${t.name}</strong>
+                </div>
+                <span style="font-weight:bold; color:var(--primary-color); font-size:1rem;">${t.total} pt</span>
             </div>`;
         });
     };
@@ -836,11 +1124,13 @@ async function setupAdminPanel() {
             // Specific renders
             if (targetId === 'admin-view-autori') window.renderAdminAutori();
             if (targetId === 'admin-view-calendario') window.renderAdminCalendario();
+            if (targetId === 'admin-view-imprevisti') window.renderAdminImprevisti();
             if (targetId === 'admin-view-docenti') window.renderAdminDocenti();
             if (targetId === 'admin-view-squadre') window.renderAdminSquadre();
             if (targetId === 'admin-view-missioni') { window.renderAdminMissioni(); window.renderAdminMissioniPending(); }
             if (targetId === 'admin-view-classifica') window.renderAdminClassifica();
             if (targetId === 'admin-view-tornei') window.renderAdminTornei();
+            if (targetId === 'admin-view-regolamento') window.renderAdminRegolamento();
             if (targetId === 'admin-view-impostazioni' || targetId === 'admin-view-profilo') window.renderAdminImpostazioni();
 
             // Mobile menu close
@@ -854,15 +1144,24 @@ async function setupAdminPanel() {
     if (window.location.pathname.includes('admin.html')) {
         await window.renderAdminAutori();
         await window.renderAdminCalendario();
+        await window.renderAdminImprevisti();
         await window.renderAdminDocenti();
         await window.renderAdminSquadre();
         await window.renderAdminMissioni();
         await window.renderAdminMissioniPending();
         await window.renderAdminClassifica();
         await window.renderAdminTornei();
+        await window.renderAdminRegolamento();
         await window.renderAdminImpostazioni();
     }
 }
+
+// Global hook per render regolamento
+window.renderAdminRegolamento = function() {
+    if (window.RulesService) {
+        window.RulesService.renderAdminEditor('admin-regolamento-container');
+    }
+};
 
 // =========================================================
 // GESTIONE CALENDARIO USCITE & AUTO-VALIDAZIONI ADMIN
@@ -1041,6 +1340,16 @@ window.renderMonthlyCalendar = function() {
                     <div style="font-size:0.68rem; opacity:0.95; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                         ${rel.groupTitle.split(':')[1] || rel.title}
                     </div>
+                    ${rel.hazardText ? `
+                        <div style="font-size:0.63rem; color: #fde047; font-weight: 600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display: flex; align-items: center; gap: 3px;" title="${rel.hazardText.replace(/"/g, '&quot;')}">
+                            <i class="fa-solid fa-scroll"></i> ${rel.hazardText}
+                        </div>
+                    ` : ''}
+                    ${rel.isMarketOpen ? `
+                        <div style="font-size:0.63rem; color: #93c5fd; font-weight: bold; display: flex; align-items: center; gap: 3px;">
+                            <i class="fa-solid fa-repeat"></i> Mercato Attivo
+                        </div>
+                    ` : ''}
                     <div class="admin-cal-event-status">
                         <span>${rel.authorIds ? rel.authorIds.length : 0} Autori</span> &bull; 
                         <span>${rel.isReleased ? 'Sbloccato' : 'In attesa'}</span>
@@ -1196,6 +1505,27 @@ window.renderAdminCalendarioList = function() {
                     </div>
                 </div>
 
+                <!-- Sezione Imprevisto Ufficiale & Mercato -->
+                <div style="margin-top: 10px; background: rgba(0,0,0,0.25); padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(212,175,55,0.25);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 6px;">
+                        <label style="font-size: 0.8rem; font-weight: bold; color: var(--accent-gold); display: flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-scroll"></i> Carta Imprevisto del Turno:
+                        </label>
+                        <select style="background: rgba(20,20,30,0.9); color: var(--text-light); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; font-size: 0.75rem; padding: 3px 8px; cursor: pointer;" onchange="window.selectCalendarPresetHazard('${rel.id}', this.value); this.selectedIndex=0;">
+                            <option value="">⚡ Inserisci imprevisto classico...</option>
+                            ${((window.CalendarService && window.CalendarService.CLASSIC_HAZARDS) || []).map(h => `<option value="${h.replace(/"/g, '&quot;')}">${h}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                        <input type="text" id="hazard-input-${rel.id}" value="${(rel.hazardText || '').replace(/"/g, '&quot;')}" placeholder="Nessun imprevisto per questo turno (es. Crisi d'ispirazione: -2 pt)" style="flex: 1; min-width: 240px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 6px 10px; border-radius: 8px; font-size: 0.82rem;" onchange="window.updateCalendarReleaseHazard('${rel.id}', this.value)">
+                        
+                        <label style="display: inline-flex; align-items: center; gap: 6px; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); padding: 5px 10px; border-radius: 8px; font-size: 0.75rem; color: #93c5fd; cursor: pointer; user-select: none;">
+                            <input type="checkbox" ${rel.isMarketOpen ? 'checked' : ''} onchange="window.updateCalendarReleaseMarket('${rel.id}', this.checked)" style="cursor: pointer;">
+                            <i class="fa-solid fa-repeat"></i> Finestra Mercato (1 Cambio)
+                        </label>
+                    </div>
+                </div>
+
                 <!-- Autori inclusi -->
                 <div style="margin-top: 10px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px;">
                     <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">
@@ -1278,9 +1608,357 @@ window.resetCalendarRelease = async function(releaseId) {
     await window.CalendarService.resetRelease(releaseId);
 };
 
+window.updateCalendarReleaseHazard = async function(releaseId, text) {
+    if (!window.CalendarService) return;
+    await window.CalendarService.updateReleaseHazard(releaseId, text);
+};
+
+window.updateCalendarReleaseMarket = async function(releaseId, isMarketOpen) {
+    if (!window.CalendarService) return;
+    await window.CalendarService.updateReleaseMarket(releaseId, isMarketOpen);
+};
+
+window.selectCalendarPresetHazard = async function(releaseId, presetText) {
+    if (!presetText || !window.CalendarService) return;
+    const input = document.getElementById(`hazard-input-${releaseId}`);
+    if (input) input.value = presetText;
+    await window.CalendarService.updateReleaseHazard(releaseId, presetText);
+};
+
+// =========================================================
+// GESTIONE DEDICATA TAB IMPREVISTI & MERCATO ADMIN (SUPER-ADMIN ONLY)
+// =========================================================
+
+window.currentImprevistiTimelineFilter = 'all';
+
+window.filterImprevistiTimeline = function(filter) {
+    window.currentImprevistiTimelineFilter = filter;
+    document.querySelectorAll('#admin-view-imprevisti .admin-mode-filter-btn').forEach(btn => btn.classList.remove('active'));
+    const btnId = `btn-timeline-filter-${filter}`;
+    const activeBtn = document.getElementById(btnId);
+    if (activeBtn) activeBtn.classList.add('active');
+    window.renderAdminImprevisti();
+};
+
+window.renderAdminImprevisti = function() {
+    if (!window.ImprevistiService) return;
+
+    // 1. Render Mazzo di Carte (Lore Deck)
+    const deckGrid = document.getElementById('admin-deck-cards-grid');
+    const deckCountBadge = document.getElementById('deck-count-badge');
+    if (deckGrid) {
+        const deck = window.ImprevistiService.getDeck() || [];
+        if (deckCountBadge) deckCountBadge.innerText = `${deck.length} Carte Disponibili`;
+
+        deckGrid.innerHTML = deck.map(card => {
+            const isMalus = card.effectType === 'malus';
+            const isMarket = card.isMarket === true;
+            
+            let effectBadge = '';
+            if (isMarket) {
+                effectBadge = `<span style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #38bdf8; padding: 2px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: bold;"><i class="fa-solid fa-repeat"></i> Mercato (1 Cambio)</span>`;
+            } else if (isMalus) {
+                effectBadge = `<span style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; padding: 2px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: bold;">${card.points} Punti</span>`;
+            } else {
+                effectBadge = `<span style="background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; padding: 2px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: bold;">+${card.points} Punti</span>`;
+            }
+
+            const authorObj = card.authorId && window.ImprevistiService ? window.ImprevistiService.getAuthorById(card.authorId) : null;
+            const authorDisplayName = authorObj ? authorObj.name : card.authorName;
+            const authorImg = authorObj && authorObj.image ? authorObj.image : null;
+
+            return `
+                <div class="glass" style="padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); display: flex; flex-direction: column; justify-content: space-between; gap: 10px; transition: transform 0.2s, border-color 0.2s;" onmouseenter="this.style.borderColor='var(--accent-gold)'" onmouseleave="this.style.borderColor='rgba(255,255,255,0.1)'">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; margin-bottom: 6px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <i class="${card.icon}" style="color: ${card.color || 'var(--accent-gold)'}; font-size: 1.1rem;"></i>
+                                <strong style="font-size: 0.88rem; color: #fff;">${card.title}</strong>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 6px; align-items: center; margin-bottom: 6px; flex-wrap: wrap;">
+                            ${effectBadge}
+                            ${authorDisplayName ? `
+                                <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem; color: #e2e8f0; background: rgba(255,255,255,0.08); padding: 2px 7px; border-radius: 6px;">
+                                    ${authorImg ? `<img src="${authorImg}" style="width: 16px; height: 16px; border-radius: 50%; object-fit: cover;">` : '<i class="fa-solid fa-user-pen"></i>'}
+                                    Target: <strong>${authorDisplayName}</strong>
+                                </span>
+                            ` : `<span style="font-size: 0.72rem; color: #94a3b8; background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px;">Target: Globale (Tutte le squadre)</span>`}
+                        </div>
+                        <p style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.35; margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;" title="${card.lore}">
+                            ${card.lore}
+                        </p>
+                    </div>
+                    <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 5px 10px; border-radius: 8px; width: 100%; border: 1px solid rgba(212,175,55,0.4); color: var(--accent-gold); font-weight: 600;" onclick="window.programmaCardFromDeck('${card.cardId}')">
+                        <i class="fa-solid fa-calendar-plus"></i> Programma nel Calendario
+                    </button>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // 2. Render Timeline degli Imprevisti Programmati
+    const timelineList = document.getElementById('admin-imprevisti-timeline-list');
+    if (timelineList) {
+        const allEvents = window.ImprevistiService.getEvents() || [];
+        const filter = window.currentImprevistiTimelineFilter || 'all';
+
+        const filtered = allEvents.filter(ev => {
+            if (filter === 'all') return true;
+            if (filter === 'active') return ev.status === 'active';
+            if (filter === 'scheduled') return ev.status === 'scheduled';
+            if (filter === 'archived') return ev.status === 'archived';
+            return true;
+        });
+
+        if (filtered.length === 0) {
+            timelineList.innerHTML = `
+                <div style="text-align: center; padding: 30px; color: var(--text-muted);">
+                    <i class="fa-solid fa-calendar-xmark" style="font-size: 2rem; margin-bottom: 10px; display: block; opacity: 0.5;"></i>
+                    Nessun imprevisto programmato per questo filtro.<br>
+                    <span style="font-size: 0.8rem;">Seleziona una carta dal mazzo in alto oppure clicca su <strong>"🪄 Distribuisci a Tutto l'Anno"</strong>.</span>
+                </div>
+            `;
+            return;
+        }
+
+        timelineList.innerHTML = filtered.map(ev => {
+            let statusBadge = '';
+            if (ev.isBlocked) {
+                statusBadge = `<span style="background: rgba(100, 116, 139, 0.2); color: #94a3b8; border: 1px solid #64748b; padding: 3px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: bold;">🚫 Disattivato</span>`;
+            } else if (ev.status === 'active') {
+                statusBadge = `<span style="background: rgba(34, 197, 94, 0.25); color: #4ade80; border: 1px solid #22c55e; padding: 3px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: bold; animation: pulse 2s infinite;"><i class="fa-solid fa-bolt"></i> ATTIVO OGGI</span>`;
+            } else if (ev.status === 'scheduled') {
+                statusBadge = `<span style="background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid #3b82f6; padding: 3px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: bold;"><i class="fa-regular fa-clock"></i> In Programma</span>`;
+            } else {
+                statusBadge = `<span style="background: rgba(255, 255, 255, 0.08); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1); padding: 3px 8px; border-radius: 6px; font-size: 0.72rem;">📜 Storico</span>`;
+            }
+
+            let effectBadge = '';
+            if (ev.isMarket) {
+                effectBadge = `<span style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #38bdf8; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold;"><i class="fa-solid fa-repeat"></i> Mercato Aperto (1 Cambio)</span>`;
+            } else if (ev.effectType === 'malus') {
+                effectBadge = `<span style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold;">${ev.points} Punti</span>`;
+            } else if (ev.points > 0) {
+                effectBadge = `<span style="background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold;">+${ev.points} Punti</span>`;
+            }
+
+            const authorObj = ev.authorId && window.ImprevistiService ? window.ImprevistiService.getAuthorById(ev.authorId) : null;
+            const authorDisplayName = authorObj ? authorObj.name : ev.authorName;
+            const authorImg = authorObj && authorObj.image ? authorObj.image : null;
+
+            const borderStyle = ev.status === 'active' ? '1px solid rgba(34, 197, 94, 0.5)' : '1px solid rgba(255,255,255,0.08)';
+            const bgStyle = ev.status === 'active' ? 'rgba(34, 197, 94, 0.04)' : 'rgba(0,0,0,0.25)';
+
+            return `
+                <div class="glass" style="padding: 14px 16px; border-radius: 12px; border: ${borderStyle}; background: ${bgStyle}; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                    <!-- Data & Info -->
+                    <div style="display: flex; align-items: center; gap: 14px; flex: 1; min-width: 280px;">
+                        <div style="background: rgba(0,0,0,0.5); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12); text-align: center; min-width: 105px;">
+                            <span style="font-size: 0.68rem; color: var(--text-muted); display: block; text-transform: uppercase;">Data Evento</span>
+                            <span style="font-family: monospace; font-size: 0.95rem; color: #fff; font-weight: bold;">${ev.date}</span>
+                        </div>
+
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap;">
+                                ${statusBadge}
+                                ${effectBadge}
+                                ${authorDisplayName && authorDisplayName !== 'Globale' ? `
+                                    <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem; color: #e2e8f0; background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 6px;">
+                                        ${authorImg ? `<img src="${authorImg}" style="width: 16px; height: 16px; border-radius: 50%; object-fit: cover;">` : '<i class="fa-solid fa-user-pen"></i>'}
+                                        Target: <strong>${authorDisplayName}</strong>
+                                    </span>
+                                ` : ''}
+                            </div>
+                            <h4 style="margin: 0; font-size: 1rem; color: var(--accent-gold);">${ev.title}</h4>
+                            ${ev.lore ? `<p style="margin: 3px 0 0 0; font-size: 0.8rem; color: var(--text-light); line-height: 1.35;">${ev.lore}</p>` : ''}
+                        </div>
+                    </div>
+
+                    <!-- Azioni Super-Admin -->
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 6px 10px; border-radius: 8px; ${ev.isForcedActive ? 'background: rgba(34,197,94,0.3); border-color: #22c55e;' : ''}" onclick="window.toggleForceActiveImprevisto('${ev.id}')" title="${ev.isForcedActive ? 'Disattiva forzatura' : 'Forza attivo subito'}">
+                            <i class="fa-solid fa-bolt"></i> ${ev.isForcedActive ? 'Attivo Forzato' : 'Forza Attivo'}
+                        </button>
+                        <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 6px 10px; border-radius: 8px;" onclick="window.openCustomImprevistoModal('${ev.id}')" title="Modifica data o dettagli">
+                            <i class="fa-solid fa-pen"></i> Modifica
+                        </button>
+                        <button class="btn btn-secondary text-danger" style="font-size: 0.75rem; padding: 6px 10px; border-radius: 8px; border-color: rgba(239,68,68,0.3);" onclick="window.deleteImprevistoEvent('${ev.id}')" title="Elimina dalla timeline">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+};
+
+window.populateAuthorDropdown = function(selectedAuthorId = '') {
+    const select = document.getElementById('imp-form-author');
+    if (!select) return;
+
+    const allAuthors = window.ImprevistiService ? window.ImprevistiService.getAllAuthors() : [];
+
+    select.innerHTML = '<option value="">-- Evento Globale / Nessuno --</option>' + 
+        allAuthors.map(a => `<option value="${a.id}" ${a.id === selectedAuthorId ? 'selected' : ''}>${a.name} (${a.modeGroup || 'Autore'})</option>`).join('');
+};
+
+window.programmaCardFromDeck = function(cardId) {
+    if (!window.ImprevistiService) return;
+    const card = window.ImprevistiService.getCardById(cardId);
+    if (!card) return;
+
+    window.populateAuthorDropdown(card.authorId || '');
+
+    document.getElementById('imp-form-id').value = '';
+    document.getElementById('imp-form-card-id').value = card.cardId;
+    document.getElementById('imp-form-date').value = window.ImprevistiService.getTodayString();
+    document.getElementById('imp-form-title').value = card.title;
+    document.getElementById('imp-form-subtitle').value = card.subtitle || '';
+    document.getElementById('imp-form-lore').value = card.lore || '';
+    document.getElementById('imp-form-effect-type').value = card.effectType || 'bonus';
+    document.getElementById('imp-form-points').value = card.points !== undefined ? card.points : 0;
+    document.getElementById('imp-form-is-market').checked = card.isMarket === true;
+
+    document.getElementById('imprevisto-modal-title').innerText = `Programma: ${card.title}`;
+    const modal = document.getElementById('modal-imprevisto-editor');
+    if (modal) modal.style.display = 'flex';
+};
+
+window.openCustomImprevistoModal = function(editEventId = '') {
+    window.populateAuthorDropdown();
+    const modal = document.getElementById('modal-imprevisto-editor');
+
+    if (editEventId && window.ImprevistiService) {
+        const events = window.ImprevistiService.getEvents();
+        const ev = events.find(e => e.id === editEventId);
+        if (ev) {
+            document.getElementById('imp-form-id').value = ev.id;
+            document.getElementById('imp-form-card-id').value = ev.cardId || 'custom';
+            document.getElementById('imp-form-date').value = ev.date || window.ImprevistiService.getTodayString();
+            document.getElementById('imp-form-title').value = ev.title || '';
+            document.getElementById('imp-form-subtitle').value = ev.subtitle || '';
+            document.getElementById('imp-form-lore').value = ev.lore || '';
+            window.populateAuthorDropdown(ev.authorId || '');
+            document.getElementById('imp-form-effect-type').value = ev.effectType || 'bonus';
+            document.getElementById('imp-form-points').value = ev.points !== undefined ? ev.points : 0;
+            document.getElementById('imp-form-is-market').checked = ev.isMarket === true;
+            document.getElementById('imprevisto-modal-title').innerText = 'Modifica Imprevisto Programmato';
+            if (modal) modal.style.display = 'flex';
+            return;
+        }
+    }
+
+    // Nuovo custom
+    document.getElementById('imp-form-id').value = '';
+    document.getElementById('imp-form-card-id').value = 'custom';
+    document.getElementById('imp-form-date').value = (window.ImprevistiService && window.ImprevistiService.getTodayString()) || new Date().toISOString().split('T')[0];
+    document.getElementById('imp-form-title').value = '';
+    document.getElementById('imp-form-subtitle').value = '';
+    document.getElementById('imp-form-lore').value = '';
+    document.getElementById('imp-form-effect-type').value = 'bonus';
+    document.getElementById('imp-form-points').value = 2;
+    document.getElementById('imp-form-is-market').checked = false;
+    document.getElementById('imprevisto-modal-title').innerText = 'Crea Nuovo Imprevisto Personalizzato';
+    if (modal) modal.style.display = 'flex';
+};
+
+window.closeImprevistoModal = function() {
+    const modal = document.getElementById('modal-imprevisto-editor');
+    if (modal) modal.style.display = 'none';
+};
+
+window.submitImprevistoModal = async function(event) {
+    if (event) event.preventDefault();
+    if (!window.ImprevistiService) return;
+
+    const eventId = document.getElementById('imp-form-id').value;
+    const date = document.getElementById('imp-form-date').value;
+    const title = document.getElementById('imp-form-title').value;
+    const subtitle = document.getElementById('imp-form-subtitle').value;
+    const lore = document.getElementById('imp-form-lore').value;
+    const authorSelect = document.getElementById('imp-form-author');
+    const authorId = authorSelect ? authorSelect.value : null;
+    const authorName = (authorSelect && authorSelect.options[authorSelect.selectedIndex]) ? (authorId ? authorSelect.options[authorSelect.selectedIndex].text : 'Globale') : 'Globale';
+    const effectType = document.getElementById('imp-form-effect-type').value;
+    const points = parseInt(document.getElementById('imp-form-points').value, 10) || 0;
+    const isMarket = document.getElementById('imp-form-is-market').checked;
+    const cardId = document.getElementById('imp-form-card-id').value || 'custom';
+
+    try {
+        if (eventId) {
+            // Modifica
+            await window.ImprevistiService.updateEvent(eventId, {
+                date,
+                title,
+                subtitle,
+                lore,
+                authorId: authorId || null,
+                authorName,
+                effectType,
+                points,
+                isMarket
+            });
+        } else {
+            // Nuovo inserimento
+            await window.ImprevistiService.addEvent({
+                cardId,
+                date,
+                title,
+                subtitle,
+                lore,
+                authorId: authorId || null,
+                authorName,
+                effectType,
+                points,
+                isMarket
+            });
+        }
+
+        window.closeImprevistoModal();
+        window.renderAdminImprevisti();
+    } catch (e) {
+        alert("Errore salvataggio imprevisto: " + e.message);
+    }
+};
+
+window.deleteImprevistoEvent = async function(eventId) {
+    if (!confirm("Sei sicuro di voler eliminare questo imprevisto dalla timeline?")) return;
+    if (window.ImprevistiService) {
+        await window.ImprevistiService.deleteEvent(eventId);
+        window.renderAdminImprevisti();
+    }
+};
+
+window.toggleForceActiveImprevisto = async function(eventId) {
+    if (window.ImprevistiService) {
+        await window.ImprevistiService.toggleForceActive(eventId);
+        window.renderAdminImprevisti();
+    }
+};
+
+window.distribuisciImprevistiStagionali = async function() {
+    if (!window.ImprevistiService) return;
+    
+    const today = window.ImprevistiService.getTodayString();
+    const startDate = prompt("Inserisci la data di inizio della stagione scolastica (YYYY-MM-DD):", today);
+    if (!startDate) return;
+
+    if (!confirm("Vuoi distribuire l'intero mazzo di imprevisti e finestre di mercato lungo l'anno scolastico a partire dal " + startDate + "?")) return;
+
+    try {
+        await window.ImprevistiService.generateSeasonalSchedule(startDate);
+        window.renderAdminImprevisti();
+        alert("✅ Imprevisti e Finestre di Mercato distribuiti con successo per tutta la stagione!");
+    } catch (e) {
+        alert("Errore: " + e.message);
+    }
+};
+
 window.renderAdminImpostazioni = async function() {
     const emailField = document.getElementById('admin-impostazioni-email') || document.getElementById('admin-profilo-email');
-    if (emailField && currentUserEmail) emailField.value = currentUserEmail;
+    const currentEmail = (typeof currentUserEmail !== 'undefined' && currentUserEmail) || window.currentUserEmail || (window.auth && window.auth.currentUser && window.auth.currentUser.email) || '';
+    if (emailField && currentEmail) emailField.value = currentEmail;
 
     // Renderizza pannello Live Editor Didattico
     if (window.LiveEditor && typeof window.LiveEditor.renderAdminPanel === 'function') {
@@ -1290,56 +1968,211 @@ window.renderAdminImpostazioni = async function() {
     const masterArea = document.getElementById('admin-master-area');
     const archivesArea = document.getElementById('admin-historical-archives-area');
     if (masterArea) {
-        masterArea.style.display = (currentUserEmail === 'prof.memmo@gmail.com') ? 'block' : 'none';
+        masterArea.style.display = 'block';
     }
     if (archivesArea) {
-        archivesArea.style.display = (currentUserEmail === 'prof.memmo@gmail.com') ? 'block' : 'none';
-        if (currentUserEmail === 'prof.memmo@gmail.com' && window.loadHistoricalArchives) {
+        archivesArea.style.display = 'block';
+        if (window.loadHistoricalArchives) {
             await window.loadHistoricalArchives();
         }
     }
 };
 window.renderAdminProfilo = window.renderAdminImpostazioni;
 
-    window.archiviaAnnoCorrente = async function() {
-        if(currentUserEmail !== 'prof.memmo@gmail.com') return;
+    window.cachedArchiveTeams = [];
+
+    window.openArchiveSelectionModal = async function() {
+        const modal = document.getElementById('selective-archive-modal');
+        const listDiv = document.getElementById('archive-teams-selector-list');
+        const nameInput = document.getElementById('archive-name-input');
+        if (!modal || !listDiv) {
+            console.error("Selective archive modal not found in DOM");
+            alert("Errore: Finestra di archiviazione non trovata.");
+            return;
+        }
+
         const currentYear = new Date().getFullYear();
-        if(!confirm(`Sei ASSOLUTAMENTE sicuro di voler archiviare l'anno ${currentYear}?`)) return;
+        if (nameInput) {
+            nameInput.value = `Archivio_${currentYear - 1}_${currentYear}`;
+        }
+
+        modal.style.display = 'flex';
+        modal.classList.add('active');
+        listDiv.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> Caricamento squadre attive...</div>';
+
         try {
-            const backupName = prompt("Inserisci un nome per l'archivio (es: Fantaletteratura_2025_2026):", `Archivio_${currentYear}`);
-            if(!backupName) return;
-            
-            const usersSnapshot = await window.db.collection('fanta_users').get();
             const teamsSnapshot = await window.db.collection('fanta_teams').get();
-            
-            let batch = window.db.batch();
-            
-            usersSnapshot.docs.forEach(doc => {
-                const data = doc.data();
-                if (data.role !== 'admin' && data.role !== 'docente') {
-                    batch.update(doc.ref, { archivedYear: backupName, status: 'archived', teamId: null, teamCode: null });
+            const activeTeams = teamsSnapshot.docs
+                .map(d => {
+                    const data = d.data();
+                    let createdDate = null;
+                    if (data.createdAt) {
+                        createdDate = data.createdAt.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
+                    }
+                    return { docId: d.id, id: data.id || d.id, createdDate, ...data };
+                })
+                .filter(t => t.status !== 'archived' && !t.archivedYear);
+
+            window.cachedArchiveTeams = activeTeams;
+
+            if (activeTeams.length === 0) {
+                listDiv.innerHTML = '<p style="font-size:0.85rem; color:var(--text-muted); text-align:center; padding:15px;">Nessuna squadra attiva trovata da archiviare.</p>';
+                return;
+            }
+
+            const now = new Date();
+            const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
+            listDiv.innerHTML = activeTeams.map(t => {
+                const teamId = t.docId || t.id;
+                const teamName = t.name || 'Squadra';
+                const teamClass = t.classe || t.className || '-';
+                const teamOwner = t.ownerEmail || 'Docente';
+                const teamPoints = t.points || 0;
+                
+                let isCreatedToday = false;
+                let dateStr = 'Anno precedente';
+                if (t.createdDate && !isNaN(t.createdDate.getTime())) {
+                    isCreatedToday = (t.createdDate.getTime() >= todayMidnight);
+                    dateStr = t.createdDate.toLocaleDateString('it-IT') + ' ' + t.createdDate.toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
+                }
+
+                // Per impostazione predefinita, deseleziona le squadre create oggi e seleziona quelle storiche
+                const isChecked = !isCreatedToday ? 'checked' : '';
+                const badgeNew = isCreatedToday 
+                    ? `<span style="font-size:0.7rem; background:rgba(34,197,94,0.2); color:#4ade80; border:1px solid #16a34a; padding:2px 6px; border-radius:4px; font-weight:bold; margin-left:6px;">🟢 Creata Oggi (Nuova)</span>`
+                    : `<span style="font-size:0.7rem; background:rgba(212,175,55,0.15); color:var(--accent-gold); padding:2px 6px; border-radius:4px;">Anno Trascorso</span>`;
+
+                return `
+                    <label style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.03); padding:10px 12px; border:1px solid rgba(255,255,255,0.1); border-radius:8px; cursor:pointer;">
+                        <input type="checkbox" class="archive-team-cb" value="${teamId}" data-is-today="${isCreatedToday}" ${isChecked} style="accent-color:var(--accent-gold); width:18px; height:18px;">
+                        <div style="flex:1;">
+                            <div style="display:flex; align-items:center; justify-content:space-between;">
+                                <span style="font-weight:bold; color:var(--text-light); font-size:0.95rem;">${teamName}</span>
+                                <span style="color:var(--accent-gold); font-weight:700; font-size:0.85rem;">${teamPoints} pt</span>
+                            </div>
+                            <div style="font-size:0.75rem; color:var(--text-muted); margin-top:3px;">
+                                Classe: <strong style="color:#ddd;">${teamClass}</strong> | Docente: ${teamOwner} | ${dateStr} ${badgeNew}
+                            </div>
+                        </div>
+                    </label>
+                `;
+            }).join('');
+
+        } catch (e) {
+            console.error("Errore caricamento squadre per archiviazione:", e);
+            listDiv.innerHTML = '<p style="color:red; font-size:0.85rem; padding:15px; text-align:center;">Errore caricamento squadre: ' + e.message + '</p>';
+        }
+    };
+
+    window.selectAllArchiveTeams = function(checked) {
+        document.querySelectorAll('.archive-team-cb').forEach(cb => {
+            cb.checked = checked;
+        });
+    };
+
+    window.selectOnlyOldArchiveTeams = function() {
+        document.querySelectorAll('.archive-team-cb').forEach(cb => {
+            cb.checked = (cb.dataset.isToday !== 'true');
+        });
+    };
+
+    window.confirmSelectiveArchive = async function() {
+        const nameInput = document.getElementById('archive-name-input');
+        const backupName = (nameInput ? nameInput.value.trim() : '') || `Archivio_${new Date().getFullYear()}`;
+
+        const checkedBoxes = document.querySelectorAll('.archive-team-cb:checked');
+        if (checkedBoxes.length === 0) {
+            alert("Seleziona almeno una squadra da archiviare.");
+            return;
+        }
+
+        const selectedTeamIds = new Set(Array.from(checkedBoxes).map(cb => cb.value));
+        const totalActive = (window.cachedArchiveTeams || []).length;
+        const remainingCount = totalActive - selectedTeamIds.size;
+
+        const confirmMsg = `Confermi l'archiviazione di ${selectedTeamIds.size} squadre nell'archivio "${backupName}"?\n\n` +
+            `• ${selectedTeamIds.size} squadre verranno congelate nell'Archivio Storico.\n` +
+            `• ${remainingCount} squadre (es. create oggi) rimarranno ATTIVE per il nuovo anno scolastico.`;
+
+        if (!confirm(confirmMsg)) return;
+
+        try {
+            const teamsSnapshot = await window.db.collection('fanta_teams').get();
+            const usersSnapshot = await window.db.collection('fanta_users').get();
+
+            // 1. Prepara classifica finale per l'archivio (solo squadre selezionate)
+            const archivedTeamsData = [];
+            teamsSnapshot.docs.forEach(d => {
+                if (selectedTeamIds.has(d.id) || selectedTeamIds.has(d.data().id)) {
+                    archivedTeamsData.push({ docId: d.id, id: d.data().id || d.id, ...d.data() });
                 }
             });
 
-            teamsSnapshot.docs.forEach(doc => {
-                batch.update(doc.ref, { archivedYear: backupName, status: 'archived' });
+            archivedTeamsData.sort((a, b) => (b.points || 0) - (a.points || 0));
+
+            const leaderboard = archivedTeamsData.map(t => ({
+                name: t.name || 'Squadra',
+                classRoom: t.classe || t.className || '-',
+                school: t.school || t.istituto || '-',
+                points: t.points || 0
+            }));
+
+            let batch = window.db.batch();
+
+            // 2. Salva documento in fanta_archives (inclusa la fotografia degli imprevisti e mercato dell'anno)
+            const currentImprevisti = (window.ImprevistiService && Array.isArray(window.ImprevistiService._events)) 
+                ? window.ImprevistiService._events 
+                : [];
+
+            const archiveDocRef = window.db.collection('fanta_archives').doc();
+            batch.set(archiveDocRef, {
+                yearName: backupName,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                totalTeams: archivedTeamsData.length,
+                leaderboard: leaderboard,
+                imprevistiSnapshot: currentImprevisti
             });
 
-            if (window.fanta_db && window.fanta_db.clearMinigameLogs) {
-                await window.fanta_db.clearMinigameLogs();
-            }
+            // 3. Archivia le sole squadre selezionate
+            teamsSnapshot.docs.forEach(doc => {
+                if (selectedTeamIds.has(doc.id) || selectedTeamIds.has(doc.data().id)) {
+                    batch.update(doc.ref, { archivedYear: backupName, status: 'archived' });
+                }
+            });
+
+            // 4. Archivia gli studenti appartenenti alle squadre selezionate
+            usersSnapshot.docs.forEach(doc => {
+                const data = doc.data();
+                const studentTeam = data.teamId || data.teamCode;
+                const belongsToArchivedTeam = selectedTeamIds.has(data.teamId) || (data.teamCode && archivedTeamsData.some(t => t.joinCode === data.teamCode));
+
+                if (data.role !== 'admin' && data.role !== 'docente' && belongsToArchivedTeam) {
+                    batch.update(doc.ref, { 
+                        archivedYear: backupName, 
+                        status: 'archived', 
+                        archivedTeamId: data.teamId || null, 
+                        archivedTeamCode: data.teamCode || null,
+                        teamId: null, 
+                        teamCode: null 
+                    });
+                }
+            });
 
             await batch.commit();
-            alert(`Archiviazione "${backupName}" completata con successo. Studenti e squadre sono stati archiviati.`);
+
+            alert(`Archiviazione "${backupName}" completata!\n${selectedTeamIds.size} squadre archiviate nello storico.\n${remainingCount} squadre nuove sono rimaste attive nel campionato!`);
             window.location.reload();
-        } catch(e) {
-            console.error(e);
+
+        } catch (e) {
+            console.error("Errore durante l'archiviazione selettiva:", e);
             alert("Errore archiviazione: " + e.message);
         }
     };
 
+    window.archiviaAnnoCorrente = window.openArchiveSelectionModal;
+
     window.ripristinaAnnoArchiviato = async function(backupName) {
-        if(currentUserEmail !== 'prof.memmo@gmail.com') return;
         if(!confirm(`Sei ASSOLUTAMENTE sicuro di voler RIPRISTINARE l'anno archiviato "${backupName}"?\nQuesta operazione rimetterà in gioco tutte le squadre e gli studenti di quell'anno.`)) return;
         try {
             const usersSnapshot = await window.db.collection('fanta_users').where('archivedYear', '==', backupName).get();
@@ -1381,7 +2214,6 @@ window.renderAdminProfilo = window.renderAdminImpostazioni;
     };
 
     window.loadHistoricalArchives = async function() {
-        if(currentUserEmail !== 'prof.memmo@gmail.com') return;
         try {
             const snapshot = await window.db.collection('fanta_archives').orderBy('timestamp', 'desc').get();
             const container = document.getElementById('admin-historical-archives-list');

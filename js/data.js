@@ -1589,6 +1589,10 @@ const CALENDAR_RELEASES = [
     }
 ];
 
+if (typeof window !== 'undefined') {
+    window.CALENDAR_RELEASES = CALENDAR_RELEASES;
+}
+
 const MOCK_DOCENTI = [];
 const MOCK_TEAMS = [];
 let MOCK_SCHEDE = [];

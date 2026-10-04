@@ -42,22 +42,32 @@ window.fanta_db.saveTeam = async (teamData) => {
     return docRef.id;
 };
 
-window.fanta_db.getTeams = async (mode = 'all') => {
+window.fanta_db.getTeams = async (mode = 'all', includeArchived = false) => {
     let query = window.db.collection('fanta_teams');
     if (mode !== 'all') query = query.where("mode", "==", mode);
     const snapshot = await query.get();
-    return snapshot.docs.map(doc => window.fanta_db.mapTeamDoc(doc));
+    const teams = snapshot.docs.map(doc => window.fanta_db.mapTeamDoc(doc));
+    if (!includeArchived) {
+        return teams.filter(t => t.status !== 'archived' && !t.archivedYear);
+    }
+    return teams;
 };
 
 window.fanta_db.getTeamByCode = async (code) => {
     const snapshot = await window.db.collection('fanta_teams').where("joinCode", "==", code.toUpperCase()).get();
     if (snapshot.empty) return null;
-    return window.fanta_db.mapTeamDoc(snapshot.docs[0]);
+    const team = window.fanta_db.mapTeamDoc(snapshot.docs[0]);
+    if (team.status === 'archived' || team.archivedYear) return null;
+    return team;
 };
 
-window.fanta_db.getUserTeams = async (email) => {
+window.fanta_db.getUserTeams = async (email, includeArchived = false) => {
     const snapshot = await window.db.collection('fanta_teams').where("ownerEmail", "==", email).get();
-    return snapshot.docs.map(doc => window.fanta_db.mapTeamDoc(doc));
+    const teams = snapshot.docs.map(doc => window.fanta_db.mapTeamDoc(doc));
+    if (!includeArchived) {
+        return teams.filter(t => t.status !== 'archived' && !t.archivedYear);
+    }
+    return teams;
 };
 
 window.fanta_db.deleteTeam = async (teamId) => {
@@ -84,8 +94,12 @@ window.fanta_db.removeCollaboratore = async (teamId, email) => {
     });
 };
 
-window.fanta_db.getCollaboratedTeams = async (email) => {
+window.fanta_db.getCollaboratedTeams = async (email, includeArchived = false) => {
     const snapshot = await window.db.collection('fanta_teams')
         .where("collaboratori", "array-contains", email.toLowerCase()).get();
-    return snapshot.docs.map(doc => window.fanta_db.mapTeamDoc(doc));
+    const teams = snapshot.docs.map(doc => window.fanta_db.mapTeamDoc(doc));
+    if (!includeArchived) {
+        return teams.filter(t => t.status !== 'archived' && !t.archivedYear);
+    }
+    return teams;
 };

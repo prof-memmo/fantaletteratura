@@ -8522,6 +8522,13 @@
       { title: "Proemio dell'ILIADE", lines: ["Cantami, o Diva, del pelide Achille", "l'ira funesta che infiniti addusse", "lutti agli Achei, molte anzi tempo all'Orco", "generose travolse alme d'eroi."], hint: "Il proemio annuncia il tema: l'ira di Achille. Inizia con l'invocazione alla Musa." },
       { title: "Proemio dell'ODISSEA", lines: ["Dimmi, o Musa, dell'eroe multiforme,", "che tanto vagò, dopo che distrusse", "la rocca sacra di Troia:", "di molti uomini vide le città e conobbe i costumi."], hint: "Il proemio enuncia il viaggio dell'eroe astuto. Il tema è il nostos, il ritorno." },
       { title: "Proemio dell'ENEIDE", lines: ["Canto le armi e l'uomo che per primo", "dalle coste di Troia, profugo per decreto del fato,", "giunse in Italia e al lido di Lavinio;", "molto fu sballottato per terra e per mare."], hint: "Il proemio dell'Eneide: armi, uomo, destino, Roma." }
+    ],
+    quiz: [
+      { q: "Chi è l'autore dell'Iliade e dell'Odissea?", o: ["Virgilio", "Omero", "Dante Alighieri", "Esiodo"], a: 1 },
+      { q: "Qual è la patria natale di Ulisse?", o: ["Troia", "Sparta", "Itaca", "Micene"], a: 2 },
+      { q: "Chi è l'eroe protagonista dell'Eneide?", o: ["Achille", "Enea", "Ettore", "Agamennone"], a: 1 },
+      { q: "Quale mostro mitologico custodiva il labirinto di Creta?", o: ["La Sfinge", "Il Minotauro", "Il Centauro", "Cerbero"], a: 1 },
+      { q: "Chi compose la Divina Commedia?", o: ["Francesco Petrarca", "Giovanni Boccaccio", "Dante Alighieri", "Ludovico Ariosto"], a: 2 }
     ]
   };
 
@@ -8597,35 +8604,110 @@
         
         const listDiv = document.getElementById('team-selector-list');
         const modal = document.getElementById('team-selector-modal');
+        const filterSelect = document.getElementById('team-selector-mode-filter');
+        const countSpan = document.getElementById('team-selector-count');
+        
         if (!listDiv || !modal) {
-            // Fallback se la UI manca
             if (type === 'manche') this.startMancheLegacy(missionId);
             else this.startMinigameDirect(type, missionId);
             return;
         }
 
+        if (filterSelect) filterSelect.value = 'all';
         modal.style.display = 'flex';
-        listDiv.innerHTML = '<div style="text-align:center; padding:10px;"><i class="fa-solid fa-spinner fa-spin"></i> Caricamento...</div>';
+        listDiv.innerHTML = '<div style="text-align:center; padding:15px; color:var(--text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> Caricamento squadre in corso...</div>';
 
         try {
-            const allTeams = window.fanta_db ? await window.fanta_db.getTeams() : [];
-            const myTeams = allTeams.filter(t => t.ownerEmail === window.currentUserEmail);
+            const userEmail = (window.currentUserEmail || (window.auth && window.auth.currentUser && window.auth.currentUser.email) || '').toLowerCase();
+            const allTeams = window.fanta_db ? await window.fanta_db.getTeams('all', false) : [];
+            
+            const myTeams = (userEmail === 'prof.memmo@gmail.com')
+                ? allTeams
+                : allTeams.filter(t => {
+                    const owner = (t.ownerEmail || '').toLowerCase();
+                    const coll = Array.isArray(t.collaboratori) ? t.collaboratori.map(c => (c || '').toLowerCase()) : [];
+                    return owner === userEmail || coll.includes(userEmail);
+                });
             
             if (myTeams.length === 0) {
-                listDiv.innerHTML = '<p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">Nessuna squadra disponibile. Crea una squadra dal tuo profilo per poter giocare.</p>';
+                listDiv.innerHTML = '<p style="font-size:0.85rem; color:var(--text-muted); text-align:center; padding:15px 0;">Nessuna squadra attiva trovata per questo account.<br>Crea prima delle squadre dal pannello docente per avviare la sfida.</p>';
+                if (countSpan) countSpan.textContent = '0 squadre trovate';
                 return;
             }
 
-            listDiv.innerHTML = myTeams.map(t => `
-                <label style="display:flex; align-items:center; gap:10px; background:rgba(212,175,55,0.05); padding:10px; border:1px solid rgba(212,175,55,0.2); border-radius:8px; cursor:pointer;">
-                    <input type="checkbox" class="team-selector-checkbox" value="${t.id}" data-name="${t.name}" checked>
-                    <span style="font-weight:bold; color:var(--text-light);">${t.name}</span>
-                </label>
-            `).join('');
+            listDiv.innerHTML = myTeams.map(t => {
+                const teamId = t.docId || t.id;
+                const teamName = t.name || 'Squadra';
+                const teamClass = t.classe || t.className || '';
+                const modeKey = (t.mode || t.campionato || 'terze').toLowerCase();
+                
+                let modeBadge = '<span style="font-size:0.7rem; padding:2px 6px; border-radius:6px; background:rgba(141,160,63,0.2); color:#a3b846; border:1px solid rgba(141,160,63,0.4);">📘 Contemporanea</span>';
+                if (modeKey === 'seconde') {
+                    modeBadge = '<span style="font-size:0.7rem; padding:2px 6px; border-radius:6px; background:rgba(212,114,26,0.2); color:#e6832b; border:1px solid rgba(212,114,26,0.4);">📙 Medievale</span>';
+                } else if (modeKey === 'avanzato') {
+                    modeBadge = '<span style="font-size:0.7rem; padding:2px 6px; border-radius:6px; background:rgba(201,162,39,0.2); color:#deb431; border:1px solid rgba(201,162,39,0.4);">📒 Internazionali</span>';
+                }
+
+                return `
+                    <label class="team-selector-row" data-mode="${modeKey}" style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.04); padding:10px 12px; border:1px solid rgba(255,255,255,0.1); border-radius:8px; cursor:pointer; transition:background 0.2s;">
+                        <input type="checkbox" class="team-selector-checkbox" value="${teamId}" data-name="${teamName}" data-mode="${modeKey}" checked onchange="window.EroiMinigames && window.EroiMinigames.updateSelectedCount()" style="accent-color:var(--accent-gold); width:18px; height:18px;">
+                        <div style="display:flex; flex-direction:column; gap:2px; flex:1;">
+                            <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                                <span style="font-weight:bold; color:var(--text-light); font-size:0.92rem;">${teamName}</span>
+                                ${teamClass ? `<span style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">Classe ${teamClass}</span>` : ''}
+                            </div>
+                            <div style="margin-top:2px;">
+                                ${modeBadge}
+                            </div>
+                        </div>
+                    </label>
+                `;
+            }).join('');
+
+            this.updateSelectedCount();
 
         } catch (e) {
             console.error("Errore caricamento squadre per minigioco", e);
             listDiv.innerHTML = '<p style="color:red; font-size:0.8rem;">Errore caricamento squadre.</p>';
+        }
+    },
+
+    onFilterChange: function() {
+        const filterSelect = document.getElementById('team-selector-mode-filter');
+        const selectedMode = filterSelect ? filterSelect.value : 'all';
+        const rows = document.querySelectorAll('.team-selector-row');
+        
+        rows.forEach(row => {
+            const rowMode = row.dataset.mode || 'terze';
+            const cb = row.querySelector('.team-selector-checkbox');
+            if (selectedMode === 'all' || rowMode === selectedMode) {
+                row.style.display = 'flex';
+                if (cb) cb.checked = true;
+            } else {
+                row.style.display = 'none';
+                if (cb) cb.checked = false;
+            }
+        });
+
+        this.updateSelectedCount();
+    },
+
+    toggleSelectAll: function(selectAll) {
+        const rows = document.querySelectorAll('.team-selector-row');
+        rows.forEach(row => {
+            if (row.style.display !== 'none') {
+                const cb = row.querySelector('.team-selector-checkbox');
+                if (cb) cb.checked = !!selectAll;
+            }
+        });
+        this.updateSelectedCount();
+    },
+
+    updateSelectedCount: function() {
+        const countSpan = document.getElementById('team-selector-count');
+        const checkedBoxes = document.querySelectorAll('.team-selector-checkbox:checked');
+        if (countSpan) {
+            countSpan.textContent = `${checkedBoxes.length} squadr${checkedBoxes.length === 1 ? 'a selezionata' : 'e selezionate'}`;
         }
     },
 
@@ -8702,7 +8784,11 @@
     },
 
     startMinigame: function(type, missionId) {
-        if (window.currentUserRole !== 'docente' && window.currentUserRole !== 'admin') {
+        const userEmail = (window.currentUserEmail || (window.auth && window.auth.currentUser && window.auth.currentUser.email) || '').toLowerCase();
+        const userRole = (window.currentUserRole || localStorage.getItem('fanta_user_role') || '').toLowerCase();
+        const isTeacherOrAdmin = userRole === 'docente' || userRole === 'teacher' || userRole === 'admin' || userEmail === 'prof.memmo@gmail.com';
+
+        if (!isTeacherOrAdmin) {
             this.startMinigameDirect(type, missionId);
             return;
         }
@@ -8710,7 +8796,11 @@
     },
 
     startManche: function(authorId) {
-        if (window.currentUserRole !== 'docente' && window.currentUserRole !== 'admin') {
+        const userEmail = (window.currentUserEmail || (window.auth && window.auth.currentUser && window.auth.currentUser.email) || '').toLowerCase();
+        const userRole = (window.currentUserRole || localStorage.getItem('fanta_user_role') || '').toLowerCase();
+        const isTeacherOrAdmin = userRole === 'docente' || userRole === 'teacher' || userRole === 'admin' || userEmail === 'prof.memmo@gmail.com';
+
+        if (!isTeacherOrAdmin) {
             this.startMancheLegacy(authorId);
             return;
         }
@@ -8747,7 +8837,14 @@
         impiccato: '🎭 L\'Impiccato',
         puzzle: '🧩 Ricostruisci la Citazione',
         cloze: '📝 Testo Bucato (Cloze)',
-        versi: '📜 Riordina i Versi'
+        versi: '📜 Riordina i Versi',
+        memory: '🃏 Memory Letterario',
+        cruciverba: '✏️ Parole Crociate',
+        rebus: '🎯 Rebus Letterario',
+        crittografia: '🔐 Crittografia in Codice',
+        indovinello: '💡 Indovinello Letterario',
+        anagramma: '🔤 Anagrammi & Sciarade',
+        differenze: '🔍 Trova le Differenze'
       };
       title.innerHTML = `<span style="color:#f5c53c;">${this.isMancheMode ? '🏆 MANCHE COMPLETA - ' : ''}${typeLabels[type] || type}</span> ${topicBadge}`;
 
@@ -8757,6 +8854,13 @@
         case 'cloze':     this.initCloze(content, data); break;
         case 'versi':     this.initVersi(content, data); break;
         case 'quiz':      this.initQuiz(content, data); break;
+        case 'memory':    this.initMemory(content, data, currentMissionId); break;
+        case 'cruciverba': this.initCruciverba(content, data, currentMissionId); break;
+        case 'rebus':     this.initRebus(content, data, currentMissionId); break;
+        case 'crittografia': this.initCrittografia(content, data, currentMissionId); break;
+        case 'indovinello': this.initIndovinello(content, data, currentMissionId); break;
+        case 'anagramma': this.initAnagramma(content, data, currentMissionId); break;
+        case 'differenze': this.initDifferenze(content, data, currentMissionId); break;
       }
     },
 
@@ -8800,39 +8904,43 @@
             const currentTurn = this.gameQueue[this.currentTurnIndex];
             
             if (currentTurn.game === 'versi') {
-                alert(`Hai terminato il minigioco 'Versi'. Assegna MANUALMENTE i punti alla ${currentTurn.teamName} dal tuo pannello LIM.`);
                 if (window.fanta_db && window.fanta_db.saveMinigameLog) {
-                    window.fanta_db.saveMinigameLog({
+                    await window.fanta_db.saveMinigameLog({
                         teamId: currentTurn.teamId,
                         teamName: currentTurn.teamName,
                         game: currentTurn.game,
-                        points: 0
+                        points: xp || 0
                     });
                 }
             } else {
                 try {
-                    const doc = await window.db.collection('fanta_teams').doc(currentTurn.teamId).get();
-                    if(doc.exists) {
-                        const t = doc.data();
-                        await window.db.collection('fanta_teams').doc(currentTurn.teamId).update({
-                            points: (t.points || 0) + xp
+                    const ref = await window.fanta_db.getTeamDocRef(currentTurn.teamId);
+                    await ref.update({
+                        points: firebase.firestore.FieldValue.increment(xp)
+                    });
+                    
+                    if (window.fanta_db && window.fanta_db.saveMinigameLog) {
+                        await window.fanta_db.saveMinigameLog({
+                            teamId: currentTurn.teamId,
+                            teamName: currentTurn.teamName,
+                            game: currentTurn.game,
+                            points: xp
                         });
+                    }
+                    
+                    if (window.showToast) {
+                        window.showToast(`+${xp} Punti assegnati a ${currentTurn.teamName}!`, 'success');
+                    } else {
                         alert(`+${xp} Punti assegnati AUTOMATICAMENTE a ${currentTurn.teamName}!`);
-                        
-                        // Salva nel log
-                        if (window.fanta_db && window.fanta_db.saveMinigameLog) {
-                            window.fanta_db.saveMinigameLog({
-                                teamId: currentTurn.teamId,
-                                teamName: currentTurn.teamName,
-                                game: currentTurn.game,
-                                points: xp
-                            });
-                        }
                     }
                 } catch(e) {
                     console.error("Errore aggiornamento punti", e);
                     alert(`Errore nell'assegnazione automatica a ${currentTurn.teamName}. Assegnali manualmente.`);
                 }
+            }
+            
+            if (typeof window.renderMinigamesHistory === 'function') {
+                window.renderMinigamesHistory();
             }
             
             this.currentTurnIndex++;
@@ -8843,23 +8951,53 @@
         this.assignPointsToTeamLegacy(xp);
     },
 
-    assignPointsToTeamLegacy: function(xp) {
+    assignPointsToTeamLegacy: async function(xp) {
+        if (!xp || xp <= 0) return;
+
+        // 1. Caso Studente
         if (window.currentUserRole === 'studente' && window.currentUserTeamId && window.db) {
-            window.db.collection('fanta_teams').doc(window.currentUserTeamId).get().then(doc => {
-                if(doc.exists) {
+            try {
+                const doc = await window.db.collection('fanta_teams').doc(window.currentUserTeamId).get();
+                if (doc.exists) {
                     const t = doc.data();
-                    window.db.collection('fanta_teams').doc(t.id).update({
+                    await window.db.collection('fanta_teams').doc(t.id).update({
                         points: (t.points || 0) + xp
                     });
-                    if(window.showToast) {
-                        window.showToast(`+${xp} Punti guadagnati per la tua squadra!`, 'success');
-                    } else {
-                        alert(`+${xp} Punti guadagnati per la tua squadra!`);
-                    }
+                    if (window.showToast) window.showToast(`+${xp} Punti guadagnati per la tua squadra!`, 'success');
+                    else alert(`+${xp} Punti guadagnati per la tua squadra!`);
                 }
-            });
-        } else if (window.currentUserRole === 'docente' || window.currentUserRole === 'admin') {
-            alert(`+${xp} Punti per la squadra selezionata. (Assegnali manualmente dal pannello LIM).`);
+            } catch(err) {
+                console.error("Errore assegnazione punti studente:", err);
+            }
+        } 
+        // 2. Caso Viandante / Utente Singolo
+        else if ((window.currentUserRole === 'viandante' || window.currentUserRole === 'fantamico' || window.currentUserRole === 'guest') && window.currentUserEmail && window.db) {
+            try {
+                const snap = await window.db.collection('fanta_teams')
+                    .where('ownerEmail', '==', window.currentUserEmail)
+                    .get();
+                if (!snap.empty) {
+                    const teamDoc = snap.docs[0];
+                    const currentMinigamePts = teamDoc.data().minigamePoints || 0;
+                    await window.db.collection('fanta_teams').doc(teamDoc.id).update({
+                        minigamePoints: currentMinigamePts + xp
+                    });
+                    if (window.showToast) {
+                        window.showToast(`+${xp} Punti minigioco aggiunti alla tua squadra Viandante (${teamDoc.data().name})!`, 'success');
+                    } else {
+                        alert(`+${xp} Punti minigioco aggiunti alla tua squadra Viandante (${teamDoc.data().name})!`);
+                    }
+                } else {
+                    if (window.showToast) window.showToast(`+${xp} Punti minigioco guadagnati! Crea una squadra per registrarli.`, 'info');
+                    else alert(`+${xp} Punti minigioco guadagnati! Crea una squadra per registrarli.`);
+                }
+            } catch(err) {
+                console.error("Errore salvataggio punti minigioco viandante:", err);
+            }
+        }
+        // 3. Caso Docente / Admin
+        else if (window.currentUserRole === 'docente' || window.currentUserRole === 'admin') {
+            alert(`+${xp} Punti per la squadra selezionata. (Assegnali dal pannello di classe/LIM).`);
         }
     },
 
@@ -9187,7 +9325,18 @@
 
     hintPuzzle: function() {
       if (!puzzleState.ex) return;
-      const fullWords = puzzleState.ex.solution.split(' ');
+      const fullWords = (puzzleState.ex.words && puzzleState.ex.words.length) ? puzzleState.ex.words : puzzleState.ex.solution.split(' ');
+      
+      // Se ci sono parole errate già selezionate, rimuovile prima di suggerire
+      while (puzzleState.selected.length > 0) {
+        const lastIdx = puzzleState.selected.length - 1;
+        if (puzzleState.selected[lastIdx] !== fullWords[lastIdx]) {
+          this.puzzleRemove(lastIdx);
+        } else {
+          break;
+        }
+      }
+
       const nextIdx = puzzleState.selected.length;
       if (nextIdx < fullWords.length) {
         const expectedWord = fullWords[nextIdx];
@@ -9396,6 +9545,17 @@
 
     hintVersi: function() {
       if (!versiState.ex) return;
+      
+      // Se ci sono versi errati già ordinati, rimuovili prima di suggerire
+      while (versiState.ordered.length > 0) {
+        const lastIdx = versiState.ordered.length - 1;
+        if (versiState.ordered[lastIdx] !== versiState.ex.lines[lastIdx]) {
+          this.versiRemove(lastIdx);
+        } else {
+          break;
+        }
+      }
+
       const nextIdx = versiState.ordered.length;
       if (nextIdx < versiState.ex.lines.length) {
         const expectedLine = versiState.ex.lines[nextIdx];
@@ -9408,8 +9568,1401 @@
     },
 
     skipCurrent: function(type) {
-      if (window.showToast) window.showToast('Esercizio saltato. Proseguiamo con il prossimo!', 'info');
+      if (window.showToast) window.showToast('Esercizio saltato. Proseguiamo con il prossimo turno!', 'info');
+      const isQueueActive = (this.gameQueue && this.gameQueue.length > 0 && this.currentTurnIndex < this.gameQueue.length);
+      if (isQueueActive) {
+          this.currentTurnIndex++;
+          this.playNextInQueue();
+          return;
+      }
       this.startMinigameDirect(type, currentMissionId);
+    },
+
+    // =====================================================
+    // MOTORE: MEMORY LETTERARIO (BLOCCO 2)
+    // =====================================================
+    memoryState: {
+      cards: [],
+      flipped: [],
+      matchedCount: 0,
+      totalPairs: 6,
+      moves: 0,
+      timer: 0,
+      timerInterval: null,
+      isLocked: false
+    },
+
+    memoryPairsDB: [
+      { id: 1, a: "Dante Alighieri", b: "La Divina Commedia", typeA: "Autore", typeB: "Opera" },
+      { id: 2, a: "Giacomo Leopardi", b: "L'Infinito (Canti)", typeA: "Autore", typeB: "Opera" },
+      { id: 3, a: "Alessandro Manzoni", b: "I Promessi Sposi", typeA: "Autore", typeB: "Opera" },
+      { id: 4, a: "Ugo Foscolo", b: "Dei Sepolcri", typeA: "Autore", typeB: "Opera" },
+      { id: 5, a: "Giovanni Boccaccio", b: "Il Decameron", typeA: "Autore", typeB: "Opera" },
+      { id: 6, a: "Francesco Petrarca", b: "Il Canzoniere", typeA: "Autore", typeB: "Opera" },
+      { id: 7, a: "Ludovico Ariosto", b: "L'Orlando Furioso", typeA: "Autore", typeB: "Opera" },
+      { id: 8, a: "Giovanni Verga", b: "I Malavoglia", typeA: "Autore", typeB: "Opera" },
+      { id: 9, a: "Luigi Pirandello", b: "Il fu Mattia Pascal", typeA: "Autore", typeB: "Opera" },
+      { id: 10, a: "Italo Svevo", b: "La coscienza di Zeno", typeA: "Autore", typeB: "Opera" },
+      { id: 11, a: "Italo Calvino", b: "Il barone rampante", typeA: "Autore", typeB: "Opera" },
+      { id: 12, a: "Eugenio Montale", b: "Ossi di seppia", typeA: "Autore", typeB: "Opera" },
+      { id: 13, a: "Giuseppe Ungaretti", b: "L'Allegria (Mattina)", typeA: "Autore", typeB: "Opera" },
+      { id: 14, a: "Giovanni Pascoli", b: "Myricae (X Agosto)", typeA: "Autore", typeB: "Opera" },
+      { id: 15, a: "Gabriele D'Annunzio", b: "Alcyone (La pioggia)", typeA: "Autore", typeB: "Opera" },
+      { id: 16, a: "Carlo Goldoni", b: "La locandiera", typeA: "Autore", typeB: "Opera" },
+      { id: 17, a: "Niccolò Machiavelli", b: "Il Principe", typeA: "Autore", typeB: "Opera" },
+      { id: 18, a: "Primo Levi", b: "Se questo è un uomo", typeA: "Autore", typeB: "Opera" },
+      { id: 19, a: "Elsa Morante", b: "La Storia", typeA: "Autore", typeB: "Opera" },
+      { id: 20, a: "Torquato Tasso", b: "Gerusalemme Liberata", typeA: "Autore", typeB: "Opera" }
+    ],
+
+    initMemory: function(container, data, missionId) {
+      if (this.memoryState.timerInterval) clearInterval(this.memoryState.timerInterval);
+
+      // Seleziona 6 coppie casuali
+      const shuffledPairs = [...this.memoryPairsDB].sort(() => Math.random() - 0.5).slice(0, 6);
+      
+      const cards = [];
+      shuffledPairs.forEach(p => {
+        cards.push({ pairId: p.id, text: p.a, type: p.typeA, isMatched: false });
+        cards.push({ pairId: p.id, text: p.b, type: p.typeB, isMatched: false });
+      });
+
+      // Mescola le 12 carte
+      cards.sort(() => Math.random() - 0.5);
+
+      this.memoryState = {
+        cards: cards,
+        flipped: [],
+        matchedCount: 0,
+        totalPairs: 6,
+        moves: 0,
+        timer: 0,
+        timerInterval: null,
+        isLocked: false
+      };
+
+      this.memoryState.timerInterval = setInterval(() => {
+        this.memoryState.timer++;
+        const timerEl = document.getElementById('memory-timer-display');
+        if (timerEl) {
+          const m = Math.floor(this.memoryState.timer / 60);
+          const s = this.memoryState.timer % 60;
+          timerEl.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+      }, 1000);
+
+      this.renderMemory(container);
+    },
+
+    renderMemory: function(container) {
+      const s = this.memoryState;
+      const m = Math.floor(s.timer / 60);
+      const sec = s.timer % 60;
+      const timeStr = `${m}:${sec < 10 ? '0' : ''}${sec}`;
+
+      container.innerHTML = `
+        <div style="padding: 10px; max-width: 680px; margin: 0 auto; text-align: center;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 10px 16px; background: rgba(0,0,0,0.3); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+            <div style="font-size: 0.85rem; color: #ccc;">
+              <i class="fa-solid fa-stopwatch" style="color: var(--accent-gold);"></i> Tempo: <strong id="memory-timer-display" style="color: #fff;">${timeStr}</strong>
+            </div>
+            <div style="font-size: 0.85rem; color: #ccc;">
+              <i class="fa-solid fa-arrows-rotate" style="color: var(--accent-gold);"></i> Mosse: <strong id="memory-moves-display" style="color: #fff;">${s.moves}</strong>
+            </div>
+            <div style="font-size: 0.85rem; color: #ccc;">
+              <i class="fa-solid fa-check-double" style="color: #2ecc71;"></i> Coppie: <strong id="memory-matched-display" style="color: #2ecc71;">${s.matchedCount}/${s.totalPairs}</strong>
+            </div>
+          </div>
+
+          <div class="memory-grid">
+            ${s.cards.map((card, idx) => {
+              const isFlipped = s.flipped.includes(idx);
+              const isMatched = card.isMatched;
+              const classes = `memory-card ${isFlipped ? 'flipped' : ''} ${isMatched ? 'matched' : ''}`;
+              const badgeColor = card.type === 'Autore' ? '#60a5fa' : '#f59e0b';
+
+              return `
+                <div class="${classes}" onclick="EroiMinigames.flipMemoryCard(${idx})">
+                  <div class="memory-card-inner memory-card-back">
+                    <i class="fa-solid fa-feather-pointed" style="opacity: 0.8;"></i>
+                  </div>
+                  <div class="memory-card-inner memory-card-front">
+                    <span style="font-size: 0.65rem; text-transform: uppercase; font-weight: 800; color: ${badgeColor}; margin-bottom: 4px; border: 1px solid ${badgeColor}; padding: 1px 6px; border-radius: 8px;">
+                      ${card.type}
+                    </span>
+                    <span style="font-size: 0.82rem; font-weight: 700; line-height: 1.2; color: #fff;">
+                      ${card.text}
+                    </span>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+
+          <div style="display: flex; justify-content: center; gap: 10px; margin-top: 18px;">
+            <button class="btn btn-secondary" style="padding: 6px 16px; font-size: 0.85rem;" onclick="EroiMinigames.resetMemory()">
+              <i class="fa-solid fa-rotate-left"></i> Ricomincia
+            </button>
+            <button class="btn btn-secondary" style="background: rgba(245,197,60,0.15); border: 1px solid #f5c53c; color: #f5c53c; font-weight: 600; padding: 6px 16px; font-size: 0.85rem;" onclick="EroiMinigames.hintMemory()">
+              <i class="fa-solid fa-lightbulb"></i> Aiuto Coppia
+            </button>
+            <button class="btn btn-secondary" style="background: rgba(255,255,255,0.05); color: #aaa; padding: 6px 16px; font-size: 0.85rem;" onclick="EroiMinigames.skipCurrent('memory')">
+              <i class="fa-solid fa-forward-step"></i> Passa
+            </button>
+          </div>
+        </div>
+      `;
+    },
+
+    flipMemoryCard: function(idx) {
+      const s = this.memoryState;
+      if (s.isLocked || s.cards[idx].isMatched || s.flipped.includes(idx)) return;
+
+      s.flipped.push(idx);
+      const container = document.getElementById('minigame-content');
+      if (container) this.renderMemory(container);
+
+      if (s.flipped.length === 2) {
+        s.moves++;
+        s.isLocked = true;
+        const [firstIdx, secondIdx] = s.flipped;
+        const cardA = s.cards[firstIdx];
+        const cardB = s.cards[secondIdx];
+
+        if (cardA.pairId === cardB.pairId) {
+          // MATCH!
+          cardA.isMatched = true;
+          cardB.isMatched = true;
+          s.matchedCount++;
+          s.flipped = [];
+          s.isLocked = false;
+
+          if (container) this.renderMemory(container);
+
+          if (s.matchedCount === s.totalPairs) {
+            if (s.timerInterval) clearInterval(s.timerInterval);
+            setTimeout(() => {
+              this.showMemoryVictory();
+            }, 600);
+          }
+        } else {
+          // NON MATCH: richiudi dopo 900ms
+          setTimeout(() => {
+            s.flipped = [];
+            s.isLocked = false;
+            if (container) this.renderMemory(container);
+          }, 900);
+        }
+      }
+    },
+
+    hintMemory: function() {
+      const s = this.memoryState;
+      if (s.isLocked) return;
+
+      // Trova la prima coppia non ancora matchata
+      const unmatchedCard = s.cards.find(c => !c.isMatched);
+      if (!unmatchedCard) return;
+
+      const matchingCards = s.cards.map((c, i) => ({ ...c, originalIdx: i }))
+        .filter(c => c.pairId === unmatchedCard.pairId && !c.isMatched);
+
+      if (matchingCards.length === 2) {
+        s.flipped = [matchingCards[0].originalIdx, matchingCards[1].originalIdx];
+        const container = document.getElementById('minigame-content');
+        if (container) this.renderMemory(container);
+
+        setTimeout(() => {
+          matchingCards[0].isMatched = true;
+          matchingCards[1].isMatched = true;
+          s.matchedCount++;
+          s.flipped = [];
+          if (container) this.renderMemory(container);
+          if (window.showToast) window.showToast('Coppia svelata!', 'info');
+
+          if (s.matchedCount === s.totalPairs) {
+            if (s.timerInterval) clearInterval(s.timerInterval);
+            setTimeout(() => { this.showMemoryVictory(); }, 600);
+          }
+        }, 1000);
+      }
+    },
+
+    resetMemory: function() {
+      const container = document.getElementById('minigame-content');
+      const data = getData(currentMissionId);
+      if (container) this.initMemory(container, data, currentMissionId);
+    },
+
+    showMemoryVictory: function() {
+      const container = document.getElementById('minigame-content');
+      if (!container) return;
+
+      const s = this.memoryState;
+      const m = Math.floor(s.timer / 60);
+      const sec = s.timer % 60;
+      const timeStr = `${m}:${sec < 10 ? '0' : ''}${sec}`;
+
+      container.innerHTML = `
+        <div style="padding: 25px; text-align: center; max-width: 500px; margin: 0 auto;">
+          <div style="font-size: 3rem; margin-bottom: 10px;">🏆</div>
+          <h2 style="color: var(--accent-gold); font-size: 1.8rem; margin: 0 0 10px 0; font-family: var(--font-heading);">
+            MEMORY COMPLETATO!
+          </h2>
+          <p style="font-size: 1rem; color: #f5f5f0; margin-bottom: 15px;">
+            Hai abbinato con successo tutti gli autori e i capolavori!
+          </p>
+          <div style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; border: 1px solid rgba(212,175,55,0.3); margin-bottom: 20px;">
+            <div style="font-size: 0.95rem; color: #ccc; margin-bottom: 6px;">Tempo impiegato: <strong>${timeStr}</strong></div>
+            <div style="font-size: 0.95rem; color: #ccc;">Mosse totali: <strong>${s.moves}</strong></div>
+            <div style="font-size: 2rem; font-weight: 800; color: #2ecc71; margin-top: 10px;">+2 PUNTI</div>
+          </div>
+          <button class="btn" style="background: var(--accent-gold); color: #000; font-weight: 800; padding: 10px 28px; border-radius: 20px;" onclick="EroiMinigames.rewardAndNext('memory', 2, 10)">
+            Continua
+          </button>
+        </div>
+      `;
+    },
+
+    // =====================================================
+    // MOTORE: PAROLE CROCIATE (BLOCCO 2)
+    // =====================================================
+    cruciverbaState: {
+      schema: null,
+      userGrid: [],
+      selectedR: 0,
+      selectedC: 0,
+      direction: 'across', // 'across' o 'down'
+      isSolved: false
+    },
+
+    cruciverbaSchemas: [
+      {
+        id: 1,
+        title: "I Grandi Classici della Letteratura",
+        rows: 6,
+        cols: 6,
+        // Griglia con lettere soluzione e '#' per caselle nere
+        solution: [
+          ['D', 'A', 'N', 'T', 'E', '#'],
+          ['E', '#', 'O', '#', 'R', '#'],
+          ['C', 'A', 'R', 'M', 'I', '#'],
+          ['A', '#', 'T', '#', 'S', '#'],
+          ['M', 'A', 'N', 'Z', 'O', 'N'],
+          ['#', '#', 'E', '#', '#', '#']
+        ],
+        numbers: [
+          [1, 0, 2, 0, 3, 0],
+          [0, 0, 0, 0, 0, 0],
+          [4, 0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0],
+          [5, 0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0]
+        ],
+        clues: {
+          across: [
+            { num: 1, text: "1 Orizz. - Il Sommo Poeta della Commedia (5 lettere)", answer: "DANTE", r: 0, c: 0, len: 5 },
+            { num: 4, text: "4 Orizz. - Componimenti poetici solenni come quelli di Foscolo (5 lettere)", answer: "CARMI", r: 2, c: 0, len: 5 },
+            { num: 5, text: "5 Orizz. - Il celebre autore dei Promessi Sposi (6 lettere)", answer: "MANZON", r: 4, c: 0, len: 6 }
+          ],
+          down: [
+            { num: 1, text: "1 Vert. - Inizio del titolo delle 100 novelle di Boccaccio (5 lettere)", answer: "DECAM", r: 0, c: 0, len: 5 },
+            { num: 2, text: "2 Vert. - L'ora scura e misteriosa dei poeti romantici (5 lettere)", answer: "NOTTE", r: 0, c: 2, len: 5 },
+            { num: 3, text: "3 Vert. - L'aggettivo del famoso 'colle' di Leopardi (4 lettere)", answer: "ERMO", r: 0, c: 4, len: 4 }
+          ]
+        }
+      },
+      {
+        id: 2,
+        title: "Personaggi & Capolavori",
+        rows: 5,
+        cols: 6,
+        solution: [
+          ['R', 'E', 'N', 'Z', 'O', '#'],
+          ['I', '#', '#', 'E', '#', '#'],
+          ['M', '#', 'O', 'N', 'D', 'E'],
+          ['A', '#', 'S', 'O', '#', '#'],
+          ['#', '#', 'S', '#', '#', '#']
+        ],
+        numbers: [
+          [1, 0, 0, 2, 0, 0],
+          [0, 0, 0, 0, 0, 0],
+          [3, 0, 4, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0]
+        ],
+        clues: {
+          across: [
+            { num: 1, text: "1 Orizz. - Il promesso sposo di Lucia (5 lettere)", answer: "RENZO", r: 0, c: 0, len: 5 },
+            { num: 3, text: "3 Orizz. - Si specchia in quelle del greco mar Zacinto (4 lettere)", answer: "ONDE", r: 2, c: 2, len: 4 }
+          ],
+          down: [
+            { num: 1, text: "1 Vert. - Accordo fonetico di fine verso (4 lettere)", answer: "RIMA", r: 0, c: 0, len: 4 },
+            { num: 2, text: "2 Vert. - Il cognome dell'inetto di Svevo (Coscienza di...) (4 lettere)", answer: "ZENO", r: 0, c: 3, len: 4 },
+            { num: 4, text: "4 Vert. - Quelli di seppia di Eugenio Montale (4 lettere)", answer: "OSSI", r: 2, c: 2, len: 3 }
+          ]
+        }
+      }
+    ],
+
+    initCruciverba: function(container, data, missionId) {
+      // Scegli uno schema
+      const schema = this.cruciverbaSchemas[Math.floor(Math.random() * this.cruciverbaSchemas.length)];
+      
+      const userGrid = [];
+      for (let r = 0; r < schema.rows; r++) {
+        userGrid[r] = [];
+        for (let c = 0; c < schema.cols; c++) {
+          userGrid[r][c] = (schema.solution[r][c] === '#') ? '#' : '';
+        }
+      }
+
+      this.cruciverbaState = {
+        schema: schema,
+        userGrid: userGrid,
+        selectedR: 0,
+        selectedC: 0,
+        direction: 'across',
+        isSolved: false
+      };
+
+      this.renderCruciverba(container);
+    },
+
+    renderCruciverba: function(container) {
+      const s = this.cruciverbaState;
+      const schema = s.schema;
+
+      // Trova la definizione attiva
+      let activeClueText = "Seleziona una casella bianca per iniziare";
+      const allClues = [...schema.clues.across, ...schema.clues.down];
+      
+      const activeClue = allClues.find(cl => {
+        if (s.direction === 'across') {
+          return cl.r === s.selectedR && s.selectedC >= cl.c && s.selectedC < cl.c + cl.len;
+        } else {
+          return cl.c === s.selectedC && s.selectedR >= cl.r && s.selectedR < cl.r + cl.len;
+        }
+      });
+
+      if (activeClue) activeClueText = activeClue.text;
+
+      container.innerHTML = `
+        <div style="padding: 10px; max-width: 680px; margin: 0 auto; text-align: center;">
+          <div style="margin-bottom: 12px; padding: 10px 14px; background: rgba(212,175,55,0.12); border: 1.5px solid var(--accent-gold); border-radius: 12px;">
+            <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--accent-gold); font-weight: 800; margin-bottom: 2px;">
+              <i class="fa-solid fa-pen"></i> Definizione Attiva:
+            </div>
+            <div style="font-size: 0.95rem; font-weight: 700; color: #fff;">
+              ${activeClueText}
+            </div>
+          </div>
+
+          <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-bottom: 18px; align-items: flex-start;">
+            <!-- Griglia Cruciverba -->
+            <div>
+              <div class="crossword-grid-container" style="grid-template-columns: repeat(${schema.cols}, 1fr);">
+                ${schema.solution.map((row, r) => row.map((solChar, c) => {
+                  if (solChar === '#') {
+                    return `<div class="cw-cell black"></div>`;
+                  }
+                  const num = schema.numbers[r][c];
+                  const userVal = s.userGrid[r][c] || '';
+                  const isSelected = (r === s.selectedR && c === s.selectedC);
+                  let isHighlighted = false;
+                  if (activeClue) {
+                    if (s.direction === 'across' && r === activeClue.r && c >= activeClue.c && c < activeClue.c + activeClue.len) isHighlighted = true;
+                    if (s.direction === 'down' && c === activeClue.c && r >= activeClue.r && r < activeClue.r + activeClue.len) isHighlighted = true;
+                  }
+
+                  const cellClass = `cw-cell ${isSelected ? 'active' : ''} ${isHighlighted && !isSelected ? 'highlight' : ''}`;
+
+                  return `
+                    <div class="${cellClass}" onclick="EroiMinigames.selectCruciverbaCell(${r}, ${c})">
+                      ${num > 0 ? `<span class="cw-cell-num">${num}</span>` : ''}
+                      <input id="cw-input-${r}-${c}" type="text" maxlength="1" value="${userVal}" 
+                        style="width: 100%; height: 100%; background: transparent; border: none; outline: none; text-align: center; font-weight: 800; font-size: inherit; color: inherit; text-transform: uppercase; cursor: pointer; padding: 0;"
+                        onfocus="EroiMinigames.selectCruciverbaCell(${r}, ${c})"
+                        oninput="EroiMinigames.inputCruciverbaCell(${r}, ${c}, this.value)"
+                        onkeydown="EroiMinigames.handleCruciverbaKey(event, ${r}, ${c})">
+                    </div>
+                  `;
+                }).join('')).join('')}
+              </div>
+            </div>
+
+            <!-- Colonna Definizioni -->
+            <div style="flex: 1; min-width: 260px; max-width: 320px; text-align: left; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; max-height: 260px; overflow-y: auto;">
+              <h5 style="color: var(--accent-gold); margin: 0 0 6px 0; font-size: 0.85rem;"><i class="fa-solid fa-arrow-right"></i> ORIZZONTALI</h5>
+              ${schema.clues.across.map(cl => {
+                const isActive = (s.direction === 'across' && activeClue && activeClue.num === cl.num);
+                return `<div class="cw-clue-item ${isActive ? 'active' : ''}" onclick="EroiMinigames.focusCruciverbaClue('across', ${cl.r}, ${cl.c})">${cl.text}</div>`;
+              }).join('')}
+
+              <h5 style="color: var(--accent-gold); margin: 12px 0 6px 0; font-size: 0.85rem;"><i class="fa-solid fa-arrow-down"></i> VERTICALI</h5>
+              ${schema.clues.down.map(cl => {
+                const isActive = (s.direction === 'down' && activeClue && activeClue.num === cl.num);
+                return `<div class="cw-clue-item ${isActive ? 'active' : ''}" onclick="EroiMinigames.focusCruciverbaClue('down', ${cl.r}, ${cl.c})">${cl.text}</div>`;
+              }).join('')}
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <button class="btn" style="background: #2ecc71; color: #000; font-weight: 800; padding: 8px 20px; border-radius: 20px;" onclick="EroiMinigames.verifyCruciverba()">
+              <i class="fa-solid fa-check"></i> Verifica Cruciverba
+            </button>
+            <button class="btn btn-secondary" style="background: rgba(245,197,60,0.15); border: 1px solid #f5c53c; color: #f5c53c; font-weight: 600; padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.hintCruciverba()">
+              <i class="fa-solid fa-lightbulb"></i> Svela Lettera
+            </button>
+            <button class="btn btn-secondary" style="padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.resetCruciverba()">
+              <i class="fa-solid fa-rotate-left"></i> Reset
+            </button>
+            <button class="btn btn-secondary" style="background: rgba(255,255,255,0.05); color: #aaa; padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.skipCurrent('cruciverba')">
+              <i class="fa-solid fa-forward-step"></i> Passa
+            </button>
+          </div>
+        </div>
+      `;
+    },
+
+    selectCruciverbaCell: function(r, c) {
+      const s = this.cruciverbaState;
+      if (s.userGrid[r][c] === '#') return;
+
+      if (s.selectedR === r && s.selectedC === c) {
+        // Toggle direzione (orizzontale <-> verticale) se ricliccata
+        s.direction = (s.direction === 'across') ? 'down' : 'across';
+      } else {
+        s.selectedR = r;
+        s.selectedC = c;
+      }
+
+      const container = document.getElementById('minigame-content');
+      if (container) this.renderCruciverba(container);
+
+      const input = document.getElementById(`cw-input-${r}-${c}`);
+      if (input) input.focus();
+    },
+
+    focusCruciverbaClue: function(dir, r, c) {
+      this.cruciverbaState.direction = dir;
+      this.cruciverbaState.selectedR = r;
+      this.cruciverbaState.selectedC = c;
+      const container = document.getElementById('minigame-content');
+      if (container) this.renderCruciverba(container);
+      const input = document.getElementById(`cw-input-${r}-${c}`);
+      if (input) input.focus();
+    },
+
+    inputCruciverbaCell: function(r, c, val) {
+      const s = this.cruciverbaState;
+      const upper = (val || '').toUpperCase().trim();
+      const lastChar = upper.length > 0 ? upper.slice(-1) : '';
+      s.userGrid[r][c] = lastChar;
+
+      // Avanza cursore
+      if (lastChar.length > 0) {
+        if (s.direction === 'across') {
+          let nextC = c + 1;
+          while (nextC < s.schema.cols && s.schema.solution[r][nextC] === '#') nextC++;
+          if (nextC < s.schema.cols) {
+            s.selectedC = nextC;
+            const container = document.getElementById('minigame-content');
+            if (container) this.renderCruciverba(container);
+            const nextInp = document.getElementById(`cw-input-${r}-${nextC}`);
+            if (nextInp) nextInp.focus();
+            return;
+          }
+        } else {
+          let nextR = r + 1;
+          while (nextR < s.schema.rows && s.schema.solution[nextR][c] === '#') nextR++;
+          if (nextR < s.schema.rows) {
+            s.selectedR = nextR;
+            const container = document.getElementById('minigame-content');
+            if (container) this.renderCruciverba(container);
+            const nextInp = document.getElementById(`cw-input-${nextR}-${c}`);
+            if (nextInp) nextInp.focus();
+            return;
+          }
+        }
+      }
+
+      const container = document.getElementById('minigame-content');
+      if (container) this.renderCruciverba(container);
+    },
+
+    handleCruciverbaKey: function(e, r, c) {
+      const s = this.cruciverbaState;
+      if (e.key === 'Backspace' && !s.userGrid[r][c]) {
+        // Torna indietro
+        if (s.direction === 'across' && c > 0) {
+          let prevC = c - 1;
+          while (prevC >= 0 && s.schema.solution[r][prevC] === '#') prevC--;
+          if (prevC >= 0) {
+            s.selectedC = prevC;
+            const container = document.getElementById('minigame-content');
+            if (container) this.renderCruciverba(container);
+            const inp = document.getElementById(`cw-input-${r}-${prevC}`);
+            if (inp) inp.focus();
+          }
+        } else if (s.direction === 'down' && r > 0) {
+          let prevR = r - 1;
+          while (prevR >= 0 && s.schema.solution[prevR][c] === '#') prevR--;
+          if (prevR >= 0) {
+            s.selectedR = prevR;
+            const container = document.getElementById('minigame-content');
+            if (container) this.renderCruciverba(container);
+            const inp = document.getElementById(`cw-input-${prevR}-${c}`);
+            if (inp) inp.focus();
+          }
+        }
+      }
+    },
+
+    hintCruciverba: function() {
+      const s = this.cruciverbaState;
+      const r = s.selectedR;
+      const c = s.selectedC;
+      if (s.schema.solution[r][c] && s.schema.solution[r][c] !== '#') {
+        s.userGrid[r][c] = s.schema.solution[r][c];
+        const container = document.getElementById('minigame-content');
+        if (container) this.renderCruciverba(container);
+        if (window.showToast) window.showToast('Lettera svelata!', 'info');
+      }
+    },
+
+    resetCruciverba: function() {
+      const container = document.getElementById('minigame-content');
+      const data = getData(currentMissionId);
+      if (container) this.initCruciverba(container, data, currentMissionId);
+    },
+
+    verifyCruciverba: function() {
+      const s = this.cruciverbaState;
+      const sol = s.schema.solution;
+      let allCorrect = true;
+      let emptyCount = 0;
+
+      for (let r = 0; r < s.schema.rows; r++) {
+        for (let c = 0; c < s.schema.cols; c++) {
+          if (sol[r][c] !== '#') {
+            const userChar = (s.userGrid[r][c] || '').toUpperCase();
+            if (!userChar) emptyCount++;
+            else if (userChar !== sol[r][c]) allCorrect = false;
+          }
+        }
+      }
+
+      if (emptyCount > 0) {
+        alert(`Ci sono ancora ${emptyCount} caselle vuote da completare!`);
+        return;
+      }
+
+      if (!allCorrect) {
+        alert("Alcune risposte non sono corrette. Ricontrolla le definizioni e riprova!");
+        return;
+      }
+
+      // VITTORIA
+      const container = document.getElementById('minigame-content');
+      if (container) {
+        container.innerHTML = `
+          <div style="padding: 25px; text-align: center; max-width: 500px; margin: 0 auto;">
+            <div style="font-size: 3rem; margin-bottom: 10px;">🏆</div>
+            <h2 style="color: var(--accent-gold); font-size: 1.8rem; margin: 0 0 10px 0; font-family: var(--font-heading);">
+              CRUCIVERBA RISOLTO!
+            </h2>
+            <p style="font-size: 1rem; color: #f5f5f0; margin-bottom: 15px;">
+              Complimenti! Tutte le definizioni e le parole crociate sono esatte.
+            </p>
+            <div style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; border: 1px solid rgba(212,175,55,0.3); margin-bottom: 20px;">
+              <div style="font-size: 2rem; font-weight: 800; color: #2ecc71;">+2 PUNTI</div>
+            </div>
+            <button class="btn" style="background: var(--accent-gold); color: #000; font-weight: 800; padding: 10px 28px; border-radius: 20px;" onclick="EroiMinigames.rewardAndNext('cruciverba', 2, 10)">
+              Continua
+            </button>
+          </div>
+        `;
+      }
+    },
+
+    // =====================================================
+    // MOTORE: REBUS LETTERARI (BLOCCO 3)
+    // =====================================================
+    rebusState: {
+      item: null,
+      userAnswer: [],
+      isSolved: false
+    },
+
+    rebusDB: [
+      {
+        id: 1,
+        title: "Rebus 1 - Capolavoro Dantesco",
+        icons: [{ icon: "👑", label: "RE", len: 2 }, { icon: "🚌", label: "BUS", len: 3 }],
+        diagram: "2 3 = 5",
+        solution: "REBUS",
+        hint: "Il nome stesso di questo celebre passatempo enigmistico!"
+      },
+      {
+        id: 2,
+        title: "Rebus 2 - Romanzo Epistolare",
+        icons: [{ icon: "🏺", label: "OR", len: 2 }, { icon: "📜", label: "TIS", len: 3 }],
+        diagram: "2 3 = 5",
+        solution: "ORTIS",
+        hint: "Le ultime lettere di Jacopo..."
+      },
+      {
+        id: 3,
+        title: "Rebus 3 - L'Idillio di Recanati",
+        icons: [{ icon: "🌊", label: "MARE", len: 4 }, { icon: "⛰️", label: "COLLE", len: 5 }],
+        diagram: "4 5 = 9",
+        solution: "INFINITO",
+        hint: "Sempre caro mi fu quest'ermo..."
+      },
+      {
+        id: 4,
+        title: "Rebus 4 - I Promessi Sposi",
+        icons: [{ icon: "💍", label: "SPOSI", len: 5 }],
+        diagram: "5",
+        solution: "SPOSI",
+        hint: "I celebri promessi di Alessandro Manzoni."
+      }
+    ],
+
+    initRebus: function(container, data, missionId) {
+      const item = this.rebusDB[Math.floor(Math.random() * this.rebusDB.length)];
+      this.rebusState = {
+        item: item,
+        userAnswer: new Array(item.solution.length).fill(''),
+        isSolved: false
+      };
+      this.renderRebus(container);
+    },
+
+    renderRebus: function(container) {
+      const s = this.rebusState;
+      const it = s.item;
+
+      container.innerHTML = `
+        <div style="padding: 10px; max-width: 650px; margin: 0 auto; text-align: center;">
+          <h4 style="color: var(--accent-gold); margin: 0 0 10px 0;">${it.title}</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 18px;">
+            Diagramma: <strong style="color: #fff;">${it.diagram}</strong> &bull; ${it.hint}
+          </p>
+
+          <div class="rebus-container">
+            ${it.icons.map((ic, i) => `
+              <div class="rebus-box">
+                <span style="font-size: 3rem; margin-bottom: 4px;">${ic.icon}</span>
+                <span style="font-size: 0.85rem; font-weight: 800; color: var(--accent-gold); letter-spacing: 1px;">(${ic.len} lettere)</span>
+              </div>
+              ${i < it.icons.length - 1 ? '<span style="font-size: 1.8rem; font-weight: 800; color: var(--accent-gold);">+</span>' : ''}
+            `).join('')}
+          </div>
+
+          <!-- Caselle Risposta -->
+          <div style="margin-bottom: 20px;">
+            <div style="display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin-bottom: 10px;">
+              ${it.solution.split('').map((char, idx) => {
+                const val = s.userAnswer[idx] || '';
+                return `
+                  <input id="rebus-slot-${idx}" type="text" maxlength="1" value="${val}"
+                    class="letter-slot ${val ? 'filled' : ''}"
+                    style="outline: none; text-align: center; cursor: pointer;"
+                    oninput="EroiMinigames.inputRebusLetter(${idx}, this.value)"
+                    onkeydown="if(event.key==='Backspace'&&!this.value&&${idx}>0) document.getElementById('rebus-slot-'+(${idx}-1)).focus();">
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <button class="btn" style="background: #2ecc71; color: #000; font-weight: 800; padding: 8px 22px; border-radius: 20px;" onclick="EroiMinigames.verifyRebus()">
+              <i class="fa-solid fa-check"></i> Verifica Rebus
+            </button>
+            <button class="btn btn-secondary" style="background: rgba(245,197,60,0.15); border: 1px solid #f5c53c; color: #f5c53c; font-weight: 600; padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.hintRebus()">
+              <i class="fa-solid fa-lightbulb"></i> Aiuto Lettera
+            </button>
+            <button class="btn btn-secondary" style="padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.resetRebus()">
+              <i class="fa-solid fa-rotate-left"></i> Reset
+            </button>
+            <button class="btn btn-secondary" style="background: rgba(255,255,255,0.05); color: #aaa; padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.skipCurrent('rebus')">
+              <i class="fa-solid fa-forward-step"></i> Passa
+            </button>
+          </div>
+        </div>
+      `;
+    },
+
+    inputRebusLetter: function(idx, val) {
+      const s = this.rebusState;
+      const char = (val || '').toUpperCase().trim().slice(-1);
+      s.userAnswer[idx] = char;
+
+      const container = document.getElementById('minigame-content');
+      if (container) this.renderRebus(container);
+
+      if (char && idx < s.item.solution.length - 1) {
+        const nextInp = document.getElementById(`rebus-slot-${idx + 1}`);
+        if (nextInp) nextInp.focus();
+      }
+    },
+
+    hintRebus: function() {
+      const s = this.rebusState;
+      const emptyIdx = s.userAnswer.findIndex((val, i) => val !== s.item.solution[i]);
+      if (emptyIdx !== -1) {
+        s.userAnswer[emptyIdx] = s.item.solution[emptyIdx];
+        const container = document.getElementById('minigame-content');
+        if (container) this.renderRebus(container);
+        if (window.showToast) window.showToast('Lettera suggerita!', 'info');
+      }
+    },
+
+    resetRebus: function() {
+      const container = document.getElementById('minigame-content');
+      const data = getData(currentMissionId);
+      if (container) this.initRebus(container, data, currentMissionId);
+    },
+
+    verifyRebus: function() {
+      const s = this.rebusState;
+      const userStr = s.userAnswer.join('').toUpperCase();
+      if (userStr === s.item.solution.toUpperCase()) {
+        const container = document.getElementById('minigame-content');
+        if (container) {
+          container.innerHTML = `
+            <div style="padding: 25px; text-align: center; max-width: 500px; margin: 0 auto;">
+              <div style="font-size: 3rem; margin-bottom: 10px;">🎯</div>
+              <h2 style="color: var(--accent-gold); font-size: 1.8rem; margin: 0 0 10px 0; font-family: var(--font-heading);">
+                REBUS RISOLTO!
+              </h2>
+              <p style="font-size: 1.05rem; color: #f5f5f0; margin-bottom: 15px;">
+                Soluzione esatta: <strong style="color: #2ecc71;">${s.item.solution}</strong>
+              </p>
+              <div style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; border: 1px solid rgba(212,175,55,0.3); margin-bottom: 20px;">
+                <div style="font-size: 2rem; font-weight: 800; color: #2ecc71;">+2 PUNTI</div>
+              </div>
+              <button class="btn" style="background: var(--accent-gold); color: #000; font-weight: 800; padding: 10px 28px; border-radius: 20px;" onclick="EroiMinigames.rewardAndNext('rebus', 2, 10)">
+                Continua
+              </button>
+            </div>
+          `;
+        }
+      } else {
+        alert("La parola inserita non è corretta. Ricontrolla le lettere e riprova!");
+      }
+    },
+
+    // =====================================================
+    // MOTORE: CRITTOGRAFIE IN CODICE (BLOCCO 3)
+    // =====================================================
+    crittoState: {
+      item: null,
+      userMap: {},
+      isSolved: false
+    },
+
+    crittoDB: [
+      {
+        id: 1,
+        author: "Dante Alighieri",
+        plain: "L AMOR CHE MOVE IL SOLE",
+        shift: 3,
+        cipher: "O DPRO FKH PRYH LO VROH",
+        hint: "Cifrario di Cesare (ogni lettera è spostata di +3 posizioni nell'alfabeto: A->D, B->E...)"
+      },
+      {
+        id: 2,
+        author: "Giacomo Leopardi",
+        plain: "E IL NAUFRAGAR M E DOLCE",
+        shift: 1,
+        cipher: "F JM OBVGSBHBS N F EPMDF",
+        hint: "Cifrario a scorrimento (+1: A->B, B->C...)"
+      },
+      {
+        id: 3,
+        author: "Ugo Foscolo",
+        plain: "A ZACINTO MIA",
+        shift: 2,
+        cipher: "C BAEKPVQ OKC",
+        hint: "Cifrario a scorrimento (+2: A->C, B->D...)"
+      }
+    ],
+
+    initCrittografia: function(container, data, missionId) {
+      const item = this.crittoDB[Math.floor(Math.random() * this.crittoDB.length)];
+      this.crittoState = {
+        item: item,
+        userMap: {},
+        isSolved: false
+      };
+      this.renderCrittografia(container);
+    },
+
+    renderCrittografia: function(container) {
+      const s = this.crittoState;
+      const it = s.item;
+
+      const words = it.cipher.split(' ');
+      const plainWords = it.plain.split(' ');
+
+      container.innerHTML = `
+        <div style="padding: 10px; max-width: 680px; margin: 0 auto; text-align: center;">
+          <h4 style="color: var(--accent-gold); margin: 0 0 6px 0;"><i class="fa-solid fa-user-ninja"></i> Messaggio Cifrato di ${it.author}</h4>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px;">
+            ${it.hint}
+          </p>
+
+          <div class="crittografia-box">
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 14px;">
+              ${words.map((w, wIdx) => `
+                <div style="display: inline-flex; gap: 2px;">
+                  ${w.split('').map((char, cIdx) => {
+                    const mappedChar = s.userMap[char] || '';
+                    return `
+                      <div class="cipher-letter-box">
+                        <span style="font-size: 1.1rem; font-weight: 800; color: #f59e0b; margin-bottom: 2px;">${char}</span>
+                        <input type="text" maxlength="1" value="${mappedChar}"
+                          class="letter-slot ${mappedChar ? 'filled' : ''}"
+                          style="width: 32px; height: 36px; font-size: 1rem; outline: none; text-align: center;"
+                          oninput="EroiMinigames.inputCrittografiaLetter('${char}', this.value)">
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <button class="btn" style="background: #2ecc71; color: #000; font-weight: 800; padding: 8px 20px; border-radius: 20px;" onclick="EroiMinigames.verifyCrittografia()">
+              <i class="fa-solid fa-check"></i> Decodifica e Verifica
+            </button>
+            <button class="btn btn-secondary" style="background: rgba(245,197,60,0.15); border: 1px solid #f5c53c; color: #f5c53c; font-weight: 600; padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.hintCrittografia()">
+              <i class="fa-solid fa-lightbulb"></i> Decifra 1 Lettera
+            </button>
+            <button class="btn btn-secondary" style="padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.resetCrittografia()">
+              <i class="fa-solid fa-rotate-left"></i> Reset
+            </button>
+            <button class="btn btn-secondary" style="background: rgba(255,255,255,0.05); color: #aaa; padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.skipCurrent('crittografia')">
+              <i class="fa-solid fa-forward-step"></i> Passa
+            </button>
+          </div>
+        </div>
+      `;
+    },
+
+    inputCrittografiaLetter: function(cipherChar, val) {
+      const char = (val || '').toUpperCase().trim().slice(-1);
+      this.crittoState.userMap[cipherChar] = char;
+      const container = document.getElementById('minigame-content');
+      if (container) this.renderCrittografia(container);
+    },
+
+    hintCrittografia: function() {
+      const s = this.crittoState;
+      const cipher = s.item.cipher;
+      const plain = s.item.plain;
+
+      for (let i = 0; i < cipher.length; i++) {
+        const cChar = cipher[i];
+        const pChar = plain[i];
+        if (cChar !== ' ' && s.userMap[cChar] !== pChar) {
+          s.userMap[cChar] = pChar;
+          const container = document.getElementById('minigame-content');
+          if (container) this.renderCrittografia(container);
+          if (window.showToast) window.showToast(`Lettera '${cChar}' decifrata come '${pChar}'!`, 'info');
+          return;
+        }
+      }
+    },
+
+    resetCrittografia: function() {
+      const container = document.getElementById('minigame-content');
+      const data = getData(currentMissionId);
+      if (container) this.initCrittografia(container, data, currentMissionId);
+    },
+
+    verifyCrittografia: function() {
+      const s = this.crittoState;
+      const cipher = s.item.cipher;
+      const plain = s.item.plain;
+
+      let decoded = '';
+      for (let i = 0; i < cipher.length; i++) {
+        const c = cipher[i];
+        if (c === ' ') decoded += ' ';
+        else decoded += (s.userMap[c] || '_');
+      }
+
+      if (decoded === plain) {
+        const container = document.getElementById('minigame-content');
+        if (container) {
+          container.innerHTML = `
+            <div style="padding: 25px; text-align: center; max-width: 500px; margin: 0 auto;">
+              <div style="font-size: 3rem; margin-bottom: 10px;">🔐</div>
+              <h2 style="color: var(--accent-gold); font-size: 1.8rem; margin: 0 0 10px 0; font-family: var(--font-heading);">
+                MESSAGGIO SEGRETO DECIFRATO!
+              </h2>
+              <p style="font-size: 1.1rem; color: #2ecc71; font-weight: 700; margin-bottom: 15px;">
+                "${plain}"
+              </p>
+              <div style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; border: 1px solid rgba(212,175,55,0.3); margin-bottom: 20px;">
+                <div style="font-size: 2rem; font-weight: 800; color: #2ecc71;">+2 PUNTI</div>
+              </div>
+              <button class="btn" style="background: var(--accent-gold); color: #000; font-weight: 800; padding: 10px 28px; border-radius: 20px;" onclick="EroiMinigames.rewardAndNext('crittografia', 2, 10)">
+                Continua
+              </button>
+            </div>
+          `;
+        }
+      } else {
+        alert("Il testo decifrato contiene ancora degli errori. Controlla le lettere e riprova!");
+      }
+    },
+
+    // =====================================================
+    // MOTORE: INDOVINELLI LETTERARI (BLOCCO 3)
+    // =====================================================
+    riddleState: {
+      item: null,
+      revealedHints: 1,
+      userAnswer: ''
+    },
+
+    riddleDB: [
+      {
+        id: 1,
+        question: "Nacqui tra le colline marchigiane, ammirai una siepe e ascoltai il canto di una fanciulla dal telaio. Chi sono?",
+        hints: [
+          "Indizio 1: Scrissi il celebre 'Zibaldone' di pensieri filosofici.",
+          "Indizio 2: La mia città natale è Recanati.",
+          "Indizio 3: La mia poesia più famosa parla dell'Infinito."
+        ],
+        solution: "GIACOMO LEOPARDI",
+        aliases: ["LEOPARDI", "GIACOMO LEOPARDI"]
+      },
+      {
+        id: 2,
+        question: "Vissi in esilio tra Svizzera e Inghilterra. Scrissi sonetti alla mia isola natale e un carme solenne per i defunti. Chi sono?",
+        hints: [
+          "Indizio 1: Nacqui a Zante (Zacinto).",
+          "Indizio 2: Il mio protagonista epistolare si chiama Jacopo Ortis.",
+          "Indizio 3: Scrissi 'Dei Sepolcri'."
+        ],
+        solution: "UGO FOSCOLO",
+        aliases: ["FOSCOLO", "UGO FOSCOLO"]
+      },
+      {
+        id: 3,
+        question: "Rinnovai la lingua italiana 'sciacquando i panni in Arno' e raccontai la peste del Seicento a Milano. Chi sono?",
+        hints: [
+          "Indizio 1: Scrissi tragedie come l'Adelchi e il Conte di Carmagnola.",
+          "Indizio 2: I miei protagonisti sono Renzo e Lucia.",
+          "Indizio 3: Scrissi 'I Promessi Sposi'."
+        ],
+        solution: "ALESSANDRO MANZONI",
+        aliases: ["MANZONI", "ALESSANDRO MANZONI"]
+      }
+    ],
+
+    initIndovinello: function(container, data, missionId) {
+      const item = this.riddleDB[Math.floor(Math.random() * this.riddleDB.length)];
+      this.riddleState = {
+        item: item,
+        revealedHints: 1,
+        userAnswer: ''
+      };
+      this.renderIndovinello(container);
+    },
+
+    renderIndovinello: function(container) {
+      const s = this.riddleState;
+      const it = s.item;
+
+      container.innerHTML = `
+        <div style="padding: 10px; max-width: 650px; margin: 0 auto; text-align: center;">
+          <div class="riddle-card">
+            <span style="font-size: 2.2rem; display: block; margin-bottom: 8px;">🤔</span>
+            <h3 style="color: #fff; font-size: 1.25rem; line-height: 1.5; margin: 0 0 15px 0;">
+              "${it.question}"
+            </h3>
+
+            <div style="text-align: left; background: rgba(0,0,0,0.3); border-radius: 10px; padding: 12px; margin-bottom: 15px;">
+              <h5 style="color: var(--accent-gold); margin: 0 0 8px 0; font-size: 0.85rem;"><i class="fa-solid fa-lightbulb"></i> INDIZI SVELATI (${s.revealedHints}/${it.hints.length}):</h5>
+              ${it.hints.slice(0, s.revealedHints).map(h => `
+                <div style="font-size: 0.85rem; color: #e0e0e0; margin-bottom: 6px;">&bull; ${h}</div>
+              `).join('')}
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 10px;">
+              <input id="riddle-input" type="text" placeholder="Scrivi il nome dell'autore..."
+                value="${s.userAnswer}"
+                class="input-control"
+                style="max-width: 320px; padding: 10px 14px; border-radius: 12px; background: rgba(0,0,0,0.5); color: #fff; border: 1.5px solid var(--accent-gold); text-align: center; font-weight: 700;"
+                oninput="EroiMinigames.riddleState.userAnswer = this.value"
+                onkeydown="if(event.key==='Enter') EroiMinigames.verifyIndovinello()">
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <button class="btn" style="background: #2ecc71; color: #000; font-weight: 800; padding: 8px 22px; border-radius: 20px;" onclick="EroiMinigames.verifyIndovinello()">
+              <i class="fa-solid fa-check"></i> Rispondi
+            </button>
+            ${s.revealedHints < it.hints.length ? `
+              <button class="btn btn-secondary" style="background: rgba(245,197,60,0.15); border: 1px solid #f5c53c; color: #f5c53c; font-weight: 600; padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.unlockIndovinelloHint()">
+                <i class="fa-solid fa-plus"></i> Svela Prossimo Indizio
+              </button>
+            ` : ''}
+            <button class="btn btn-secondary" style="background: rgba(255,255,255,0.05); color: #aaa; padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.skipCurrent('indovinello')">
+              <i class="fa-solid fa-forward-step"></i> Passa
+            </button>
+          </div>
+        </div>
+      `;
+    },
+
+    unlockIndovinelloHint: function() {
+      const s = this.riddleState;
+      if (s.revealedHints < s.item.hints.length) {
+        s.revealedHints++;
+        const container = document.getElementById('minigame-content');
+        if (container) this.renderIndovinello(container);
+      }
+    },
+
+    resetIndovinello: function() {
+      const container = document.getElementById('minigame-content');
+      const data = getData(currentMissionId);
+      if (container) this.initIndovinello(container, data, currentMissionId);
+    },
+
+    verifyIndovinello: function() {
+      const s = this.riddleState;
+      const inp = (s.userAnswer || (document.getElementById('riddle-input') ? document.getElementById('riddle-input').value : '')).toUpperCase().trim();
+
+      const isMatch = s.item.aliases.some(al => inp.includes(al) || al.includes(inp) && inp.length > 4);
+
+      if (isMatch) {
+        const container = document.getElementById('minigame-content');
+        if (container) {
+          container.innerHTML = `
+            <div style="padding: 25px; text-align: center; max-width: 500px; margin: 0 auto;">
+              <div style="font-size: 3rem; margin-bottom: 10px;">💡</div>
+              <h2 style="color: var(--accent-gold); font-size: 1.8rem; margin: 0 0 10px 0; font-family: var(--font-heading);">
+                INDOVINELLO RISOLTO!
+              </h2>
+              <p style="font-size: 1.1rem; color: #2ecc71; font-weight: 700; margin-bottom: 15px;">
+                "${s.item.solution}"
+              </p>
+              <div style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; border: 1px solid rgba(212,175,55,0.3); margin-bottom: 20px;">
+                <div style="font-size: 2rem; font-weight: 800; color: #2ecc71;">+2 PUNTI</div>
+              </div>
+              <button class="btn" style="background: var(--accent-gold); color: #000; font-weight: 800; padding: 10px 28px; border-radius: 20px;" onclick="EroiMinigames.rewardAndNext('indovinello', 2, 10)">
+                Continua
+              </button>
+            </div>
+          `;
+        }
+      } else {
+        alert("Risposta non esatta! Rileggi gli indizi e riprova.");
+      }
+    },
+
+    // =====================================================
+    // MOTORE: ANAGRAMMI & SCIARADE (BLOCCO 3)
+    // =====================================================
+    anagrammaState: {
+      item: null,
+      availableTiles: [],
+      placedTiles: [],
+      isSolved: false
+    },
+
+    anagrammaDB: [
+      {
+        id: 1,
+        scrambled: "UGO FOSCOLO",
+        hint: "Celebre poeta e patriota preromantico (2 parole)",
+        solution: "UGO FOSCOLO"
+      },
+      {
+        id: 2,
+        scrambled: "L INFINITO",
+        hint: "Il celebre idillio dell'ermo colle",
+        solution: "L INFINITO"
+      },
+      {
+        id: 3,
+        scrambled: "DECAMERON",
+        hint: "Le 100 novelle di Giovanni Boccaccio",
+        solution: "DECAMERON"
+      },
+      {
+        id: 4,
+        scrambled: "MANZONI",
+        hint: "L'autore dei Promessi Sposi",
+        solution: "MANZONI"
+      }
+    ],
+
+    initAnagramma: function(container, data, missionId) {
+      const item = this.anagrammaDB[Math.floor(Math.random() * this.anagrammaDB.length)];
+      const letters = item.solution.replace(/\s+/g, '').split('').sort(() => Math.random() - 0.5);
+
+      this.anagrammaState = {
+        item: item,
+        availableTiles: letters.map((l, i) => ({ id: i, char: l })),
+        placedTiles: [],
+        isSolved: false
+      };
+      this.renderAnagramma(container);
+    },
+
+    renderAnagramma: function(container) {
+      const s = this.anagrammaState;
+      const it = s.item;
+
+      container.innerHTML = `
+        <div style="padding: 10px; max-width: 650px; margin: 0 auto; text-align: center;">
+          <h4 style="color: var(--accent-gold); margin: 0 0 6px 0;">Ricomponi l'Anagramma</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+            Indizio: <strong style="color: #fff;">${it.hint}</strong>
+          </p>
+
+          <!-- Lettere Posizionate -->
+          <div style="min-height: 55px; background: rgba(0,0,0,0.4); border: 1.5px dashed var(--accent-gold); border-radius: 12px; padding: 8px; margin-bottom: 18px; display: flex; justify-content: center; align-items: center; flex-wrap: wrap;">
+            ${s.placedTiles.length === 0 ? '<span style="color: #888; font-size: 0.85rem;">Clicca le lettere in basso per comporre la parola</span>' : ''}
+            ${s.placedTiles.map((t, idx) => `
+              <div class="anagram-tile" style="background: rgba(46,204,113,0.25); border-color: #2ecc71;" onclick="EroiMinigames.removeAnagramTile(${idx})">
+                ${t.char}
+              </div>
+            `).join('')}
+          </div>
+
+          <!-- Lettere Disponibili -->
+          <div style="margin-bottom: 20px;">
+            ${s.availableTiles.map((t, idx) => `
+              <div class="anagram-tile" onclick="EroiMinigames.clickAnagramTile(${idx})">
+                ${t.char}
+              </div>
+            `).join('')}
+          </div>
+
+          <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <button class="btn btn-secondary" style="padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.resetAnagramma()">
+              <i class="fa-solid fa-rotate-left"></i> Reset
+            </button>
+            <button class="btn btn-secondary" style="background: rgba(245,197,60,0.15); border: 1px solid #f5c53c; color: #f5c53c; font-weight: 600; padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.hintAnagramma()">
+              <i class="fa-solid fa-lightbulb"></i> Aiuto Prossima Lettera
+            </button>
+            <button class="btn btn-secondary" style="background: rgba(255,255,255,0.05); color: #aaa; padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.skipCurrent('anagramma')">
+              <i class="fa-solid fa-forward-step"></i> Passa
+            </button>
+          </div>
+        </div>
+      `;
+    },
+
+    clickAnagramTile: function(idx) {
+      const s = this.anagrammaState;
+      const tile = s.availableTiles.splice(idx, 1)[0];
+      s.placedTiles.push(tile);
+
+      const container = document.getElementById('minigame-content');
+      if (container) this.renderAnagramma(container);
+
+      // Check soluzione
+      const currentWord = s.placedTiles.map(t => t.char).join('');
+      const targetWord = s.item.solution.replace(/\s+/g, '');
+
+      if (currentWord === targetWord) {
+        setTimeout(() => {
+          if (container) {
+            container.innerHTML = `
+              <div style="padding: 25px; text-align: center; max-width: 500px; margin: 0 auto;">
+                <div style="font-size: 3rem; margin-bottom: 10px;">🔤</div>
+                <h2 style="color: var(--accent-gold); font-size: 1.8rem; margin: 0 0 10px 0; font-family: var(--font-heading);">
+                  ANAGRAMMA RISOLTO!
+                </h2>
+                <p style="font-size: 1.1rem; color: #2ecc71; font-weight: 700; margin-bottom: 15px;">
+                  "${s.item.solution}"
+                </p>
+                <div style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; border: 1px solid rgba(212,175,55,0.3); margin-bottom: 20px;">
+                  <div style="font-size: 2rem; font-weight: 800; color: #2ecc71;">+2 PUNTI</div>
+                </div>
+                <button class="btn" style="background: var(--accent-gold); color: #000; font-weight: 800; padding: 10px 28px; border-radius: 20px;" onclick="EroiMinigames.rewardAndNext('anagramma', 2, 10)">
+                  Continua
+                </button>
+              </div>
+            `;
+          }
+        }, 300);
+      }
+    },
+
+    removeAnagramTile: function(idx) {
+      const s = this.anagrammaState;
+      const tile = s.placedTiles.splice(idx, 1)[0];
+      s.availableTiles.push(tile);
+      const container = document.getElementById('minigame-content');
+      if (container) this.renderAnagramma(container);
+    },
+
+    hintAnagramma: function() {
+      const s = this.anagrammaState;
+      const targetWord = s.item.solution.replace(/\s+/g, '');
+      const nextNeededChar = targetWord[s.placedTiles.length];
+
+      if (nextNeededChar) {
+        const availIdx = s.availableTiles.findIndex(t => t.char === nextNeededChar);
+        if (availIdx !== -1) {
+          this.clickAnagramTile(availIdx);
+        }
+      }
+    },
+
+    resetAnagramma: function() {
+      const container = document.getElementById('minigame-content');
+      const data = getData(currentMissionId);
+      if (container) this.initAnagramma(container, data, currentMissionId);
+    },
+
+    // =====================================================
+    // MOTORE: TROVA LE DIFFERENZE (BLOCCO 3)
+    // =====================================================
+    diffState: {
+      item: null,
+      foundSpots: [],
+      totalSpots: 3
+    },
+
+    diffDB: [
+      {
+        id: 1,
+        title: "Ritratto di Ugo Foscolo",
+        imgA: "avatar_autori/Foscolo.png",
+        imgB: "avatar_autori/Foscolo.png",
+        spots: [
+          { id: 1, x: 50, y: 30, desc: "Sguardo e ciuffo neoclassico" },
+          { id: 2, x: 75, y: 70, desc: "Colletto della giacca" },
+          { id: 3, x: 25, y: 65, desc: "Ombra del carme dei Sepolcri" }
+        ]
+      },
+      {
+        id: 2,
+        title: "Ritratto di Giacomo Leopardi",
+        imgA: "avatar_autori/Leopardi.png",
+        imgB: "avatar_autori/Leopardi.png",
+        spots: [
+          { id: 1, x: 45, y: 25, desc: "Fronte pensierosa" },
+          { id: 2, x: 65, y: 60, desc: "Dettaglio dell'abito" },
+          { id: 3, x: 30, y: 75, desc: "Sfondo dell'ermo colle" }
+        ]
+      }
+    ],
+
+    initDifferenze: function(container, data, missionId) {
+      const item = this.diffDB[Math.floor(Math.random() * this.diffDB.length)];
+      this.diffState = {
+        item: item,
+        foundSpots: [],
+        totalSpots: item.spots.length
+      };
+      this.renderDifferenze(container);
+    },
+
+    renderDifferenze: function(container) {
+      const s = this.diffState;
+      const it = s.item;
+
+      container.innerHTML = `
+        <div style="padding: 10px; max-width: 680px; margin: 0 auto; text-align: center;">
+          <h4 style="color: var(--accent-gold); margin: 0 0 4px 0;">${it.title}</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
+            Clicca sull'immagine di destra per scovare le <strong style="color: #2ecc71;">${s.totalSpots} differenze</strong> nascoste! (Trovate: <strong style="color: #2ecc71;">${s.foundSpots.length}/${s.totalSpots}</strong>)
+          </p>
+
+          <div class="diff-container">
+            <!-- Immagine A (Originale) -->
+            <div>
+              <div style="font-size: 0.75rem; color: #888; margin-bottom: 4px; font-weight: 700;">ORIGINALE</div>
+              <div class="diff-box">
+                <img src="${it.imgA}" style="width: 100%; height: 100%; object-fit: cover;">
+              </div>
+            </div>
+
+            <!-- Immagine B (Con Differenze Cliccabili) -->
+            <div>
+              <div style="font-size: 0.75rem; color: var(--accent-gold); margin-bottom: 4px; font-weight: 700;">TROVA LE DIFFERENZE 🔍</div>
+              <div class="diff-box" style="border-color: var(--accent-gold);">
+                <img src="${it.imgB}" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.95;">
+                ${it.spots.map(sp => {
+                  const isFound = s.foundSpots.includes(sp.id);
+                  return `
+                    <div class="diff-spot ${isFound ? 'found' : ''}"
+                      style="left: calc(${sp.x}% - 22px); top: calc(${sp.y}% - 22px);"
+                      onclick="EroiMinigames.clickDiffSpot(${sp.id})">
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <button class="btn btn-secondary" style="padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.resetDifferenze()">
+              <i class="fa-solid fa-rotate-left"></i> Reset
+            </button>
+            <button class="btn btn-secondary" style="background: rgba(255,255,255,0.05); color: #aaa; padding: 8px 16px; border-radius: 20px;" onclick="EroiMinigames.skipCurrent('differenze')">
+              <i class="fa-solid fa-forward-step"></i> Passa
+            </button>
+          </div>
+        </div>
+      `;
+    },
+
+    clickDiffSpot: function(spotId) {
+      const s = this.diffState;
+      if (s.foundSpots.includes(spotId)) return;
+
+      s.foundSpots.push(spotId);
+      const container = document.getElementById('minigame-content');
+      if (container) this.renderDifferenze(container);
+
+      if (window.showToast) window.showToast(`Differenza trovata! (${s.foundSpots.length}/${s.totalSpots})`, 'success');
+
+      if (s.foundSpots.length === s.totalSpots) {
+        setTimeout(() => {
+          if (container) {
+            container.innerHTML = `
+              <div style="padding: 25px; text-align: center; max-width: 500px; margin: 0 auto;">
+                <div style="font-size: 3rem; margin-bottom: 10px;">🔍</div>
+                <h2 style="color: var(--accent-gold); font-size: 1.8rem; margin: 0 0 10px 0; font-family: var(--font-heading);">
+                  TUTTE LE DIFFERENZE TROVATE!
+                </h2>
+                <p style="font-size: 1rem; color: #f5f5f0; margin-bottom: 15px;">
+                  Ottimo colpo d'occhio! Hai individuato tutti i dettagli modificati.
+                </p>
+                <div style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; border: 1px solid rgba(212,175,55,0.3); margin-bottom: 20px;">
+                  <div style="font-size: 2rem; font-weight: 800; color: #2ecc71;">+2 PUNTI</div>
+                </div>
+                <button class="btn" style="background: var(--accent-gold); color: #000; font-weight: 800; padding: 10px 28px; border-radius: 20px;" onclick="EroiMinigames.rewardAndNext('differenze', 2, 10)">
+                  Continua
+                </button>
+              </div>
+            `;
+          }
+        }, 400);
+      }
+    },
+
+    resetDifferenze: function() {
+      const container = document.getElementById('minigame-content');
+      const data = getData(currentMissionId);
+      if (container) this.initDifferenze(container, data, currentMissionId);
     },
 
     // =====================================================

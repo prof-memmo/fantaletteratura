@@ -17,10 +17,11 @@ window.CalendarService = {
         } catch (e) {}
 
         // 2. Ascolta modifiche in tempo reale da Firestore
-        if (window.fbDb) {
+        const db = window.db || window.fbDb || (typeof firebase !== 'undefined' && firebase.firestore ? firebase.firestore() : null);
+        if (db) {
             try {
-                window.fbDb.collection('fanta_calendar').doc('releases_config')
-                    .onSnapshot((doc) => {
+                db.collection('fanta_calendar').doc('releases_config')
+                    .onSnapshot(async (doc) => {
                         if (doc && doc.exists) {
                             const data = doc.data() || {};
                             this._overrides = data.overrides || {};
@@ -35,6 +36,28 @@ window.CalendarService = {
                             if (typeof window.renderAdminCalendario === 'function') {
                                 window.renderAdminCalendario();
                             }
+                            if (typeof window.renderAdminImprevisti === 'function') {
+                                window.renderAdminImprevisti();
+                            }
+                            // Aggiorna la griglia autori se la schermata di selezione è attiva
+                            if (typeof window.populateAuthorSelects === 'function' && document.getElementById('author-grid')) {
+                                window.populateAuthorSelects(window.currentTeamMode || 'terze');
+                            }
+                        } else if (doc && !doc.exists) {
+                            // Se non esiste ancora su Firestore, salva la struttura predefinita con le 18 uscite
+                            const baseReleases = typeof CALENDAR_RELEASES !== 'undefined' ? CALENDAR_RELEASES : [];
+                            try {
+                                await db.collection('fanta_calendar').doc('releases_config').set({
+                                    releases: baseReleases,
+                                    overrides: this._overrides || {},
+                                    season: '2026-2027',
+                                    totalReleases: baseReleases.length,
+                                    lastUpdated: new Date().toISOString(),
+                                    updatedBy: (window.Auth && window.Auth.getUser && window.Auth.getUser().email) || 'admin'
+                                }, { merge: true });
+                            } catch (errInit) {
+                                // Se l'utente corrente non ha permessi di scrittura, continua con i dati base locali
+                            }
                         }
                     }, (err) => {
                         console.warn("Errore listener Firestore calendario:", err);
@@ -48,15 +71,45 @@ window.CalendarService = {
         this.applyCalendarValidations();
     },
 
+    CLASSIC_HAZARDS: [
+        "⚜️ Dante cacciato da Firenze: L'esilio costa caro (-2 punti a Dante)",
+        "🎲 Foscolo perde tutto a Londra: Debiti di gioco in esilio (-2 punti a Ugo Foscolo)",
+        "🌙 Leopardi e il Passero Solitario: Malinconia e studio matto (-1 punto a Giacomo Leopardi)",
+        "🔥 Boccaccio sotto Censura: Novelle scandalose del Decameron all'Indice (-3 punti a Giovanni Boccaccio)",
+        "🌾 Verga e la Lupa: Dramma rusticano e gelosie in Sicilia (-2 punti a Giovanni Verga)",
+        "🌊 Manzoni sciacqua i panni in Arno: Italiano perfetto e successo morale (+3 punti ad Alessandro Manzoni)",
+        "👑 Petrarca incoronato in Campidoglio: Trionfo poetico d'alloro a Roma (+4 punti a Francesco Petrarca)",
+        "🏆 Carducci vince il Premio Nobel: Primo italiano a trionfare a Stoccolma (+4 punti a Giosuè Carducci)",
+        "🏰 Ariosto alla Corte Estense: Gran successo dell'Orlando Furioso tra i duchi (+3 punti a Ludovico Ariosto)",
+        "🌲 Calvino scopre il Barone Rampante: Bestseller travolgente (+3 punti a Italo Calvino)",
+        "🎭 Pirandello e la Maschera Nuda: Trionfo teatrale per Sei Personaggi (+3 punti a Luigi Pirandello)",
+        "✈️ D'Annunzio e il Volo su Vienna: Gesto patriottico e gloria nei salotti (+3 punti a Gabriele D'Annunzio)"
+    ],
+
     getReleases() {
         const baseReleases = typeof CALENDAR_RELEASES !== 'undefined' ? CALENDAR_RELEASES : [];
         const todayStr = this.getTodayDateString();
+        const d = new Date();
+        const currYear = d.getFullYear();
+        const currMonth = d.getMonth() + 1;
+        const schoolYearStart = (currMonth >= 9) ? currYear : (currYear - 1);
 
         return baseReleases.map(rel => {
             const ov = this._overrides[rel.id] || {};
-            const effectiveDate = ov.date || rel.date;
+            let effectiveDate = ov.date || rel.date;
+
+            // Se la data proviene dal calendario base senza override, normalizza l'anno all'anno scolastico attivo
+            if (!ov.date && rel.date && rel.date.length === 10) {
+                const parts = rel.date.split('-');
+                const baseMonth = parseInt(parts[1], 10);
+                const targetYear = (baseMonth >= 9) ? schoolYearStart : (schoolYearStart + 1);
+                effectiveDate = `${targetYear}-${parts[1]}-${parts[2]}`;
+            }
+
             const isForced = ov.forced === true;
             const isBlocked = ov.blocked === true;
+            const hazardText = ov.hazardText !== undefined ? ov.hazardText : (rel.hazardText || '');
+            const isMarketOpen = ov.isMarketOpen === true;
             
             // Un'uscita è rilasciata se forzata, oppure se oggi >= data e NON è bloccata
             const isDateReached = todayStr >= effectiveDate;
@@ -73,7 +126,9 @@ window.CalendarService = {
                 isForced,
                 isBlocked,
                 isReleased,
-                status
+                status,
+                hazardText,
+                isMarketOpen
             };
         });
     },
@@ -102,10 +157,8 @@ window.CalendarService = {
                 const mode = GAME_MODES[modeKey];
                 if (mode && Array.isArray(mode.authors)) {
                     mode.authors.forEach(a => {
-                        if (releasedAuthorIds.has(a.id)) {
-                            a.isPointsRevealed = true;
-                            a.isSchedaRevealed = true;
-                        }
+                        a.isPointsRevealed = releasedAuthorIds.has(a.id);
+                        a.isSchedaRevealed = releasedAuthorIds.has(a.id);
                     });
                 }
             });
@@ -114,30 +167,30 @@ window.CalendarService = {
         // Applica ad AUTHORS globale se presente
         if (typeof AUTHORS !== 'undefined' && Array.isArray(AUTHORS)) {
             AUTHORS.forEach(a => {
-                if (releasedAuthorIds.has(a.id)) {
-                    a.isPointsRevealed = true;
-                    a.isSchedaRevealed = true;
-                }
+                a.isPointsRevealed = releasedAuthorIds.has(a.id);
+                a.isSchedaRevealed = releasedAuthorIds.has(a.id);
             });
         }
         if (typeof AUTHORS_SECONDE !== 'undefined' && Array.isArray(AUTHORS_SECONDE)) {
             AUTHORS_SECONDE.forEach(a => {
-                if (releasedAuthorIds.has(a.id)) {
-                    a.isPointsRevealed = true;
-                    a.isSchedaRevealed = true;
-                }
+                a.isPointsRevealed = releasedAuthorIds.has(a.id);
+                a.isSchedaRevealed = releasedAuthorIds.has(a.id);
             });
         }
         if (typeof AUTHORS_INTERNAZIONALI !== 'undefined' && Array.isArray(AUTHORS_INTERNAZIONALI)) {
             AUTHORS_INTERNAZIONALI.forEach(a => {
-                if (releasedAuthorIds.has(a.id)) {
-                    a.isPointsRevealed = true;
-                    a.isSchedaRevealed = true;
-                }
+                a.isPointsRevealed = releasedAuthorIds.has(a.id);
+                a.isSchedaRevealed = releasedAuthorIds.has(a.id);
             });
         }
 
         console.log(`📅 CalendarService: validate ${releasedAuthorIds.size} entità autore in base al calendario.`);
+    },
+
+    isAuthorReleased(authorId) {
+        if (!authorId) return false;
+        const releases = this.getReleases();
+        return releases.some(rel => rel.isReleased && Array.isArray(rel.authorIds) && rel.authorIds.includes(authorId));
     },
 
     async updateReleaseDate(releaseId, newDate) {
@@ -158,6 +211,18 @@ window.CalendarService = {
         if (!this._overrides[releaseId]) this._overrides[releaseId] = {};
         this._overrides[releaseId].blocked = blockedState;
         if (blockedState) this._overrides[releaseId].forced = false;
+        await this._saveOverrides();
+    },
+
+    async updateReleaseHazard(releaseId, hazardText) {
+        if (!this._overrides[releaseId]) this._overrides[releaseId] = {};
+        this._overrides[releaseId].hazardText = (hazardText || '').trim();
+        await this._saveOverrides();
+    },
+
+    async updateReleaseMarket(releaseId, isMarketOpen) {
+        if (!this._overrides[releaseId]) this._overrides[releaseId] = {};
+        this._overrides[releaseId].isMarketOpen = isMarketOpen === true;
         await this._saveOverrides();
     },
 
@@ -203,8 +268,9 @@ window.CalendarService = {
     async _saveOverrides() {
         try {
             localStorage.setItem('fanta_calendar_overrides', JSON.stringify(this._overrides));
-            if (window.fbDb) {
-                await window.fbDb.collection('fanta_calendar').doc('releases_config').set({
+            const db = window.db || window.fbDb || (typeof firebase !== 'undefined' && firebase.firestore ? firebase.firestore() : null);
+            if (db) {
+                await db.collection('fanta_calendar').doc('releases_config').set({
                     overrides: this._overrides,
                     lastUpdated: new Date().toISOString(),
                     updatedBy: (window.Auth && window.Auth.getUser && window.Auth.getUser().email) || 'admin'
@@ -213,6 +279,7 @@ window.CalendarService = {
             this.applyCalendarValidations();
             if (typeof window.renderAdminCalendario === 'function') window.renderAdminCalendario();
             if (typeof window.renderAdminAutori === 'function') window.renderAdminAutori();
+            if (typeof window.renderAdminImprevisti === 'function') window.renderAdminImprevisti();
         } catch (e) {
             console.error("Errore salvataggio modifiche calendario:", e);
             alert("Errore salvataggio su Cloud: " + e.message);
