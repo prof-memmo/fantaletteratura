@@ -1108,6 +1108,30 @@ function checkLoginSession() {
         });
     }
 
+    // Inizializzazione Ricezione SSO
+    let ssoUser = null;
+    try {
+        if (window.location.hash && window.location.hash.includes('pm_sso=')) {
+            const match = window.location.hash.match(/pm_sso=([^&]+)/);
+            if (match && match[1]) {
+                ssoUser = JSON.parse(decodeURIComponent(match[1]));
+                if (ssoUser && ssoUser.uid) {
+                    localStorage.setItem('pm_sso_fanta', JSON.stringify(ssoUser));
+                    history.replaceState(null, '', window.location.pathname + window.location.search);
+                }
+            }
+        }
+    } catch(e) {
+        console.warn("Errore parsing SSO Fanta:", e);
+    }
+
+    if (!ssoUser) {
+        try {
+            const cached = localStorage.getItem('pm_sso_fanta');
+            if (cached) ssoUser = JSON.parse(cached);
+        } catch(e) {}
+    }
+
     // Ripristina modalità se salvata
     const savedMode = localStorage.getItem('fanta_active_mode');
     if (savedMode) {
@@ -1116,7 +1140,8 @@ function checkLoginSession() {
     }
 
     fanta_db.onAuthStateChanged(async (user) => {
-        if (!user) {
+        const effectiveUser = user || (ssoUser ? { uid: ssoUser.uid, email: ssoUser.email, displayName: ssoUser.name } : null);
+        if (!effectiveUser) {
             // Mostra stato Ospite nell'header
             const loginHubBtn = document.getElementById('btn-login-hub-dropdown');
             const profileBtn = document.getElementById('btn-profile-dropdown');
@@ -1138,8 +1163,8 @@ function checkLoginSession() {
             return;
         }
 
-        if (user) {
-            const email = user.email.toLowerCase();
+        if (effectiveUser) {
+            const email = (effectiveUser.email || '').toLowerCase();
             currentUserEmail = email;
             
             // 1. Verifica sull'Hub Centrale (Single Sign-On Auth)
@@ -1147,7 +1172,7 @@ function checkLoginSession() {
             let hubRole = isSuperAdmin ? 'docente' : 'docente';
             
             try {
-                const hubDoc = await window.db.collection('hub_users').doc(user.uid).get();
+                const hubDoc = await window.db.collection('hub_users').doc(effectiveUser.uid).get();
                 if (hubDoc.exists) {
                     const hubData = hubDoc.data();
                     if (!isSuperAdmin && hubData.statusAccount && (hubData.statusAccount === 'rejected' || hubData.statusAccount === 'suspended')) {
@@ -1722,6 +1747,7 @@ function setLoggedOut() {
     window.currentUserRole = null;
     window.currentUserTeamId = null;
     localStorage.removeItem('fanta_user_role');
+    localStorage.removeItem('pm_sso_fanta');
     
     // Sidebar and menu-btn removed
     
