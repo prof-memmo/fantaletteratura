@@ -1270,30 +1270,12 @@ window.selectOnboardingRole = async function(role) {
     }
 };
 
-async function loginGoogle() {
-    const ageEl = document.getElementById('welcome-check-age');
-    const privEl = document.getElementById('welcome-check-privacy');
-    if (ageEl && privEl && (!ageEl.checked || !privEl.checked)) {
-        alert("Devi confermare l'età e accettare Privacy Policy e Termini per continuare.");
-        return;
-    }
-
-    try {
-        const result = await fanta_db.loginWithGoogle();
-        const user = result.user;
-        const email = user.email.toLowerCase();
-
-        // checkLoginSession gestirà la logica di approvazione/reindirizzamento
-    } catch (error) {
-        console.error("Google Login Error:", error);
-        if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
-            // Ignoriamo l'errore: su Safari iOS spesso il popup si "stacca" ma il login prosegue in background.
-            // onAuthStateChanged rileverà l'accesso completato tra poco.
-            console.log("Popup interrotto. Attendiamo il completamento in background...");
-        } else {
-            alert("Attendi qualche istante o ricarica la pagina. Se sei su Instagram, apri il sito in Safari/Chrome.");
-        }
-    }
+function loginGoogle() {
+    const isPreview = window.location.pathname.includes('/preview');
+    const portalUrl = isPreview
+        ? 'https://gestionesiti.profmemmo.it/preview/portal.html?redirect=fantaletteratura'
+        : 'https://gestionesiti.profmemmo.it/portal.html?redirect=fantaletteratura';
+    window.location.href = portalUrl;
 }
 
 async function checkStudentConsent() {
