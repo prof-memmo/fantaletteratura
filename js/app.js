@@ -1108,30 +1108,6 @@ function checkLoginSession() {
         });
     }
 
-    // Inizializzazione Ricezione SSO
-    let ssoUser = null;
-    try {
-        if (window.location.hash && window.location.hash.includes('pm_sso=')) {
-            const match = window.location.hash.match(/pm_sso=([^&]+)/);
-            if (match && match[1]) {
-                ssoUser = JSON.parse(decodeURIComponent(match[1]));
-                if (ssoUser && ssoUser.uid) {
-                    localStorage.setItem('pm_sso_fanta', JSON.stringify(ssoUser));
-                    history.replaceState(null, '', window.location.pathname + window.location.search);
-                }
-            }
-        }
-    } catch(e) {
-        console.warn("Errore parsing SSO Fanta:", e);
-    }
-
-    if (!ssoUser) {
-        try {
-            const cached = localStorage.getItem('pm_sso_fanta');
-            if (cached) ssoUser = JSON.parse(cached);
-        } catch(e) {}
-    }
-
     // Ripristina modalità se salvata
     const savedMode = localStorage.getItem('fanta_active_mode');
     if (savedMode) {
@@ -1140,8 +1116,7 @@ function checkLoginSession() {
     }
 
     fanta_db.onAuthStateChanged(async (user) => {
-        const effectiveUser = user || (ssoUser ? { uid: ssoUser.uid, email: ssoUser.email, displayName: ssoUser.name } : null);
-        if (!effectiveUser) {
+        if (!user) {
             // Mostra stato Ospite nell'header
             const loginHubBtn = document.getElementById('btn-login-hub-dropdown');
             const profileBtn = document.getElementById('btn-profile-dropdown');
@@ -1163,8 +1138,8 @@ function checkLoginSession() {
             return;
         }
 
-        if (effectiveUser) {
-            const email = (effectiveUser.email || '').toLowerCase();
+        if (user) {
+            const email = user.email.toLowerCase();
             currentUserEmail = email;
             
             // 1. Verifica sull'Hub Centrale (Single Sign-On Auth)
@@ -1172,12 +1147,12 @@ function checkLoginSession() {
             let hubRole = isSuperAdmin ? 'docente' : 'docente';
             
             try {
-                const hubDoc = await window.db.collection('hub_users').doc(effectiveUser.uid).get();
+                const hubDoc = await window.db.collection('hub_users').doc(user.uid).get();
                 if (hubDoc.exists) {
                     const hubData = hubDoc.data();
                     if (!isSuperAdmin && hubData.statusAccount && (hubData.statusAccount === 'rejected' || hubData.statusAccount === 'suspended')) {
                         alert("Accesso negato: L'account è stato sospeso nell'Hub.");
-                        window.location.href = 'https://gestionesiti.profmemmo.it/portal.html';
+                        window.location.href = 'https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html';
                         return;
                     }
                     if (hubData.role === 'admin' || isSuperAdmin) {
@@ -1259,7 +1234,7 @@ function checkLoginSession() {
             setLoggedOut();
             if (window.location.pathname.includes('admin.html')) {
                 alert("Devi effettuare l'accesso per visualizzare il pannello admin.");
-                window.location.href = 'https://gestionesiti.profmemmo.it/portal.html?redirect=fantaletteratura';
+                window.location.href = 'https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html?redirect=fantaletteratura';
             } else {
                 navigateTo('view-welcome', false);
             }
@@ -1295,12 +1270,30 @@ window.selectOnboardingRole = async function(role) {
     }
 };
 
-function loginGoogle() {
-    const isPreview = window.location.pathname.includes('/preview');
-    const portalUrl = isPreview
-        ? 'https://gestionesiti.profmemmo.it/preview/portal.html?redirect=fantaletteratura'
-        : 'https://gestionesiti.profmemmo.it/portal.html?redirect=fantaletteratura';
-    window.location.href = portalUrl;
+async function loginGoogle() {
+    const checkAge = document.getElementById('welcome-check-age')?.checked;
+    const checkPrivacy = document.getElementById('welcome-check-privacy')?.checked;
+    if (!checkAge || !checkPrivacy) {
+        alert("Devi confermare l'età e accettare Privacy Policy e Termini per continuare.");
+        return;
+    }
+
+    try {
+        const result = await fanta_db.loginWithGoogle();
+        const user = result.user;
+        const email = user.email.toLowerCase();
+
+        // checkLoginSession gestirà la logica di approvazione/reindirizzamento
+    } catch (error) {
+        console.error("Google Login Error:", error);
+        if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+            // Ignoriamo l'errore: su Safari iOS spesso il popup si "stacca" ma il login prosegue in background.
+            // onAuthStateChanged rileverà l'accesso completato tra poco.
+            console.log("Popup interrotto. Attendiamo il completamento in background...");
+        } else {
+            alert("Attendi qualche istante o ricarica la pagina. Se sei su Instagram, apri il sito in Safari/Chrome.");
+        }
+    }
 }
 
 async function checkStudentConsent() {
@@ -1484,7 +1477,7 @@ async function logoutDocente() {
     if (headerUserRole) headerUserRole.textContent = 'NON REGISTRATO';
     if (dropdownTitle) dropdownTitle.textContent = 'OSPITE';
     if (dropdownSubtitle) dropdownSubtitle.textContent = 'NON AUTENTICATO';
-    if (headerAvatar) headerAvatar.src = 'https://gestionesiti.profmemmo.it/shared/assets/branding/prof-memmo/prof-memmo-avatar.png';
+    if (headerAvatar) headerAvatar.src = 'https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png';
     if (loginHubBtn) loginHubBtn.style.display = 'flex';
     if (profileBtn) profileBtn.style.display = 'none';
     if (inviteBtn) inviteBtn.style.display = 'none';
@@ -1747,7 +1740,6 @@ function setLoggedOut() {
     window.currentUserRole = null;
     window.currentUserTeamId = null;
     localStorage.removeItem('fanta_user_role');
-    localStorage.removeItem('pm_sso_fanta');
     
     // Sidebar and menu-btn removed
     
@@ -1986,7 +1978,7 @@ async function renderProfilo() {
     };
 
     if (profAvatarImg || headerAvatarImg) {
-        const cachedAvatar = localStorage.getItem('fanta_user_avatar') || localStorage.getItem('hub_user_avatar') || window.selectedFantaAvatar || 'https://gestionesiti.profmemmo.it/shared/assets/branding/prof-memmo/prof-memmo-avatar.png';
+        const cachedAvatar = localStorage.getItem('fanta_user_avatar') || localStorage.getItem('hub_user_avatar') || window.selectedFantaAvatar || 'https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png';
         const cachedName = localStorage.getItem('fanta_user_name') || (currentUserEmail ? (currentUserEmail === 'prof.memmo@gmail.com' ? 'Prof. Memmo' : currentUserEmail.split('@')[0]) : 'Docente');
         
         updateAllProfileDisplays(cachedAvatar, cachedName);
@@ -2048,7 +2040,7 @@ async function renderProfilo() {
             <strong style="color: #b45309; font-size: 1.05rem;">🔒 Limite Versione Base Raggiunto (${myTeams.length} squadre su max 4 ammesse)</strong><br>
             Il tuo abbonamento per l'anno scolastico precedente è scaduto ed il tuo profilo è attualmente in <b>Versione Base</b>.<br>
             Con la Versione Base puoi mantenere attive <b>al massimo 4 squadre</b> per il campionato di quest'anno. 
-            Le prime 4 squadre del tuo elenco parteciperanno regolarmente, oppure puoi <a href="https://gestionesiti.profmemmo.it/portal.html" target="_blank" style="color: #b45309; font-weight: bold; text-decoration: underline;">rinnovare l'abbonamento nell'Hub</a> per sbloccarle tutte senza limiti!
+            Le prime 4 squadre del tuo elenco parteciperanno regolarmente, oppure puoi <a href="https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html" target="_blank" style="color: #b45309; font-weight: bold; text-decoration: underline;">rinnovare l'abbonamento nell'Hub</a> per sbloccarle tutte senza limiti!
         `;
         squadreList.parentNode.insertBefore(warningDiv, squadreList);
     }
@@ -2987,8 +2979,8 @@ async function rifiutaInvito(invId) {
 
 async function shareInvite(options = {}) {
     // options: { type: 'general'|'tournament'|'student', tourId, code, teamName }
-    const showcaseUrl = "https://profmemmo.it/";
-    const fantaUrl = "https://fantaletteratura.profmemmo.it/";
+    const showcaseUrl = "https://prof-memmo.github.io/games/";
+    const fantaUrl = "https://prof-memmo.github.io/fantaletteratura/";
     
     let targetUrl = showcaseUrl;
     let shareTitle = "Ecosistema Didattico Prof. Memmo";
@@ -3047,7 +3039,7 @@ async function shareInvite(options = {}) {
 }
 
 function copyShareLink() {
-    const textToCopy = window.currentShareText || "Ecosistema Didattico Prof. Memmo: https://profmemmo.it/";
+    const textToCopy = window.currentShareText || "Ecosistema Didattico Prof. Memmo: https://prof-memmo.github.io/games/";
     navigator.clipboard.writeText(textToCopy).then(() => {
         alert("Link e messaggio copiati negli appunti!");
     });
@@ -4422,7 +4414,7 @@ window.loadDocenteClassiComposizione = async function() {
                 teamsList.innerHTML = `
                     <div class="glass" style="padding: 25px; text-align: center; grid-column: 1 / -1; color: var(--text-muted);">
                         <p style="margin-bottom: 10px;">Non hai ancora creato o associato alcuna classe.</p>
-                        <a href="https://profmemmo.it/profilo.html" target="_blank" class="btn btn-secondary" style="font-size:0.82rem; padding: 6px 14px; display:inline-flex; align-items:center; gap:6px;">
+                        <a href="https://prof-memmo.github.io/games/profilo.html" target="_blank" class="btn btn-secondary" style="font-size:0.82rem; padding: 6px 14px; display:inline-flex; align-items:center; gap:6px;">
                             <i class="fa-solid fa-chalkboard-user"></i> Crea una classe nell'Hub
                         </a>
                     </div>
@@ -5162,7 +5154,7 @@ window.avviaSalaGiochiGame = function(gameType) {
     }
 };
 
-window.selectedFantaAvatar = localStorage.getItem('fanta_user_avatar') || 'https://gestionesiti.profmemmo.it/shared/assets/branding/prof-memmo/prof-memmo-avatar.png';
+window.selectedFantaAvatar = localStorage.getItem('fanta_user_avatar') || 'https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png';
 window.openEditProfileModal = async function() {
     const user = window.auth ? window.auth.currentUser : null;
     const modal = document.getElementById('edit-profile-modal');
@@ -5176,7 +5168,7 @@ window.openEditProfileModal = async function() {
     if (nameInput) nameInput.value = user ? (user.displayName || user.email.split('@')[0]) : '';
     if (schoolInput) schoolInput.value = '';
     
-    let currentAvatar = window.selectedFantaAvatar || 'https://gestionesiti.profmemmo.it/shared/assets/branding/prof-memmo/prof-memmo-avatar.png';
+    let currentAvatar = window.selectedFantaAvatar || 'https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png';
 
     if (user && window.db) {
         try {

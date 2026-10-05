@@ -15,7 +15,7 @@
   <!-- Icone per Safari e Dispositivi Mobili -->
   <link rel="manifest" href="manifest.json">
   <script>window.HUB_GAME_ID = "fantaletteratura";</script>
-  <script src="https://gestionesiti.profmemmo.it/shared/hub-subscription-guard.js?v=20260823e_subscription_guard"></script>
+  <script src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/hub-subscription-guard.js?v=20260823e_subscription_guard"></script>
 </head>
 <body class="no-sidebar">
     <div id="app-container">
@@ -29,7 +29,7 @@
             <!-- Centro: Logo Avatar Prof. Memmo -->
             <div class="header-center-logo">
                 <div class="header-prof-logo-wrapper" onclick="navigateTo('view-welcome')" title="Home Fantaletteratura">
-                    <img src="https://gestionesiti.profmemmo.it/shared/assets/branding/prof-memmo/prof-memmo-avatar.png" class="header-prof-logo" alt="Prof. Memmo Logo">
+                    <img src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png" class="header-prof-logo" alt="Prof. Memmo Logo">
                 </div>
             </div>
 
@@ -38,7 +38,7 @@
                 <div class="user-menu-container" id="header-user-container">
                     <div class="user-menu-trigger" id="header-user-menu-trigger" onclick="event.stopPropagation(); window.toggleUserDropdown(event);">
                         <div class="user-avatar-circle">
-                            <img id="header-user-avatar-img" src="https://gestionesiti.profmemmo.it/shared/assets/branding/prof-memmo/prof-memmo-avatar.png" alt="Avatar" onerror="this.src='https://gestionesiti.profmemmo.it/shared/assets/branding/prof-memmo/prof-memmo-avatar.png'">
+                            <img id="header-user-avatar-img" src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png" alt="Avatar" onerror="this.src='https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png'">
                             <script>
                                 (function(){
                                     try {
@@ -74,7 +74,7 @@
                         </div>
 
                         <!-- Golden Pill Login Button (visibile per ospiti) -->
-                        <button class="dropdown-pill-btn" id="btn-login-hub-dropdown" style="background: linear-gradient(135deg, var(--primary-color) 0%, #68792b 100%); color: #0f1108; font-weight: 800;" onclick="loginGoogle()">
+                        <button class="dropdown-pill-btn" id="btn-login-hub-dropdown" style="background: linear-gradient(135deg, var(--primary-color) 0%, #68792b 100%); color: #0f1108; font-weight: 800;" onclick="window.location.href='https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html?redirect=fantaletteratura'">
                             <i class="fa-solid fa-right-to-bracket"></i> Accedi tramite Hub
                         </button>
 
@@ -95,7 +95,7 @@
                             </button>
                         </div>
 
-                        <button class="dropdown-pill-btn" onclick="window.closeUserDropdown(); if(window.showContattiModal) window.showContattiModal(); else window.open('https://profmemmo.it/contatti.html', '_blank');">
+                        <button class="dropdown-pill-btn" onclick="window.closeUserDropdown(); if(window.showContattiModal) window.showContattiModal(); else window.open('https://prof-memmo.github.io/games/contatti.html', '_blank');">
                             <i class="fa-solid fa-envelope"></i> Contatti
                         </button>
 
@@ -134,7 +134,7 @@
                     </svg>
                     <h2 style="color: var(--primary-color); margin-bottom: 20px; font-size: 2rem;">Tempo di Riposo!</h2>
                     <div id="pausa-video-container" style="margin-bottom: 20px;">
-                        <video id="gatto-video" src="https://gestionesiti.profmemmo.it/shared/assets/video/gatto-che-dorme.mp4" autoplay loop muted playsinline style="filter: url(#remove-white); max-width: 100%; max-height: 250px;"></video>
+                        <video id="gatto-video" src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/video/gatto-che-dorme.mp4" autoplay loop muted playsinline style="filter: url(#remove-white); max-width: 100%; max-height: 250px;"></video>
                     </div>
                     <p style="font-size: 1.1rem; color: #444; line-height: 1.5; margin-bottom: 20px;">
                         Hai studiato per 45 minuti! È il momento di fare una pausa.<br><br>
@@ -157,7 +157,7 @@
                     <p class="text-center" style="font-size: 0.95rem; color: #fff; margin-bottom: 18px; font-weight: 500;">Accedi o registrati per iniziare a giocare.</p>
                     
                     <div style="text-align: center; margin: 25px 0;">
-                        <button type="button" class="btn" style="background: var(--primary-color); color: #fff; font-size: 1.15rem; font-weight: 800; padding: 14px 28px; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: none; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;" onclick="loginGoogle()">
+                        <button type="button" class="btn" style="background: var(--primary-color); color: #fff; font-size: 1.15rem; font-weight: 800; padding: 14px 28px; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: none; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;" onclick="window.location.href='https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html?redirect=fantaletteratura'">
                             <i class="fa-solid fa-right-to-bracket"></i> Accedi tramite Hub
                         </button>
                     </div>
@@ -346,7 +346,7 @@
                 <div id="view-regolamento-content">
                     <div class="glass" style="padding: 28px 24px; border-radius: 16px; max-width: 900px; margin: 0 auto;">
                         <div class="text-center mb-4">
-                            <img src="https://gestionesiti.profmemmo.it/shared/assets/branding/games/fantaletteratura-badge.png" alt="Logo Fantaletteratura" class="fanta-logo-glow" style="max-height: 120px; width: auto; display: block; margin: 0 auto 14px; filter: drop-shadow(0 0 15px rgba(212,175,55,0.4));">
+                            <img src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/games/fantaletteratura-badge.png" alt="Logo Fantaletteratura" class="fanta-logo-glow" style="max-height: 120px; width: auto; display: block; margin: 0 auto 14px; filter: drop-shadow(0 0 15px rgba(212,175,55,0.4));">
                             <h2 style="font-size: 1.6rem; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 4px 0; color: #fff; font-weight: 700;">Regolamento</h2>
                         </div>
                         <ul class="rules-list" style="list-style-type: disc; padding-left: 24px; margin: 20px 0 0 0; line-height: 1.85; font-size: 0.95rem; color: #f1f5f9;">
@@ -774,10 +774,10 @@
                     <!-- Parte Sinistra: Blu/Verde Palette -->
                     <div class="contact-left">
                         <h2>Mettiamoci in contatto</h2>
-                        <p>Hai domande o proposte? <a href="https://profmemmo.it/" target="_blank" style="color: inherit; font-weight: bold; text-decoration: underline;">Visita il sito</a> per scoprire i materiali, i giochi e la filosofia, oppure <a href="https://profmemmo.it/condividi-esperienza.html" target="_blank" style="color: inherit; font-weight: bold; text-decoration: underline;">condividi la tua esperienza</a> lasciando commenti e feedback tramite il modulo!</p>
+                        <p>Hai domande o proposte? <a href="https://prof-memmo.github.io/games/" target="_blank" style="color: inherit; font-weight: bold; text-decoration: underline;">Visita il sito</a> per scoprire i materiali, i giochi e la filosofia, oppure <a href="https://prof-memmo.github.io/games/condividi-esperienza.html" target="_blank" style="color: inherit; font-weight: bold; text-decoration: underline;">condividi la tua esperienza</a> lasciando commenti e feedback tramite il modulo!</p>
                         
                         <div class="avatar-circle-container">
-                            <img src="https://gestionesiti.profmemmo.it/shared/assets/branding/prof-memmo/prof-memmo-avatar.png" alt="Prof Memmo" class="avatar-circle">
+                            <img src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png" alt="Prof Memmo" class="avatar-circle">
                         </div>
 
                         <div class="contact-email-box">
@@ -1147,7 +1147,7 @@
                 <a href="#" onclick="event.preventDefault(); openSharedModal('termini')" style="color: inherit; text-decoration: none;">Termini e Condizioni</a>
             </div>
             <div style="display: flex; align-items: center; justify-content: flex-start; gap: 20px; margin: 0; width: 100%; box-sizing: border-box;">
-                <img src="https://gestionesiti.profmemmo.it/shared/assets/legal/patamu-badge.png" alt="Patamu" style="height: 80px; object-fit: contain; flex-shrink: 0;">
+                <img src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/legal/patamu-badge.png" alt="Patamu" style="height: 80px; object-fit: contain; flex-shrink: 0;">
                 <p style="text-align: left; font-size: 0.8rem; line-height: 1.4; margin: 0; flex: 1; color: inherit;">
                     © 2026 Guglielmo Piersanti. Tutti i contenuti presenti su questo sito sono di proprietà dell'autore e sono protetti tramite deposito e marcatura temporale presso Patamu. I contenuti sono inoltre distribuiti con licenza Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0).
                 </p>
@@ -1180,7 +1180,7 @@
                 <i class="fa-solid fa-gamepad"></i>
                 <span>Sala Giochi</span>
             </a>
-            <a href="https://profmemmo.it/contatti.html" target="_blank" class="tab-item" data-tooltip="Inviaci un Messaggio">
+            <a href="https://prof-memmo.github.io/games/contatti.html" target="_blank" class="tab-item" data-tooltip="Inviaci un Messaggio">
                 <i class="fa-solid fa-envelope"></i>
                 <span>Contatti</span>
             </a>
@@ -1756,7 +1756,7 @@
                     <i class="fa-solid fa-globe"></i> Profilo Globale Ecosistema
                 </div>
                 <p style="font-size: 0.75rem; color: #cbd5e1; margin: 0 0 10px 0;">Il tuo account è sincronizzato con l'Ecosistema Prof. Memmo. Gestisci abbonamenti e impostazioni generali dall'Hub.</p>
-                <a href="https://profmemmo.it/profilo.html" target="_blank" class="btn" style="width: 100%; border-radius: 20px; font-weight: 700; font-size: 0.8rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; padding: 8px 12px; background: #6366f1; color: white;">
+                <a href="https://prof-memmo.github.io/games/profilo.html" target="_blank" class="btn" style="width: 100%; border-radius: 20px; font-weight: 700; font-size: 0.8rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; padding: 8px 12px; background: #6366f1; color: white;">
                     Gestisci Profilo Globale <i class="fa-solid fa-arrow-up-right-from-square"></i>
                 </a>
             </div>
@@ -1802,7 +1802,7 @@
     <div id="modal-miniguida" class="modal-overlay" style="display: none; align-items: center; justify-content: center; z-index: 9999; background: rgba(15,23,42,0.8); backdrop-filter: blur(4px); position: fixed; inset: 0; padding: 20px;">
         <div class="modal-content" style="background: white; border-radius: 24px; width: 100%; max-width: 900px; display: flex; overflow: hidden; position: relative; max-height: 90vh; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
             <div style="width: 33%; background: #f8fafc; display: flex; align-items: flex-end; justify-content: center; border-right: 2px solid #f1f5f9; padding-top: 20px;" class="hide-mobile">
-                <img src="assets/prof_memmo_full.jpg" onerror="this.src='https://gestionesiti.profmemmo.it/shared/assets/branding/prof-memmo/prof-memmo-full.jpg';" alt="Prof Memmo" style="width: 120%; object-fit: contain; mix-blend-mode: multiply; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));">
+                <img src="assets/prof_memmo_full.jpg" onerror="this.src='https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-full.jpg';" alt="Prof Memmo" style="width: 120%; object-fit: contain; mix-blend-mode: multiply; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));">
             </div>
             <div style="flex: 1; padding: 30px 40px; display: flex; flex-direction: column; position: relative; min-height: 450px;">
                 <button onclick="closeMiniguida()" style="position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; border-radius: 50%; border: none; background: #f1f5f9; color: #475569; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s;"><i class="fa-solid fa-xmark"></i></button>
@@ -1918,6 +1918,7 @@
     <script src="js/app.js?v=20261004_v3_zeroflicker"></script>
     <!-- Modali condivisi ed Access Control ecosistema Prof. Memmo -->
     <script>window.HUB_GAME_ID = "fantaletteratura";</script>
-    <script src="https://gestionesiti.profmemmo.it/shared/legal-modal.js?v=20261004_v3_zeroflicker"></script>
+    <script src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/hub-subscription-guard.js?v=20261004_v3_zeroflicker"></script>
+    <script src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/legal-modal.js?v=20261004_v3_zeroflicker"></script>
 </body>
 </html>

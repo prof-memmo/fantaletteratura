@@ -15,7 +15,7 @@ function setupNavigation() {
 
 function navigateTo(viewId, pushHistory = true) {
     if (viewId === 'view-contatti') {
-        window.open('https://profmemmo.it/contatti.html', '_blank');
+        window.open('https://prof-memmo.github.io/games/contatti.html', '_blank');
         return;
     }
 
