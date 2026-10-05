@@ -281,7 +281,7 @@ Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma
             container.innerHTML = `
                 <div class="glass" style="padding: 28px 24px; border-radius: 16px; max-width: 900px; margin: 0 auto;">
                     <div class="text-center mb-4">
-                        <img src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/games/fantaletteratura-badge.png" alt="Logo Fantaletteratura" class="fanta-logo-glow" style="max-height: 120px; width: auto; display: block; margin: 0 auto 14px; filter: drop-shadow(0 0 15px rgba(212,175,55,0.4));">
+                        <img src="https://gestionesiti.profmemmo.it/shared/assets/branding/games/fantaletteratura-badge.png" alt="Logo Fantaletteratura" class="fanta-logo-glow" style="max-height: 120px; width: auto; display: block; margin: 0 auto 14px; filter: drop-shadow(0 0 15px rgba(212,175,55,0.4));">
                         <h2 style="font-size: 1.6rem; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 4px 0; color: #fff; font-weight: 700;">Regolamento</h2>
                     </div>
 
