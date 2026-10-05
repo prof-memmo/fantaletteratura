@@ -2962,7 +2962,7 @@ async function rifiutaInvito(invId) {
 async function shareInvite(options = {}) {
     // options: { type: 'general'|'tournament'|'student', tourId, code, teamName }
     const showcaseUrl = "https://profmemmo.it/";
-    const fantaUrl = "https://prof-memmo.github.io/fantaletteratura/";
+    const fantaUrl = "https://fantaletteratura.profmemmo.it/";
     
     let targetUrl = showcaseUrl;
     let shareTitle = "Ecosistema Didattico Prof. Memmo";
