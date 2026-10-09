@@ -1117,6 +1117,18 @@ function checkLoginSession() {
 
     fanta_db.onAuthStateChanged(async (user) => {
         if (!user) {
+            // Se esiste una sessione SSO attiva dall'Hub, mantieni l'accesso autenticato
+            const ssoRaw = localStorage.getItem('hub_user_session');
+            if (ssoRaw) {
+                try {
+                    const ssoSession = JSON.parse(ssoRaw);
+                    if (ssoSession && ssoSession.email) {
+                        currentUserEmail = ssoSession.email.toLowerCase();
+                        return;
+                    }
+                } catch(e) {}
+            }
+
             // Mostra stato Ospite nell'header
             const loginHubBtn = document.getElementById('btn-login-hub-dropdown');
             const profileBtn = document.getElementById('btn-profile-dropdown');
