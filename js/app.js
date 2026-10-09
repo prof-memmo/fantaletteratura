@@ -1124,6 +1124,29 @@ function checkLoginSession() {
                     const ssoSession = JSON.parse(ssoRaw);
                     if (ssoSession && ssoSession.email) {
                         currentUserEmail = ssoSession.email.toLowerCase();
+                        const isSuperAdmin = (currentUserEmail === "prof.memmo@gmail.com");
+                        currentUserRole = isSuperAdmin ? 'docente' : (ssoSession.role || 'docente');
+                        setLoggedIn(currentUserEmail, currentUserRole);
+                        const adminMenuItem = document.getElementById('menu-admin-item');
+                        if (adminMenuItem) {
+                            adminMenuItem.style.display = isSuperAdmin ? 'block' : 'none';
+                        }
+                        if (pendingInitialView) {
+                            const target = pendingInitialView;
+                            pendingInitialView = null;
+                            navigateTo(target, false);
+                        } else {
+                            const activeCode = localStorage.getItem('fanta_active_team_code');
+                            if (currentUserRole === 'studente') {
+                                if (!activeCode) {
+                                    navigateTo('view-studenti', false);
+                                } else {
+                                    navigateTo('view-gioco', false);
+                                }
+                            } else {
+                                navigateTo('view-docente', false);
+                            }
+                        }
                         return;
                     }
                 } catch(e) {}
@@ -1164,7 +1187,7 @@ function checkLoginSession() {
                     const hubData = hubDoc.data();
                     if (!isSuperAdmin && hubData.statusAccount && (hubData.statusAccount === 'rejected' || hubData.statusAccount === 'suspended')) {
                         alert("Accesso negato: L'account è stato sospeso nell'Hub.");
-                        window.location.href = 'https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html';
+                        window.location.href = 'https://profmemmo.it/portal.html';
                         return;
                     }
                     if (hubData.role === 'admin' || isSuperAdmin) {
@@ -1246,7 +1269,7 @@ function checkLoginSession() {
             setLoggedOut();
             if (window.location.pathname.includes('admin.html')) {
                 alert("Devi effettuare l'accesso per visualizzare il pannello admin.");
-                window.location.href = 'https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html?redirect=fantaletteratura';
+                window.location.href = 'https://profmemmo.it/portal.html?redirect=fantaletteratura';
             } else {
                 navigateTo('view-welcome', false);
             }
@@ -2052,7 +2075,7 @@ async function renderProfilo() {
             <strong style="color: #b45309; font-size: 1.05rem;">🔒 Limite Versione Base Raggiunto (${myTeams.length} squadre su max 4 ammesse)</strong><br>
             Il tuo abbonamento per l'anno scolastico precedente è scaduto ed il tuo profilo è attualmente in <b>Versione Base</b>.<br>
             Con la Versione Base puoi mantenere attive <b>al massimo 4 squadre</b> per il campionato di quest'anno. 
-            Le prime 4 squadre del tuo elenco parteciperanno regolarmente, oppure puoi <a href="https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html" target="_blank" style="color: #b45309; font-weight: bold; text-decoration: underline;">rinnovare l'abbonamento nell'Hub</a> per sbloccarle tutte senza limiti!
+            Le prime 4 squadre del tuo elenco parteciperanno regolarmente, oppure puoi <a href="https://profmemmo.it/portal.html" target="_blank" style="color: #b45309; font-weight: bold; text-decoration: underline;">rinnovare l'abbonamento nell'Hub</a> per sbloccarle tutte senza limiti!
         `;
         squadreList.parentNode.insertBefore(warningDiv, squadreList);
     }
