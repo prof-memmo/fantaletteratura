@@ -50,6 +50,8 @@
                     overlay.style.display = 'none';
                 }
             }
+        }, err => {
+            console.warn("Hub guard status listener notice:", err.message);
         });
     };
 
