@@ -256,8 +256,9 @@ window.CalendarService = {
                 blocked: false
             };
 
-            // Avanza di 14 giorni per la prossima uscita bisettimanale
-            curDate.setDate(curDate.getDate() + 14);
+            // Cadenza: 14 giorni da novembre a fine aprile (uscite 1-13), poi sprint settimanale di 7 giorni a maggio per le ultime uscite fino alla chiusura del 1° giugno
+            const stepDays = (index >= 12) ? 7 : 14;
+            curDate.setDate(curDate.getDate() + stepDays);
         });
 
         this._overrides = newOverrides;

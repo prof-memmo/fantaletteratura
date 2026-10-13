@@ -145,8 +145,8 @@
             <section id="admin-view-calendario" class="admin-view" style="display:none;">
                 <div style="padding: 0 15px 15px 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                     <div>
-                        <h2 style="margin: 0;"><i class="fa-solid fa-calendar-days" style="color: var(--accent-gold);"></i> Calendario &amp; Imprevisti</h2>
-                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">Le schede e i punteggi degli autori si validano automaticamente alle date previste. Puoi impostare le <strong>Carte Imprevisto Ufficiali</strong> e abilitare le <strong>Finestre di Mercato (1 Cambio)</strong> per ogni turno.</p>
+                        <h2 style="margin: 0;"><i class="fa-solid fa-calendar-days" style="color: var(--accent-gold);"></i> Calendario Uscite &amp; Validazioni Autori</h2>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">Le schede e i punteggi degli autori si validano automaticamente alle date previste a partire dal 10 Novembre 2026. Puoi modificare puntualmente ogni data da questo pannello o gestire gli imprevisti dalla tab dedicata.</p>
                     </div>
                     <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 14px; border-radius: 12px;" onclick="window.renderAdminCalendario()"><i class="fa-solid fa-rotate"></i> Ricarica</button>
                 </div>
@@ -455,7 +455,7 @@
                         <div style="display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap;">
                             <div>
                                 <label style="font-size: 0.78rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Data Primo Martedì di Avvio:</label>
-                                <input type="date" id="input-smart-calendar-start" class="input-control" value="2026-09-29" style="width: auto; font-family: monospace; padding: 7px 12px;">
+                                <input type="date" id="input-smart-calendar-start" class="input-control" value="2026-11-10" style="width: auto; font-family: monospace; padding: 7px 12px;">
                             </div>
                             <button type="button" class="btn" style="background: var(--accent-gold); color: var(--bg-dark); font-weight: bold; width: auto; padding: 9px 18px; font-size: 0.85rem; border: none; cursor: pointer; border-radius: 8px;" onclick="window.generaCalendarioNuovoAnno()">
                                 <i class="fa-solid fa-wand-magic-sparkles"></i> Genera Calendario Nuovo Anno
