@@ -31,6 +31,8 @@
                                     this.lockUI();
                                 }
                             }
+                        }, err => {
+                            console.warn("Permissions guard status listener notice:", err.message);
                         });
                     }
                 }
