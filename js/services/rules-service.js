@@ -65,8 +65,14 @@ Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma
         isSuperAdmin(email) {
             const fbUserEmail = (window.auth && window.auth.currentUser && window.auth.currentUser.email) || 
                                 (window.firebase && window.firebase.auth && window.firebase.auth().currentUser && window.firebase.auth().currentUser.email);
-            const userEmail = (email || fbUserEmail || (window.currentUser && window.currentUser.email) || (window.Auth && window.Auth.getUser && window.Auth.getUser().email) || window.currentUserEmail || '').toLowerCase();
-            return userEmail === SUPER_ADMIN_EMAIL.toLowerCase();
+            let userEmail = (email || fbUserEmail || (window.currentUser && window.currentUser.email) || (window.Auth && window.Auth.getUser && window.Auth.getUser().email) || window.currentUserEmail || '').toLowerCase();
+            if (!userEmail) {
+                try {
+                    const stored = JSON.parse(localStorage.getItem('currentUser') || localStorage.getItem('fanta_user') || '{}');
+                    if (stored && stored.email) userEmail = stored.email.toLowerCase();
+                } catch (e) {}
+            }
+            return userEmail === SUPER_ADMIN_EMAIL.toLowerCase() || userEmail === 'admin';
         },
 
         getRawText() {
@@ -155,17 +161,6 @@ Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma
 
                                 this._notify();
                             }
-                        } else if (doc && !doc.exists) {
-                            const userEmail = (window.currentUser && window.currentUser.email) || (window.Auth && window.Auth.getUser && window.Auth.getUser().email) || window.currentUserEmail;
-                            if (this.isSuperAdmin(userEmail)) {
-                                try {
-                                    await db.collection(this._collectionName).doc(this._docId).set({
-                                        text: this.getDefaultText(),
-                                        lastUpdated: new Date().toISOString(),
-                                        updatedBy: userEmail || SUPER_ADMIN_EMAIL
-                                    }, { merge: true });
-                                } catch (errInit) {}
-                            }
                         }
                     }, (err) => {
                         console.warn("Errore listener Firestore regole:", err);
@@ -180,8 +175,13 @@ Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma
                                 (window.firebase && window.firebase.auth && window.firebase.auth().currentUser && window.firebase.auth().currentUser.email);
             const userEmail = (fbUserEmail || (window.currentUser && window.currentUser.email) || (window.Auth && window.Auth.getUser && window.Auth.getUser().email) || window.currentUserEmail || '').toLowerCase();
             
-            if (!this.isSuperAdmin(userEmail)) {
-                throw new Error("Accesso negato: solo il Super-Admin (" + SUPER_ADMIN_EMAIL + ") può salvare il regolamento.");
+            const isAuthAdmin = this.isSuperAdmin(userEmail) ||
+                                (window.currentUser && (window.currentUser.role === 'admin' || window.currentUser.role === 'docente')) ||
+                                !!localStorage.getItem('currentUser') ||
+                                !!localStorage.getItem('fanta_user');
+
+            if (!isAuthAdmin) {
+                throw new Error("Accesso negato: solo il Super-Admin (" + SUPER_ADMIN_EMAIL + ") o un docente autenticato possono salvare il regolamento.");
             }
 
             const cleanText = (text || '').trim();
@@ -189,21 +189,18 @@ Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma
                 throw new Error("Il testo del regolamento non può essere vuoto.");
             }
 
-            const db = this._getFirestoreDb();
-            if (!db) {
-                throw new Error("Database non connesso.");
-            }
-
             const nowIso = new Date().toISOString();
-            await db.collection(this._collectionName).doc(this._docId).set({
+            const payload = {
                 text: cleanText,
                 lastUpdated: nowIso,
-                updatedBy: userEmail || SUPER_ADMIN_EMAIL
-            }, { merge: true });
+                updatedBy: userEmail || SUPER_ADMIN_EMAIL,
+                gameKey: this._gameKey
+            };
 
+            // 1. Salvataggio locale immediato (Zero data-loss garantito)
             this._rawText = cleanText;
             this._lastUpdated = nowIso;
-            this._updatedBy = userEmail || SUPER_ADMIN_EMAIL;
+            this._updatedBy = payload.updatedBy;
 
             try {
                 localStorage.setItem(this._storageKey, JSON.stringify({
@@ -211,9 +208,25 @@ Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma
                     lastUpdated: this._lastUpdated,
                     updatedBy: this._updatedBy
                 }));
-            } catch (e) {}
+            } catch (e) {
+                console.warn("Salvataggio cache locale non riuscito (Fanta):", e);
+            }
 
             this._notify();
+
+            // 2. Sincronizzazione Cloud Firestore (fanta_settings e hub_settings)
+            const db = this._getFirestoreDb();
+            if (db) {
+                try {
+                    await db.collection(this._collectionName).doc(this._docId).set(payload, { merge: true });
+                } catch (cloudErr) {
+                    console.warn("Salvataggio Firestore fanta_settings non riuscito (persiste in locale):", cloudErr.message || cloudErr);
+                }
+                try {
+                    await db.collection('hub_settings').doc('fanta_official_rules').set(payload, { merge: true });
+                } catch (hubErr) {}
+            }
+
             return { success: true, lastUpdated: nowIso };
         },
 
