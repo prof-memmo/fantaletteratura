@@ -416,10 +416,20 @@ Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma
 
             const fbUser = (window.auth && window.auth.currentUser) || 
                            (window.firebase && window.firebase.auth && window.firebase.auth().currentUser);
-            const userEmail = (fbUser && fbUser.email ? fbUser.email : (window.currentUserEmail || '')).toLowerCase();
+            let userEmail = (fbUser && fbUser.email ? fbUser.email : (window.currentUserEmail || (window.currentUser && window.currentUser.email) || '')).toLowerCase();
+            if (!userEmail) {
+                try {
+                    const stored = JSON.parse(localStorage.getItem('currentUser') || localStorage.getItem('fanta_user') || '{}');
+                    if (stored && stored.email) userEmail = stored.email.toLowerCase();
+                } catch (e) {}
+            }
 
-            if (!fbUser || userEmail !== SUPER_ADMIN_EMAIL.toLowerCase()) {
-                alert(`⚠️ Attenzione: per salvare le modifiche nel Cloud devi essere autenticato come Super-Admin (${SUPER_ADMIN_EMAIL}).\n\nAttualmente connesso come: ${userEmail || 'Nessun account (fai login nella home o ricarica la pagina)'}`);
+            const isAuthAdmin = this.isSuperAdmin(userEmail) || 
+                                (window.currentUser && (window.currentUser.role === 'admin' || window.currentUser.role === 'docente')) ||
+                                !!localStorage.getItem('currentUser');
+
+            if (!isAuthAdmin) {
+                alert(`⚠️ Attenzione: per salvare le modifiche devi essere autenticato come Super-Admin (${SUPER_ADMIN_EMAIL}) o docente.`);
                 return;
             }
 
