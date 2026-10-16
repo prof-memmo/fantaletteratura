@@ -1807,31 +1807,49 @@
             <div style="flex: 1; padding: 30px 40px; display: flex; flex-direction: column; position: relative; min-height: 450px;">
                 <button onclick="closeMiniguida()" style="position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; border-radius: 50%; border: none; background: #f1f5f9; color: #475569; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s;"><i class="fa-solid fa-xmark"></i></button>
                 
-                <h2 id="miniguida-title" style="font-size: 2rem; font-weight: 900; color: var(--primary-color); margin-bottom: 30px; text-align: center; text-transform: uppercase; border-bottom: 4px solid rgba(168, 85, 247, 0.2); padding-bottom: 10px; display: inline-block; margin-left: auto; margin-right: auto;">Come si gioca?</h2>
+                <h2 id="miniguida-title" style="font-size: 2rem; font-weight: 900; color: var(--primary-color); margin-bottom: 30px; text-align: center; text-transform: uppercase; border-bottom: 4px solid rgba(168, 85, 247, 0.2); padding-bottom: 10px; display: inline-block; margin-left: auto; margin-right: auto;">Miniguida</h2>
                 
                 <div id="miniguida-step-0" class="miniguida-step" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; animation: fadeIn 0.3s ease-out;">
-                    <i class="fa-solid fa-pen-nib" style="font-size: 5rem; color: var(--primary-color); margin-bottom: 20px;"></i>
-                    <p style="font-size: 1.25rem; color: #475569; line-height: 1.6; font-weight: 500;">✍️ <strong>Crea la tua Rosa di 5 Autori:</strong><br>Scegli e acquista i tuoi 5 autori preferiti della storia letteraria (<em>da Dante a Pirandello, da Calvino a Leopardi</em>).</p>
+                    <i class="fa-solid fa-bullseye" style="font-size: 4.5rem; color: var(--primary-color); margin-bottom: 20px;"></i>
+                    <p style="font-size: 1.25rem; color: #475569; line-height: 1.6; font-weight: 500; max-width: 540px; margin: 0 auto;">Lo scopo del gioco è creare la tua squadra di autori letterari, accumulare punti con le attività e le sfide di classe e scalare la classifica.</p>
                 </div>
                 
                 <div id="miniguida-step-1" class="miniguida-step" style="flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; animation: fadeIn 0.3s ease-out;">
-                    <i class="fa-solid fa-dice" style="font-size: 5rem; color: #f59e0b; margin-bottom: 20px;"></i>
-                    <p style="font-size: 1.25rem; color: #475569; line-height: 1.6; font-weight: 500;">🎲 <strong>Bonus, Malus &amp; Imprevisti:</strong><br>Guadagna o perdi punti durante l'anno scolastico in base agli eventi storici e alle vicende biografiche degli autori.</p>
+                    <i class="fa-solid fa-gamepad" style="font-size: 4.5rem; color: var(--primary-color); margin-bottom: 20px;"></i>
+                    <p style="font-size: 1.25rem; color: #475569; line-height: 1.6; font-weight: 500; max-width: 540px; margin: 0 auto;">Si gioca acquistando gli autori con i propri crediti, schierando la formazione titolare prima di ogni turno e partecipando ai minigiochi per ottenere bonus extra.</p>
                 </div>
                 
                 <div id="miniguida-step-2" class="miniguida-step" style="flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; animation: fadeIn 0.3s ease-out;">
-                    <i class="fa-solid fa-puzzle-piece" style="font-size: 5rem; color: #ec4899; margin-bottom: 20px;"></i>
-                    <p style="font-size: 1.25rem; color: #475569; line-height: 1.6; font-weight: 500;">🧩 <strong>Minigiochi Letterari alla LIM:</strong><br>Sfida le altre squadre della classe con <em>Quiz, Cloze, Versi e Puzzle</em> per conquistare punti extra.</p>
+                    <i class="fa-solid fa-user" style="font-size: 4.5rem; color: var(--primary-color); margin-bottom: 20px;"></i>
+                    <p style="font-size: 1.25rem; color: #475569; line-height: 1.6; font-weight: 500; max-width: 540px; margin: 0 auto;">Entra nel tuo <strong>Profilo</strong> per gestire la tua squadra, controllare i crediti e schierare la formazione titolare.</p>
                 </div>
 
                 <div id="miniguida-step-3" class="miniguida-step" style="flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; animation: fadeIn 0.3s ease-out;">
-                    <i class="fa-solid fa-trophy" style="font-size: 5rem; color: #10b981; margin-bottom: 20px;"></i>
-                    <p style="font-size: 1.25rem; color: #475569; line-height: 1.6; font-weight: 500;">🏆 <strong>Scala la Classifica:</strong><br>Completa le missioni didattiche del docente e porta la tua fanta-squadra in vetta al <strong>Campionato Letterario</strong>!</p>
+                    <i class="fa-solid fa-house" style="font-size: 4.5rem; color: var(--primary-color); margin-bottom: 20px;"></i>
+                    <p style="font-size: 1.25rem; color: #475569; line-height: 1.6; font-weight: 500; max-width: 540px; margin: 0 auto;">Torna su <strong>Home</strong> per avere una panoramica generale sullo stato del gioco e sulle novità del turno.</p>
+                </div>
+
+                <div id="miniguida-step-4" class="miniguida-step" style="flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; animation: fadeIn 0.3s ease-out;">
+                    <i class="fa-solid fa-dice" style="font-size: 4.5rem; color: var(--primary-color); margin-bottom: 20px;"></i>
+                    <p style="font-size: 1.25rem; color: #475569; line-height: 1.6; font-weight: 500; max-width: 540px; margin: 0 auto;">Vai in <strong>Sala Giochi</strong> per divertirti con i minigiochi, accumulare crediti e ottenere punti bonus.</p>
+                </div>
+
+                <div id="miniguida-step-5" class="miniguida-step" style="flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; animation: fadeIn 0.3s ease-out;">
+                    <i class="fa-solid fa-trophy" style="font-size: 4.5rem; color: var(--primary-color); margin-bottom: 20px;"></i>
+                    <p style="font-size: 1.25rem; color: #475569; line-height: 1.6; font-weight: 500; max-width: 540px; margin: 0 auto;">Clicca su <strong>Classifiche</strong> per scoprire i punteggi aggiornati e le posizioni di tutte le squadre.</p>
+                </div>
+
+                <div id="miniguida-step-6" class="miniguida-step" style="flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; animation: fadeIn 0.3s ease-out;">
+                    <i class="fa-solid fa-book-open" style="font-size: 4.5rem; color: var(--primary-color); margin-bottom: 20px;"></i>
+                    <p style="font-size: 1.25rem; color: #475569; line-height: 1.6; font-weight: 500; max-width: 540px; margin: 0 auto;">Consulta le <strong>Schede</strong> per approfondire la biografia, le opere e le curiosità di ogni autore.<br><br><em>Consulta il regolamento per saperne di più.</em></p>
                 </div>
                 
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
                     <div style="display: flex; gap: 8px;" id="miniguida-dots">
                         <div class="dot active" style="width: 12px; height: 12px; border-radius: 50%; background: var(--primary-color); transition: 0.3s;"></div>
+                        <div class="dot" style="width: 12px; height: 12px; border-radius: 50%; background: #e2e8f0; transition: 0.3s;"></div>
+                        <div class="dot" style="width: 12px; height: 12px; border-radius: 50%; background: #e2e8f0; transition: 0.3s;"></div>
+                        <div class="dot" style="width: 12px; height: 12px; border-radius: 50%; background: #e2e8f0; transition: 0.3s;"></div>
                         <div class="dot" style="width: 12px; height: 12px; border-radius: 50%; background: #e2e8f0; transition: 0.3s;"></div>
                         <div class="dot" style="width: 12px; height: 12px; border-radius: 50%; background: #e2e8f0; transition: 0.3s;"></div>
                         <div class="dot" style="width: 12px; height: 12px; border-radius: 50%; background: #e2e8f0; transition: 0.3s;"></div>
@@ -1856,7 +1874,7 @@
     
     <script>
         let currentMiniguidaStep = 0;
-        const totalMiniguidaSteps = 4;
+        const totalMiniguidaSteps = 7;
         
         function openMiniguida() {
             if (window.FantaMiniguidaService) {
