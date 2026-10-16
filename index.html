@@ -953,21 +953,8 @@
                       </div>
 
                       <div class="glass mb-2" style="padding: 15px;">
-                          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                              <h3 style="margin:0;">Tornei Interni</h3>
-                              <div style="display:flex; gap:10px;">
-                                  <button class="btn" style="width: auto; padding: 5px 10px; font-size: 0.8rem; background: var(--primary-color)" onclick="openTorneoModal()"><i class="fa-solid fa-plus"></i> Crea</button>
-                              </div>
-                          </div>
-                          <p style="font-size:0.8rem; margin-bottom: 15px; color: var(--text-muted);">Crea classifiche isolate per classi o scuole, sfidando le squadre che hai creato.</p>
-                          <div id="profilo-tornei-list" style="display:flex; flex-direction:column; gap:10px;">
-                              <i>Nessun torneo privato creato.</i>
-                          </div>
-                      </div>
-
-                      <div class="glass mb-2" style="padding: 15px;">
                           <button class="btn" style="background: var(--danger-color); font-size: 0.9rem;" onclick="eliminaAccountTotale()"><i class="fa-solid fa-trash-can"></i> Elimina Account e Dati</button>
-                          <p style="font-size:0.7rem; color:var(--text-muted); margin-top:10px; line-height:1.2;">Attenzione: questa operazione rimuoverà definitivamente tutti i tuoi dati, le squadre e i tornei da questo dispositivo.</p>
+                          <p style="font-size:0.7rem; color:var(--text-muted); margin-top:10px; line-height:1.2;">Attenzione: questa operazione rimuoverà definitivamente tutti i tuoi dati e le squadre da questo dispositivo.</p>
                       </div>
                   </div>
 
@@ -1222,41 +1209,6 @@
         </div>
     </div>
 
-    <!-- Modale Creazione Torneo -->
-    <div id="torneo-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-dark); z-index:2000; overflow-y:auto;">
-        <div style="padding: 15px; position: sticky; top: 0; background:var(--bg-dark); z-index:10; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center;">
-            <h3 style="margin:0;">Crea Nuovo Torneo</h3>
-            <button class="btn-secondary" onclick="document.getElementById('torneo-modal').style.display='none'" style="padding: 5px 15px; width:auto; border-radius:20px; border:none;"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div style="padding: 20px;">
-            <div class="input-group">
-                <label>Nome del Torneo</label>
-                <input type="text" id="torneo-nome-input" class="input-control" placeholder="Es: Quarte vs Quinte">
-            </div>
-            <h4 class="mb-1">Seleziona squadre partecipanti</h4>
-            <div id="torneo-squadre-checkboxes" style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
-                <!-- Inserite da JS -->
-            </div>
-            <button type="button" class="btn" onclick="creaTorneo()">Salva Torneo</button>
-        </div>
-    </div>
-
-    <!-- Modale Unisciti a Torneo (Accetta Invito) -->
-    <div id="join-torneo-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-dark); z-index:2000; overflow-y:auto;">
-        <div style="padding: 15px; position: sticky; top: 0; background:var(--bg-dark); z-index:10; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center;">
-            <h3 style="margin:0;">Iscriviti al Torneo</h3>
-            <button class="btn-secondary" onclick="document.getElementById('join-torneo-modal').style.display='none'" style="padding: 5px 15px; width:auto; border-radius:20px; border:none;"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div style="padding: 20px;">
-            <input type="hidden" id="join-torneo-id">
-            <input type="hidden" id="join-invite-id">
-            <p style="font-size:0.8rem; color:#aaa; margin-bottom:15px;">Quali squadre vuoi aggregare a questo torneo?</p>
-            <div id="join-torneo-squadre" style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
-                <!-- Inserite da JS -->
-            </div>
-            <button type="button" class="btn" onclick="joinTorneo()">Conferma e Iscriviti</button>
-        </div>
-    </div>
 
     <!-- Modale Condivisione Universale -->
     <div id="share-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:3000; overflow-y:auto; backdrop-filter: blur(10px);">
