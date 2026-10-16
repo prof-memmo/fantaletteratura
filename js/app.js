@@ -3004,60 +3004,6 @@ let presAuthorBonusIndex = 0;
 
 window.initPresentazioniTab = async function() {
     await window.aggiornaCampiPresentazione();
-    
-    // Carica i tornei e popolali nella griglia
-    const torneiContainer = document.getElementById('pres-tornei-container');
-    if (torneiContainer) {
-        torneiContainer.innerHTML = '<div class="glass" style="padding:10px; text-align:center; color:var(--text-muted); grid-column:1/-1;"><i class="fa-solid fa-spinner fa-spin"></i> Caricamento tornei...</div>';
-        
-        try {
-            const tuttiTornei = await window.fanta_db.getTournaments();
-            const tutteSquadre = await window.fanta_db.getTeams();
-            
-            // Determina le squadre associate a questo utente
-            const currentUserEmail = firebase.auth().currentUser ? firebase.auth().currentUser.email : null;
-            const isAdmin = currentUserEmail === 'prof.memmo@gmail.com';
-            
-            let myTeamIds = [];
-            if (!isAdmin && currentUserEmail) {
-                myTeamIds = tutteSquadre.filter(t => t.createdBy === currentUserEmail || (t.collaborators && t.collaborators.includes(currentUserEmail))).map(t => t.id);
-            }
-            
-            // Filtra i tornei: admin vede tutti, docenti vedono tornei in cui c'è almeno una loro squadra (o creati da loro)
-            const torneiMostrati = tuttiTornei.filter(t => {
-                if (isAdmin) return true;
-                if (t.createdBy === currentUserEmail) return true;
-                if (!t.teams) return false;
-                return t.teams.some(teamId => myTeamIds.includes(teamId));
-            });
-            
-            if (torneiMostrati.length === 0) {
-                torneiContainer.innerHTML = '<div class="glass" style="padding:10px; text-align:center; color:var(--text-muted); grid-column:1/-1;">Nessun torneo interno disponibile.</div>';
-                return;
-            }
-            
-            torneiContainer.innerHTML = '';
-            torneiMostrati.forEach(t => {
-                const numSquadre = (t.teams || []).length;
-                const div = document.createElement('div');
-                div.className = 'pres-card';
-                div.setAttribute('data-type', 'torneo');
-                div.setAttribute('data-value', t.id);
-                div.onclick = function() { window.togglePresOption(this); };
-                
-                div.innerHTML = `
-                    <div class="pres-card-icon"><i class="fa-solid fa-trophy"></i></div>
-                    <div class="pres-card-title">${t.name}</div>
-                    <div class="pres-card-desc">${numSquadre} squadre iscritte</div>
-                `;
-                torneiContainer.appendChild(div);
-            });
-            
-        } catch (error) {
-            console.error("Errore nel caricamento dei tornei per le presentazioni:", error);
-            torneiContainer.innerHTML = '<div class="glass" style="padding:10px; text-align:center; color:#e74c3c; grid-column:1/-1;">Errore nel caricamento tornei.</div>';
-        }
-    }
 };
 
 window.selectPresOption = function(element) {
@@ -3189,7 +3135,6 @@ window.avviaPresentazioneLIM = async function() {
     presCurrentIndex = 0;
     
     try {
-        const tourneys = await window.fanta_db.getTournaments();
         const presentationTypeName = selectedTipo === 'finale' ? 'FINALE' : (selectedTipo === 'semifinale' ? 'SEMIFINALE' : 'INTERMEDIA');
         
         presSlides.push({
@@ -3335,56 +3280,6 @@ window.avviaPresentazioneLIM = async function() {
                 presSlides.push({
                     type: 'podium',
                     torneoName: torneoName,
-                    teams: teamsForRank
-                });
-            }
-        }
-        
-        // 4. Aggiungi i Tornei Interni selezionati
-        const checkedTornei = Array.from(document.querySelectorAll('.pres-card[data-type="torneo"].active')).map(el => el.getAttribute('data-value'));
-        
-        if (checkedTornei.length > 0) {
-            const allTeams = await window.fanta_db.getTeams();
-            const checkedAutori = Array.from(document.querySelectorAll('input[name="pres-autori"]:checked')).map(el => el.value);
-            
-            for (const tId of checkedTornei) {
-                const torneo = tourneys.find(t => t.id === tId);
-                if (!torneo) continue;
-                
-                const tournamentTeams = allTeams.filter(t => (torneo.teams || []).includes(t.id));
-                const calcTTeams = tournamentTeams.map(t => {
-                    const modeCfg = GAME_MODES[t.campionato] || GAME_MODES.terze;
-                    const pool = modeCfg.authors || AUTHORS;
-                    
-                    let authPts = 0;
-                    t.authors.forEach(aid => {
-                        let a = pool.find(x => x.id === aid);
-                        if (a && (a.isPointsRevealed || checkedAutori.includes(`${t.campionato}:${a.id}`))) {
-                            authPts += a.points;
-                        }
-                    });
-                    const missPts = (t.missionsCompleted || 0) * 5;
-                    const totPts = authPts + missPts;
-                    
-                    return { id: t.id, name: t.name, totPoints: totPts };
-                });
-                
-                const sorted = calcTTeams.sort((a,b) => a.totPoints - b.totPoints);
-                const teamsForRank = sorted.map(t => ({ id: t.id, name: t.name, points: t.totPoints }));
-                
-                presSlides.push({
-                    type: 'suspense',
-                    subtitle: `TORNEO INTERNO`,
-                    text: `SCOPRIAMO LA CLASSIFICA:<br>${torneo.name.toUpperCase()}`
-                });
-                presSlides.push({
-                    type: 'leaderboard-list',
-                    torneoName: `TORNEO INTERNO - ${torneo.name.toUpperCase()}`,
-                    teams: teamsForRank
-                });
-                presSlides.push({
-                    type: 'podium',
-                    torneoName: `TORNEO INTERNO - ${torneo.name.toUpperCase()}`,
                     teams: teamsForRank
                 });
             }
