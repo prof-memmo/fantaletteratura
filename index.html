@@ -1131,7 +1131,7 @@
 
         <!-- Bottom Navigation Tabs (Floating Dock on PC) -->
         <nav class="bottom-bar">
-            <a href="#" class="tab-item active" data-view="view-welcome" data-tooltip="Home">
+            <a href="#" class="tab-item active" data-action="navigate" data-view="view-welcome" data-tooltip="Home">
                 <i class="fa-solid fa-house"></i>
                 <span>Home</span>
             </a>
@@ -1139,19 +1139,19 @@
                 <i class="fa-solid fa-circle-question"></i>
                 <span>Miniguida</span>
             </a>
-            <a href="#" class="tab-item" data-view="view-regolamento" data-tooltip="Regolamento">
+            <a href="#" class="tab-item" data-action="navigate" data-view="view-regolamento" data-tooltip="Regolamento">
                 <i class="fa-solid fa-scale-balanced"></i>
                 <span>Regolamento</span>
             </a>
-            <a href="#" class="tab-item" data-view="view-classifiche" data-tooltip="Classifiche">
+            <a href="#" class="tab-item" data-action="navigate" data-view="view-classifiche" data-tooltip="Classifiche">
                 <i class="fa-solid fa-trophy"></i>
                 <span>Classifiche</span>
             </a>
-            <a href="#" class="tab-item" data-view="view-schede" data-tooltip="Schede">
+            <a href="#" class="tab-item" data-action="navigate" data-view="view-schede" data-tooltip="Schede">
                 <i class="fa-solid fa-file-lines"></i>
                 <span>Schede</span>
             </a>
-            <a href="#" class="tab-item" data-view="view-salagiochi" data-tooltip="Sala Giochi">
+            <a href="#" class="tab-item" data-action="navigate" data-view="view-salagiochi" data-tooltip="Sala Giochi">
                 <i class="fa-solid fa-gamepad"></i>
                 <span>Sala Giochi</span>
             </a>
@@ -1159,7 +1159,7 @@
                 <i class="fa-solid fa-envelope"></i>
                 <span>Contatti</span>
             </a>
-            <a href="#" class="tab-item hidden" data-view="view-profilo" id="tab-item-profilo" data-tooltip="Profilo" style="position: relative;">
+            <a href="#" class="tab-item hidden" data-action="navigate" data-view="view-profilo" id="tab-item-profilo" data-tooltip="Profilo" style="position: relative;">
                 <i class="fa-solid fa-user"></i>
                 <span>Profilo</span>
                 <span id="tab-notification-badge" style="display: none; position: absolute; top: 4px; right: 22%; background: #e63946; border: 1.5px solid var(--bg-dark); width: 8px; height: 8px; border-radius: 50%; box-shadow: 0 0 5px #e63946;"></span>
@@ -1208,15 +1208,15 @@
             <p id="share-modal-desc" style="font-size:0.9rem; color:var(--text-muted); margin-bottom:20px; text-align:center;">Scegli dove vuoi condividere Fantaletteratura!</p>
             
             <div class="share-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; max-width:540px; margin:0 auto;">
-                <a href="#" class="share-btn whatsapp" id="share-wa" target="_blank" style="padding:16px 12px; border-radius:12px; text-decoration:none; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:white; font-weight:700; font-size:0.8rem; letter-spacing:0.5px; transition:all 0.2s;">
+                <a href="#" class="share-btn whatsapp" id="share-wa" data-action="share-whatsapp" target="_blank" style="padding:16px 12px; border-radius:12px; text-decoration:none; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:white; font-weight:700; font-size:0.8rem; letter-spacing:0.5px; transition:all 0.2s;">
                     <i class="fa-brands fa-whatsapp" style="font-size:1.5rem; color:#25D366;"></i>
                     <span>WHATSAPP</span>
                 </a>
-                <a href="#" class="share-btn classroom" id="share-classroom" target="_blank" style="padding:16px 12px; border-radius:12px; text-decoration:none; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:white; font-weight:700; font-size:0.8rem; letter-spacing:0.5px; transition:all 0.2s;">
+                <a href="#" class="share-btn classroom" id="share-classroom" data-action="share-classroom" target="_blank" style="padding:16px 12px; border-radius:12px; text-decoration:none; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:white; font-weight:700; font-size:0.8rem; letter-spacing:0.5px; transition:all 0.2s;">
                     <i class="fa-solid fa-graduation-cap" style="font-size:1.5rem; color:#FFB74D;"></i>
                     <span>CLASSROOM</span>
                 </a>
-                <a href="#" class="share-btn teams" id="share-teams" target="_blank" style="padding:16px 12px; border-radius:12px; text-decoration:none; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:white; font-weight:700; font-size:0.8rem; letter-spacing:0.5px; transition:all 0.2s;">
+                <a href="#" class="share-btn teams" id="share-teams" data-action="share-teams" target="_blank" style="padding:16px 12px; border-radius:12px; text-decoration:none; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:white; font-weight:700; font-size:0.8rem; letter-spacing:0.5px; transition:all 0.2s;">
                     <i class="fa-solid fa-users-rectangle" style="font-size:1.5rem; color:#7B83EB;"></i>
                     <span>MS TEAMS</span>
                 </a>
