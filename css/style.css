@@ -269,6 +269,11 @@
     transform: translateY(-1px);
 }
 
+#btn-login-hub-dropdown:hover {
+    background: #e6c86e !important;
+    color: #0f172a !important;
+}
+
 .dropdown-pill-btn i {
     font-size: 0.85rem;
 }
