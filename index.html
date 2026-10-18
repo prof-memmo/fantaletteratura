@@ -1317,25 +1317,6 @@
         </div>
     </div>
 
-    <!-- Modal Collaboratori Docente -->
-    <div id="modal-collaboratori" class="modal-wip" style="z-index:3500;" onclick="if(event.target===this)document.getElementById('modal-collaboratori').style.display='none'">
-        <div class="modal-wip-content" style="max-width:420px;">
-            <div style="font-family:var(--font-heading); font-size:1.3rem; color:var(--primary-color); margin-bottom:5px;">
-                <i class="fa-solid fa-user-plus"></i> Docenti Collaboratori
-            </div>
-            <p id="collaboratori-team-nome" style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;"></p>
-            <div id="collaboratori-lista" style="margin-bottom:15px; min-height:40px;"></div>
-            <div class="input-group" style="margin-bottom:10px;">
-                <label style="font-size:0.8rem;">Aggiungi collaboratore (email docente approvato)</label>
-                <input type="email" id="collaboratori-new-email" class="input-control" placeholder="email@scuola.it">
-            </div>
-            <input type="hidden" id="collaboratori-team-id">
-            <div style="display:flex; gap:10px;">
-                <button class="btn" style="flex:1;" onclick="aggiungiCollaboratore()"><i class="fa-solid fa-plus"></i> Aggiungi</button>
-                <button class="btn btn-secondary" style="flex:1;" onclick="document.getElementById('modal-collaboratori').style.display='none'">Chiudi</button>
-            </div>
-        </div>
-    </div>
 
     <!-- MODAL: Assegnazione Multipla Studenti a Squadra -->
     <div id="modal-assegna-multipli" class="modal-wip" style="z-index:3500; display:none;" onclick="if(event.target===this)this.style.display='none'">

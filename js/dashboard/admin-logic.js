@@ -674,10 +674,6 @@ async function setupAdminPanel() {
             const modeInfo = t.mode ? GAME_MODES[t.mode] : null;
             const badge = modeInfo ? `<span class="mode-badge ${modeInfo.colorClass}">${modeInfo.emoji} ${modeInfo.shortLabel}</span>` : '';
             const pool = (modeInfo && modeInfo.authors && modeInfo.authors.length > 0) ? modeInfo.authors : AUTHORS;
-            const collaboratori = (t.collaboratori || []);
-            const collBadge = collaboratori.length > 0
-                ? `<span style="font-size:0.7rem; color:var(--accent-gold);"><i class="fa-solid fa-users-gear"></i> ${collaboratori.length} collaboratore/i</span>`
-                : '';
 
             const ownerUser = userMap[(t.ownerEmail || '').toLowerCase()];
             const schoolName = ownerUser ? (ownerUser.school || '') : '';
@@ -742,7 +738,6 @@ async function setupAdminPanel() {
                             <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                                 <strong style="font-size: 0.9rem; color: var(--text-main);">${t.name}</strong>
                                 ${badge}
-                                ${collBadge ? `<span style="font-size: 0.75rem; color: var(--accent-gold);" title="Ha collaboratori"><i class="fa-solid fa-users-gear"></i></span>` : ''}
                             </div>
                             <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">
                                 <i class="fa-solid fa-graduation-cap"></i> ${t.classe || 'N/D'}${schoolLabel} &bull; 
@@ -761,10 +756,6 @@ async function setupAdminPanel() {
                             <div style="display: flex; gap: 4px;">
                                 <button class="btn btn-secondary" title="Dettagli Autori/Studenti" style="padding: 4px 8px; font-size: 0.75rem; width: auto;" onclick="const panel = this.closest('.glass').querySelector('.details-panel'); panel.style.display = panel.style.display === 'none' ? 'block' : 'none'; this.querySelector('i').classList.toggle('fa-chevron-down'); this.querySelector('i').classList.toggle('fa-chevron-up');">
                                     <i class="fa-solid fa-chevron-down"></i>
-                                </button>
-                                <button class="btn btn-secondary" title="Gestisci Collaboratori" style="padding: 4px 8px; font-size: 0.75rem; width: auto; background: rgba(141,160,63,0.15); border-color: var(--primary-color);"
-                                    onclick="window.apriCollaboratori('${t.id}', '${t.name.replace(/'/g, "\\'")}')">
-                                    <i class="fa-solid fa-user-plus"></i>
                                 </button>
                                 <button class="btn btn-secondary text-danger" style="padding: 4px 8px; font-size: 0.75rem; width: auto; background: transparent; border-color: transparent;" onclick="eliminaSquadra('${t.id}')">
                                     <i class="fa-solid fa-trash"></i>

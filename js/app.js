@@ -2099,10 +2099,6 @@ async function renderProfilo() {
         });
         let misPts = (team.missionsCompleted || 0) * 5;
         const modeBadgeHtml = `<span class="mode-badge ${modeCfg.colorClass}">${modeCfg.emoji} ${modeCfg.shortLabel}</span>`;
-        const collabBadge = isCollaborated
-            ? `<span style="font-size:0.72rem; background:rgba(141,160,63,0.2); color:var(--primary-color); border-radius:8px; padding:2px 8px; margin-left:4px;"><i class="fa-solid fa-users-gear"></i> Collaboratore</span>`
-            : '';
-
         // Autori in questa squadra
         let autoriSection = '';
         if (team.authors && team.authors.length > 0) {
@@ -2164,47 +2160,6 @@ async function renderProfilo() {
         let azioniSection = '';
 
         if (isDocente) {
-            // Docenti di questa squadra (Proprietario + Collaboratori)
-            const docentiArr = [];
-            if (team.ownerEmail) {
-                docentiArr.push({ email: team.ownerEmail, role: 'Proprietario' });
-            }
-            if (team.collaboratori && team.collaboratori.length > 0) {
-                team.collaboratori.forEach(email => {
-                    docentiArr.push({ email: email, role: 'Collaboratore' });
-                });
-            }
-
-            if (docentiArr.length > 0) {
-                const docentiRows = docentiArr.map(d => {
-                    const isOwner = d.role === 'Proprietario';
-                    const roleBadge = isOwner 
-                        ? `<span style="font-size:0.65rem; background:rgba(245, 197, 60, 0.15); color:#f5c53c; border: 1px solid rgba(245, 197, 60, 0.25); border-radius:6px; padding:1px 6px; font-weight:600;">Proprietario</span>`
-                        : `<span style="font-size:0.65rem; background:rgba(141,160,63,0.15); color:var(--primary-color); border: 1px solid rgba(141,160,63,0.25); border-radius:6px; padding:1px 6px; font-weight:600;">Collaboratore</span>`;
-                    
-                    return `
-                        <div style="display:flex; align-items:center; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.03);">
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                <i class="fa-solid fa-chalkboard-user" style="color:var(--text-muted); font-size:0.8rem;"></i>
-                                <span style="font-size:0.8rem; font-weight:500; color:var(--text-main);">${d.email}</span>
-                            </div>
-                            ${roleBadge}
-                        </div>
-                    `;
-                }).join('');
-
-                docentiSection = `
-                    <details style="margin-top:6px; margin-bottom:6px; width:100%; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px;">
-                        <summary style="font-size:0.78rem; cursor:pointer; color:var(--primary-color); font-weight:600; user-select:none; margin-bottom:6px; display:flex; align-items:center; gap:5px;">
-                            <i class="fa-solid fa-user-tie"></i> Docenti Gestori (${docentiArr.length})
-                        </summary>
-                        <div style="padding-left:4px; max-height: 150px; overflow-y: auto;">
-                            ${docentiRows}
-                        </div>
-                    </details>
-                `;
-            }
-
             // Studenti iscritti/assegnati a questa squadra (da team.members o fallback allStudentsMap)
             const membersList = Array.isArray(team.members) && team.members.length > 0 
                 ? team.members 
@@ -2255,10 +2210,6 @@ async function renderProfilo() {
                     <button class="btn btn-secondary" style="flex:1; min-width:80px; padding:6px 8px; font-size:0.75rem; border-radius:8px; background:rgba(255,255,255,0.03);" 
                         onclick="docenteModificaSquadra('${team.id}', '${team.name.replace(/'/g, "\\'")}', '${(team.classe || '').replace(/'/g, "\\'")}')">
                         <i class="fa-solid fa-pen-to-square"></i> Modifica
-                    </button>
-                    <button class="btn btn-secondary" style="flex:1.2; min-width:100px; padding:6px 8px; font-size:0.75rem; border-radius:8px; background:rgba(141,160,63,0.15); border-color:var(--primary-color);"
-                        onclick="window.apriCollaboratori('${team.id}', '${team.name.replace(/'/g, "\\'")}')">
-                        <i class="fa-solid fa-user-plus"></i> Collaboratori
                     </button>
                     <button class="btn btn-danger" style="flex:1; min-width:80px; padding:6px 8px; font-size:0.75rem; border-radius:8px; background:rgba(230, 57, 70, 0.1); border:1px solid rgba(230, 57, 70, 0.2); color:#e63946;" 
                         onclick="docenteEliminaSquadra('${team.id}', '${team.name.replace(/'/g, "\\'")}')">
