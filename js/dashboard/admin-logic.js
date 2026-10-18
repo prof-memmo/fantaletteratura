@@ -1016,7 +1016,6 @@ async function setupAdminPanel() {
             if (targetId === 'admin-view-autori') window.renderAdminAutori();
             if (targetId === 'admin-view-calendario') window.renderAdminCalendario();
             if (targetId === 'admin-view-imprevisti') window.renderAdminImprevisti();
-            if (targetId === 'admin-view-docenti') window.renderAdminDocenti();
             if (targetId === 'admin-view-squadre') window.renderAdminSquadre();
             if (targetId === 'admin-view-missioni') { window.renderAdminMissioni(); window.renderAdminMissioniPending(); }
             if (targetId === 'admin-view-classifica') window.renderAdminClassifica();
@@ -1035,7 +1034,6 @@ async function setupAdminPanel() {
         await window.renderAdminAutori();
         await window.renderAdminCalendario();
         await window.renderAdminImprevisti();
-        await window.renderAdminDocenti();
         await window.renderAdminSquadre();
         await window.renderAdminMissioni();
         await window.renderAdminMissioniPending();

@@ -681,95 +681,6 @@ window.confermaSposta = async function() {
     }
 };
 
-// ── COLLABORATORI DOCENTI ───────────────────────────────────
-window.apriCollaboratori = async function(teamId, teamName) {
-    const modal = document.getElementById('modal-collaboratori');
-    if (!modal) return;
-    document.getElementById('collaboratori-team-id').value = teamId;
-    document.getElementById('collaboratori-team-nome').textContent = `Squadra: ${teamName}`;
-    document.getElementById('collaboratori-new-email').value = '';
-    modal.style.display = 'flex';
-
-    // Renderizza uno stato di caricamento provvisorio
-    const lista = document.getElementById('collaboratori-lista');
-    if (lista) {
-        lista.innerHTML = '<i style="font-size:0.85rem; color:var(--text-muted);">Caricamento collaboratori...</i>';
-    }
-
-    try {
-        const teamDoc = await window.db.collection('fanta_teams').doc(teamId).get();
-        const colList = teamDoc.data()?.collaboratori || [];
-        window._renderCollaboratoriLista(teamId, colList);
-    } catch (e) {
-        console.error(e);
-        if (lista) {
-            lista.innerHTML = '<i style="font-size:0.85rem; color:var(--danger-color);">Errore caricamento.</i>';
-        }
-    }
-};
-
-window._renderCollaboratoriLista = function(teamId, collaboratori) {
-    const lista = document.getElementById('collaboratori-lista');
-    if (!lista) return;
-    if (!collaboratori || collaboratori.length === 0) {
-        lista.innerHTML = '<i style="font-size:0.85rem; color:var(--text-muted);">Nessun collaboratore aggiunto.</i>';
-        return;
-    }
-    lista.innerHTML = collaboratori.map(email => `
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
-            <span style="font-size:0.85rem;">${email}</span>
-            <button class="btn btn-secondary text-danger" style="padding:3px 8px; font-size:0.72rem; width:auto;"
-                onclick="rimuoviCollaboratore('${teamId}', '${email}')">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>`).join('');
-};
-
-window.aggiungiCollaboratore = async function() {
-    const teamId = document.getElementById('collaboratori-team-id').value;
-    const email = document.getElementById('collaboratori-new-email').value.trim().toLowerCase();
-    if (!email) { alert('Inserisci un\'email valida.'); return; }
-
-    try {
-        // Verifica che l'email sia un docente approvato
-        const userDoc = await window.db.collection('fanta_users').doc(email).get();
-        if (!userDoc.exists || (userDoc.data().role !== 'teacher' && userDoc.data().role !== 'docente')) {
-            alert('Email non trovata o non corrisponde a un docente approvato.');
-            return;
-        }
-        await fanta_db.addCollaboratore(teamId, email);
-        document.getElementById('collaboratori-new-email').value = '';
-        alert('Collaboratore aggiunto!');
-        // Aggiorna la lista
-        const teamDoc = await window.db.collection('fanta_teams').doc(teamId).get();
-        window._renderCollaboratoriLista(teamId, teamDoc.data()?.collaboratori || []);
-        if (window.location.pathname.includes('admin.html')) {
-            if (typeof window.renderAdminSquadre === 'function') window.renderAdminSquadre();
-        } else {
-            if (typeof renderProfilo === 'function') renderProfilo();
-        }
-    } catch (e) {
-        console.error(e);
-        alert('Errore: ' + e.message);
-    }
-};
-
-window.rimuoviCollaboratore = async function(teamId, email) {
-    if (!confirm(`Rimuovere ${email} dai collaboratori?`)) return;
-    try {
-        await fanta_db.removeCollaboratore(teamId, email);
-        const teamDoc = await window.db.collection('fanta_teams').doc(teamId).get();
-        window._renderCollaboratoriLista(teamId, teamDoc.data()?.collaboratori || []);
-        if (window.location.pathname.includes('admin.html')) {
-            if (typeof window.renderAdminSquadre === 'function') window.renderAdminSquadre();
-        } else {
-            if (typeof renderProfilo === 'function') renderProfilo();
-        }
-    } catch (e) {
-        console.error(e);
-        alert('Errore: ' + e.message);
-    }
-};
 
 /* =========================================
    LEADERBOARDS DINAMICHE
@@ -1436,25 +1347,6 @@ function azzeraTutteSpunte() {
     alert(`Tutte le spunte della modalità ${modeCfg.label} sono state rimosse!`);
 }
 
-window.testConnessioneAdmin = async function() {
-    const feedback = document.createElement('div');
-    feedback.style = 'position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#3498db; color:white; padding:15px 30px; border-radius:12px; font-weight:bold; z-index:20000; box-shadow:0 10px 30px rgba(0,0,0,0.5); font-size:0.9rem;';
-    feedback.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifica connessione in corso...';
-    document.body.appendChild(feedback);
-
-    try {
-        // Tentiamo di leggere la configurazione globale come test
-        await fanta_db.getSettings('terze');
-        feedback.style.background = '#27ae60';
-        feedback.innerHTML = '<i class="fa-solid fa-circle-check"></i> Connessione Firebase OK!';
-        setTimeout(() => feedback.remove(), 3000);
-    } catch (e) {
-        console.error("Errore test connessione:", e);
-        feedback.style.background = '#e74c3c';
-        feedback.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Errore connessione: ' + e.message;
-        setTimeout(() => feedback.remove(), 5000);
-    }
-};
 
 async function logoutDocente() {
     await fanta_db.logout();

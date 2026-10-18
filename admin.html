@@ -105,7 +105,6 @@
                 <button class="btn admin-tab-btn active" data-target="admin-view-autori"><i class="fa-solid fa-feather"></i> Autori</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-calendario"><i class="fa-solid fa-calendar-days"></i> Calendario</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-imprevisti" onclick="window.renderAdminImprevisti()"><i class="fa-solid fa-scroll"></i> Imprevisti &amp; Mercato</button>
-                <button class="btn admin-tab-btn" data-target="admin-view-docenti"><i class="fa-solid fa-users"></i> Gestione Utenti e Classi</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-squadre"><i class="fa-solid fa-users-rectangle"></i> Squadre</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-missioni"><i class="fa-solid fa-scroll"></i> Missioni</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-classifica"><i class="fa-solid fa-ranking-star"></i> Classifica Globale</button>
@@ -113,32 +112,6 @@
                 <button class="btn admin-tab-btn" data-target="admin-view-miniguida" onclick="window.renderAdminMiniguida()"><i class="fa-solid fa-chalkboard-user"></i> Miniguida</button>
                 <button class="btn admin-tab-btn" data-target="admin-view-impostazioni"><i class="fa-solid fa-gear"></i> Impostazioni</button>
             </div>
-
-            <!-- VIEW: Pannello Admin - Gestione Utenti e Classi -->
-            <section id="admin-view-docenti" class="admin-view" style="display:none;">
-                <div style="padding: 0 15px 15px 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                    <div>
-                        <h2 style="margin: 0;"><i class="fa-solid fa-users" style="color: var(--accent-gold);"></i> Gestione Utenti e Classi</h2>
-                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">Pannello di controllo iscritti, ruoli didattici, classi e autorizzazioni di Fantaletteratura.</p>
-                    </div>
-                    <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 14px; border-radius: 12px;" onclick="window.renderAdminDocenti()"><i class="fa-solid fa-rotate"></i> Ricarica</button>
-                </div>
-                <div class="glass" style="padding: 15px; margin: 0 15px 20px 15px;">
-                    <!-- Interactive Docenti Stat Cards -->
-                    <div id="admin-docenti-stats" class="admin-stats-grid" style="margin-bottom: 20px;">
-                        <!-- Rendered by JS -->
-                    </div>
-
-                    <!-- Search Input -->
-                    <div style="margin-bottom: 15px;">
-                        <input type="text" class="input-field" placeholder="🔍 Cerca utente per nome o email..." oninput="window.renderAdminDocenti(this.value)" style="width: 100%; padding: 12px 18px; border-radius: 50px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); color: #fff;">
-                    </div>
-
-                    <div id="admin-docenti-list" style="overflow-x: auto;">
-                        <!-- Rendered by JS -->
-                    </div>
-                </div>
-            </section>
 
             <!-- VIEW: Pannello Admin - Calendario Uscite -->
             <section id="admin-view-calendario" class="admin-view" style="display:none;">
@@ -421,15 +394,6 @@
                     <!-- Live Editor Didattico (Correzioni al Volo) -->
                     <div id="admin-live-editor-container"></div>
 
-                    <!-- Diagnostica e Notifiche -->
-                    <div style="margin-bottom: 25px; padding: 15px; border: 1px solid var(--glass-border); border-radius: 12px; background: rgba(255, 255, 255, 0.02);">
-                        <h3 style="color: var(--primary-color); margin-top:0; font-size: 1.05rem;"><i class="fa-solid fa-wrench"></i> Diagnostica &amp; Sistema</h3>
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Strumenti di verifica connessione e gestione avvisi dell'amministratore.</p>
-                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                            <button type="button" class="btn" style="background:#3498db; width:auto; padding:8px 18px; font-size:0.85rem;" onclick="testConnessioneAdmin()"><i class="fa-solid fa-satellite-dish"></i> Test Connessione Database</button>
-                            <button type="button" class="btn" style="background:var(--accent-gold); color:var(--bg-dark); width:auto; padding:8px 18px; font-size:0.85rem;" onclick="resetNotificheLette()"><i class="fa-solid fa-bell-slash"></i> Reset Notifiche Non Lette</button>
-                        </div>
-                    </div>
 
                     <!-- Configura Calendario per Nuovo Anno Scolastico -->
                     <div style="margin-bottom: 25px; padding: 18px; border: 1px solid var(--accent-gold); border-radius: 12px; background: rgba(212, 175, 55, 0.06);">
