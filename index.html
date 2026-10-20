@@ -15,7 +15,13 @@
   <!-- Icone per Safari e Dispositivi Mobili -->
   <link rel="manifest" href="manifest.json">
   <script>window.HUB_GAME_ID = "fantaletteratura";</script>
-  <script src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/hub-subscription-guard.js?v=20260823e_subscription_guard"></script>
+  <script>
+    (function() {
+      var isPrev = window.location.pathname.indexOf('/preview') !== -1;
+      var cdnBase = isPrev ? 'https://prof-memmo.github.io/prof-memmo-gestione-siti/preview/shared/' : 'https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/';
+      document.write('<script src="' + cdnBase + 'hub-subscription-guard.js?v=20261020_fanta_guard"><\/script>');
+    })();
+  </script>
 </head>
 <body class="no-sidebar">
     <div id="app-container">
@@ -73,6 +79,22 @@
                             <div class="dropdown-user-subtitle" id="dropdown-user-subtitle">NON AUTENTICATO</div>
                         </div>
 
+                        <!-- Sottofondo Music Box Integrato -->
+                        <div class="dropdown-music-box">
+                            <div class="music-header">
+                                <span class="music-label"><i class="fa-solid fa-music"></i> SOTTOFONDO</span>
+                                <a href="https://freetouse.com/music" target="_blank" class="music-link">FREETOUSE.COM/MUSIC</a>
+                            </div>
+                            <div class="music-capsule">
+                                <span class="music-track-title">Traccia...</span>
+                                <div class="music-btns">
+                                    <button class="music-btn-icon" onclick="window.MusicPlayer.prevTrack()" title="Precedente"><i class="fa-solid fa-backward-step"></i></button>
+                                    <button class="music-play-btn" onclick="window.MusicPlayer.togglePlay()" title="Play/Pausa"><i class="fa-solid fa-play"></i></button>
+                                    <button class="music-btn-icon" onclick="window.MusicPlayer.nextTrack()" title="Successiva"><i class="fa-solid fa-forward-step"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Golden Pill Login Button (visibile per ospiti) -->
                         <button class="dropdown-pill-btn" id="btn-login-hub-dropdown" style="background: #d4af37; color: #0f172a; font-weight: 800;" onclick="window.location.href='https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html?redirect=fantaletteratura'">
                             <i class="fa-solid fa-right-to-bracket"></i> Accedi tramite Hub
@@ -86,24 +108,11 @@
                             <i class="fa-solid fa-paper-plane"></i> Invita un Collega
                         </button>
 
-                        <div class="dropdown-split-row">
-                            <button class="dropdown-pill-btn" onclick="window.closeUserDropdown(); window.openSharedModal ? window.openSharedModal('privacy') : (window.openLegalModal ? window.openLegalModal('privacy') : null);">
-                                <i class="fa-solid fa-shield"></i> Privacy
-                            </button>
-                            <button class="dropdown-pill-btn" onclick="window.closeUserDropdown(); window.openSharedModal ? window.openSharedModal('termini') : (window.openLegalModal ? window.openLegalModal('terms') : null);">
-                                <i class="fa-solid fa-scroll"></i> Termini
-                            </button>
-                        </div>
-
-                        <button class="dropdown-pill-btn" onclick="window.closeUserDropdown(); if(window.showContattiModal) window.showContattiModal(); else window.open('https://prof-memmo.github.io/games/contatti.html', '_blank');">
-                            <i class="fa-solid fa-envelope"></i> Contatti
-                        </button>
-
                         <div class="dropdown-bottom-row" id="dropdown-bottom-row" style="display: none;">
-                            <button class="dropdown-pill-btn btn-notifiche-pill" onclick="window.closeUserDropdown(); apriNotificheModal();">
+                            <button class="dropdown-pill-btn btn-notifiche-pill" id="btn-notifiche-dropdown" onclick="window.closeUserDropdown(); apriNotificheModal();">
                                 <i class="fa-solid fa-bell"></i> Notifiche <span id="dropdown-notif-badge" class="badge-notif-pill" style="display:none;">0</span>
                             </button>
-                            <button class="dropdown-pill-btn btn-esci-pill" onclick="window.closeUserDropdown(); logoutDocente();">
+                            <button class="dropdown-pill-btn btn-esci-pill" id="btn-logout-dropdown" onclick="window.closeUserDropdown(); logoutDocente();">
                                 <i class="fa-solid fa-power-off"></i> Esci
                             </button>
                         </div>
@@ -1072,9 +1081,11 @@
 
         <!-- Final Footer (Desktop & Hidden Area) -->
         <footer style="padding: 10px 20px; text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 25px; width: 100%; box-sizing: border-box;">
-            <div style="display: flex; justify-content: center; gap: 20px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;">
-                <a href="#" onclick="event.preventDefault(); openSharedModal('privacy')" style="color: inherit; text-decoration: none; opacity: 0.85;">Privacy Policy</a>
-                <a href="#" onclick="event.preventDefault(); openSharedModal('termini')" style="color: inherit; text-decoration: none; opacity: 0.85;">Termini e Condizioni</a>
+            <div class="footer-legal-links" style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px 20px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;">
+                <a href="javascript:void(0)" onclick="if(window.openSharedModal) window.openSharedModal('privacy');" data-legal="privacy" style="color: inherit; text-decoration: underline; opacity: 0.85;">Privacy Policy</a>
+                <a href="javascript:void(0)" onclick="if(window.openSharedModal) window.openSharedModal('termini');" data-legal="terms" style="color: inherit; text-decoration: underline; opacity: 0.85;">Termini e Condizioni</a>
+                <a href="javascript:void(0)" onclick="if(window.openSharedModal) window.openSharedModal('contatti');" data-legal="contatti" style="color: inherit; text-decoration: underline; opacity: 0.85;">Contatti</a>
+                <a href="https://prof-memmo.github.io/games/condividi-esperienza.html" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline; opacity: 0.85;">Condividi Esperienza</a>
             </div>
             <div style="display: flex; align-items: center; justify-content: flex-start; gap: 20px; margin: 0; width: 100%; box-sizing: border-box;">
                 <img src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/legal/patamu-badge.png" alt="Patamu" style="height: 52px; object-fit: contain; flex-shrink: 0;" onerror="this.src='assets/patamu.png'">
@@ -1083,6 +1094,20 @@
                 </p>
             </div>
         </footer>
+        <script>
+            (function() {
+                var fl = document.querySelector('.footer-legal-links');
+                if (fl && window.MutationObserver) {
+                    var expected = fl.innerHTML;
+                    var obs = new MutationObserver(function() {
+                        if (!fl.querySelector('a[href*="condividi-esperienza"]')) {
+                            fl.innerHTML = expected;
+                        }
+                    });
+                    obs.observe(fl, { childList: true, subtree: true });
+                }
+            })();
+        </script>
 
         <!-- Bottom Navigation Tabs (Floating Dock on PC) -->
         <nav class="bottom-bar">
@@ -1818,7 +1843,12 @@
     <script src="js/app.js?v=20261004_v3_zeroflicker"></script>
     <!-- Modali condivisi ed Access Control ecosistema Prof. Memmo -->
     <script>window.HUB_GAME_ID = "fantaletteratura";</script>
-    <script src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/hub-subscription-guard.js?v=20261004_v3_zeroflicker"></script>
-    <script src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/legal-modal.js?v=20261004_v3_zeroflicker"></script>
+    <script>
+      (function() {
+        var isPrev = window.location.pathname.indexOf('/preview') !== -1;
+        var cdnBase = isPrev ? 'https://prof-memmo.github.io/prof-memmo-gestione-siti/preview/shared/' : 'https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/';
+        document.write('<script src="' + cdnBase + 'legal-modal.js?v=20261020_fanta_legal"><\/script>');
+      })();
+    </script>
 </body>
 </html>
