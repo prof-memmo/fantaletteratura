@@ -1678,7 +1678,7 @@
     <div id="modal-miniguida" class="modal-overlay" style="display: none; align-items: center; justify-content: center; z-index: 9999; background: rgba(15,23,42,0.8); backdrop-filter: blur(4px); position: fixed; inset: 0; padding: 20px;">
         <div class="modal-content" style="background: white; border-radius: 24px; width: 100%; max-width: 900px; display: flex; overflow: hidden; position: relative; max-height: 90vh; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
             <div style="width: 33%; background: #f8fafc; display: flex; align-items: flex-end; justify-content: center; border-right: 2px solid #f1f5f9; padding-top: 20px;" class="hide-mobile">
-                <img src="assets/prof_memmo_full.jpg" onerror="this.src='https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-full.jpg';" alt="Prof Memmo" style="width: 120%; object-fit: contain; mix-blend-mode: multiply; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));">
+                <img src="assets/prof_memmo_full.png" onerror="this.src='https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-full.png';" alt="Prof Memmo" style="width: 120%; object-fit: contain; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));">
             </div>
             <div style="flex: 1; padding: 30px 40px; display: flex; flex-direction: column; position: relative; min-height: 450px;">
                 <button onclick="closeMiniguida()" style="position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; border-radius: 50%; border: none; background: #f1f5f9; color: #475569; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s;"><i class="fa-solid fa-xmark"></i></button>
@@ -1691,31 +1691,36 @@
                 </div>
                 
                 <div id="miniguida-step-1" class="miniguida-step" style="flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; animation: fadeIn 0.3s ease-out;">
+                    <i class="fa-solid fa-chalkboard-user" style="font-size: 4.5rem; color: var(--primary-color); margin-bottom: 20px;"></i>
+                    <p style="font-size: 1.15rem; color: #475569; line-height: 1.6; font-weight: 500; max-width: 540px; margin: 0 auto;"><strong>Per il Docente:</strong> crea le tue classi dal Profilo su <em>prof-memmo.github.io/games</em> per ottenere il <strong>Codice Classe</strong> da condividere con gli alunni.<br><br><strong>Per gli Studenti:</strong> nessun bisogno di email! Basta inserire il <strong>Codice Classe</strong> e selezionare il proprio nome per iniziare subito la sfida.</p>
+                </div>
+
+                <div id="miniguida-step-2" class="miniguida-step" style="flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; animation: fadeIn 0.3s ease-out;">
                     <i class="fa-solid fa-gamepad" style="font-size: 4.5rem; color: var(--primary-color); margin-bottom: 20px;"></i>
                     <p style="font-size: 1.25rem; color: #475569; line-height: 1.6; font-weight: 500; max-width: 540px; margin: 0 auto;">Si gioca acquistando gli autori con i propri crediti, schierando la formazione titolare prima di ogni turno e partecipando ai minigiochi per ottenere bonus extra.</p>
                 </div>
                 
-                <div id="miniguida-step-2" class="miniguida-step" style="flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; animation: fadeIn 0.3s ease-out;">
+                <div id="miniguida-step-3" class="miniguida-step" style="flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; animation: fadeIn 0.3s ease-out;">
                     <i class="fa-solid fa-user" style="font-size: 4.5rem; color: var(--primary-color); margin-bottom: 20px;"></i>
                     <p style="font-size: 1.25rem; color: #475569; line-height: 1.6; font-weight: 500; max-width: 540px; margin: 0 auto;">Entra nel tuo <strong>Profilo</strong> per gestire la tua squadra, controllare i crediti e schierare la formazione titolare.</p>
                 </div>
 
-                <div id="miniguida-step-3" class="miniguida-step" style="flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; animation: fadeIn 0.3s ease-out;">
+                <div id="miniguida-step-4" class="miniguida-step" style="flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; animation: fadeIn 0.3s ease-out;">
                     <i class="fa-solid fa-house" style="font-size: 4.5rem; color: var(--primary-color); margin-bottom: 20px;"></i>
                     <p style="font-size: 1.25rem; color: #475569; line-height: 1.6; font-weight: 500; max-width: 540px; margin: 0 auto;">Torna su <strong>Home</strong> per avere una panoramica generale sullo stato del gioco e sulle novità del turno.</p>
                 </div>
 
-                <div id="miniguida-step-4" class="miniguida-step" style="flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; animation: fadeIn 0.3s ease-out;">
+                <div id="miniguida-step-5" class="miniguida-step" style="flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; animation: fadeIn 0.3s ease-out;">
                     <i class="fa-solid fa-dice" style="font-size: 4.5rem; color: var(--primary-color); margin-bottom: 20px;"></i>
                     <p style="font-size: 1.25rem; color: #475569; line-height: 1.6; font-weight: 500; max-width: 540px; margin: 0 auto;">Vai in <strong>Sala Giochi</strong> per divertirti con i minigiochi, accumulare crediti e ottenere punti bonus.</p>
                 </div>
 
-                <div id="miniguida-step-5" class="miniguida-step" style="flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; animation: fadeIn 0.3s ease-out;">
+                <div id="miniguida-step-6" class="miniguida-step" style="flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; animation: fadeIn 0.3s ease-out;">
                     <i class="fa-solid fa-trophy" style="font-size: 4.5rem; color: var(--primary-color); margin-bottom: 20px;"></i>
                     <p style="font-size: 1.25rem; color: #475569; line-height: 1.6; font-weight: 500; max-width: 540px; margin: 0 auto;">Clicca su <strong>Classifiche</strong> per scoprire i punteggi aggiornati e le posizioni di tutte le squadre.</p>
                 </div>
 
-                <div id="miniguida-step-6" class="miniguida-step" style="flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; animation: fadeIn 0.3s ease-out;">
+                <div id="miniguida-step-7" class="miniguida-step" style="flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; animation: fadeIn 0.3s ease-out;">
                     <i class="fa-solid fa-book-open" style="font-size: 4.5rem; color: var(--primary-color); margin-bottom: 20px;"></i>
                     <p style="font-size: 1.25rem; color: #475569; line-height: 1.6; font-weight: 500; max-width: 540px; margin: 0 auto;">Consulta le <strong>Schede</strong> per approfondire la biografia, le opere e le curiosità di ogni autore.<br><br><em>Consulta il regolamento per saperne di più.</em></p>
                 </div>
@@ -1723,6 +1728,7 @@
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
                     <div style="display: flex; gap: 8px;" id="miniguida-dots">
                         <div class="dot active" style="width: 12px; height: 12px; border-radius: 50%; background: var(--primary-color); transition: 0.3s;"></div>
+                        <div class="dot" style="width: 12px; height: 12px; border-radius: 50%; background: #e2e8f0; transition: 0.3s;"></div>
                         <div class="dot" style="width: 12px; height: 12px; border-radius: 50%; background: #e2e8f0; transition: 0.3s;"></div>
                         <div class="dot" style="width: 12px; height: 12px; border-radius: 50%; background: #e2e8f0; transition: 0.3s;"></div>
                         <div class="dot" style="width: 12px; height: 12px; border-radius: 50%; background: #e2e8f0; transition: 0.3s;"></div>
@@ -1750,7 +1756,7 @@
     
     <script>
         let currentMiniguidaStep = 0;
-        const totalMiniguidaSteps = 7;
+        const totalMiniguidaSteps = 8;
         
         function openMiniguida() {
             if (window.FantaMiniguidaService) {
