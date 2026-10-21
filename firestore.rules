@@ -185,11 +185,6 @@ service cloud.firestore {
       allow update, delete: if isAdmin() || (isFantaAuthorized() && resource.data.ownerEmail.lower() == currentUserEmail());
     }
 
-    match /fanta_tournaments/{tournamentId} {
-      allow read: if isAdmin() || isFantaAuthorized();
-      allow create: if isFantaAuthorized() && request.resource.data.ownerEmail.lower() == currentUserEmail();
-      allow update, delete: if isAdmin() || (isFantaAuthorized() && resource.data.ownerEmail.lower() == currentUserEmail());
-    }
 
     match /fanta_invites/{inviteId} {
       allow read: if isFantaAuthorized() && (resource.data.fromEmail.lower() == currentUserEmail() || resource.data.toEmail.lower() == currentUserEmail());

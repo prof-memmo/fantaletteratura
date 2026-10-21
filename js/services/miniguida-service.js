@@ -11,28 +11,48 @@
     const SUPER_ADMIN_EMAIL = 'prof.memmo@gmail.com';
 
     const DEFAULT_MINIGUIDA = {
-        title: "Come si gioca?",
+        title: "Miniguida",
         themeColor: "#8b5cf6",
         steps: [
             {
-                icon: "fa-pen-nib",
-                title: "Crea la tua Rosa di 5 Autori",
-                text: "✍️ <strong>Crea la tua Rosa di 5 Autori:</strong><br>Scegli e acquista i tuoi 5 autori preferiti della storia letteraria (<em>da Dante a Pirandello, da Calvino a Leopardi</em>)."
+                icon: "fa-bullseye",
+                title: "Scopo del Gioco",
+                text: "Lo scopo del gioco è creare la tua squadra di autori letterari, accumulare punti con le attività e le sfide di classe e scalare la classifica."
+            },
+            {
+                icon: "fa-chalkboard-user",
+                title: "Accesso e Classi",
+                text: "<strong>Per il Docente:</strong> crea le tue classi dal Profilo su <em>prof-memmo.github.io/games</em> per ottenere il <strong>Codice Classe</strong> da condividere con gli alunni.<br><br><strong>Per gli Studenti:</strong> nessun bisogno di email! Basta inserire il <strong>Codice Classe</strong> e selezionare il proprio nome per iniziare subito la sfida."
+            },
+            {
+                icon: "fa-gamepad",
+                title: "Come si Gioca",
+                text: "Si gioca acquistando gli autori con i propri crediti, schierando la formazione titolare prima di ogni turno e partecipando ai minigiochi per ottenere bonus extra."
+            },
+            {
+                icon: "fa-user",
+                title: "Profilo",
+                text: "Entra nel tuo <strong>Profilo</strong> per gestire la tua squadra, controllare i crediti e schierare la formazione titolare."
+            },
+            {
+                icon: "fa-house",
+                title: "Home",
+                text: "Torna su <strong>Home</strong> per avere una panoramica generale sullo stato del gioco e sulle novità del turno."
             },
             {
                 icon: "fa-dice",
-                title: "Bonus, Malus & Imprevisti",
-                text: "🎲 <strong>Bonus, Malus &amp; Imprevisti:</strong><br>Guadagna o perdi punti durante l'anno scolastico in base agli eventi storici e alle vicende biografiche degli autori."
-            },
-            {
-                icon: "fa-puzzle-piece",
-                title: "Minigiochi Letterari alla LIM",
-                text: "🧩 <strong>Minigiochi Letterari alla LIM:</strong><br>Sfida le altre squadre della classe con <em>Quiz, Cloze, Versi e Puzzle</em> per conquistare punti extra."
+                title: "Sala Giochi",
+                text: "Vai in <strong>Sala Giochi</strong> per divertirti con i minigiochi, accumulare crediti e ottenere punti bonus."
             },
             {
                 icon: "fa-trophy",
-                title: "Scala la Classifica",
-                text: "🏆 <strong>Scala la Classifica:</strong><br>Completa le missioni didattiche del docente e porta la tua fanta-squadra in vetta al <strong>Campionato Letterario</strong>!"
+                title: "Classifiche",
+                text: "Clicca su <strong>Classifiche</strong> per scoprire i punteggi aggiornati e le posizioni di tutte le squadre."
+            },
+            {
+                icon: "fa-book-open",
+                title: "Schede",
+                text: "Consulta le <strong>Schede</strong> per approfondire la biografia, le opere e le curiosità di ogni autore.<br><br><em>Consulta il regolamento per saperne di più.</em>"
             }
         ]
     };
@@ -51,8 +71,22 @@
             return JSON.parse(JSON.stringify(DEFAULT_MINIGUIDA));
         },
 
+        ensureAccessStep(data) {
+            if (!data || !Array.isArray(data.steps)) return data;
+            const hasAccess = data.steps.some(s => 
+                (s.title && s.title.toLowerCase().includes('accesso')) ||
+                (s.text && s.text.toLowerCase().includes('accesso'))
+            );
+            if (!hasAccess && data.steps.length > 0) {
+                const accessStep = JSON.parse(JSON.stringify(DEFAULT_MINIGUIDA.steps[1]));
+                data.steps.splice(1, 0, accessStep);
+            }
+            return data;
+        },
+
         getData() {
-            return this._data || this.getDefaultData();
+            const raw = this._data || this.getDefaultData();
+            return this.ensureAccessStep(raw);
         },
 
         subscribe(callback) {
@@ -180,25 +214,58 @@
         renderModal() {
             const data = this.getData();
             const titleEl = document.getElementById('miniguida-title');
-            if (titleEl) titleEl.innerText = data.title || "Come si gioca?";
+            if (titleEl) titleEl.innerText = data.title || "Miniguida";
 
-            // Rigenera step dinamicamente se necessario
-            const stepsContainer = document.querySelector('#modal-miniguida .modal-content > div:nth-child(2)');
-            if (!stepsContainer) return;
+            const stepsWrapper = document.querySelector('#modal-miniguida .modal-content > div:nth-child(2)');
+            if (!stepsWrapper) return;
+
+            // Rimuovi vecchi step
+            const oldSteps = stepsWrapper.querySelectorAll('.miniguida-step');
+            oldSteps.forEach(el => el.remove());
+
+            // Rigenera dots
+            const dotsContainer = document.getElementById('miniguida-dots');
+            if (dotsContainer) dotsContainer.innerHTML = '';
+
+            const footerRow = dotsContainer ? dotsContainer.parentElement : null;
 
             data.steps.forEach((step, idx) => {
-                let stepEl = document.getElementById('miniguida-step-' + idx);
-                if (stepEl) {
-                    const iconEl = stepEl.querySelector('i');
-                    const textEl = stepEl.querySelector('p');
-                    if (iconEl && step.icon) {
-                        iconEl.className = step.icon.startsWith('fa-') ? `fa-solid ${step.icon}` : 'fa-solid fa-feather';
-                    }
-                    if (textEl && step.text) {
-                        textEl.innerHTML = step.text;
-                    }
+                const stepDiv = document.createElement('div');
+                stepDiv.id = 'miniguida-step-' + idx;
+                stepDiv.className = 'miniguida-step';
+                stepDiv.style.flex = '1';
+                stepDiv.style.display = (idx === this._currentStep) ? 'flex' : 'none';
+                stepDiv.style.flexDirection = 'column';
+                stepDiv.style.alignItems = 'center';
+                stepDiv.style.justifyContent = 'center';
+                stepDiv.style.textAlign = 'center';
+                stepDiv.style.animation = 'fadeIn 0.3s ease-out';
+                stepDiv.style.padding = '10px 0';
+
+                const iconClass = step.icon ? (step.icon.startsWith('fa-') ? `fa-solid ${step.icon}` : `fa-solid fa-${step.icon}`) : 'fa-solid fa-feather';
+                stepDiv.innerHTML = `
+                    <i class="${iconClass}" style="font-size: 4.5rem; color: var(--primary-color); margin-bottom: 20px;"></i>
+                    <p style="font-size: 1.25rem; color: #475569; line-height: 1.6; font-weight: 500; max-width: 540px; margin: 0 auto;">${step.text || ''}</p>
+                `;
+
+                if (footerRow) {
+                    stepsWrapper.insertBefore(stepDiv, footerRow);
+                } else {
+                    stepsWrapper.appendChild(stepDiv);
+                }
+
+                if (dotsContainer) {
+                    const dot = document.createElement('div');
+                    dot.className = 'dot' + (idx === this._currentStep ? ' active' : '');
+                    dot.style.width = '12px';
+                    dot.style.height = '12px';
+                    dot.style.borderRadius = '50%';
+                    dot.style.background = (idx === this._currentStep) ? 'var(--primary-color)' : '#e2e8f0';
+                    dot.style.transition = '0.3s';
+                    dotsContainer.appendChild(dot);
                 }
             });
+
             this.updateView();
         },
 
@@ -261,7 +328,7 @@
                             <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Anteprima Live (Come appare agli studenti):</label>
                             <div style="background: white; border-radius: 20px; padding: 20px; color: #1e293b; display: flex; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); min-height: 420px; position: relative;">
                                 <div style="width: 35%; background: #f8fafc; display: flex; align-items: flex-end; justify-content: center; border-right: 1.5px solid #f1f5f9; padding-top: 15px;">
-                                    <img src="assets/prof_memmo_full.jpg" onerror="this.src='https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-full.jpg';" alt="Prof Memmo" style="width: 120%; object-fit: contain; mix-blend-mode: multiply;">
+                                    <img src="assets/prof_memmo_full.png" onerror="this.src='https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-full.png';" alt="Prof Memmo" style="width: 120%; object-fit: contain; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));">
                                 </div>
                                 <div style="flex: 1; padding: 15px 20px; display: flex; flex-direction: column; justify-content: space-between;">
                                     <div>

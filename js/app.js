@@ -681,95 +681,6 @@ window.confermaSposta = async function() {
     }
 };
 
-// ── COLLABORATORI DOCENTI ───────────────────────────────────
-window.apriCollaboratori = async function(teamId, teamName) {
-    const modal = document.getElementById('modal-collaboratori');
-    if (!modal) return;
-    document.getElementById('collaboratori-team-id').value = teamId;
-    document.getElementById('collaboratori-team-nome').textContent = `Squadra: ${teamName}`;
-    document.getElementById('collaboratori-new-email').value = '';
-    modal.style.display = 'flex';
-
-    // Renderizza uno stato di caricamento provvisorio
-    const lista = document.getElementById('collaboratori-lista');
-    if (lista) {
-        lista.innerHTML = '<i style="font-size:0.85rem; color:var(--text-muted);">Caricamento collaboratori...</i>';
-    }
-
-    try {
-        const teamDoc = await window.db.collection('fanta_teams').doc(teamId).get();
-        const colList = teamDoc.data()?.collaboratori || [];
-        window._renderCollaboratoriLista(teamId, colList);
-    } catch (e) {
-        console.error(e);
-        if (lista) {
-            lista.innerHTML = '<i style="font-size:0.85rem; color:var(--danger-color);">Errore caricamento.</i>';
-        }
-    }
-};
-
-window._renderCollaboratoriLista = function(teamId, collaboratori) {
-    const lista = document.getElementById('collaboratori-lista');
-    if (!lista) return;
-    if (!collaboratori || collaboratori.length === 0) {
-        lista.innerHTML = '<i style="font-size:0.85rem; color:var(--text-muted);">Nessun collaboratore aggiunto.</i>';
-        return;
-    }
-    lista.innerHTML = collaboratori.map(email => `
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
-            <span style="font-size:0.85rem;">${email}</span>
-            <button class="btn btn-secondary text-danger" style="padding:3px 8px; font-size:0.72rem; width:auto;"
-                onclick="rimuoviCollaboratore('${teamId}', '${email}')">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>`).join('');
-};
-
-window.aggiungiCollaboratore = async function() {
-    const teamId = document.getElementById('collaboratori-team-id').value;
-    const email = document.getElementById('collaboratori-new-email').value.trim().toLowerCase();
-    if (!email) { alert('Inserisci un\'email valida.'); return; }
-
-    try {
-        // Verifica che l'email sia un docente approvato
-        const userDoc = await window.db.collection('fanta_users').doc(email).get();
-        if (!userDoc.exists || (userDoc.data().role !== 'teacher' && userDoc.data().role !== 'docente')) {
-            alert('Email non trovata o non corrisponde a un docente approvato.');
-            return;
-        }
-        await fanta_db.addCollaboratore(teamId, email);
-        document.getElementById('collaboratori-new-email').value = '';
-        alert('Collaboratore aggiunto!');
-        // Aggiorna la lista
-        const teamDoc = await window.db.collection('fanta_teams').doc(teamId).get();
-        window._renderCollaboratoriLista(teamId, teamDoc.data()?.collaboratori || []);
-        if (window.location.pathname.includes('admin.html')) {
-            if (typeof window.renderAdminSquadre === 'function') window.renderAdminSquadre();
-        } else {
-            if (typeof renderProfilo === 'function') renderProfilo();
-        }
-    } catch (e) {
-        console.error(e);
-        alert('Errore: ' + e.message);
-    }
-};
-
-window.rimuoviCollaboratore = async function(teamId, email) {
-    if (!confirm(`Rimuovere ${email} dai collaboratori?`)) return;
-    try {
-        await fanta_db.removeCollaboratore(teamId, email);
-        const teamDoc = await window.db.collection('fanta_teams').doc(teamId).get();
-        window._renderCollaboratoriLista(teamId, teamDoc.data()?.collaboratori || []);
-        if (window.location.pathname.includes('admin.html')) {
-            if (typeof window.renderAdminSquadre === 'function') window.renderAdminSquadre();
-        } else {
-            if (typeof renderProfilo === 'function') renderProfilo();
-        }
-    } catch (e) {
-        console.error(e);
-        alert('Errore: ' + e.message);
-    }
-};
 
 /* =========================================
    LEADERBOARDS DINAMICHE
@@ -1436,25 +1347,6 @@ function azzeraTutteSpunte() {
     alert(`Tutte le spunte della modalità ${modeCfg.label} sono state rimosse!`);
 }
 
-window.testConnessioneAdmin = async function() {
-    const feedback = document.createElement('div');
-    feedback.style = 'position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#3498db; color:white; padding:15px 30px; border-radius:12px; font-weight:bold; z-index:20000; box-shadow:0 10px 30px rgba(0,0,0,0.5); font-size:0.9rem;';
-    feedback.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifica connessione in corso...';
-    document.body.appendChild(feedback);
-
-    try {
-        // Tentiamo di leggere la configurazione globale come test
-        await fanta_db.getSettings('terze');
-        feedback.style.background = '#27ae60';
-        feedback.innerHTML = '<i class="fa-solid fa-circle-check"></i> Connessione Firebase OK!';
-        setTimeout(() => feedback.remove(), 3000);
-    } catch (e) {
-        console.error("Errore test connessione:", e);
-        feedback.style.background = '#e74c3c';
-        feedback.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Errore connessione: ' + e.message;
-        setTimeout(() => feedback.remove(), 5000);
-    }
-};
 
 async function logoutDocente() {
     await fanta_db.logout();
@@ -1501,12 +1393,10 @@ async function logoutDocente() {
     const profAdminEmail = document.getElementById('admin-profilo-email');
     const profSqList = document.getElementById('profilo-squadre-list');
     const profMisList = document.getElementById('profilo-missioni-list');
-    const profTornei = document.getElementById('profilo-tornei-list');
     
     if(profEmail) profEmail.value = "";
     if(profSqList) profSqList.innerHTML = '<i>Nessuna squadra caricata. Entra nella home e iscrivi una classe.</i>';
     if(profMisList) profMisList.innerHTML = '<i>Ancora nessuna missione...</i>';
-    if(profTornei) profTornei.innerHTML = '<i>Nessun torneo creato.</i>';
     
     navigateTo('view-welcome');
 }
@@ -1526,9 +1416,6 @@ window.onclick = function(event) {
         document.body.style.overflow = 'auto';
     }
     if (event.target.id === 'share-modal') event.target.style.display = 'none';
-    if (event.target.id === 'torneo-modal') event.target.style.display = 'none';
-    if (event.target.id === 'join-torneo-modal') event.target.style.display = 'none';
-    if (event.target.id === 'invite-torneo-modal') event.target.style.display = 'none';
 }
 
 function setLoggedIn(email, role = '') {
@@ -2104,10 +1991,6 @@ async function renderProfilo() {
         });
         let misPts = (team.missionsCompleted || 0) * 5;
         const modeBadgeHtml = `<span class="mode-badge ${modeCfg.colorClass}">${modeCfg.emoji} ${modeCfg.shortLabel}</span>`;
-        const collabBadge = isCollaborated
-            ? `<span style="font-size:0.72rem; background:rgba(141,160,63,0.2); color:var(--primary-color); border-radius:8px; padding:2px 8px; margin-left:4px;"><i class="fa-solid fa-users-gear"></i> Collaboratore</span>`
-            : '';
-
         // Autori in questa squadra
         let autoriSection = '';
         if (team.authors && team.authors.length > 0) {
@@ -2169,47 +2052,6 @@ async function renderProfilo() {
         let azioniSection = '';
 
         if (isDocente) {
-            // Docenti di questa squadra (Proprietario + Collaboratori)
-            const docentiArr = [];
-            if (team.ownerEmail) {
-                docentiArr.push({ email: team.ownerEmail, role: 'Proprietario' });
-            }
-            if (team.collaboratori && team.collaboratori.length > 0) {
-                team.collaboratori.forEach(email => {
-                    docentiArr.push({ email: email, role: 'Collaboratore' });
-                });
-            }
-
-            if (docentiArr.length > 0) {
-                const docentiRows = docentiArr.map(d => {
-                    const isOwner = d.role === 'Proprietario';
-                    const roleBadge = isOwner 
-                        ? `<span style="font-size:0.65rem; background:rgba(245, 197, 60, 0.15); color:#f5c53c; border: 1px solid rgba(245, 197, 60, 0.25); border-radius:6px; padding:1px 6px; font-weight:600;">Proprietario</span>`
-                        : `<span style="font-size:0.65rem; background:rgba(141,160,63,0.15); color:var(--primary-color); border: 1px solid rgba(141,160,63,0.25); border-radius:6px; padding:1px 6px; font-weight:600;">Collaboratore</span>`;
-                    
-                    return `
-                        <div style="display:flex; align-items:center; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.03);">
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                <i class="fa-solid fa-chalkboard-user" style="color:var(--text-muted); font-size:0.8rem;"></i>
-                                <span style="font-size:0.8rem; font-weight:500; color:var(--text-main);">${d.email}</span>
-                            </div>
-                            ${roleBadge}
-                        </div>
-                    `;
-                }).join('');
-
-                docentiSection = `
-                    <details style="margin-top:6px; margin-bottom:6px; width:100%; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px;">
-                        <summary style="font-size:0.78rem; cursor:pointer; color:var(--primary-color); font-weight:600; user-select:none; margin-bottom:6px; display:flex; align-items:center; gap:5px;">
-                            <i class="fa-solid fa-user-tie"></i> Docenti Gestori (${docentiArr.length})
-                        </summary>
-                        <div style="padding-left:4px; max-height: 150px; overflow-y: auto;">
-                            ${docentiRows}
-                        </div>
-                    </details>
-                `;
-            }
-
             // Studenti iscritti/assegnati a questa squadra (da team.members o fallback allStudentsMap)
             const membersList = Array.isArray(team.members) && team.members.length > 0 
                 ? team.members 
@@ -2260,10 +2102,6 @@ async function renderProfilo() {
                     <button class="btn btn-secondary" style="flex:1; min-width:80px; padding:6px 8px; font-size:0.75rem; border-radius:8px; background:rgba(255,255,255,0.03);" 
                         onclick="docenteModificaSquadra('${team.id}', '${team.name.replace(/'/g, "\\'")}', '${(team.classe || '').replace(/'/g, "\\'")}')">
                         <i class="fa-solid fa-pen-to-square"></i> Modifica
-                    </button>
-                    <button class="btn btn-secondary" style="flex:1.2; min-width:100px; padding:6px 8px; font-size:0.75rem; border-radius:8px; background:rgba(141,160,63,0.15); border-color:var(--primary-color);"
-                        onclick="window.apriCollaboratori('${team.id}', '${team.name.replace(/'/g, "\\'")}')">
-                        <i class="fa-solid fa-user-plus"></i> Collaboratori
                     </button>
                     <button class="btn btn-danger" style="flex:1; min-width:80px; padding:6px 8px; font-size:0.75rem; border-radius:8px; background:rgba(230, 57, 70, 0.1); border:1px solid rgba(230, 57, 70, 0.2); color:#e63946;" 
                         onclick="docenteEliminaSquadra('${team.id}', '${team.name.replace(/'/g, "\\'")}')">
@@ -2368,7 +2206,6 @@ async function renderProfilo() {
     }
 
     renderNotifiche();
-    renderTornei();
 }
 
 window.docenteModificaSquadra = async function(teamId, currentName, currentClasse) {
@@ -2496,14 +2333,6 @@ async function renderNotifiche() {
     try {
         const allTeams = await fanta_db.getTeams();
         
-        let pendingInvites = [];
-        try {
-            const myPending = await fanta_db.getInvites(currentUserEmail);
-            pendingInvites = myPending.filter(i => i.status === 'pending');
-        } catch (err) {
-            console.warn("getInvites failed or permission denied: ", err);
-        }
-
         let pendingMissions = [];
         if (currentUserEmail === 'prof.memmo@gmail.com') {
             try {
@@ -2585,7 +2414,7 @@ async function renderNotifiche() {
             });
         }
         
-        const totalNotifications = pendingInvites.length + unseenSchede.length + pendingMissions.length + unseenMissions.length;
+        const totalNotifications = unseenSchede.length + pendingMissions.length + unseenMissions.length;
         
         // Aggiorna Badge Header Globale
         const headerBadge = document.getElementById('header-notification-badge');
@@ -2634,26 +2463,7 @@ async function renderNotifiche() {
                 return;
             }
             
-            // 1. Mostra gli inviti ai tornei
-            if (pendingInvites.length > 0) {
-                const tourneys = await fanta_db.getTournaments();
-                pendingInvites.forEach(inv => {
-                    let t = tourneys.find(x => x.id === inv.tournamentId);
-                    let tName = t ? t.name : "Torneo Sconosciuto";
-                    
-                    list.innerHTML += `
-                        <div style="background:rgba(255,193,7,0.1); padding:12px; border-radius:8px; border-left:3px solid #ffc107; font-size:0.85rem; margin-bottom:10px;">
-                            <p style="margin:0 0 10px 0;"><b>${inv.fromEmail}</b> ti ha invitato al torneo <b>${tName}</b>.</p>
-                            <div style="display:flex; gap:10px;">
-                                <button class="btn" style="padding:5px 12px; font-size:0.75rem; width:auto; background:var(--primary-color);" onclick="document.getElementById('notifiche-modal').style.display='none'; openJoinTorneoModal('${inv.tournamentId}', '${inv.id}')">Accetta e Iscrivi Squadre</button>
-                                <button class="btn btn-secondary" style="padding:5px 12px; font-size:0.75rem; width:auto;" onclick="rifiutaInvito('${inv.id}')">Rifiuta</button>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-            
-            // 2. Mostra le nuove schede autore pubblicate
+            // Mostra le nuove schede autore pubblicate
             unseenSchede.forEach(item => {
                 let actionAttr = '';
                 let actionBtn = '';
@@ -2863,122 +2673,8 @@ window.apriNotificheModal = function() {
     }
 };
 
-async function openTorneoModal() {
-    const modal = document.getElementById('torneo-modal');
-    if(!modal) return;
-    
-    const checkboxes = document.getElementById('torneo-squadre-checkboxes');
-    checkboxes.innerHTML = '<p class="text-center">Caricamento squadre...</p>';
-    
-    const myTeams = (await getAllTeams()).filter(t => t.ownerEmail === currentUserEmail);
-    
-    checkboxes.innerHTML = '';
-    if(myTeams.length < 2) {
-        checkboxes.innerHTML = '<p class="text-danger">Devi creare almeno 2 squadre per organizzare un torneo privato!</p>';
-    } else {
-        myTeams.forEach(team => {
-            checkboxes.innerHTML += `
-                <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
-                    <input type="checkbox" class="torneo-team-chk" value="${team.id}" style="width:16px; height:16px;">
-                    <span style="font-size:1rem;">${team.name}</span>
-                </label>
-            `;
-        });
-    }
-    
-    document.getElementById('torneo-nome-input').value = '';
-    modal.style.display = 'block';
-}
-
-async function creaTorneo(event) {
-    if(event) event.preventDefault();
-    const nome = document.getElementById('torneo-nome-input').value.trim();
-    if(!nome) { alert("Inserisci il nome del torneo."); return; }
-    
-    const selectedIds = Array.from(document.querySelectorAll('.torneo-team-chk:checked')).map(chk => chk.value);
-    if(selectedIds.length < 2) { alert("Seleziona almeno 2 squadre per creare il torneo."); return; }
-    
-    try {
-        await fanta_db.saveTournament({
-            name: nome,
-            ownerEmail: currentUserEmail,
-            teams: selectedIds
-        });
-        
-        document.getElementById('torneo-modal').style.display = 'none';
-        renderTornei();
-    } catch (e) {
-        console.error("Errore creazione torneo:", e);
-        alert("Errore durante la creazione del torneo.");
-    }
-}
-
-async function openJoinTorneoModal(tourId, inviteId) {
-    const modal = document.getElementById('join-torneo-modal');
-    if(!modal) return;
-    
-    document.getElementById('join-torneo-id').value = tourId;
-    document.getElementById('join-invite-id').value = inviteId;
-    
-    const checkboxes = document.getElementById('join-torneo-squadre');
-    checkboxes.innerHTML = '<p class="text-center">Caricamento squadre...</p>';
-    
-    const myTeams = (await getAllTeams()).filter(t => t.ownerEmail === currentUserEmail);
-    
-    checkboxes.innerHTML = '';
-    if(myTeams.length === 0) {
-        checkboxes.innerHTML = '<p class="text-danger">Non hai ancora creato squadre!</p>';
-    } else {
-        myTeams.forEach(team => {
-            checkboxes.innerHTML += `
-                <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
-                    <input type="checkbox" class="join-team-chk" value="${team.id}" style="width:16px; height:16px;">
-                    <span style="font-size:1rem;">${team.name}</span>
-                </label>
-            `;
-        });
-    }
-    modal.style.display = 'block';
-}
-
-async function joinTorneo(event) {
-    if(event) event.preventDefault();
-    const tourId = document.getElementById('join-torneo-id').value;
-    const invId = document.getElementById('join-invite-id').value;
-    
-    try {
-        const tourneys = await fanta_db.getTournaments();
-        const tournament = tourneys.find(t => t.id === tourId);
-        if(!tournament) { alert("Torneo non trovato."); return; }
-        
-        const selectedIds = Array.from(document.querySelectorAll('.join-team-chk:checked')).map(chk => chk.value);
-        if(selectedIds.length === 0) { alert("Seleziona almeno una tua squadra da iscrivere."); return; }
-        
-        const updatedTeams = [...new Set([...(tournament.teams || []), ...selectedIds])];
-        await window.db.collection('fanta_tournaments').doc(tourId).update({ teams: updatedTeams });
-        await fanta_db.updateInviteStatus(invId, 'accepted');
-        
-        document.getElementById('join-torneo-modal').style.display = 'none';
-        alert("Squadre iscritte con successo!");
-        renderProfilo(); 
-    } catch (e) {
-        console.error("Errore partecipazione torneo:", e);
-        alert("Errore durante la partecipazione al torneo.");
-    }
-}
-
-async function rifiutaInvito(invId) {
-    if(!confirm("Vuoi rimuovere questo invito?")) return;
-    try {
-        await fanta_db.deleteInvite(invId);
-        renderProfilo();
-    } catch (e) {
-        console.error("Errore rifiuto invito:", e);
-    }
-}
-
 async function shareInvite(options = {}) {
-    // options: { type: 'general'|'tournament'|'student', tourId, code, teamName }
+    // options: { type: 'general'|'student', code, teamName }
     const showcaseUrl = "https://prof-memmo.github.io/games/";
     const fantaUrl = "https://prof-memmo.github.io/fantaletteratura/";
     
@@ -2990,10 +2686,6 @@ async function shareInvite(options = {}) {
         targetUrl = fantaUrl;
         shareTitle = `Unisciti alla squadra ${options.teamName}`;
         shareText = `Ciao! Unisciti alla mia squadra ${options.teamName} su Fantaletteratura. \nUsa il codice: ${options.code}\nEntra qui: ${fantaUrl}`;
-    } else if (options.type === 'tournament') {
-        targetUrl = fantaUrl;
-        shareTitle = "Invito al Torneo di Fantaletteratura";
-        shareText = `Partecipa al mio torneo privato su Fantaletteratura! Iscrivi le tue squadre usando questo link: ${fantaUrl}`;
     }
 
     const fullShareText = (options.type === 'student') ? shareText : (shareText + `\n\n🔗 Scopri di più qui: ${targetUrl}`);
@@ -3017,9 +2709,7 @@ async function shareInvite(options = {}) {
     if (!modal) return;
 
     document.getElementById('share-modal-title').textContent = shareTitle;
-    document.getElementById('share-modal-desc').textContent = (options.type === 'tournament') 
-        ? "Condividi l'invito al torneo con i tuoi colleghi!"
-        : (options.type === 'student' ? "Condividi il codice con i tuoi studenti!" : "Fai conoscere l'Ecosistema Didattico ai tuoi colleghi!");
+    document.getElementById('share-modal-desc').textContent = (options.type === 'student' ? "Condividi il codice con i tuoi studenti!" : "Fai conoscere l'Ecosistema Didattico ai tuoi colleghi!");
 
     // Configura i link
     const encodedFullText = encodeURIComponent(fullShareText);
@@ -3045,119 +2735,8 @@ function copyShareLink() {
     });
 }
 
-function openInviteModal(tourId) {
-    shareInvite({ type: tourId ? 'tournament' : 'general', tourId: tourId });
-}
-
-async function inviaInvitoTorneo(event) {
-    if(event) event.preventDefault();
-    const tourId = document.getElementById('invite-torneo-id').value;
-    const targetEmail = document.getElementById('invite-collega-email').value.trim();
-    
-    if(!targetEmail) { alert("Inserisci l'email!"); return; }
-    if(targetEmail === currentUserEmail) { alert("Non puoi autoinvitarti!"); return; }
-
-    const isGeneral = !tourId;
-    
-    try {
-        const snapshotUsers = await window.db.collection('fanta_users').where("email", "==", targetEmail).get();
-        const isRegistered = !snapshotUsers.empty;
-
-        if(!isRegistered) {
-            const subject = encodeURIComponent("Benvenuto in Fantaletteratura!");
-            let bodyPlain = `Ciao! \n\nHai ricevuto un invito a partecipare a Fantaletteratura, la sfida tra capolavori! \n\n` +
-                `Fantaletteratura è un gioco didattico dove classi e studenti creano squadre di autori letterari per sfidarsi a colpi di missioni e punteggi. \n\n`;
-                
-            if (isGeneral) {
-                bodyPlain += `Un tuo collega ti ha appena invitato a iscriverti come docente. Accedi subito per registrare la tua classe e iniziare la sfida!\n\n`;
-            } else {
-                bodyPlain += `Un tuo collega ti ha appena invitato ad un torneo privato. Accedi subito per registrare la tua classe e iniziare la sfida!\n\n`;
-            }
-            
-            bodyPlain += `Puoi accedere qui: ${window.location.origin}${window.location.pathname}\n\nBuona fortuna!`;
-            
-            const body = encodeURIComponent(bodyPlain);
-            window.location.href = `mailto:${targetEmail}?subject=${subject}&body=${body}`;
-        }
-        
-        await fanta_db.saveInvite({
-            tournamentId: tourId || 'general',
-            fromEmail: currentUserEmail,
-            toEmail: targetEmail
-        });
-        
-        document.getElementById('invite-torneo-modal').style.display = 'none';
-        alert(isGeneral ? "Invito generico spedito!" : "Invito al torneo spedito!");
-    } catch (e) {
-        console.error("Errore invio invito:", e);
-        alert("Errore durante l'invio dell'invito.");
-    }
-}
-
-async function renderTornei() {
-    const tourneysList = document.getElementById('profilo-tornei-list');
-    if(!tourneysList || !currentUserEmail) return;
-    
-    tourneysList.innerHTML = '<p class="text-center">Caricamento tornei...</p>';
-    
-    try {
-        const tourneys = await fanta_db.getTournaments();
-        const allTeams = await fanta_db.getTeams();
-        const myTeamsIds = allTeams.filter(t => t.ownerEmail === currentUserEmail).map(t => t.id);
-
-        // Mostra il torneo se il docente lo ha creato O se ci ha iscritto delle sue squadre
-        let myTourneys = tourneys.filter(t => {
-            return t.ownerEmail === currentUserEmail || (t.teams && t.teams.some(teamId => myTeamsIds.includes(teamId)));
-        });
-        
-        tourneysList.innerHTML = '';
-        if(myTourneys.length === 0) {
-            tourneysList.innerHTML = '<i>Nessun torneo. Creane uno o unisciti tramite invito.</i>';
-            return;
-        }
-        
-        myTourneys.forEach(tour => {
-            let calculated = (tour.teams || []).map(tid => {
-                let tObj = allTeams.find(x => x.id === tid);
-                if(!tObj) return null;
-                let authPts = 0;
-                const teamMode = tObj.mode || 'terze';
-                const modeCfg = GAME_MODES[teamMode] || GAME_MODES.terze;
-                const pool = modeCfg.authors || AUTHORS;
-
-                tObj.authors.forEach(aid => {
-                    let a = pool.find(x => x.id === aid);
-                    if(a && a.isPointsRevealed) authPts += a.points;
-                });
-                return {
-                    team: tObj.name,
-                    totale: authPts + ((tObj.missionsCompleted || 0) * 5)
-                };
-            }).filter(x => x !== null);
-            
-            calculated.sort((a,b) => b.totale - a.totale);
-            
-            let rankHtml = calculated.map((item, idx) => `
-                <div style="display:flex; justify-content:space-between; font-size:0.9rem; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
-                    <span>${idx+1}. ${item.team}</span>
-                    <span class="text-primary" style="font-weight:bold">${item.totale} pt</span>
-                </div>
-            `).join('');
-            
-            let btnInvita = `<button class="btn btn-secondary" style="font-size:0.75rem; padding:4px 8px; width:auto; float:right;" onclick="openInviteModal('${tour.id}')"><i class="fa-solid fa-paper-plane"></i> Invita Collega</button>`;
-
-            tourneysList.innerHTML += `
-                <div style="background:rgba(255,255,255,0.05); padding:10px 15px; border-radius:8px; border-left:3px solid var(--primary-color); margin-bottom:15px;">
-                    ${btnInvita}
-                    <div style="font-weight:bold; font-size:1.1rem; margin-bottom:10px; color:var(--primary-color);"> <i class="fa-solid fa-trophy"></i> ${tour.name}</div>
-                    ${rankHtml}
-                </div>
-            `;
-        });
-    } catch (e) {
-        console.error("Errore caricamento tornei:", e);
-        tourneysList.innerHTML = '<i>Errore nel caricamento dei tornei.</i>';
-    }
+function openInviteModal() {
+    shareInvite({ type: 'general' });
 }
 
 /* =========================================
@@ -3268,60 +2847,6 @@ let presAuthorBonusIndex = 0;
 
 window.initPresentazioniTab = async function() {
     await window.aggiornaCampiPresentazione();
-    
-    // Carica i tornei e popolali nella griglia
-    const torneiContainer = document.getElementById('pres-tornei-container');
-    if (torneiContainer) {
-        torneiContainer.innerHTML = '<div class="glass" style="padding:10px; text-align:center; color:var(--text-muted); grid-column:1/-1;"><i class="fa-solid fa-spinner fa-spin"></i> Caricamento tornei...</div>';
-        
-        try {
-            const tuttiTornei = await window.fanta_db.getTournaments();
-            const tutteSquadre = await window.fanta_db.getTeams();
-            
-            // Determina le squadre associate a questo utente
-            const currentUserEmail = firebase.auth().currentUser ? firebase.auth().currentUser.email : null;
-            const isAdmin = currentUserEmail === 'prof.memmo@gmail.com';
-            
-            let myTeamIds = [];
-            if (!isAdmin && currentUserEmail) {
-                myTeamIds = tutteSquadre.filter(t => t.createdBy === currentUserEmail || (t.collaborators && t.collaborators.includes(currentUserEmail))).map(t => t.id);
-            }
-            
-            // Filtra i tornei: admin vede tutti, docenti vedono tornei in cui c'è almeno una loro squadra (o creati da loro)
-            const torneiMostrati = tuttiTornei.filter(t => {
-                if (isAdmin) return true;
-                if (t.createdBy === currentUserEmail) return true;
-                if (!t.teams) return false;
-                return t.teams.some(teamId => myTeamIds.includes(teamId));
-            });
-            
-            if (torneiMostrati.length === 0) {
-                torneiContainer.innerHTML = '<div class="glass" style="padding:10px; text-align:center; color:var(--text-muted); grid-column:1/-1;">Nessun torneo interno disponibile.</div>';
-                return;
-            }
-            
-            torneiContainer.innerHTML = '';
-            torneiMostrati.forEach(t => {
-                const numSquadre = (t.teams || []).length;
-                const div = document.createElement('div');
-                div.className = 'pres-card';
-                div.setAttribute('data-type', 'torneo');
-                div.setAttribute('data-value', t.id);
-                div.onclick = function() { window.togglePresOption(this); };
-                
-                div.innerHTML = `
-                    <div class="pres-card-icon"><i class="fa-solid fa-trophy"></i></div>
-                    <div class="pres-card-title">${t.name}</div>
-                    <div class="pres-card-desc">${numSquadre} squadre iscritte</div>
-                `;
-                torneiContainer.appendChild(div);
-            });
-            
-        } catch (error) {
-            console.error("Errore nel caricamento dei tornei per le presentazioni:", error);
-            torneiContainer.innerHTML = '<div class="glass" style="padding:10px; text-align:center; color:#e74c3c; grid-column:1/-1;">Errore nel caricamento tornei.</div>';
-        }
-    }
 };
 
 window.selectPresOption = function(element) {
@@ -3453,7 +2978,6 @@ window.avviaPresentazioneLIM = async function() {
     presCurrentIndex = 0;
     
     try {
-        const tourneys = await window.fanta_db.getTournaments();
         const presentationTypeName = selectedTipo === 'finale' ? 'FINALE' : (selectedTipo === 'semifinale' ? 'SEMIFINALE' : 'INTERMEDIA');
         
         presSlides.push({
@@ -3599,56 +3123,6 @@ window.avviaPresentazioneLIM = async function() {
                 presSlides.push({
                     type: 'podium',
                     torneoName: torneoName,
-                    teams: teamsForRank
-                });
-            }
-        }
-        
-        // 4. Aggiungi i Tornei Interni selezionati
-        const checkedTornei = Array.from(document.querySelectorAll('.pres-card[data-type="torneo"].active')).map(el => el.getAttribute('data-value'));
-        
-        if (checkedTornei.length > 0) {
-            const allTeams = await window.fanta_db.getTeams();
-            const checkedAutori = Array.from(document.querySelectorAll('input[name="pres-autori"]:checked')).map(el => el.value);
-            
-            for (const tId of checkedTornei) {
-                const torneo = tourneys.find(t => t.id === tId);
-                if (!torneo) continue;
-                
-                const tournamentTeams = allTeams.filter(t => (torneo.teams || []).includes(t.id));
-                const calcTTeams = tournamentTeams.map(t => {
-                    const modeCfg = GAME_MODES[t.campionato] || GAME_MODES.terze;
-                    const pool = modeCfg.authors || AUTHORS;
-                    
-                    let authPts = 0;
-                    t.authors.forEach(aid => {
-                        let a = pool.find(x => x.id === aid);
-                        if (a && (a.isPointsRevealed || checkedAutori.includes(`${t.campionato}:${a.id}`))) {
-                            authPts += a.points;
-                        }
-                    });
-                    const missPts = (t.missionsCompleted || 0) * 5;
-                    const totPts = authPts + missPts;
-                    
-                    return { id: t.id, name: t.name, totPoints: totPts };
-                });
-                
-                const sorted = calcTTeams.sort((a,b) => a.totPoints - b.totPoints);
-                const teamsForRank = sorted.map(t => ({ id: t.id, name: t.name, points: t.totPoints }));
-                
-                presSlides.push({
-                    type: 'suspense',
-                    subtitle: `TORNEO INTERNO`,
-                    text: `SCOPRIAMO LA CLASSIFICA:<br>${torneo.name.toUpperCase()}`
-                });
-                presSlides.push({
-                    type: 'leaderboard-list',
-                    torneoName: `TORNEO INTERNO - ${torneo.name.toUpperCase()}`,
-                    teams: teamsForRank
-                });
-                presSlides.push({
-                    type: 'podium',
-                    torneoName: `TORNEO INTERNO - ${torneo.name.toUpperCase()}`,
                     teams: teamsForRank
                 });
             }

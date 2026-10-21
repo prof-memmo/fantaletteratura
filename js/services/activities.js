@@ -19,23 +19,6 @@ window.fanta_db.approveMission = async (missionId) => {
     await window.db.collection('fanta_missions').doc(missionId).update({ status: 'approved' });
 };
 
-// --- TOURNAMENTS ---
-window.fanta_db.saveTournament = async (tournamentData) => {
-    const docRef = await window.db.collection('fanta_tournaments').add({
-        ...tournamentData,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    return docRef.id;
-};
-
-window.fanta_db.getTournaments = async () => {
-    const snapshot = await window.db.collection('fanta_tournaments').get();
-    return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-};
-
-window.fanta_db.deleteTournament = async (tournamentId) => {
-    await window.db.collection('fanta_tournaments').doc(tournamentId).delete();
-};
 
 // --- INVITES ---
 window.fanta_db.saveInvite = async (inviteData) => {

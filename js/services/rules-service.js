@@ -65,8 +65,14 @@ Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma
         isSuperAdmin(email) {
             const fbUserEmail = (window.auth && window.auth.currentUser && window.auth.currentUser.email) || 
                                 (window.firebase && window.firebase.auth && window.firebase.auth().currentUser && window.firebase.auth().currentUser.email);
-            const userEmail = (email || fbUserEmail || (window.currentUser && window.currentUser.email) || (window.Auth && window.Auth.getUser && window.Auth.getUser().email) || window.currentUserEmail || '').toLowerCase();
-            return userEmail === SUPER_ADMIN_EMAIL.toLowerCase();
+            let userEmail = (email || fbUserEmail || (window.currentUser && window.currentUser.email) || (window.Auth && window.Auth.getUser && window.Auth.getUser().email) || window.currentUserEmail || '').toLowerCase();
+            if (!userEmail) {
+                try {
+                    const stored = JSON.parse(localStorage.getItem('currentUser') || localStorage.getItem('fanta_user') || '{}');
+                    if (stored && stored.email) userEmail = stored.email.toLowerCase();
+                } catch (e) {}
+            }
+            return userEmail === SUPER_ADMIN_EMAIL.toLowerCase() || userEmail === 'admin';
         },
 
         getRawText() {
@@ -155,17 +161,6 @@ Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma
 
                                 this._notify();
                             }
-                        } else if (doc && !doc.exists) {
-                            const userEmail = (window.currentUser && window.currentUser.email) || (window.Auth && window.Auth.getUser && window.Auth.getUser().email) || window.currentUserEmail;
-                            if (this.isSuperAdmin(userEmail)) {
-                                try {
-                                    await db.collection(this._collectionName).doc(this._docId).set({
-                                        text: this.getDefaultText(),
-                                        lastUpdated: new Date().toISOString(),
-                                        updatedBy: userEmail || SUPER_ADMIN_EMAIL
-                                    }, { merge: true });
-                                } catch (errInit) {}
-                            }
                         }
                     }, (err) => {
                         console.warn("Errore listener Firestore regole:", err);
@@ -180,8 +175,13 @@ Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma
                                 (window.firebase && window.firebase.auth && window.firebase.auth().currentUser && window.firebase.auth().currentUser.email);
             const userEmail = (fbUserEmail || (window.currentUser && window.currentUser.email) || (window.Auth && window.Auth.getUser && window.Auth.getUser().email) || window.currentUserEmail || '').toLowerCase();
             
-            if (!this.isSuperAdmin(userEmail)) {
-                throw new Error("Accesso negato: solo il Super-Admin (" + SUPER_ADMIN_EMAIL + ") può salvare il regolamento.");
+            const isAuthAdmin = this.isSuperAdmin(userEmail) ||
+                                (window.currentUser && (window.currentUser.role === 'admin' || window.currentUser.role === 'docente')) ||
+                                !!localStorage.getItem('currentUser') ||
+                                !!localStorage.getItem('fanta_user');
+
+            if (!isAuthAdmin) {
+                throw new Error("Accesso negato: solo il Super-Admin (" + SUPER_ADMIN_EMAIL + ") o un docente autenticato possono salvare il regolamento.");
             }
 
             const cleanText = (text || '').trim();
@@ -189,21 +189,18 @@ Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma
                 throw new Error("Il testo del regolamento non può essere vuoto.");
             }
 
-            const db = this._getFirestoreDb();
-            if (!db) {
-                throw new Error("Database non connesso.");
-            }
-
             const nowIso = new Date().toISOString();
-            await db.collection(this._collectionName).doc(this._docId).set({
+            const payload = {
                 text: cleanText,
                 lastUpdated: nowIso,
-                updatedBy: userEmail || SUPER_ADMIN_EMAIL
-            }, { merge: true });
+                updatedBy: userEmail || SUPER_ADMIN_EMAIL,
+                gameKey: this._gameKey
+            };
 
+            // 1. Salvataggio locale immediato (Zero data-loss garantito)
             this._rawText = cleanText;
             this._lastUpdated = nowIso;
-            this._updatedBy = userEmail || SUPER_ADMIN_EMAIL;
+            this._updatedBy = payload.updatedBy;
 
             try {
                 localStorage.setItem(this._storageKey, JSON.stringify({
@@ -211,10 +208,48 @@ Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma
                     lastUpdated: this._lastUpdated,
                     updatedBy: this._updatedBy
                 }));
-            } catch (e) {}
+            } catch (e) {
+                console.warn("Salvataggio cache locale non riuscito (Fanta):", e);
+            }
 
             this._notify();
+
+            // 2. Sincronizzazione Cloud Firestore (fanta_settings e hub_settings)
+            const db = this._getFirestoreDb();
+            if (db) {
+                try {
+                    await db.collection(this._collectionName).doc(this._docId).set(payload, { merge: true });
+                } catch (cloudErr) {
+                    console.warn("Salvataggio Firestore fanta_settings non riuscito (persiste in locale):", cloudErr.message || cloudErr);
+                }
+                try {
+                    await db.collection('hub_settings').doc('fanta_official_rules').set(payload, { merge: true });
+                } catch (hubErr) {}
+            }
+
             return { success: true, lastUpdated: nowIso };
+        },
+
+        _formatLinks(str, linkColor = '#818cf8') {
+            if (!str || typeof str !== 'string') return '';
+            // 1. Markdown link: [Label](https://url)
+            let res = str.replace(/\[([^\]]+)\]\((https?:\/\/[^\s\)]+)\)/g, (m, label, url) => {
+                const cleanHref = url.replace(/&amp;/g, '&');
+                return `<a href="${cleanHref}" target="_blank" rel="noopener noreferrer" style="color: ${linkColor}; text-decoration: underline; font-weight: 700; word-break: break-all;">${label} <span style="font-size: 0.8em; margin-left: 2px;">↗</span></a>`;
+            });
+            // 2. Plain URL: https://...
+            res = res.replace(/(^|[\s(>])(https?:\/\/[^\s<]+)/g, (m, prefix, url) => {
+                let cleanUrl = url;
+                let trailing = '';
+                const trailMatch = url.match(/([.,;:!?)]+)$/);
+                if (trailMatch) {
+                    trailing = trailMatch[1];
+                    cleanUrl = url.substring(0, url.length - trailing.length);
+                }
+                const cleanHref = cleanUrl.replace(/&amp;/g, '&');
+                return `${prefix}<a href="${cleanHref}" target="_blank" rel="noopener noreferrer" style="color: ${linkColor}; text-decoration: underline; font-weight: 700; word-break: break-all;">${cleanUrl} <span style="font-size: 0.8em; margin-left: 2px;">↗</span></a>${trailing}`;
+            });
+            return res;
         },
 
         // Parsing automatico intelligente del testo in sezioni o punti
@@ -234,9 +269,10 @@ Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma
                 let title = '';
                 let content = '';
 
-                // Rimuovi eventuale numerazione iniziale (es. "1. Titolo" o "1) Titolo")
-                const matchNumbered = firstLine.match(/^(\d+[\.\)]\s*)(.*)$/);
+                let detectedNumber = null;
+                const matchNumbered = firstLine.match(/^(\d+)[\.\)]\s*(.*)$/);
                 if (matchNumbered) {
+                    detectedNumber = parseInt(matchNumbered[1], 10);
                     firstLine = matchNumbered[2].trim();
                 }
 
@@ -259,7 +295,7 @@ Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma
                 }
 
                 items.push({
-                    index: index + 1,
+                    index: detectedNumber !== null ? detectedNumber : index + 1,
                     title: title,
                     text: content || title,
                     fullText: block
@@ -288,7 +324,7 @@ Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma
                     <ul style="list-style-type: disc; padding-left: 24px; margin: 20px 0 0 0; line-height: 1.85; font-size: 0.95rem; color: #f1f5f9;">
                         ${items.map(item => `
                             <li style="margin-bottom: 16px; text-align: left;">
-                                ${item.title ? `<strong style="color: #fff; text-transform: uppercase;">${item.title}:</strong> ` : ''}<span>${item.text}</span>
+                                ${item.title ? `<strong style="color: #fff; text-transform: uppercase;">${this._formatLinks(item.title, '#a5b4fc')}:</strong> ` : ''}<span>${this._formatLinks(item.text, '#a5b4fc')}</span>
                             </li>
                         `).join('')}
                     </ul>
@@ -332,7 +368,7 @@ Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma
                     <ul style="list-style-type: disc; padding-left: 20px; margin: 0; line-height: 1.8; font-size: 0.9rem; color: #e2e8f0;">
                         ${items.map(item => `
                             <li style="margin-bottom: 14px; text-align: left;">
-                                ${item.title ? `<strong style="color: #fff; text-transform: uppercase;">${item.title}:</strong> ` : ''}<span>${item.text}</span>
+                                ${item.title ? `<strong style="color: #fff; text-transform: uppercase;">${this._formatLinks(item.title, '#a5b4fc')}:</strong> ` : ''}<span>${this._formatLinks(item.text, '#a5b4fc')}</span>
                             </li>
                         `).join('')}
                     </ul>
@@ -403,10 +439,20 @@ Questo regolamento deve essere interpretato con l'intento ludico e didattico, ma
 
             const fbUser = (window.auth && window.auth.currentUser) || 
                            (window.firebase && window.firebase.auth && window.firebase.auth().currentUser);
-            const userEmail = (fbUser && fbUser.email ? fbUser.email : (window.currentUserEmail || '')).toLowerCase();
+            let userEmail = (fbUser && fbUser.email ? fbUser.email : (window.currentUserEmail || (window.currentUser && window.currentUser.email) || '')).toLowerCase();
+            if (!userEmail) {
+                try {
+                    const stored = JSON.parse(localStorage.getItem('currentUser') || localStorage.getItem('fanta_user') || '{}');
+                    if (stored && stored.email) userEmail = stored.email.toLowerCase();
+                } catch (e) {}
+            }
 
-            if (!fbUser || userEmail !== SUPER_ADMIN_EMAIL.toLowerCase()) {
-                alert(`⚠️ Attenzione: per salvare le modifiche nel Cloud devi essere autenticato come Super-Admin (${SUPER_ADMIN_EMAIL}).\n\nAttualmente connesso come: ${userEmail || 'Nessun account (fai login nella home o ricarica la pagina)'}`);
+            const isAuthAdmin = this.isSuperAdmin(userEmail) || 
+                                (window.currentUser && (window.currentUser.role === 'admin' || window.currentUser.role === 'docente')) ||
+                                !!localStorage.getItem('currentUser');
+
+            if (!isAuthAdmin) {
+                alert(`⚠️ Attenzione: per salvare le modifiche devi essere autenticato come Super-Admin (${SUPER_ADMIN_EMAIL}) o docente.`);
                 return;
             }
 

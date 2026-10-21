@@ -123,12 +123,12 @@
                     // Controlliamo il numero di squadre max da fuori (in app.js)
                     return true; 
                 }
-                if (action === 'use_tornei' || action === 'use_missioni') return false;
+                if (action === 'use_missioni') return false;
             }
 
             if (planKey === 'viandante') {
                 // Viandante = no funzioni classe/docente e no missioni didattiche (Articolo 5)
-                if (action === 'create_class' || action === 'gestione_studenti' || action === 'tornei_classe' || action === 'use_missioni') return false;
+                if (action === 'create_class' || action === 'gestione_studenti' || action === 'use_missioni') return false;
             }
 
             return true;
@@ -142,12 +142,6 @@
             });
 
             // Selezioniamo i pulsanti/tab da bloccare
-            if (!this.can('use_tornei')) {
-                const torneiBtn = document.querySelector('[onclick*="view-torneo"]');
-                const torneiTab = document.querySelector('[data-view="view-torneo"]');
-                if (torneiBtn) this.applyLock(torneiBtn);
-                if (torneiTab) this.applyLock(torneiTab);
-            }
 
             if (!this.can('use_missioni')) {
                 const missioniBtn = document.querySelector('[onclick*="view-missioni"]');
