@@ -1423,11 +1423,24 @@ function setLoggedIn(email, role = '') {
     window.currentUserEmail = email;
     if (role) {
         localStorage.setItem('fanta_user_role', role);
+        localStorage.setItem('hub_user_role', role);
         currentUserRole = role;
     } else {
         currentUserRole = localStorage.getItem('fanta_user_role') || '';
     }
     window.currentUserRole = currentUserRole;
+
+    // Aggiorna e memorizza il nome utente in localStorage per sincronizzazione anti-flicker Safari
+    const authUser = (window.auth && window.auth.currentUser) || (window.firebase && firebase.auth && firebase.auth().currentUser);
+    const displayName = (window.currentUserData && window.currentUserData.name) || (authUser && authUser.displayName) || (email === 'prof.memmo@gmail.com' ? 'Prof. Memmo' : (email ? email.split('@')[0] : 'Docente'));
+    if (displayName) {
+        localStorage.setItem('fanta_user_name', displayName);
+        localStorage.setItem('hub_user_name', displayName);
+        const headerNameEl = document.getElementById('header-user-name');
+        const dropdownTitleEl = document.getElementById('dropdown-user-title');
+        if (headerNameEl) headerNameEl.textContent = displayName.toUpperCase();
+        if (dropdownTitleEl) dropdownTitleEl.textContent = displayName.toUpperCase();
+    }
     
     const isTeacher = currentUserRole === 'docente' || currentUserRole === 'teacher' || email === 'prof.memmo@gmail.com';
     const isFantamico = currentUserRole === 'fantamico' || currentUserRole === 'viandante' || currentUserRole === 'guest';
