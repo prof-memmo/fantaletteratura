@@ -1365,8 +1365,8 @@ async function logoutDocente() {
     const bottomRow = document.getElementById('dropdown-bottom-row');
     const notifBadge = document.getElementById('header-notification-badge');
 
-    if (headerUserName) headerUserName.textContent = 'OSPITE';
-    if (headerUserRole) headerUserRole.textContent = 'NON REGISTRATO';
+    if (headerUserName) headerUserName.textContent = 'ACCEDI';
+    if (headerUserRole) headerUserRole.textContent = 'OSPITE';
     if (dropdownTitle) dropdownTitle.textContent = 'OSPITE';
     if (dropdownSubtitle) dropdownSubtitle.textContent = 'NON AUTENTICATO';
     if (headerAvatar) headerAvatar.src = 'https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png';
