@@ -20,7 +20,7 @@ function navigateTo(viewId, pushHistory = true) {
     }
 
     // ACCESSO E PROTEZIONE NAVIGAZIONE
-    const isPublicView = ['view-welcome', 'view-onboarding', 'view-regolamento', 'view-salagiochi'].includes(viewId);
+    const isPublicView = ['view-welcome', 'view-onboarding', 'view-regolamento'].includes(viewId);
     const hasStudentCode = localStorage.getItem('fanta_active_team_code');
     const isDocente = !!currentUserEmail;
 
@@ -51,9 +51,11 @@ function navigateTo(viewId, pushHistory = true) {
     }
 
     if (!isPublicView && !hasStudentCode && !isDocente) {
-        // Blocco totale per utenti non loggati che provano ad accedere a sezioni riservate
-        alert("Devi prima effettuare l'accesso per visitare questa sezione.");
-        navigateTo('view-welcome', pushHistory);
+        // Blocco totale per utenti non loggati: la card Capibara è già mostrata da HubSubscriptionGuard
+        if (!window.HubSubscriptionGuard) {
+            alert("Devi prima effettuare l'accesso per visitare questa sezione.");
+            navigateTo('view-welcome', pushHistory);
+        }
         return;
     }
 
