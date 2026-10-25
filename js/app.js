@@ -1254,6 +1254,25 @@ async function checkStudentConsent() {
             return;
         }
 
+        // Verifica capienza complessiva della classe (Formula Flessibile: max 30 studenti per Piano Base)
+        if (!isAlreadyMember && team.ownerEmail) {
+            try {
+                const ownerEmailClean = team.ownerEmail.toLowerCase().trim();
+                const ownerTeams = await fanta_db.getUserTeams(ownerEmailClean);
+                let totalStudentsInClass = 0;
+                for (const t of ownerTeams) {
+                    const mems = await fanta_db.getStudentsInTeam(t.id);
+                    totalStudentsInClass += (mems ? mems.length : 0);
+                }
+                if (totalStudentsInClass >= 30) {
+                    alert("Questa classe ha raggiunto la capienza massima consentita per il Piano Base (30 studenti). Per classi più numerose, il docente può passare al Piano Docente nell'Hub.");
+                    return;
+                }
+            } catch (capErr) {
+                console.warn("Verifica capienza classe non bloccante:", capErr);
+            }
+        }
+
         // Salviamo il ruolo per i futuri login, se l'utente è autenticato tramite Google
         if (user) {
             try {
@@ -1723,10 +1742,11 @@ function setupTeamSave() {
                 else if (p.includes('docente')) planKey = 'docente_didattico';
             }
             if (planKey === 'base') {
-                const userTeams = await fanta_db.getUserTeams(currentUserEmail);
+                const cleanEmail = (currentUserEmail || '').toLowerCase().trim();
+                const userTeams = await fanta_db.getUserTeams(cleanEmail);
                 const activeTeams = userTeams.filter(t => t.status !== 'archived');
                 if (activeTeams.length >= 4) {
-                    alert("Limite Raggiunto: Il piano Base consente massimo 4 squadre. Passa a un piano superiore per creare infinite squadre!");
+                    alert("Limite Raggiunto: Il piano Base consente massimo 4 squadre per la tua classe. Passa a un piano superiore nell'Hub per creare squadre illimitate!");
                     return;
                 }
             }
