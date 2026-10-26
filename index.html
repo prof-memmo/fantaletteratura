@@ -12,6 +12,12 @@
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+  <!-- Firebase SDKs (in head for immediate auth harmonization on Safari) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js?v=20261022_v2"></script>
+
   <!-- Icone per Safari e Dispositivi Mobili -->
   <link rel="manifest" href="manifest.json">
   <script>window.HUB_GAME_ID = "fantaletteratura";</script>
@@ -21,6 +27,14 @@
       var cdnBase = isPrev ? 'https://prof-memmo.github.io/prof-memmo-gestione-siti/preview/shared/' : 'https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/';
       document.write('<script src="' + cdnBase + 'hub-subscription-guard.js?v=20261020_fanta_guard"><\/script>');
     })();
+
+    window.goToHubPortal = function() {
+      var isPrev = window.location.pathname.indexOf('/preview') !== -1;
+      var portalUrl = isPrev 
+        ? 'https://prof-memmo.github.io/prof-memmo-gestione-siti/preview/portal.html?redirect=fantaletteratura'
+        : 'https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html?redirect=fantaletteratura';
+      window.location.href = portalUrl;
+    };
   </script>
 </head>
 <body class="no-sidebar">
@@ -45,28 +59,10 @@
                     <div class="user-menu-trigger" id="header-user-menu-trigger" onclick="event.stopPropagation(); window.toggleUserDropdown(event);">
                         <div class="user-avatar-circle">
                             <img id="header-user-avatar-img" src="https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png" alt="Avatar" onerror="this.src='https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png'">
-                            <script>
-                                (function(){
-                                    try {
-                                        var av = localStorage.getItem('fanta_user_avatar') || localStorage.getItem('hub_user_avatar');
-                                        if (av) {
-                                            var el = document.getElementById('header-user-avatar-img');
-                                            if (el) el.src = av;
-                                        }
-                                        var nm = localStorage.getItem('fanta_user_name') || localStorage.getItem('hub_user_name');
-                                        if (nm) {
-                                            var elN = document.getElementById('header-user-name');
-                                            if (elN) elN.textContent = nm;
-                                            var elT = document.getElementById('dropdown-user-title');
-                                            if (elT) elT.textContent = nm;
-                                        }
-                                    } catch(e){}
-                                })();
-                            </script>
                         </div>
                         <div class="user-trigger-text">
-                            <span class="user-trigger-name" id="header-user-name">OSPITE</span>
-                            <span class="user-trigger-role" id="header-user-role">NON REGISTRATO</span>
+                            <span class="user-trigger-name" id="header-user-name">ACCEDI</span>
+                            <span class="user-trigger-role" id="header-user-role">OSPITE</span>
                         </div>
                         <span id="header-notification-badge" class="badge-notif-pill" style="display: none;">0</span>
                         <span class="user-trigger-chevron"><i class="fa-solid fa-chevron-down"></i></span>
@@ -96,7 +92,7 @@
                         </div>
 
                         <!-- Golden Pill Login Button (visibile per ospiti) -->
-                        <button class="dropdown-pill-btn" id="btn-login-hub-dropdown" style="background: #d4af37; color: #0f172a; font-weight: 800;" onclick="window.location.href='https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html?redirect=fantaletteratura'">
+                        <button class="dropdown-pill-btn" id="btn-login-hub-dropdown" style="background: #d4af37; color: #0f172a; font-weight: 800;" onclick="window.goToHubPortal()">
                             <i class="fa-solid fa-right-to-bracket"></i> Accedi tramite Hub
                         </button>
 
@@ -117,6 +113,39 @@
                             </button>
                         </div>
                     </div>
+                    <script>
+                        // Anti-flicker immediato per Safari / mobile: armonizzazione sincrona istantanea da localStorage
+                        (function(){
+                            try {
+                                var av = localStorage.getItem('fanta_user_avatar') || localStorage.getItem('hub_user_avatar');
+                                if (av) {
+                                    var elA = document.getElementById('header-user-avatar-img');
+                                    if (elA) elA.src = av;
+                                }
+                                var nm = localStorage.getItem('fanta_user_name') || localStorage.getItem('hub_user_name');
+                                var rl = localStorage.getItem('fanta_user_role') || localStorage.getItem('hub_user_role');
+                                if (nm) {
+                                    var elN = document.getElementById('header-user-name');
+                                    if (elN) elN.textContent = nm.toUpperCase();
+                                    var elT = document.getElementById('dropdown-user-title');
+                                    if (elT) elT.textContent = nm.toUpperCase();
+                                }
+                                if (rl) {
+                                    var roleText = (rl === 'docente' || rl === 'admin') ? (rl === 'admin' ? 'AMMINISTRATORE' : 'DOCENTE REGISTRATO') : (rl === 'studente' ? 'STUDENTE' : 'FANTAMICO');
+                                    var elR = document.getElementById('header-user-role');
+                                    if (elR) elR.textContent = roleText;
+                                    var elSub = document.getElementById('dropdown-user-subtitle');
+                                    if (elSub) elSub.textContent = roleText;
+                                }
+                                if (nm || rl) {
+                                    var btnL = document.getElementById('btn-login-hub-dropdown');
+                                    if (btnL) btnL.style.display = 'none';
+                                    var btnP = document.getElementById('btn-profile-dropdown');
+                                    if (btnP) btnP.style.display = 'flex';
+                                }
+                            } catch(e){}
+                        })();
+                    </script>
                 </div>
             </div>
         </header>
@@ -166,7 +195,7 @@
                     <p class="text-center" style="font-size: 0.95rem; color: #fff; margin-bottom: 18px; font-weight: 500;">Accedi o registrati per iniziare a giocare.</p>
                     
                     <div style="text-align: center; margin: 25px 0;">
-                        <button type="button" class="btn" style="background: var(--primary-color); color: #fff; font-size: 1.15rem; font-weight: 800; padding: 14px 28px; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: none; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;" onclick="window.location.href='https://prof-memmo.github.io/prof-memmo-gestione-siti/portal.html?redirect=fantaletteratura'">
+                        <button type="button" class="btn" style="background: var(--primary-color); color: #fff; font-size: 1.15rem; font-weight: 800; padding: 14px 28px; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: none; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;" onclick="window.goToHubPortal()">
                             <i class="fa-solid fa-right-to-bracket"></i> Accedi tramite Hub
                         </button>
                     </div>
@@ -1561,13 +1590,6 @@
         </div>
     </div>
 
-    <!-- Firebase SDK (Compat Version) -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    
-    <!-- Configurazione & Service Layer -->
-    <script src="js/firebase-config.js?v=10"></script>
     <!-- Auth Modules -->
     <script src="js/auth/login.js?v=10"></script>
     <script src="js/auth/logout.js?v=10"></script>

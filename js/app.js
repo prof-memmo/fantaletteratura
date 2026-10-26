@@ -1254,6 +1254,25 @@ async function checkStudentConsent() {
             return;
         }
 
+        // Verifica capienza complessiva della classe (Formula Flessibile: max 30 studenti per Piano Base)
+        if (!isAlreadyMember && team.ownerEmail) {
+            try {
+                const ownerEmailClean = team.ownerEmail.toLowerCase().trim();
+                const ownerTeams = await fanta_db.getUserTeams(ownerEmailClean);
+                let totalStudentsInClass = 0;
+                for (const t of ownerTeams) {
+                    const mems = await fanta_db.getStudentsInTeam(t.id);
+                    totalStudentsInClass += (mems ? mems.length : 0);
+                }
+                if (totalStudentsInClass >= 30) {
+                    alert("Questa classe ha raggiunto la capienza massima consentita per il Piano Base (30 studenti). Per classi più numerose, il docente può passare al Piano Docente nell'Hub.");
+                    return;
+                }
+            } catch (capErr) {
+                console.warn("Verifica capienza classe non bloccante:", capErr);
+            }
+        }
+
         // Salviamo il ruolo per i futuri login, se l'utente è autenticato tramite Google
         if (user) {
             try {
@@ -1365,8 +1384,8 @@ async function logoutDocente() {
     const bottomRow = document.getElementById('dropdown-bottom-row');
     const notifBadge = document.getElementById('header-notification-badge');
 
-    if (headerUserName) headerUserName.textContent = 'OSPITE';
-    if (headerUserRole) headerUserRole.textContent = 'NON REGISTRATO';
+    if (headerUserName) headerUserName.textContent = 'ACCEDI';
+    if (headerUserRole) headerUserRole.textContent = 'OSPITE';
     if (dropdownTitle) dropdownTitle.textContent = 'OSPITE';
     if (dropdownSubtitle) dropdownSubtitle.textContent = 'NON AUTENTICATO';
     if (headerAvatar) headerAvatar.src = 'https://prof-memmo.github.io/prof-memmo-gestione-siti/shared/assets/branding/prof-memmo/prof-memmo-avatar.png';
@@ -1423,11 +1442,24 @@ function setLoggedIn(email, role = '') {
     window.currentUserEmail = email;
     if (role) {
         localStorage.setItem('fanta_user_role', role);
+        localStorage.setItem('hub_user_role', role);
         currentUserRole = role;
     } else {
         currentUserRole = localStorage.getItem('fanta_user_role') || '';
     }
     window.currentUserRole = currentUserRole;
+
+    // Aggiorna e memorizza il nome utente in localStorage per sincronizzazione anti-flicker Safari
+    const authUser = (window.auth && window.auth.currentUser) || (window.firebase && firebase.auth && firebase.auth().currentUser);
+    const displayName = (window.currentUserData && window.currentUserData.name) || (authUser && authUser.displayName) || (email === 'prof.memmo@gmail.com' ? 'Prof. Memmo' : (email ? email.split('@')[0] : 'Docente'));
+    if (displayName) {
+        localStorage.setItem('fanta_user_name', displayName);
+        localStorage.setItem('hub_user_name', displayName);
+        const headerNameEl = document.getElementById('header-user-name');
+        const dropdownTitleEl = document.getElementById('dropdown-user-title');
+        if (headerNameEl) headerNameEl.textContent = displayName.toUpperCase();
+        if (dropdownTitleEl) dropdownTitleEl.textContent = displayName.toUpperCase();
+    }
     
     const isTeacher = currentUserRole === 'docente' || currentUserRole === 'teacher' || email === 'prof.memmo@gmail.com';
     const isFantamico = currentUserRole === 'fantamico' || currentUserRole === 'viandante' || currentUserRole === 'guest';
@@ -1710,10 +1742,11 @@ function setupTeamSave() {
                 else if (p.includes('docente')) planKey = 'docente_didattico';
             }
             if (planKey === 'base') {
-                const userTeams = await fanta_db.getUserTeams(currentUserEmail);
+                const cleanEmail = (currentUserEmail || '').toLowerCase().trim();
+                const userTeams = await fanta_db.getUserTeams(cleanEmail);
                 const activeTeams = userTeams.filter(t => t.status !== 'archived');
                 if (activeTeams.length >= 4) {
-                    alert("Limite Raggiunto: Il piano Base consente massimo 4 squadre. Passa a un piano superiore per creare infinite squadre!");
+                    alert("Limite Raggiunto: Il piano Base consente massimo 4 squadre per la tua classe. Passa a un piano superiore nell'Hub per creare squadre illimitate!");
                     return;
                 }
             }
