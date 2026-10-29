@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Fantaletteratura</title>
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=20261004_header_unificato">
+    <link rel="stylesheet" href="css/style.css?v=20261029_fanta_countdown">
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -186,6 +186,23 @@
 
             <!-- VIEW: Welcome Home -->
             <section id="view-welcome" class="view active">
+
+                <!-- Countdown Pill Campionato FantaLetteratura (Opzione 2) -->
+                <div class="fanta-pill-container">
+                    <div id="fanta-countdown-pill" class="fanta-countdown-pill" title="Stato Campionato FantaLetteratura">
+                        <div class="fanta-pill-badge-wrap">
+                            <img src="assets/branding/fantaletteratura-badge.png?v=20261004_v2" alt="FantaLetteratura Logo" class="fanta-pill-logo">
+                        </div>
+                        <div class="fanta-pill-content">
+                            <span class="fanta-pill-title" id="fanta-pill-title">1ª Giornata FantaLetteratura</span>
+                            <span class="fanta-pill-sep">·</span>
+                            <span class="fanta-pill-timer" id="fanta-pill-timer">
+                                <i class="fa-solid fa-hourglass-half fanta-hourglass-icon"></i>
+                                <span id="fanta-countdown-val">Calcolo in corso...</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
 
                 <h1 class="text-center">Benvenuto in Fantaletteratura!<br>Clicca sul pulsante, crea la tua squadra e completa le missioni!</h1>
                 <div class="logo-container">
@@ -1862,7 +1879,7 @@
     <!-- Dashboard -->
     <script src="js/dashboard/admin-logic.js?v=20261004_v3_zeroflicker"></script>
     <script src="js/live-editor.js?v=20261004_v3_zeroflicker"></script>
-    <script src="js/app.js?v=20261004_v3_zeroflicker"></script>
+    <script src="js/app.js?v=20261029_fanta_countdown"></script>
     <!-- Modali condivisi ed Access Control ecosistema Prof. Memmo -->
     <script>window.HUB_GAME_ID = "fantaletteratura";</script>
     <script>

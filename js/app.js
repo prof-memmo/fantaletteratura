@@ -107,6 +107,136 @@ async function saveGameState(specificMode = null) {
     }
 }
 
+/* ==========================================================================
+   CONTEGGIO USCITE CAMPIONATO FANTALETTERATURA (Opzione 2)
+   ========================================================================== */
+window.initFantaCountdown = function() {
+    const pill = document.getElementById('fanta-countdown-pill');
+    if (!pill) return;
+
+    const titleEl = document.getElementById('fanta-pill-title');
+    const timerValEl = document.getElementById('fanta-countdown-val');
+    const iconEl = pill.querySelector('.fanta-hourglass-icon');
+
+    let releasesSchedule = [
+        { id: 'rel_1', number: 1, date: '2026-11-10T08:00:00' },
+        { id: 'rel_2', number: 2, date: '2026-11-24T08:00:00' },
+        { id: 'rel_3', number: 3, date: '2026-12-08T08:00:00' },
+        { id: 'rel_4', number: 4, date: '2026-12-22T08:00:00' },
+        { id: 'rel_5', number: 5, date: '2027-01-12T08:00:00' },
+        { id: 'rel_6', number: 6, date: '2027-01-26T08:00:00' },
+        { id: 'rel_7', number: 7, date: '2027-02-09T08:00:00' },
+        { id: 'rel_8', number: 8, date: '2027-02-23T08:00:00' },
+        { id: 'rel_9', number: 9, date: '2027-03-09T08:00:00' },
+        { id: 'rel_10', number: 10, date: '2027-03-23T08:00:00' },
+        { id: 'rel_11', number: 11, date: '2027-04-06T08:00:00' },
+        { id: 'rel_12', number: 12, date: '2027-04-20T08:00:00' },
+        { id: 'rel_13', number: 13, date: '2027-05-04T08:00:00' },
+        { id: 'rel_14', number: 14, date: '2027-05-18T08:00:00' },
+        { id: 'rel_15', number: 15, date: '2027-06-01T08:00:00' }
+    ];
+
+    function syncScheduleFromService() {
+        if (window.CalendarService && typeof window.CalendarService.getReleases === 'function') {
+            const rels = window.CalendarService.getReleases();
+            if (rels && rels.length > 0) {
+                releasesSchedule = rels.map((r, idx) => {
+                    let dStr = r.effectiveDate || r.date;
+                    if (dStr && dStr.length === 10) dStr += 'T08:00:00';
+                    return {
+                        id: r.id || `rel_${idx + 1}`,
+                        number: r.groupNumber || (idx + 1),
+                        date: dStr
+                    };
+                });
+            }
+        }
+    }
+
+    syncScheduleFromService();
+
+    let timerInterval = null;
+
+    function updateTick() {
+        const now = new Date();
+        let activeRelease = null;
+        let isLiveNow = false;
+
+        for (let i = 0; i < releasesSchedule.length; i++) {
+            const rel = releasesSchedule[i];
+            const relStart = new Date(rel.date);
+            const relEnd = new Date(relStart.getTime() + 24 * 60 * 60 * 1000);
+
+            if (now >= relStart && now < relEnd) {
+                activeRelease = rel;
+                isLiveNow = true;
+                break;
+            } else if (now < relStart) {
+                activeRelease = rel;
+                isLiveNow = false;
+                break;
+            }
+        }
+
+        if (!activeRelease) {
+            const container = pill.closest('.fanta-pill-container') || pill;
+            container.style.display = 'none';
+            if (timerInterval) clearInterval(timerInterval);
+            return;
+        }
+
+        const container = pill.closest('.fanta-pill-container') || pill;
+        container.style.display = 'flex';
+
+        if (isLiveNow) {
+            pill.classList.add('is-live');
+            if (titleEl) titleEl.textContent = `🔴 LIVE · ${activeRelease.number}ª Giornata`;
+            if (timerValEl) timerValEl.textContent = 'Uscita in corso oggi!';
+            if (iconEl) iconEl.className = 'fa-solid fa-satellite-dish fanta-hourglass-icon';
+        } else {
+            pill.classList.remove('is-live');
+            if (titleEl) titleEl.textContent = `${activeRelease.number}ª Giornata FantaLetteratura`;
+            if (iconEl) iconEl.className = 'fa-solid fa-hourglass-half fanta-hourglass-icon';
+
+            const target = new Date(activeRelease.date);
+            const diff = target - now;
+
+            if (diff > 0) {
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+                const pad = (n) => String(n).padStart(2, '0');
+                if (timerValEl) {
+                    timerValEl.textContent = `${pad(d)}g : ${pad(h)}h : ${pad(m)}m : ${pad(s)}s`;
+                }
+            }
+        }
+    }
+
+    const db = window.db || window.fbDb || (typeof firebase !== 'undefined' && firebase.firestore ? firebase.firestore() : null);
+    if (db) {
+        try {
+            db.collection('fanta_calendar').doc('releases_config').onSnapshot(() => {
+                syncScheduleFromService();
+                updateTick();
+            }, (err) => {
+                console.warn("Fanta countdown offline:", err);
+                updateTick();
+            });
+        } catch(e) {
+            updateTick();
+        }
+    } else {
+        updateTick();
+    }
+
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(updateTick, 1000);
+    updateTick();
+};
+
 function initApp() {
     // Visibilità immediata — previene la schermata grigia nella HOME
     // Nel pannello admin aspettiamo la verifica di checkLoginSession per sicurezza
@@ -119,6 +249,11 @@ function initApp() {
         localStorage.removeItem('fanta_seen_schede');
         localStorage.setItem('fanta_seen_schede_migrated_v3', 'true');
         console.log("Migration: cleared old fanta_seen_schede auto-read pollution.");
+    }
+
+    // Inizializza Countdown Campionato
+    if (window.initFantaCountdown) {
+        window.initFantaCountdown();
     }
 
     // Sottoscrivi real-time a tutti i campionati per raccogliere notifiche e schede in tempo reale
