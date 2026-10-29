@@ -3681,22 +3681,18 @@ h1, h2, h3, h4 {
 }
 
 .fanta-pill-badge-wrap {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    overflow: hidden;
-    background: #0f172a;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    box-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
+    height: 30px;
 }
 
 .fanta-pill-logo {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: 26px;
+    width: auto;
+    max-width: 160px;
+    object-fit: contain;
     display: block;
 }
 

@@ -195,7 +195,7 @@ window.initFantaCountdown = function() {
             if (iconEl) iconEl.className = 'fa-solid fa-satellite-dish fanta-hourglass-icon';
         } else {
             pill.classList.remove('is-live');
-            if (titleEl) titleEl.textContent = `${activeRelease.number}ª Giornata FantaLetteratura`;
+            if (titleEl) titleEl.textContent = `${activeRelease.number}ª Giornata`;
             if (iconEl) iconEl.className = 'fa-solid fa-hourglass-half fanta-hourglass-icon';
 
             const target = new Date(activeRelease.date);
