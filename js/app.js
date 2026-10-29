@@ -190,12 +190,12 @@ window.initFantaCountdown = function() {
 
         if (isLiveNow) {
             pill.classList.add('is-live');
-            if (titleEl) titleEl.textContent = `🔴 LIVE · ${activeRelease.number}ª Giornata`;
+            if (titleEl) titleEl.innerHTML = `🔴 LIVE · ${activeRelease.number}ª Giornata`;
             if (timerValEl) timerValEl.textContent = 'Uscita in corso oggi!';
             if (iconEl) iconEl.className = 'fa-solid fa-satellite-dish fanta-hourglass-icon';
         } else {
             pill.classList.remove('is-live');
-            if (titleEl) titleEl.textContent = `${activeRelease.number}ª Giornata`;
+            if (titleEl) titleEl.innerHTML = `<i class="fa-solid fa-trophy"></i> ${activeRelease.number}ª Giornata`;
             if (iconEl) iconEl.className = 'fa-solid fa-hourglass-half fanta-hourglass-icon';
 
             const target = new Date(activeRelease.date);
