@@ -495,110 +495,46 @@ window.renderStudentImprevistiNotice = function() {
 
     if (!activeEvents || activeEvents.length === 0) {
         banner.innerHTML = `
-            <div class="fanta-bando-pergamena" style="position: relative; overflow: hidden; padding: 22px 26px; border-radius: 14px; border: 2px solid #b8974a; background: linear-gradient(135deg, #fdfaf1 0%, #f7ecd2 50%, #f0dec0 100%); box-shadow: 0 10px 32px rgba(0,0,0,0.45), inset 0 0 35px rgba(184, 151, 74, 0.22); margin-bottom: 14px; color: #2c1a06; font-family: 'Cormorant Garamond', Georgia, serif; pointer-events: none; user-select: none;">
-                <!-- Watermark Pergamena di sfondo -->
-                <img src="assets/branding/pergamena-imprevisti.png" alt="Pergamena decorativa" style="position: absolute; right: -25px; bottom: -35px; width: 220px; height: auto; opacity: 0.16; pointer-events: none; filter: sepia(0.8) contrast(1.1);" aria-hidden="true">
-
-                <div style="display: flex; align-items: flex-start; gap: 18px; position: relative; z-index: 2;">
-                    <!-- Illustrazione Pergamena d'epoca sul fianco sinistro -->
-                    <div style="flex-shrink: 0; display: none; align-items: center; justify-content: center;" class="fanta-pergamena-crest-box">
-                        <img src="assets/branding/pergamena-imprevisti.png" alt="Sigillo Pergamena" style="width: 82px; height: auto; filter: drop-shadow(0 4px 8px rgba(70,45,15,0.35));">
-                    </div>
-
-                    <div style="flex: 1; min-width: 0;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
-                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                                <span style="background: #4a2c0c; color: #fbf3db; border: 1px solid #7c511a; font-weight: 700; font-size: 0.76rem; padding: 4px 12px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.8px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.15);">
-                                    <i class="fa-solid fa-scroll" style="color: #f1c40f;"></i> Bando Ufficiale della Gazzetta Letteraria
-                                </span>
-                                <span style="background: rgba(141, 160, 63, 0.25); color: #3e4b12; border: 1px solid #70822e; font-weight: 700; font-size: 0.74rem; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
-                                    <i class="fa-solid fa-feather-pointed"></i> Notizia dal Regno
-                                </span>
-                            </div>
-                            <span style="font-size: 0.85rem; font-weight: 600; color: #6b4c24; display: inline-flex; align-items: center; gap: 5px;">
-                                <i class="fa-regular fa-bell"></i> Bollettino Ufficiale
-                            </span>
-                        </div>
-                        
-                        <h3 style="margin: 6px 0 8px 0; color: #2c1a06; font-size: 1.45rem; font-weight: 700; line-height: 1.25; display: flex; align-items: center; gap: 10px; letter-spacing: 0.3px;">
-                            <i class="fa-solid fa-feather-pointed" style="color: #93591c; font-size: 1.2rem;"></i> La Quiete prima della Battaglia Letteraria
-                        </h3>
-                        
-                        <p style="margin: 0 0 12px 0; font-size: 1.08rem; color: #3f2710; line-height: 1.55; font-style: italic;">
-                            «Udite, udite, nobili docenti e valorosi studenti! Su questa pergamena del Regno verranno proclamati gli Imprevisti d’Epoca, i grandi colpi di scena storici e le finestre straordinarie del Mercato. Gli scribi della Gazzetta sono all'opera: preparate le vostre rose, presto giungeranno i primi verdetti!»
-                        </p>
-
-                        <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap; border-top: 1px dashed rgba(92, 61, 16, 0.35); padding-top: 10px;">
-                            <span style="font-size: 0.88rem; color: #4a2c0c; font-weight: 600;">
-                                <i class="fa-solid fa-shield-halved" style="color: #854d0e;"></i> Bacheca Ufficiale di FantaLetteratura
-                            </span>
-                            <span style="margin-left: auto; font-size: 0.78rem; color: #7c5a2e; font-style: italic; opacity: 0.9;">
-                                Gli imprevisti entreranno in vigore durante il Campionato
-                            </span>
-                        </div>
-                    </div>
+            <div style="position: relative; width: 100%; aspect-ratio: 1524 / 1024; background: url('assets/branding/pergamena-imprevisti.png') no-repeat center center; background-size: 100% 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 13% 18%; box-sizing: border-box; filter: drop-shadow(0 8px 22px rgba(0,0,0,0.5)); text-align: center; pointer-events: none; user-select: none;">
+                <div style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 0.85rem; font-weight: 800; color: #4a2c0c; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 2px;">
+                    📜 Bando della Gazzetta
                 </div>
+                <div id="fanta-pergamena-title" style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.12rem; font-weight: 700; color: #2c1a06; line-height: 1.25; margin-bottom: 3px;">
+                    Gli Imprevisti del Regno
+                </div>
+                <p id="fanta-pergamena-desc" style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 0.86rem; font-style: italic; color: #3f2710; line-height: 1.35; margin: 0; max-width: 270px;">
+                    In questa bacheca appariranno gli Imprevisti Letterari e il Mercato durante il Campionato.
+                </p>
             </div>
         `;
         return;
     }
+
     banner.innerHTML = activeEvents.map(ev => {
-        let effectBadge = '';
+        let badgeHtml = '';
         if (ev.isMarket) {
-            effectBadge = `<span style="background: #0284c7; color: #ffffff; border: 1px solid #0369a1; padding: 4px 12px; border-radius: 6px; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.3px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(2,132,199,0.25);"><i class="fa-solid fa-repeat"></i> Finestra di Mercato: 1 Cambio Rosa Disponibile</span>`;
+            badgeHtml = `<span style="background:#0284c7; color:white; font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:4px; margin-top:4px; display:inline-block;">Mercato Aperto</span>`;
         } else if (ev.effectType === 'malus') {
-            effectBadge = `<span style="background: #b91c1c; color: #ffffff; border: 1px solid #991b1b; padding: 4px 12px; border-radius: 6px; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.3px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(185,28,28,0.25);"><i class="fa-solid fa-skull-crossbones"></i> Malus: ${ev.points} Punti</span>`;
+            badgeHtml = `<span style="background:#b91c1c; color:white; font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:4px; margin-top:4px; display:inline-block;">Malus: ${ev.points} Punti</span>`;
         } else if (ev.points > 0) {
-            effectBadge = `<span style="background: #15803d; color: #ffffff; border: 1px solid #166534; padding: 4px 12px; border-radius: 6px; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.3px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(21,128,61,0.25);"><i class="fa-solid fa-star"></i> Bonus: +${ev.points} Punti</span>`;
+            badgeHtml = `<span style="background:#15803d; color:white; font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:4px; margin-top:4px; display:inline-block;">Bonus: +${ev.points} Punti</span>`;
         }
 
+        let loreText = ev.lore || '';
+        if (loreText.length > 95) loreText = loreText.substring(0, 92) + '...';
+
         return `
-            <div class="fanta-bando-pergamena" style="position: relative; overflow: hidden; padding: 22px 26px; border-radius: 14px; border: 2px solid #b8974a; background: linear-gradient(135deg, #fdfaf1 0%, #f7ecd2 50%, #f0dec0 100%); box-shadow: 0 10px 32px rgba(0,0,0,0.45), inset 0 0 35px rgba(184, 151, 74, 0.22); margin-bottom: 14px; color: #2c1a06; font-family: 'Cormorant Garamond', Georgia, serif; pointer-events: none; user-select: none;">
-                <!-- Watermark Pergamena di sfondo -->
-                <img src="assets/branding/pergamena-imprevisti.png" alt="Pergamena decorativa" style="position: absolute; right: -25px; bottom: -35px; width: 220px; height: auto; opacity: 0.16; pointer-events: none; filter: sepia(0.8) contrast(1.1);" aria-hidden="true">
-
-                <div style="display: flex; align-items: flex-start; gap: 18px; position: relative; z-index: 2;">
-                    <!-- Illustrazione Pergamena d'epoca sul fianco sinistro -->
-                    <div style="flex-shrink: 0; display: none; align-items: center; justify-content: center;" class="fanta-pergamena-crest-box">
-                        <img src="assets/branding/pergamena-imprevisti.png" alt="Sigillo Pergamena" style="width: 82px; height: auto; filter: drop-shadow(0 4px 8px rgba(70,45,15,0.35));">
-                    </div>
-
-                    <div style="flex: 1; min-width: 0;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
-                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                                <span style="background: #4a2c0c; color: #fbf3db; border: 1px solid #7c511a; font-weight: 700; font-size: 0.76rem; padding: 4px 12px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.8px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.15);">
-                                    <i class="fa-solid fa-scroll" style="color: #f1c40f;"></i> Bando Ufficiale della Gazzetta Letteraria
-                                </span>
-                                ${ev.isMarket ? `<span style="background: #0284c7; color: #ffffff; border: 1px solid #0369a1; font-weight: 700; font-size: 0.74rem; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="fa-solid fa-repeat"></i> Mercato Straordinario</span>` : ''}
-                            </div>
-                            <span style="font-size: 0.85rem; font-weight: 600; color: #6b4c24; display: inline-flex; align-items: center; gap: 5px;">
-                                <i class="fa-regular fa-calendar-days"></i> Oggi in Vigore
-                            </span>
-                        </div>
-                        
-                        <h3 style="margin: 6px 0 8px 0; color: #2c1a06; font-size: 1.45rem; font-weight: 700; line-height: 1.25; display: flex; align-items: center; gap: 10px; letter-spacing: 0.3px;">
-                            <i class="${ev.icon || 'fa-solid fa-feather-pointed'}" style="color: #93591c; font-size: 1.2rem;"></i> ${ev.title}
-                        </h3>
-                        
-                        ${ev.lore ? `
-                            <p style="margin: 0 0 12px 0; font-size: 1.08rem; color: #3f2710; line-height: 1.55; font-style: italic;">
-                                "${ev.lore}"
-                            </p>
-                        ` : ''}
-
-                        <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap; border-top: 1px dashed rgba(92, 61, 16, 0.35); padding-top: 10px;">
-                            ${ev.authorName && ev.authorName !== 'Globale' ? `
-                                <span style="font-size: 0.92rem; color: #4a2c0c; font-weight: 600;">
-                                    Autore bersaglio: <strong style="color: #854d0e; text-decoration: underline dotted #b8974a;">${ev.authorName}</strong>
-                                </span>
-                            ` : ''}
-                            ${effectBadge}
-                            <span style="margin-left: auto; font-size: 0.75rem; color: #7c5a2e; font-style: italic; opacity: 0.85;">
-                                <i class="fa-solid fa-circle-info"></i> Avviso informativo per tutti i partecipanti
-                            </span>
-                        </div>
-                    </div>
+            <div style="position: relative; width: 100%; aspect-ratio: 1524 / 1024; background: url('assets/branding/pergamena-imprevisti.png') no-repeat center center; background-size: 100% 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 13% 18%; box-sizing: border-box; filter: drop-shadow(0 8px 22px rgba(0,0,0,0.5)); text-align: center; pointer-events: none; user-select: none;">
+                <div style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 0.82rem; font-weight: 800; color: #4a2c0c; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 2px;">
+                    📜 Bando Ufficiale
                 </div>
+                <div style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.12rem; font-weight: 700; color: #2c1a06; line-height: 1.25; margin-bottom: 3px;">
+                    ${ev.title || 'Nuovo Imprevisto'}
+                </div>
+                <p style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 0.86rem; font-style: italic; color: #3f2710; line-height: 1.35; margin: 0; max-width: 270px;">
+                    ${loreText}
+                </p>
+                ${badgeHtml}
             </div>
         `;
     }).join('');
