@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Fantaletteratura</title>
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css?v=20261029_fanta_green_border">
+    <link rel="stylesheet" href="css/style.css?v=20261101_pergamena">
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -153,11 +153,6 @@
         <!-- VIEWS -->
         <main id="main-content">
             
-            <!-- BANNER BOLLETTINO IMPREVISTI & MERCATO (READ-ONLY PER STUDENTI) -->
-            <div id="student-imprevisti-banner" style="display:none; margin: 10px auto 18px auto; max-width: 900px; padding: 0 15px;">
-                <!-- Popolato dinamicamente da JS quando un evento è attivo -->
-            </div>
-            
             <!-- VIEW: Pausa Obbligatoria -->
             <section id="view-pausa-obbligatoria" class="view" style="display: none;">
                 <div style="max-width: 600px; margin: 0 auto; text-align: center; padding: 20px;">
@@ -228,6 +223,21 @@
                         <p class="text-center" style="font-size: 0.9rem; margin-bottom:20px;">Il tuo account è in attesa di approvazione dal Game Master.<br>Ti avviseremo via mail appena sarai attivo!</p>
                     </div>
                     <div style="text-align:center; margin-top:15px;"><a href="#" onclick="logoutDocente()" style="color:var(--danger-color); font-size:0.8rem; text-decoration:none;">Disconnetti</a></div>
+                </div>
+
+                <!-- Bacheca Pergamena Imprevisti & Mercato (Discreta e Compatta - Testo scritto dentro) -->
+                <div id="student-imprevisti-banner" style="margin: 24px auto 10px auto; max-width: 480px; width: 100%; pointer-events: none; user-select: none;">
+                    <div style="position: relative; width: 100%; aspect-ratio: 1536 / 1024; background: url('assets/branding/pergamena-imprevisti.png') no-repeat center center; background-size: 100% 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12% 16%; box-sizing: border-box; filter: drop-shadow(0 8px 22px rgba(0,0,0,0.5)); text-align: center;">
+                        <div style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 0.85rem; font-weight: 800; color: #4a2c0c; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 2px;">
+                            📜 Bando della Gazzetta
+                        </div>
+                        <div id="fanta-pergamena-title" style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.15rem; font-weight: 700; color: #2c1a06; line-height: 1.25; margin-bottom: 4px;">
+                            Gli Imprevisti del Regno
+                        </div>
+                        <p id="fanta-pergamena-desc" style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 0.88rem; font-style: italic; color: #3f2710; line-height: 1.35; margin: 0; max-width: 310px;">
+                            In questa bacheca appariranno gli Imprevisti Letterari e il Mercato durante il Campionato.
+                        </p>
+                    </div>
                 </div>
             </section>
 
@@ -1865,7 +1875,7 @@
     <!-- Scripts -->
     <script src="js/data.js?v=20261004_v3_zeroflicker"></script>
     <script src="js/services/calendar-service.js?v=20261004_v3_zeroflicker"></script>
-    <script src="js/services/imprevisti-service.js?v=20261004_v3_zeroflicker"></script>
+    <script src="js/services/imprevisti-service.js?v=20261101_pergamena"></script>
     <script src="js/services/rules-service.js?v=20261004_v3_zeroflicker"></script>
     <script src="js/services/miniguida-service.js?v=20261004_v3_zeroflicker"></script>
     <script src="js/music.js?v=20261004_v3_zeroflicker"></script>
@@ -1876,7 +1886,7 @@
     <!-- Dashboard -->
     <script src="js/dashboard/admin-logic.js?v=20261004_v3_zeroflicker"></script>
     <script src="js/live-editor.js?v=20261004_v3_zeroflicker"></script>
-    <script src="js/app.js?v=20261029_fanta_green_border"></script>
+    <script src="js/app.js?v=20261101_pergamena_home"></script>
     <!-- Modali condivisi ed Access Control ecosistema Prof. Memmo -->
     <script>window.HUB_GAME_ID = "fantaletteratura";</script>
     <script>

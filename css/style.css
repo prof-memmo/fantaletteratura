@@ -3768,5 +3768,16 @@ h1, h2, h3, h4 {
     }
 }
 
+/* Bollettino Pergamena Imprevisti e Mercato FantaLetteratura */
+@media (min-width: 640px) {
+    .fanta-pergamena-crest-box {
+        display: flex !important;
+    }
+}
+.fanta-bando-pergamena {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+
 
 

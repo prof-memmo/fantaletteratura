@@ -487,59 +487,54 @@ window.renderStudentImprevistiNotice = function() {
     const banner = document.getElementById('student-imprevisti-banner');
     if (!banner) return;
 
-    if (!window.ImprevistiService) {
-        banner.style.display = 'none';
-        return;
-    }
-
-    const activeEvents = window.ImprevistiService.getActiveEvents();
-    if (!activeEvents || activeEvents.length === 0) {
-        banner.style.display = 'none';
-        banner.innerHTML = '';
-        return;
-    }
-
     banner.style.display = 'block';
+
+    const activeEvents = (window.ImprevistiService && typeof window.ImprevistiService.getActiveEvents === 'function') 
+        ? window.ImprevistiService.getActiveEvents() 
+        : [];
+
+    if (!activeEvents || activeEvents.length === 0) {
+        banner.innerHTML = `
+            <div style="position: relative; width: 100%; aspect-ratio: 1536 / 1024; background: url('assets/branding/pergamena-imprevisti.png') no-repeat center center; background-size: 100% 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12% 16%; box-sizing: border-box; filter: drop-shadow(0 8px 22px rgba(0,0,0,0.5)); text-align: center; pointer-events: none; user-select: none;">
+                <div style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 0.85rem; font-weight: 800; color: #4a2c0c; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 2px;">
+                    📜 Bando della Gazzetta
+                </div>
+                <div id="fanta-pergamena-title" style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.15rem; font-weight: 700; color: #2c1a06; line-height: 1.25; margin-bottom: 4px;">
+                    Gli Imprevisti del Regno
+                </div>
+                <p id="fanta-pergamena-desc" style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 0.88rem; font-style: italic; color: #3f2710; line-height: 1.35; margin: 0; max-width: 310px;">
+                    In questa bacheca appariranno gli Imprevisti Letterari e il Mercato durante il Campionato.
+                </p>
+            </div>
+        `;
+        return;
+    }
+
     banner.innerHTML = activeEvents.map(ev => {
-        let effectBadge = '';
+        let badgeHtml = '';
         if (ev.isMarket) {
-            effectBadge = `<span style="background: rgba(56, 189, 248, 0.25); color: #38bdf8; border: 1px solid #38bdf8; padding: 3px 10px; border-radius: 8px; font-weight: bold; font-size: 0.8rem;"><i class="fa-solid fa-repeat"></i> Finestra di Mercato: 1 Cambio Rosa Disponibile</span>`;
+            badgeHtml = `<span style="background:#0284c7; color:white; font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:4px; margin-top:4px; display:inline-block;">Mercato Aperto</span>`;
         } else if (ev.effectType === 'malus') {
-            effectBadge = `<span style="background: rgba(239, 68, 68, 0.25); color: #f87171; border: 1px solid #ef4444; padding: 3px 10px; border-radius: 8px; font-weight: bold; font-size: 0.8rem;">Malus: ${ev.points} Punti</span>`;
+            badgeHtml = `<span style="background:#b91c1c; color:white; font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:4px; margin-top:4px; display:inline-block;">Malus: ${ev.points} Punti</span>`;
         } else if (ev.points > 0) {
-            effectBadge = `<span style="background: rgba(34, 197, 94, 0.25); color: #4ade80; border: 1px solid #22c55e; padding: 3px 10px; border-radius: 8px; font-weight: bold; font-size: 0.8rem;">Bonus: +${ev.points} Punti</span>`;
+            badgeHtml = `<span style="background:#15803d; color:white; font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:4px; margin-top:4px; display:inline-block;">Bonus: +${ev.points} Punti</span>`;
         }
 
-        return `
-            <div class="glass" style="padding: 16px 20px; border-radius: 14px; border: 1px solid rgba(212,175,55,0.4); background: linear-gradient(135deg, rgba(20,20,30,0.95), rgba(40,30,15,0.85)); box-shadow: 0 8px 32px rgba(0,0,0,0.4); margin-bottom: 12px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
-                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                        <span style="background: var(--accent-gold); color: var(--bg-dark); font-weight: 800; font-size: 0.72rem; padding: 3px 10px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 5px;">
-                            <i class="fa-solid fa-scroll"></i> Bollettino Ufficiale della Gazzetta Letteraria
-                        </span>
-                        ${ev.isMarket ? `<span style="background: rgba(56,189,248,0.2); color: #38bdf8; border: 1px solid #38bdf8; font-weight: 700; font-size: 0.72rem; padding: 3px 10px; border-radius: 12px;"><i class="fa-solid fa-repeat"></i> Mercato Aperto</span>` : ''}
-                    </div>
-                    <span style="font-size: 0.78rem; color: var(--text-muted);"><i class="fa-regular fa-calendar"></i> Oggi</span>
-                </div>
-                
-                <h3 style="margin: 4px 0 6px 0; color: #fff; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
-                    <i class="${ev.icon || 'fa-solid fa-scroll'}" style="color: var(--accent-gold);"></i> ${ev.title}
-                </h3>
-                
-                ${ev.lore ? `
-                    <p style="margin: 0 0 10px 0; font-size: 0.88rem; color: #e2e8f0; line-height: 1.45;">
-                        ${ev.lore}
-                    </p>
-                ` : ''}
+        let loreText = ev.lore || '';
+        if (loreText.length > 95) loreText = loreText.substring(0, 92) + '...';
 
-                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px;">
-                    ${ev.authorName && ev.authorName !== 'Globale' ? `
-                        <span style="font-size: 0.82rem; color: var(--text-light);">
-                            Autore bersaglio: <strong style="color: var(--accent-gold);">${ev.authorName}</strong>
-                        </span>
-                    ` : ''}
-                    ${effectBadge}
+        return `
+            <div style="position: relative; width: 100%; aspect-ratio: 1536 / 1024; background: url('assets/branding/pergamena-imprevisti.png') no-repeat center center; background-size: 100% 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12% 16%; box-sizing: border-box; filter: drop-shadow(0 8px 22px rgba(0,0,0,0.5)); text-align: center; pointer-events: none; user-select: none;">
+                <div style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 0.82rem; font-weight: 800; color: #4a2c0c; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 2px;">
+                    📜 Bando Ufficiale
                 </div>
+                <div style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.15rem; font-weight: 700; color: #2c1a06; line-height: 1.25; margin-bottom: 4px;">
+                    ${ev.title || 'Nuovo Imprevisto'}
+                </div>
+                <p style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 0.88rem; font-style: italic; color: #3f2710; line-height: 1.35; margin: 0; max-width: 310px;">
+                    ${loreText}
+                </p>
+                ${badgeHtml}
             </div>
         `;
     }).join('');
