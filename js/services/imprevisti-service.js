@@ -503,42 +503,59 @@ window.renderStudentImprevistiNotice = function() {
     banner.innerHTML = activeEvents.map(ev => {
         let effectBadge = '';
         if (ev.isMarket) {
-            effectBadge = `<span style="background: rgba(56, 189, 248, 0.25); color: #38bdf8; border: 1px solid #38bdf8; padding: 3px 10px; border-radius: 8px; font-weight: bold; font-size: 0.8rem;"><i class="fa-solid fa-repeat"></i> Finestra di Mercato: 1 Cambio Rosa Disponibile</span>`;
+            effectBadge = `<span style="background: #0284c7; color: #ffffff; border: 1px solid #0369a1; padding: 4px 12px; border-radius: 6px; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.3px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(2,132,199,0.25);"><i class="fa-solid fa-repeat"></i> Finestra di Mercato: 1 Cambio Rosa Disponibile</span>`;
         } else if (ev.effectType === 'malus') {
-            effectBadge = `<span style="background: rgba(239, 68, 68, 0.25); color: #f87171; border: 1px solid #ef4444; padding: 3px 10px; border-radius: 8px; font-weight: bold; font-size: 0.8rem;">Malus: ${ev.points} Punti</span>`;
+            effectBadge = `<span style="background: #b91c1c; color: #ffffff; border: 1px solid #991b1b; padding: 4px 12px; border-radius: 6px; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.3px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(185,28,28,0.25);"><i class="fa-solid fa-skull-crossbones"></i> Malus: ${ev.points} Punti</span>`;
         } else if (ev.points > 0) {
-            effectBadge = `<span style="background: rgba(34, 197, 94, 0.25); color: #4ade80; border: 1px solid #22c55e; padding: 3px 10px; border-radius: 8px; font-weight: bold; font-size: 0.8rem;">Bonus: +${ev.points} Punti</span>`;
+            effectBadge = `<span style="background: #15803d; color: #ffffff; border: 1px solid #166534; padding: 4px 12px; border-radius: 6px; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.3px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(21,128,61,0.25);"><i class="fa-solid fa-star"></i> Bonus: +${ev.points} Punti</span>`;
         }
 
         return `
-            <div class="glass" style="padding: 16px 20px; border-radius: 14px; border: 1px solid rgba(212,175,55,0.4); background: linear-gradient(135deg, rgba(20,20,30,0.95), rgba(40,30,15,0.85)); box-shadow: 0 8px 32px rgba(0,0,0,0.4); margin-bottom: 12px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
-                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                        <span style="background: var(--accent-gold); color: var(--bg-dark); font-weight: 800; font-size: 0.72rem; padding: 3px 10px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 5px;">
-                            <i class="fa-solid fa-scroll"></i> Bollettino Ufficiale della Gazzetta Letteraria
-                        </span>
-                        ${ev.isMarket ? `<span style="background: rgba(56,189,248,0.2); color: #38bdf8; border: 1px solid #38bdf8; font-weight: 700; font-size: 0.72rem; padding: 3px 10px; border-radius: 12px;"><i class="fa-solid fa-repeat"></i> Mercato Aperto</span>` : ''}
-                    </div>
-                    <span style="font-size: 0.78rem; color: var(--text-muted);"><i class="fa-regular fa-calendar"></i> Oggi</span>
-                </div>
-                
-                <h3 style="margin: 4px 0 6px 0; color: #fff; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
-                    <i class="${ev.icon || 'fa-solid fa-scroll'}" style="color: var(--accent-gold);"></i> ${ev.title}
-                </h3>
-                
-                ${ev.lore ? `
-                    <p style="margin: 0 0 10px 0; font-size: 0.88rem; color: #e2e8f0; line-height: 1.45;">
-                        ${ev.lore}
-                    </p>
-                ` : ''}
+            <div class="fanta-bando-pergamena" style="position: relative; overflow: hidden; padding: 22px 26px; border-radius: 14px; border: 2px solid #b8974a; background: linear-gradient(135deg, #fdfaf1 0%, #f7ecd2 50%, #f0dec0 100%); box-shadow: 0 10px 32px rgba(0,0,0,0.45), inset 0 0 35px rgba(184, 151, 74, 0.22); margin-bottom: 14px; color: #2c1a06; font-family: 'Cormorant Garamond', Georgia, serif; pointer-events: none; user-select: none;">
+                <!-- Watermark Pergamena di sfondo -->
+                <img src="assets/branding/pergamena-imprevisti.png" alt="Pergamena decorativa" style="position: absolute; right: -25px; bottom: -35px; width: 220px; height: auto; opacity: 0.16; pointer-events: none; filter: sepia(0.8) contrast(1.1);" aria-hidden="true">
 
-                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px;">
-                    ${ev.authorName && ev.authorName !== 'Globale' ? `
-                        <span style="font-size: 0.82rem; color: var(--text-light);">
-                            Autore bersaglio: <strong style="color: var(--accent-gold);">${ev.authorName}</strong>
-                        </span>
-                    ` : ''}
-                    ${effectBadge}
+                <div style="display: flex; align-items: flex-start; gap: 18px; position: relative; z-index: 2;">
+                    <!-- Illustrazione Pergamena d'epoca sul fianco sinistro -->
+                    <div style="flex-shrink: 0; display: none; align-items: center; justify-content: center;" class="fanta-pergamena-crest-box">
+                        <img src="assets/branding/pergamena-imprevisti.png" alt="Sigillo Pergamena" style="width: 82px; height: auto; filter: drop-shadow(0 4px 8px rgba(70,45,15,0.35));">
+                    </div>
+
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <span style="background: #4a2c0c; color: #fbf3db; border: 1px solid #7c511a; font-weight: 700; font-size: 0.76rem; padding: 4px 12px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.8px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.15);">
+                                    <i class="fa-solid fa-scroll" style="color: #f1c40f;"></i> Bando Ufficiale della Gazzetta Letteraria
+                                </span>
+                                ${ev.isMarket ? `<span style="background: #0284c7; color: #ffffff; border: 1px solid #0369a1; font-weight: 700; font-size: 0.74rem; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="fa-solid fa-repeat"></i> Mercato Straordinario</span>` : ''}
+                            </div>
+                            <span style="font-size: 0.85rem; font-weight: 600; color: #6b4c24; display: inline-flex; align-items: center; gap: 5px;">
+                                <i class="fa-regular fa-calendar-days"></i> Oggi in Vigore
+                            </span>
+                        </div>
+                        
+                        <h3 style="margin: 6px 0 8px 0; color: #2c1a06; font-size: 1.45rem; font-weight: 700; line-height: 1.25; display: flex; align-items: center; gap: 10px; letter-spacing: 0.3px;">
+                            <i class="${ev.icon || 'fa-solid fa-feather-pointed'}" style="color: #93591c; font-size: 1.2rem;"></i> ${ev.title}
+                        </h3>
+                        
+                        ${ev.lore ? `
+                            <p style="margin: 0 0 12px 0; font-size: 1.08rem; color: #3f2710; line-height: 1.55; font-style: italic;">
+                                "${ev.lore}"
+                            </p>
+                        ` : ''}
+
+                        <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap; border-top: 1px dashed rgba(92, 61, 16, 0.35); padding-top: 10px;">
+                            ${ev.authorName && ev.authorName !== 'Globale' ? `
+                                <span style="font-size: 0.92rem; color: #4a2c0c; font-weight: 600;">
+                                    Autore bersaglio: <strong style="color: #854d0e; text-decoration: underline dotted #b8974a;">${ev.authorName}</strong>
+                                </span>
+                            ` : ''}
+                            ${effectBadge}
+                            <span style="margin-left: auto; font-size: 0.75rem; color: #7c5a2e; font-style: italic; opacity: 0.85;">
+                                <i class="fa-solid fa-circle-info"></i> Avviso informativo per tutti i partecipanti
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
