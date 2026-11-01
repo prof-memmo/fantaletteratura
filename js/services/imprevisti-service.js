@@ -495,14 +495,14 @@ window.renderStudentImprevistiNotice = function() {
 
     if (!activeEvents || activeEvents.length === 0) {
         banner.innerHTML = `
-            <div style="position: relative; width: 100%; aspect-ratio: 1524 / 1024; background: url('assets/branding/pergamena-imprevisti.png') no-repeat center center; background-size: 100% 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 13% 18%; box-sizing: border-box; filter: drop-shadow(0 8px 22px rgba(0,0,0,0.5)); text-align: center; pointer-events: none; user-select: none;">
+            <div style="position: relative; width: 100%; aspect-ratio: 1536 / 1024; background: url('assets/branding/pergamena-imprevisti.png') no-repeat center center; background-size: 100% 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12% 16%; box-sizing: border-box; filter: drop-shadow(0 8px 22px rgba(0,0,0,0.5)); text-align: center; pointer-events: none; user-select: none;">
                 <div style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 0.85rem; font-weight: 800; color: #4a2c0c; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 2px;">
                     📜 Bando della Gazzetta
                 </div>
-                <div id="fanta-pergamena-title" style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.12rem; font-weight: 700; color: #2c1a06; line-height: 1.25; margin-bottom: 3px;">
+                <div id="fanta-pergamena-title" style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.15rem; font-weight: 700; color: #2c1a06; line-height: 1.25; margin-bottom: 4px;">
                     Gli Imprevisti del Regno
                 </div>
-                <p id="fanta-pergamena-desc" style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 0.86rem; font-style: italic; color: #3f2710; line-height: 1.35; margin: 0; max-width: 270px;">
+                <p id="fanta-pergamena-desc" style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 0.88rem; font-style: italic; color: #3f2710; line-height: 1.35; margin: 0; max-width: 310px;">
                     In questa bacheca appariranno gli Imprevisti Letterari e il Mercato durante il Campionato.
                 </p>
             </div>
@@ -524,14 +524,14 @@ window.renderStudentImprevistiNotice = function() {
         if (loreText.length > 95) loreText = loreText.substring(0, 92) + '...';
 
         return `
-            <div style="position: relative; width: 100%; aspect-ratio: 1524 / 1024; background: url('assets/branding/pergamena-imprevisti.png') no-repeat center center; background-size: 100% 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 13% 18%; box-sizing: border-box; filter: drop-shadow(0 8px 22px rgba(0,0,0,0.5)); text-align: center; pointer-events: none; user-select: none;">
+            <div style="position: relative; width: 100%; aspect-ratio: 1536 / 1024; background: url('assets/branding/pergamena-imprevisti.png') no-repeat center center; background-size: 100% 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12% 16%; box-sizing: border-box; filter: drop-shadow(0 8px 22px rgba(0,0,0,0.5)); text-align: center; pointer-events: none; user-select: none;">
                 <div style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 0.82rem; font-weight: 800; color: #4a2c0c; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 2px;">
                     📜 Bando Ufficiale
                 </div>
-                <div style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.12rem; font-weight: 700; color: #2c1a06; line-height: 1.25; margin-bottom: 3px;">
+                <div style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.15rem; font-weight: 700; color: #2c1a06; line-height: 1.25; margin-bottom: 4px;">
                     ${ev.title || 'Nuovo Imprevisto'}
                 </div>
-                <p style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 0.86rem; font-style: italic; color: #3f2710; line-height: 1.35; margin: 0; max-width: 270px;">
+                <p style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 0.88rem; font-style: italic; color: #3f2710; line-height: 1.35; margin: 0; max-width: 310px;">
                     ${loreText}
                 </p>
                 ${badgeHtml}
