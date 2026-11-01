@@ -487,19 +487,61 @@ window.renderStudentImprevistiNotice = function() {
     const banner = document.getElementById('student-imprevisti-banner');
     if (!banner) return;
 
-    if (!window.ImprevistiService) {
-        banner.style.display = 'none';
-        return;
-    }
-
-    const activeEvents = window.ImprevistiService.getActiveEvents();
-    if (!activeEvents || activeEvents.length === 0) {
-        banner.style.display = 'none';
-        banner.innerHTML = '';
-        return;
-    }
-
     banner.style.display = 'block';
+
+    const activeEvents = (window.ImprevistiService && typeof window.ImprevistiService.getActiveEvents === 'function') 
+        ? window.ImprevistiService.getActiveEvents() 
+        : [];
+
+    if (!activeEvents || activeEvents.length === 0) {
+        banner.innerHTML = `
+            <div class="fanta-bando-pergamena" style="position: relative; overflow: hidden; padding: 22px 26px; border-radius: 14px; border: 2px solid #b8974a; background: linear-gradient(135deg, #fdfaf1 0%, #f7ecd2 50%, #f0dec0 100%); box-shadow: 0 10px 32px rgba(0,0,0,0.45), inset 0 0 35px rgba(184, 151, 74, 0.22); margin-bottom: 14px; color: #2c1a06; font-family: 'Cormorant Garamond', Georgia, serif; pointer-events: none; user-select: none;">
+                <!-- Watermark Pergamena di sfondo -->
+                <img src="assets/branding/pergamena-imprevisti.png" alt="Pergamena decorativa" style="position: absolute; right: -25px; bottom: -35px; width: 220px; height: auto; opacity: 0.16; pointer-events: none; filter: sepia(0.8) contrast(1.1);" aria-hidden="true">
+
+                <div style="display: flex; align-items: flex-start; gap: 18px; position: relative; z-index: 2;">
+                    <!-- Illustrazione Pergamena d'epoca sul fianco sinistro -->
+                    <div style="flex-shrink: 0; display: none; align-items: center; justify-content: center;" class="fanta-pergamena-crest-box">
+                        <img src="assets/branding/pergamena-imprevisti.png" alt="Sigillo Pergamena" style="width: 82px; height: auto; filter: drop-shadow(0 4px 8px rgba(70,45,15,0.35));">
+                    </div>
+
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <span style="background: #4a2c0c; color: #fbf3db; border: 1px solid #7c511a; font-weight: 700; font-size: 0.76rem; padding: 4px 12px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.8px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.15);">
+                                    <i class="fa-solid fa-scroll" style="color: #f1c40f;"></i> Bando Ufficiale della Gazzetta Letteraria
+                                </span>
+                                <span style="background: rgba(141, 160, 63, 0.25); color: #3e4b12; border: 1px solid #70822e; font-weight: 700; font-size: 0.74rem; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+                                    <i class="fa-solid fa-feather-pointed"></i> Notizia dal Regno
+                                </span>
+                            </div>
+                            <span style="font-size: 0.85rem; font-weight: 600; color: #6b4c24; display: inline-flex; align-items: center; gap: 5px;">
+                                <i class="fa-regular fa-bell"></i> Bollettino Ufficiale
+                            </span>
+                        </div>
+                        
+                        <h3 style="margin: 6px 0 8px 0; color: #2c1a06; font-size: 1.45rem; font-weight: 700; line-height: 1.25; display: flex; align-items: center; gap: 10px; letter-spacing: 0.3px;">
+                            <i class="fa-solid fa-feather-pointed" style="color: #93591c; font-size: 1.2rem;"></i> La Quiete prima della Battaglia Letteraria
+                        </h3>
+                        
+                        <p style="margin: 0 0 12px 0; font-size: 1.08rem; color: #3f2710; line-height: 1.55; font-style: italic;">
+                            «Udite, udite, nobili docenti e valorosi studenti! Su questa pergamena del Regno verranno proclamati gli Imprevisti d’Epoca, i grandi colpi di scena storici e le finestre straordinarie del Mercato. Gli scribi della Gazzetta sono all'opera: preparate le vostre rose, presto giungeranno i primi verdetti!»
+                        </p>
+
+                        <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap; border-top: 1px dashed rgba(92, 61, 16, 0.35); padding-top: 10px;">
+                            <span style="font-size: 0.88rem; color: #4a2c0c; font-weight: 600;">
+                                <i class="fa-solid fa-shield-halved" style="color: #854d0e;"></i> Bacheca Ufficiale di FantaLetteratura
+                            </span>
+                            <span style="margin-left: auto; font-size: 0.78rem; color: #7c5a2e; font-style: italic; opacity: 0.9;">
+                                Gli imprevisti entreranno in vigore durante il Campionato
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        return;
+    }
     banner.innerHTML = activeEvents.map(ev => {
         let effectBadge = '';
         if (ev.isMarket) {

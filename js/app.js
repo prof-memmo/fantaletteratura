@@ -1266,7 +1266,7 @@ function checkLoginSession() {
                             navigateTo('view-classifiche', false);
                         }
                     } else if (currentUserRole === 'docente' || currentUserRole === 'fantamico' || isSuperAdmin) {
-                        navigateTo('view-profilo', false);
+                        navigateTo('view-welcome', false);
                     } else {
                         navigateTo('view-welcome', false);
                     }
