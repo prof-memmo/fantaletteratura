@@ -20,9 +20,20 @@ function navigateTo(viewId, pushHistory = true) {
     }
 
     // ACCESSO E PROTEZIONE NAVIGAZIONE
-    const isPublicView = ['view-welcome', 'view-onboarding', 'view-regolamento'].includes(viewId);
-    const hasStudentCode = localStorage.getItem('fanta_active_team_code');
-    const isDocente = !!currentUserEmail;
+    const isPublicView = [
+        'view-welcome', 
+        'view-onboarding', 
+        'view-regolamento', 
+        'view-classifiche', 
+        'view-classifica-dettaglio', 
+        'view-schede', 
+        'view-salagiochi', 
+        'view-privacy', 
+        'view-contatti'
+    ].includes(viewId);
+
+    const hasStudentCode = localStorage.getItem('fanta_active_team_code') || localStorage.getItem('pm_student_class') || localStorage.getItem('hub_user_class');
+    const isDocente = !!(currentUserEmail || (typeof window !== 'undefined' && window.auth && window.auth.currentUser && window.auth.currentUser.email) || localStorage.getItem('fanta_user_email') || localStorage.getItem('hub_user_email'));
 
     // Controllo Centralizzato HubSubscriptionGuard
     if (window.HubSubscriptionGuard && typeof window.HubSubscriptionGuard.verifyAccess === 'function') {
