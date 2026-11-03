@@ -17,6 +17,13 @@ if (typeof firebase !== 'undefined') {
     window.auth = firebase.auth();
     window.fbDb = window.db;
     window.fbAuth = window.auth;
+
+    // Assicura persistenza locale su Safari / iOS WebKit (armonizzazione ecosistema)
+    if (window.auth && typeof window.auth.setPersistence === 'function') {
+        window.auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(err) {
+            console.warn("FantaLetteratura setPersistence LOCAL:", err);
+        });
+    }
     
     // =========================================================
     // WRAPPER "ZERO REFACTORING" PER LE COLLEZIONI
