@@ -1202,7 +1202,7 @@ function checkLoginSession() {
                         return;
                     }
                     if (hubData.role === 'admin' || isSuperAdmin) {
-                        hubRole = 'docente';
+                        hubRole = 'admin';
                     } else if (hubData.role === 'docente') {
                         hubRole = 'docente';
                     } else if (hubData.role === 'viandante' || hubData.role === 'forestiero' || hubData.role === 'fantamico') {
@@ -1225,7 +1225,7 @@ function checkLoginSession() {
             }
 
             // 3. Sincronizzazione profilo FantaLetteratura
-            currentUserRole = isSuperAdmin ? 'docente' : hubRole;
+            currentUserRole = isSuperAdmin ? 'admin' : hubRole;
             setLoggedIn(email, currentUserRole);
 
             try {
@@ -1249,7 +1249,7 @@ function checkLoginSession() {
 
             const adminMenuItem = document.getElementById('menu-admin-item');
             if (adminMenuItem) {
-                adminMenuItem.style.display = isSuperAdmin ? 'block' : 'none';
+                adminMenuItem.style.display = (isSuperAdmin || currentUserRole === 'admin') ? 'block' : 'none';
             }
 
             if (!window.location.pathname.includes('admin.html')) {
@@ -1596,7 +1596,7 @@ function setLoggedIn(email, role = '') {
         if (dropdownTitleEl) dropdownTitleEl.textContent = displayName.toUpperCase();
     }
     
-    const isTeacher = currentUserRole === 'docente' || currentUserRole === 'teacher' || email === 'prof.memmo@gmail.com';
+    const isTeacher = currentUserRole === 'admin' || currentUserRole === 'docente' || currentUserRole === 'teacher' || email === 'prof.memmo@gmail.com';
     const isFantamico = currentUserRole === 'fantamico' || currentUserRole === 'viandante' || currentUserRole === 'guest';
     const isStudent = currentUserRole === 'studente';
 
@@ -1623,14 +1623,16 @@ function setLoggedIn(email, role = '') {
     const headerRoleEl = document.getElementById('header-user-role');
     const dropdownRoleEl = document.getElementById('dropdown-user-subtitle');
     let roleText = 'DOCENTE REGISTRATO';
-    if (isTeacher) roleText = (email === 'prof.memmo@gmail.com' ? 'AMMINISTRATORE' : 'DOCENTE REGISTRATO');
+    if (currentUserRole === 'admin' || email === 'prof.memmo@gmail.com') roleText = 'AMMINISTRATORE';
+    else if (isTeacher) roleText = 'DOCENTE REGISTRATO';
     else if (isFantamico) roleText = 'FANTAMICO';
     else if (isStudent) roleText = 'STUDENTE';
     if (headerRoleEl) headerRoleEl.textContent = roleText;
     if (dropdownRoleEl) dropdownRoleEl.textContent = roleText;
 
     if (loggedWelc) {
-        if (isTeacher) loggedWelc.textContent = "Bentornato, Prof!";
+        if (currentUserRole === 'admin' || email === 'prof.memmo@gmail.com') loggedWelc.textContent = "Bentornato, Amministratore!";
+        else if (isTeacher) loggedWelc.textContent = "Bentornato, Prof!";
         else if (isFantamico) loggedWelc.textContent = "Ciao, Viandante!";
         else if (isStudent) loggedWelc.textContent = "Ciao, Studente!";
         else loggedWelc.textContent = "Benvenuto!";
@@ -1766,7 +1768,7 @@ function setLoggedIn(email, role = '') {
 
     const adminTab = document.getElementById('tab-item-admin');
     if (adminTab) {
-        if (email === 'prof.memmo@gmail.com') adminTab.classList.remove('hidden');
+        if (email === 'prof.memmo@gmail.com' || currentUserRole === 'admin') adminTab.classList.remove('hidden');
         else adminTab.classList.add('hidden');
     }
 
@@ -4018,24 +4020,42 @@ window.loadDocenteClassiComposizione = async function() {
     select.innerHTML = '<option value="">Caricamento classi...</option>';
 
     try {
-        const user = window.auth ? window.auth.currentUser : null;
+        let user = window.auth ? window.auth.currentUser : null;
+        if (!user && window.auth && typeof window.auth.onAuthStateChanged === 'function') {
+            user = await new Promise(resolve => {
+                const unsub = window.auth.onAuthStateChanged(u => {
+                    unsub();
+                    resolve(u);
+                });
+                setTimeout(() => resolve(null), 1500);
+            });
+        }
         if (!user) return;
 
         const uid = user.uid;
         const email = (user.email || '').toLowerCase();
+        const isSuperAdmin = (email === 'prof.memmo@gmail.com' || window.currentUserRole === 'admin');
 
-        const queries = [
-            // Nuove classi unificate Hub
-            window.db.collection('hub_classes').where('teacherId', '==', uid).get().catch(() => ({ docs: [] })),
-            window.db.collection('hub_classes').where('teacherEmail', '==', email).get().catch(() => ({ docs: [] })),
-            window.db.collection('hub_classes').where('teacherIds', 'array-contains', uid).get().catch(() => ({ docs: [] })),
-            window.db.collection('hub_classes').where('collaboratori', 'array-contains', email).get().catch(() => ({ docs: [] })),
-            // Classi storiche/legacy
-            window.db.collection('classes').where('teacherId', '==', uid).get().catch(() => ({ docs: [] })),
-            window.db.collection('classes').where('teacherEmail', '==', email).get().catch(() => ({ docs: [] })),
-            window.db.collection('classes').where('teacherIds', 'array-contains', uid).get().catch(() => ({ docs: [] })),
-            window.db.collection('classes').where('collaboratori', 'array-contains', email).get().catch(() => ({ docs: [] }))
-        ];
+        let queries = [];
+        if (isSuperAdmin) {
+            queries = [
+                window.db.collection('hub_classes').get().catch(() => ({ docs: [] })),
+                window.db.collection('classes').get().catch(() => ({ docs: [] }))
+            ];
+        } else {
+            queries = [
+                // Nuove classi unificate Hub
+                window.db.collection('hub_classes').where('teacherId', '==', uid).get().catch(() => ({ docs: [] })),
+                window.db.collection('hub_classes').where('teacherEmail', '==', email).get().catch(() => ({ docs: [] })),
+                window.db.collection('hub_classes').where('teacherIds', 'array-contains', uid).get().catch(() => ({ docs: [] })),
+                window.db.collection('hub_classes').where('collaboratori', 'array-contains', email).get().catch(() => ({ docs: [] })),
+                // Classi storiche/legacy
+                window.db.collection('classes').where('teacherId', '==', uid).get().catch(() => ({ docs: [] })),
+                window.db.collection('classes').where('teacherEmail', '==', email).get().catch(() => ({ docs: [] })),
+                window.db.collection('classes').where('teacherIds', 'array-contains', uid).get().catch(() => ({ docs: [] })),
+                window.db.collection('classes').where('collaboratori', 'array-contains', email).get().catch(() => ({ docs: [] }))
+            ];
+        }
 
         const results = await Promise.all(queries);
         const classMap = new Map();

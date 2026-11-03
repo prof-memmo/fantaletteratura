@@ -124,6 +124,8 @@
                                 }
                                 var nm = localStorage.getItem('fanta_user_name') || localStorage.getItem('hub_user_name');
                                 var rl = localStorage.getItem('fanta_user_role') || localStorage.getItem('hub_user_role');
+                                var isAdm = (rl === 'admin' || (nm && nm.toUpperCase().indexOf('MEMMO') !== -1));
+                                if (isAdm) rl = 'admin';
                                 if (nm) {
                                     var elN = document.getElementById('header-user-name');
                                     if (elN) elN.textContent = nm.toUpperCase();
