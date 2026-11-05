@@ -14,14 +14,38 @@ function closeWipModal() {
 }
 
 function openLegalModal(type) {
-    if (type === 'privacy') hasReadPrivacy = true;
-    if (type === 'termini') hasReadTermini = true;
+    if (type === 'privacy') {
+        if (typeof hasReadPrivacy !== 'undefined') hasReadPrivacy = true;
+        window.hasReadPrivacy = true;
+    }
+    if (type === 'termini') {
+        if (typeof hasReadTermini !== 'undefined') hasReadTermini = true;
+        window.hasReadTermini = true;
+    }
     const modal = document.getElementById(`modal-${type}`);
     if (modal) {
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden'; // Previeni scroll del body
     }
 }
+
+// Assicura che anche openSharedModal registri la lettura per le viste studente
+const origOpenSharedModal = window.openSharedModal;
+window.openSharedModal = function(type) {
+    if (type === 'privacy') {
+        if (typeof hasReadPrivacy !== 'undefined') hasReadPrivacy = true;
+        window.hasReadPrivacy = true;
+    }
+    if (type === 'termini') {
+        if (typeof hasReadTermini !== 'undefined') hasReadTermini = true;
+        window.hasReadTermini = true;
+    }
+    if (typeof origOpenSharedModal === 'function') {
+        origOpenSharedModal(type);
+    } else {
+        openLegalModal(type);
+    }
+};
 
 function closeLegalModal(type) {
     const modal = document.getElementById(`modal-${type}`);
