@@ -1175,7 +1175,7 @@ function checkLoginSession() {
                 localStorage.setItem('pm_student_class', ssoClass);
                 setLoggedIn(ssoEmail || 'studente', 'studente');
                 if (typeof window.navigateTo === 'function') {
-                    window.navigateTo('view-classifiche', false);
+                    window.navigateTo('view-welcome', false);
                 }
                 return;
             }
@@ -1288,8 +1288,8 @@ function checkLoginSession() {
                         if (hubStudentTeamId) {
                             localStorage.setItem('fanta_active_team_id', hubStudentTeamId);
                         }
-                        // Lo studente autenticato accede direttamente alle classifiche senza passare da form o codici
-                        navigateTo('view-classifiche', false);
+                        // Lo studente autenticato accede direttamente alla Home per consultare la sua squadra e i punteggi
+                        navigateTo('view-welcome', false);
                     } else if (currentUserRole === 'docente' || currentUserRole === 'fantamico' || isSuperAdmin) {
                         navigateTo('view-welcome', false);
                     } else {
@@ -1339,7 +1339,7 @@ window.selectOnboardingRole = async function(role) {
         if (studentClass) {
             localStorage.setItem('fanta_active_team_code', studentClass);
         }
-        navigateTo('view-classifiche');
+        navigateTo('view-welcome');
     } else {
         navigateTo('view-welcome');
     }
@@ -1693,17 +1693,26 @@ function setLoggedIn(email, role = '') {
             
             (async () => {
                 try {
+                    let hubUserObj = {};
+                    try { hubUserObj = JSON.parse(localStorage.getItem('hub_user') || '{}'); } catch(e){}
                     const user = window.auth ? window.auth.currentUser : null;
-                    const uid = user ? user.uid : '';
+                    const uid = (user ? user.uid : '') || hubUserObj.uid || localStorage.getItem('hub_user_uid') || '';
+                    const studentName = hubUserObj.displayName || hubUserObj.name || localStorage.getItem('hub_user_name') || '';
                     let assignedTeam = null;
 
-                    if (uid) {
+                    if (uid || studentName) {
                         const snap = await window.db.collection('fanta_teams').get();
                         snap.forEach(d => {
                             const data = d.data();
                             if (data.status === 'archived' || data.archivedYear) return;
                             if (Array.isArray(data.members)) {
-                                if (data.members.some(m => (typeof m === 'object' ? (m.uid || m.id) : m) === uid)) {
+                                if (data.members.some(m => {
+                                    if (typeof m === 'object' && m !== null) {
+                                        return (uid && (m.uid === uid || m.id === uid)) ||
+                                               (studentName && m.name && m.name.toLowerCase() === studentName.toLowerCase());
+                                    }
+                                    return (uid && m === uid) || (studentName && String(m).toLowerCase() === studentName.toLowerCase());
+                                })) {
                                     assignedTeam = { docId: d.id, id: data.id || d.id, ...data };
                                 }
                             }
@@ -1764,17 +1773,17 @@ function setLoggedIn(email, role = '') {
                             </div>
                         `;
                     } else {
-                        const teamCode = localStorage.getItem('fanta_active_team_code') || '';
+                        const teamCode = localStorage.getItem('fanta_active_team_code') || localStorage.getItem('hub_user_class') || localStorage.getItem('pm_student_class') || '';
                         loggedInNormalContent.innerHTML = `
                             <h3 class="text-center mb-1 text-primary">Area Studente</h3>
                             <p class="text-center" style="font-size: 0.9rem; margin-bottom:20px;">
-                                Hai effettuato l'accesso come studente.
-                                ${teamCode ? `<br>Codice Classe/Squadra attivo: <b style="color:var(--accent-gold);">${teamCode}</b> <a href="#" onclick="navigateTo('view-studenti')" style="font-size:0.8rem; color:var(--primary-color); margin-left:6px;">(Cambia)</a>` : `<br><span style="color:#fbbf24;">Inserisci il codice classe fornito dal tuo docente per iniziare.</span>`}
+                                Benvenuto nel Campionato FantaLetteratura!
+                                ${teamCode ? `<br>Classe attiva: <b style="color:var(--accent-gold);">${teamCode}</b><br><span style="font-size:0.82rem; color:var(--text-muted); display:inline-block; margin-top:4px;">Il tuo docente ti assegnerà alla tua squadra per comporre i 5 Autori.</span>` : `<br><span style="color:#fbbf24;">Inserisci il codice classe fornito dal tuo docente per iniziare.</span>`}
                             </p>
                             <div style="display:flex; flex-direction:column; gap:10px;">
                                 ${!teamCode ? `<button class="btn" style="width:100%; background:var(--primary-color);" onclick="navigateTo('view-studenti')"><i class="fa-solid fa-key"></i> Inserisci Codice Classe</button>` : ''}
-                                <button class="btn" style="width:100%;" onclick="navigateTo('view-classifiche')">Vedi le Classifiche</button>
-                                <button class="btn btn-secondary" style="width:100%; border-width:2px;" onclick="navigateTo('view-schede')">Esplora le Schede Autore</button>
+                                <button class="btn" style="width:100%;" onclick="navigateTo('view-classifiche')"><i class="fa-solid fa-ranking-star"></i> Vedi le Classifiche</button>
+                                <button class="btn btn-secondary" style="width:100%; border-width:2px;" onclick="navigateTo('view-schede')"><i class="fa-solid fa-book-open"></i> Esplora le Schede Autore</button>
                             </div>
                         `;
                     }
