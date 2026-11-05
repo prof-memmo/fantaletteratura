@@ -1163,6 +1163,23 @@ function checkLoginSession() {
 
     fanta_db.onAuthStateChanged(async (user) => {
         if (!user) {
+            // Verifica sessione SSO da localStorage (per studenti registrati dall'Hub o token persistito)
+            const ssoRole = localStorage.getItem('hub_user_role') || localStorage.getItem('fanta_user_role');
+            const ssoClass = localStorage.getItem('hub_user_class') || localStorage.getItem('pm_student_class') || localStorage.getItem('fanta_active_team_code');
+            const ssoEmail = localStorage.getItem('hub_user_email') || localStorage.getItem('fanta_user_email');
+            
+            if (ssoRole === 'studente' && ssoClass) {
+                currentUserRole = 'studente';
+                currentUserEmail = ssoEmail || '';
+                localStorage.setItem('fanta_active_team_code', ssoClass);
+                localStorage.setItem('pm_student_class', ssoClass);
+                setLoggedIn(ssoEmail || 'studente', 'studente');
+                if (typeof window.navigateTo === 'function') {
+                    window.navigateTo('view-classifiche', false);
+                }
+                return;
+            }
+
             // Mostra stato Ospite nell'header
             const loginHubBtn = document.getElementById('btn-login-hub-dropdown');
             const profileBtn = document.getElementById('btn-profile-dropdown');
@@ -1191,6 +1208,8 @@ function checkLoginSession() {
             // 1. Verifica sull'Hub Centrale (Single Sign-On Auth)
             let isSuperAdmin = (email === "prof.memmo@gmail.com");
             let hubRole = isSuperAdmin ? 'docente' : 'docente';
+            let hubStudentClass = '';
+            let hubStudentTeamId = '';
             
             try {
                 const hubDoc = await window.db.collection('hub_users').doc(user.uid).get();
@@ -1210,6 +1229,8 @@ function checkLoginSession() {
                     } else {
                         hubRole = 'studente';
                     }
+                    hubStudentClass = hubData.classCode || hubData.className || hubData.classe || '';
+                    hubStudentTeamId = hubData.teamId || '';
                 }
             } catch (err) {
                 console.warn("Verifica Hub (fallback):", err);
@@ -1258,13 +1279,17 @@ function checkLoginSession() {
                     pendingInitialView = null;
                     navigateTo(target, false);
                 } else {
-                    const activeCode = localStorage.getItem('fanta_active_team_code');
                     if (currentUserRole === 'studente') {
-                        if (!activeCode) {
-                            navigateTo('view-studenti', false);
-                        } else {
-                            navigateTo('view-classifiche', false);
+                        const effectiveClass = hubStudentClass || localStorage.getItem('hub_user_class') || localStorage.getItem('pm_student_class') || localStorage.getItem('fanta_active_team_code') || '';
+                        if (effectiveClass) {
+                            localStorage.setItem('fanta_active_team_code', effectiveClass);
+                            localStorage.setItem('pm_student_class', effectiveClass);
                         }
+                        if (hubStudentTeamId) {
+                            localStorage.setItem('fanta_active_team_id', hubStudentTeamId);
+                        }
+                        // Lo studente autenticato accede direttamente alle classifiche senza passare da form o codici
+                        navigateTo('view-classifiche', false);
                     } else if (currentUserRole === 'docente' || currentUserRole === 'fantamico' || isSuperAdmin) {
                         navigateTo('view-welcome', false);
                     } else {
@@ -1310,7 +1335,11 @@ window.selectOnboardingRole = async function(role) {
     }
 
     if (role === 'studente') {
-        navigateTo('view-studenti');
+        const studentClass = localStorage.getItem('hub_user_class') || localStorage.getItem('pm_student_class') || '';
+        if (studentClass) {
+            localStorage.setItem('fanta_active_team_code', studentClass);
+        }
+        navigateTo('view-classifiche');
     } else {
         navigateTo('view-welcome');
     }
