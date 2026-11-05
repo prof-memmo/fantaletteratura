@@ -2212,6 +2212,7 @@ async function renderProfilo() {
         });
         let misPts = (team.missionsCompleted || 0) * 5;
         const modeBadgeHtml = `<span class="mode-badge ${modeCfg.colorClass}">${modeCfg.emoji} ${modeCfg.shortLabel}</span>`;
+        const collabBadge = isCollaborated ? ' <span class="badge" style="background:#0284c7; color:#fff; font-size:0.7rem; margin-left:8px; padding:2px 6px; border-radius:4px; font-family:sans-serif; vertical-align:middle;">Docente Collaboratore</span>' : '';
         // Autori in questa squadra
         let autoriSection = '';
         if (team.authors && team.authors.length > 0) {
