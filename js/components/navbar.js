@@ -22,6 +22,7 @@ function navigateTo(viewId, pushHistory = true) {
     // ACCESSO E PROTEZIONE NAVIGAZIONE
     const isPublicView = [
         'view-welcome', 
+        'view-studenti',
         'view-onboarding', 
         'view-regolamento', 
         'view-classifiche', 
@@ -107,6 +108,15 @@ function navigateTo(viewId, pushHistory = true) {
     if(viewId === 'view-salagiochi') {
         if(typeof window.renderSalaGiochiView === 'function') {
             window.renderSalaGiochiView();
+        }
+    }
+    if(viewId === 'view-studenti') {
+        const input = document.getElementById('student-code-input');
+        if (input && !input.value) {
+            const autoClass = localStorage.getItem('hub_user_class') || localStorage.getItem('pm_student_class') || (new URLSearchParams(window.location.search).get('class')) || '';
+            if (autoClass) {
+                input.value = autoClass.toUpperCase();
+            }
         }
     }
 

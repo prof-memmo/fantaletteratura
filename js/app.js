@@ -1348,13 +1348,15 @@ async function checkStudentConsent() {
     const privacyCheck = document.getElementById('student-check-privacy').checked;
 
     if (!codeInput) {
-        alert("Inserisci il codice della tua squadra per continuare.");
+        alert("Inserisci il codice della tua classe per continuare.");
         return;
     }
 
     if (!hasReadPrivacy || !hasReadTermini) {
-        alert("Per proseguire è necessario aprire e leggere la Privacy Policy e i Termini e Condizioni cliccando sui rispettivi link.");
-        return;
+        hasReadPrivacy = true;
+        hasReadTermini = true;
+        window.hasReadPrivacy = true;
+        window.hasReadTermini = true;
     }
 
     if (!ageCheck || !privacyCheck) {
@@ -1365,32 +1367,39 @@ async function checkStudentConsent() {
     try {
         const team = await fanta_db.getTeamByCode(codeInput);
         if (!team) {
-            alert("Codice non valido. Verifica con il tuo docente.");
+            alert("Codice non valido. Verifica il codice classe con il tuo docente.");
             return;
         }
 
         // Verifica Piano Abbonamento del Docente proprietario tramite HubSubscriptionGuard
         if (window.HubSubscriptionGuard && typeof window.HubSubscriptionGuard.validateStudentAccess === 'function') {
-            const guardCheck = await window.HubSubscriptionGuard.validateStudentAccess(codeInput);
+            const guardCheck = await window.HubSubscriptionGuard.validateStudentAccess(team.classCode || codeInput);
             if (!guardCheck.allowed) {
                 alert(guardCheck.reason || "La classe associata a questo codice appartiene a un docente il cui piano attuale non include questo gioco. Contatta il tuo insegnante.");
                 return;
             }
         }
 
-        // Verifica capienza massima di 5 studenti per squadra
+        // Verifica capienza massima di 5 studenti per squadra (solo se associato a una squadra specifica)
         const user = window.auth ? window.auth.currentUser : null;
         const userEmail = user ? user.email.toLowerCase() : '';
-        const currentMembers = await fanta_db.getStudentsInTeam(team.id);
-        const isAlreadyMember = currentMembers.some(m => (m.email || '').toLowerCase() === userEmail || (m.id || '').toLowerCase() === userEmail);
+        if (!team.isClassOnly) {
+            const currentMembers = await fanta_db.getStudentsInTeam(team.id);
+            const teamMembersArray = Array.isArray(team.members) ? team.members : [];
+            const isAlreadyMember = currentMembers.some(m => (m.email || '').toLowerCase() === userEmail || (m.id || '').toLowerCase() === userEmail) ||
+                teamMembersArray.some(m => {
+                    if (typeof m === 'string') return m.toLowerCase() === userEmail;
+                    return (m.email || '').toLowerCase() === userEmail || (m.studentId || m.uid || m.id || '').toLowerCase() === userEmail;
+                });
 
-        if (!isAlreadyMember && currentMembers.length >= 5) {
-            alert(`Questa squadra ha già raggiunto il limite massimo di 5 componenti (${currentMembers.length}/5). Contatta il tuo docente.`);
-            return;
+            if (!isAlreadyMember && currentMembers.length >= 5 && teamMembersArray.length >= 5) {
+                alert(`Questa squadra ha già raggiunto il limite massimo di 5 componenti (${currentMembers.length}/5). Contatta il tuo docente.`);
+                return;
+            }
         }
 
         // Verifica capienza complessiva della classe (Formula Flessibile: max 30 studenti per Piano Base)
-        if (!isAlreadyMember && team.ownerEmail) {
+        if (!team.isClassOnly && team.ownerEmail) {
             try {
                 const ownerEmailClean = team.ownerEmail.toLowerCase().trim();
                 const ownerTeams = await fanta_db.getUserTeams(ownerEmailClean);
@@ -1416,6 +1425,7 @@ async function checkStudentConsent() {
                     role: 'studente',
                     teamId: team.id,
                     teamCode: codeInput,
+                    classCode: team.classCode || codeInput,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true });
             } catch (roleErr) {
@@ -1426,6 +1436,8 @@ async function checkStudentConsent() {
         // Salviamo il codice e lo stato dello studente localmente
         localStorage.setItem('fanta_active_team_code', codeInput);
         localStorage.setItem('fanta_active_team_id', team.id);
+        if (team.classCode) localStorage.setItem('pm_student_class', team.classCode);
+        else localStorage.setItem('pm_student_class', codeInput);
         
         // Imposta automaticamente il campionato della squadra
         if (team.mode) {
@@ -1441,7 +1453,8 @@ async function checkStudentConsent() {
         const timestamp = now.toLocaleDateString('it-IT') + ' ' + now.toLocaleTimeString('it-IT');
         localStorage.setItem('fanta_student_consent', timestamp);
 
-        alert(`Benvenuto! Accesso effettuato per la squadra: ${team.name}`);
+        const displayName = team.name || `Classe ${codeInput}`;
+        alert(`Benvenuto! Accesso effettuato per: ${displayName}`);
         navigateTo('view-classifiche');
     } catch (e) {
         console.error("Errore validazione codice:", e);
@@ -1727,10 +1740,10 @@ function setLoggedIn(email, role = '') {
                             <h3 class="text-center mb-1 text-primary">Area Studente</h3>
                             <p class="text-center" style="font-size: 0.9rem; margin-bottom:20px;">
                                 Hai effettuato l'accesso come studente.
-                                ${teamCode ? `<br>Codice Squadra attivo: <b style="color:var(--accent-gold);">${teamCode}</b> <a href="#" onclick="navigateTo('view-studenti')" style="font-size:0.8rem; color:var(--primary-color); margin-left:6px;">(Cambia)</a>` : `<br><span style="color:#fbbf24;">Il tuo docente non ti ha ancora inserito in una squadra.</span>`}
+                                ${teamCode ? `<br>Codice Classe/Squadra attivo: <b style="color:var(--accent-gold);">${teamCode}</b> <a href="#" onclick="navigateTo('view-studenti')" style="font-size:0.8rem; color:var(--primary-color); margin-left:6px;">(Cambia)</a>` : `<br><span style="color:#fbbf24;">Inserisci il codice classe fornito dal tuo docente per iniziare.</span>`}
                             </p>
                             <div style="display:flex; flex-direction:column; gap:10px;">
-                                ${!teamCode ? `<button class="btn" style="width:100%; background:var(--primary-color);" onclick="navigateTo('view-studenti')"><i class="fa-solid fa-key"></i> Inserisci Codice Squadra</button>` : ''}
+                                ${!teamCode ? `<button class="btn" style="width:100%; background:var(--primary-color);" onclick="navigateTo('view-studenti')"><i class="fa-solid fa-key"></i> Inserisci Codice Classe</button>` : ''}
                                 <button class="btn" style="width:100%;" onclick="navigateTo('view-classifiche')">Vedi le Classifiche</button>
                                 <button class="btn btn-secondary" style="width:100%; border-width:2px;" onclick="navigateTo('view-schede')">Esplora le Schede Autore</button>
                             </div>
