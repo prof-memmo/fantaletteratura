@@ -171,6 +171,13 @@ service cloud.firestore {
           request.resource.data.ownerEmail == resource.data.ownerEmail &&
           request.resource.data.name == resource.data.name &&
           request.resource.data.collaboratori.hasAll([currentUserEmail()])
+        ) ||
+        (
+          // Permesso controllato per studenti della squadra (Draft 5 Star e Sostituzione Mercato)
+          request.resource.data.ownerEmail == resource.data.ownerEmail &&
+          request.resource.data.name == resource.data.name &&
+          request.resource.data.points == resource.data.points &&
+          (request.resource.data.classe == resource.data.classe || !('classe' in resource.data))
         )
       ));
       allow delete: if isAdmin() || (isFantaAuthorized() && (

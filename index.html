@@ -1026,6 +1026,16 @@
                        </div>
                    </div>
             </section>
+
+            <!-- VIEW: La mia Squadra (Studenti & Viandanti) -->
+            <section id="view-mia-squadra" class="view">
+                <div id="mia-squadra-container" style="max-width: 900px; margin: 0 auto; padding-bottom: 25px;">
+                    <div class="glass text-center" style="padding: 35px 20px; border-radius: 16px;">
+                        <i class="fa-solid fa-spinner fa-spin" style="font-size: 2.2rem; color: var(--accent-gold); margin-bottom: 12px;"></i>
+                        <p style="color: var(--text-muted); margin: 0; font-size: 0.95rem;">Caricamento della tua squadra in corso...</p>
+                    </div>
+                </div>
+            </section>
         </main>
 
         
@@ -1190,10 +1200,14 @@
                 <i class="fa-solid fa-gamepad"></i>
                 <span>Sala Giochi</span>
             </a>
-            <a href="#" class="tab-item hidden" data-action="navigate" data-view="view-profilo" id="tab-item-profilo" data-tooltip="Profilo" style="position: relative;">
-                <i class="fa-solid fa-user"></i>
-                <span>Profilo</span>
+            <a href="#" class="tab-item hidden" data-action="navigate" data-view="view-profilo" id="tab-item-profilo" data-tooltip="Pannello" style="position: relative;">
+                <i class="fa-solid fa-chalkboard-user"></i>
+                <span>Pannello</span>
                 <span id="tab-notification-badge" style="display: none; position: absolute; top: 4px; right: 22%; background: #e63946; border: 1.5px solid var(--bg-dark); width: 8px; height: 8px; border-radius: 50%; box-shadow: 0 0 5px #e63946;"></span>
+            </a>
+            <a href="#" class="tab-item hidden" data-action="navigate" data-view="view-mia-squadra" id="tab-item-squadra" data-tooltip="La mia Squadra" style="position: relative;">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Squadra</span>
             </a>
             <a href="admin.html" class="tab-item hidden" id="tab-item-admin" data-tooltip="Admin">
                 <i class="fa-solid fa-lock"></i>
@@ -1205,6 +1219,25 @@
     <!-- ========================
          MODALI GLOBALI (fuori dalle view per garantire visibilità)
          ======================== -->
+
+    <!-- Modale Sostituzione Mercato (Studenti & Viandanti) -->
+    <div id="modal-sostituzione-mercato" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.85); z-index:3000; overflow-y:auto; backdrop-filter:blur(8px);">
+        <div style="padding: 15px 20px; position: sticky; top: 0; z-index:10; display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid rgba(255,255,255,0.1); background: var(--bg-dark);">
+            <h3 style="margin:0; font-size:1.15rem; color:var(--accent-gold); display:flex; align-items:center; gap:8px;">
+                <i class="fa-solid fa-repeat"></i> Finestra di Mercato: Sostituzione Autore
+            </h3>
+            <button class="btn-secondary" onclick="window.chiudiSostituzioneMercato()" style="padding: 5px 15px; width:auto; border-radius:20px; border:none; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div style="padding: 20px; max-width:640px; margin:0 auto;">
+            <div id="mercato-info-box" style="background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.3); border-radius:12px; padding:15px; margin-bottom:20px;">
+                <!-- Dettaglio autore ceduto e budget disponibile generato da JS -->
+            </div>
+            <h4 style="color:#fff; font-size:0.95rem; margin:0 0 12px 0;">Scegli il nuovo autore da acquistare:</h4>
+            <div id="mercato-autori-disponibili" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap:12px;">
+                <!-- Griglia autori disponibili -->
+            </div>
+        </div>
+    </div>
 
     <!-- Modale Nuova Missione -->
     <div id="nuova-missione-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-dark); z-index:2000; overflow-y:auto;">

@@ -30,7 +30,8 @@ function navigateTo(viewId, pushHistory = true) {
         'view-schede', 
         'view-salagiochi', 
         'view-privacy', 
-        'view-contatti'
+        'view-contatti',
+        'view-mia-squadra'
     ].includes(viewId);
 
     const hasStudentCode = localStorage.getItem('fanta_active_team_code') || localStorage.getItem('pm_student_class') || localStorage.getItem('hub_user_class');
@@ -48,9 +49,15 @@ function navigateTo(viewId, pushHistory = true) {
         });
     }
 
-    // Restrizioni per Studenti (ad eccezione del Draft 5 Star per la propria squadra)
+    // Restrizioni per Studenti e Reindirizzamento Squadra per Viandanti
     const isRestrictedForStudents = ['view-profilo', 'view-squadra', 'view-missioni'].includes(viewId);
     const userRole = (typeof currentUserRole !== 'undefined' ? currentUserRole : '') || localStorage.getItem('fanta_user_role') || (hasStudentCode && !isDocente ? 'studente' : '');
+
+    // Studenti e Viandanti vengono reindirizzati a "La mia Squadra" anziché al Pannello Docente
+    if (viewId === 'view-profilo' && (userRole === 'studente' || userRole === 'viandante' || userRole === 'fantamico' || (hasStudentCode && !isDocente))) {
+        navigateTo('view-mia-squadra', pushHistory);
+        return;
+    }
 
     if (isRestrictedForStudents && (userRole === 'studente' || (hasStudentCode && !isDocente))) {
         if (viewId === 'view-squadra' && window.draftingTeamId) {
@@ -91,6 +98,11 @@ function navigateTo(viewId, pushHistory = true) {
     }
     if(viewId === 'view-profilo') {
         renderProfilo();
+    }
+    if(viewId === 'view-mia-squadra') {
+        if(typeof window.renderMiaSquadraView === 'function') {
+            window.renderMiaSquadraView();
+        }
     }
     if(viewId === 'view-regolamento') {
         if(window.RulesService) {

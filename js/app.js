@@ -251,6 +251,19 @@ function initApp() {
         console.log("Migration: cleared old fanta_seen_schede auto-read pollution.");
     }
 
+    // Riconoscimento automatico codice classe da URL (SSO dal portale)
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlClass = (urlParams.get('class') || urlParams.get('classe') || urlParams.get('code') || '').trim().toUpperCase();
+        if (urlClass) {
+            localStorage.setItem('hub_user_class', urlClass);
+            localStorage.setItem('pm_student_class', urlClass);
+            localStorage.setItem('fanta_active_team_code', urlClass);
+        }
+    } catch(eParam) {
+        console.warn("Class param parsing:", eParam);
+    }
+
     // Inizializza Countdown Campionato
     if (window.initFantaCountdown) {
         window.initFantaCountdown();
@@ -1180,6 +1193,26 @@ function checkLoginSession() {
                 return;
             }
 
+            if (ssoRole === 'viandante' || ssoRole === 'fantamico') {
+                currentUserRole = 'fantamico';
+                currentUserEmail = ssoEmail || 'viandante';
+                setLoggedIn(currentUserEmail, 'fantamico');
+                if (typeof window.navigateTo === 'function') {
+                    window.navigateTo('view-welcome', false);
+                }
+                return;
+            }
+
+            if ((ssoRole === 'docente' || ssoRole === 'teacher' || ssoRole === 'admin') && (ssoEmail || localStorage.getItem('hub_user_name'))) {
+                currentUserRole = ssoRole === 'admin' ? 'admin' : 'docente';
+                currentUserEmail = ssoEmail || 'docente@scuola.it';
+                setLoggedIn(currentUserEmail, currentUserRole);
+                if (typeof window.navigateTo === 'function') {
+                    window.navigateTo('view-welcome', false);
+                }
+                return;
+            }
+
             // Mostra stato Ospite nell'header
             const loginHubBtn = document.getElementById('btn-login-hub-dropdown');
             const profileBtn = document.getElementById('btn-profile-dropdown');
@@ -1579,11 +1612,13 @@ async function logoutDocente() {
     if(loginSec) loginSec.style.display = 'block';
     if(loggedSec) loggedSec.style.display = 'none';
     
-    // Hide Profile tabs/links
+    // Hide Profile & Squadra tabs/links
     const pLink = document.getElementById('menu-link-profilo');
     const pTab = document.getElementById('tab-item-profilo');
+    const sTab = document.getElementById('tab-item-squadra');
     if(pLink) pLink.classList.add('hidden');
     if(pTab) pTab.classList.add('hidden');
+    if(sTab) sTab.classList.add('hidden');
     
     const profEmail = document.getElementById('profilo-email');
     const profAdminEmail = document.getElementById('admin-profilo-email');
@@ -1796,7 +1831,7 @@ function setLoggedIn(email, role = '') {
                 <h3 class="text-center mb-1 text-primary">Bentornato, Viandante!</h3>
                 <p class="text-center" style="font-size: 0.9rem; margin-bottom:20px;">Hai effettuato l'accesso all'area personale Viandante.</p>
                 <div style="display:flex; flex-direction:column; gap:10px;">
-                    <button class="btn" style="width:100%;" onclick="navigateTo('view-profilo')">Vai al tuo Profilo</button>
+                    <button class="btn" style="width:100%;" onclick="navigateTo('view-mia-squadra')"><i class="fa-solid fa-shield-halved"></i> Vai alla tua Squadra</button>
                 </div>
             `;
         } else {
@@ -1810,11 +1845,16 @@ function setLoggedIn(email, role = '') {
         }
     }
     
-    // Show Profile and Admin tabs only if not a student
+    // Gestione visibilità Tab Dock Bar: Profilo/Pannello per Docenti/Admin, Squadra per Studenti/Viandanti
     const pTab = document.getElementById('tab-item-profilo');
+    const sTab = document.getElementById('tab-item-squadra');
     if(pTab) {
-        if (isStudent) pTab.classList.add('hidden');
+        if (isStudent || isFantamico) pTab.classList.add('hidden');
         else pTab.classList.remove('hidden');
+    }
+    if(sTab) {
+        if (isStudent || isFantamico) sTab.classList.remove('hidden');
+        else sTab.classList.add('hidden');
     }
 
     const adminTab = document.getElementById('tab-item-admin');
@@ -1857,8 +1897,10 @@ function setLoggedOut() {
     
     const pLink = document.getElementById('menu-link-profilo');
     const pTab = document.getElementById('tab-item-profilo');
+    const sTab = document.getElementById('tab-item-squadra');
     if(pLink) pLink.classList.add('hidden');
     if(pTab) pTab.classList.add('hidden');
+    if(sTab) sTab.classList.add('hidden');
 
     // Nascondi link pannello admin
     const adminMenuItem = document.getElementById('menu-admin-item');
@@ -1905,7 +1947,12 @@ function setupTeamSave() {
     if (!saveBtn) return;
     
     saveBtn.addEventListener('click', async () => {
-        if (!currentUserEmail) {
+        if (!currentUserEmail && window.auth && window.auth.currentUser && window.auth.currentUser.email) {
+            currentUserEmail = window.auth.currentUser.email.toLowerCase();
+        }
+
+        const isStudDraft = window.draftingTeamId && (currentUserRole === 'studente' || localStorage.getItem('hub_user_role') === 'studente');
+        if (!currentUserEmail && !isStudDraft) {
             alert("Devi identificarti nella Home prima di salvare una squadra!");
             navigateTo('view-welcome');
             return;
@@ -1978,9 +2025,10 @@ function setupTeamSave() {
                 calculateBudget();
 
                 const isStud = currentUserRole === 'studente';
-                if (isStud) {
-                    setLoggedIn(currentUserEmail);
-                    navigateTo('view-welcome');
+                const isFant = currentUserRole === 'fantamico' || currentUserRole === 'viandante';
+                if (isStud || isFant) {
+                    if (typeof setLoggedIn === 'function') setLoggedIn(currentUserEmail || 'studente', currentUserRole || 'studente');
+                    navigateTo('view-mia-squadra');
                 } else {
                     renderProfilo();
                     if (window.loadDocenteClassiComposizione) window.loadDocenteClassiComposizione();
@@ -2048,8 +2096,12 @@ function setupTeamSave() {
         updateAuthorCardsSelection();
         calculateBudget();
         
-        renderProfilo();
-        navigateTo('view-profilo');
+        if (currentUserRole === 'viandante' || currentUserRole === 'fantamico' || currentUserRole === 'studente') {
+            navigateTo('view-mia-squadra');
+        } else {
+            renderProfilo();
+            navigateTo('view-profilo');
+        }
     });
 }
 
@@ -5043,3 +5095,481 @@ window.addEventListener('click', () => {
         ddOld.style.display = 'none';
     }
 });
+
+/* =========================================================
+   VISTA: LA MIA SQUADRA (STUDENTI & VIANDANTI)
+   Consultazione Rosa, Punteggi per Autore e Finestra di Mercato
+========================================================= */
+
+window.renderMiaSquadraView = async function() {
+    const container = document.getElementById('mia-squadra-container');
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="glass text-center" style="padding: 35px 20px; border-radius: 16px;">
+            <i class="fa-solid fa-spinner fa-spin" style="font-size: 2.2rem; color: var(--accent-gold); margin-bottom: 12px;"></i>
+            <p style="color: var(--text-muted); margin: 0; font-size: 0.95rem;">Caricamento della tua squadra in corso...</p>
+        </div>
+    `;
+
+    try {
+        const user = window.auth ? window.auth.currentUser : null;
+        const role = (typeof currentUserRole !== 'undefined' && currentUserRole) || localStorage.getItem('fanta_user_role') || localStorage.getItem('hub_user_role') || 'studente';
+        const isStudent = (role === 'studente');
+        const isViandante = (role === 'viandante' || role === 'fantamico' || role === 'guest');
+        const email = (currentUserEmail || (user && user.email) || localStorage.getItem('fanta_user_email') || localStorage.getItem('hub_user_email') || '').toLowerCase().trim();
+        const uid = user ? user.uid : '';
+        const studentName = (user && user.displayName) || localStorage.getItem('pm_student_name') || localStorage.getItem('hub_user_name') || '';
+        const studentId = localStorage.getItem('pm_student_id') || '';
+        const classCode = localStorage.getItem('pm_student_class') || localStorage.getItem('hub_user_class') || localStorage.getItem('fanta_active_team_code') || '';
+
+        const allTeams = await getAllTeams(true);
+        let myTeam = null;
+
+        if (isStudent) {
+            // 1. Ricerca per identificativo studente tra i membri
+            if (uid || studentName || studentId) {
+                myTeam = allTeams.find(t => {
+                    if (t.status === 'archived' || t.archivedYear) return false;
+                    if (!Array.isArray(t.members)) return false;
+                    return t.members.some(m => {
+                        if (typeof m === 'object' && m !== null) {
+                            const mId = (m.studentId || m.uid || m.id || '').toLowerCase().trim();
+                            const mName = (m.name || m.nickname || '').toLowerCase().trim();
+                            return (uid && mId === uid.toLowerCase()) ||
+                                   (studentId && mId === studentId.toLowerCase()) ||
+                                   (studentName && mName === studentName.toLowerCase());
+                        }
+                        const strM = String(m).toLowerCase().trim();
+                        return (uid && strM === uid.toLowerCase()) ||
+                               (studentId && strM === studentId.toLowerCase()) ||
+                               (studentName && strM === studentName.toLowerCase());
+                    });
+                });
+            }
+
+            // 2. Fallback per codice classe se non ancora assegnato nominalmente a una squadra specifica
+            if (!myTeam && classCode) {
+                const classTeams = allTeams.filter(t => {
+                    if (t.status === 'archived' || t.archivedYear) return false;
+                    const c = (t.classe || t.classCode || t.className || '').toUpperCase().trim();
+                    return c === classCode.toUpperCase().trim();
+                });
+                if (classTeams.length > 0) {
+                    myTeam = classTeams[0];
+                }
+            }
+        } else {
+            // Viandante: ricerca per email proprietario
+            myTeam = allTeams.find(t => {
+                if (t.status === 'archived' || t.archivedYear) return false;
+                return (email && t.ownerEmail && t.ownerEmail.toLowerCase() === email) ||
+                       (t.userRole === 'viandante' && t.ownerEmail === email);
+            });
+        }
+
+        // Se nessuna squadra è stata trovata
+        if (!myTeam) {
+            if (isStudent) {
+                container.innerHTML = `
+                    <div class="glass text-center" style="padding: 35px 25px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);">
+                        <div style="font-size: 3rem; margin-bottom: 12px;">🎒</div>
+                        <h2 style="font-size: 1.4rem; color: #fff; margin: 0 0 10px 0;">Nessuna Squadra Assegnata</h2>
+                        <p style="font-size: 0.95rem; color: var(--text-muted); max-width: 500px; margin: 0 auto 20px auto; line-height: 1.5;">
+                            Sei collegato alla classe <strong style="color: var(--accent-gold);">${classCode || '-'}</strong>.<br>
+                            Il tuo docente creerà le squadre della classe a breve. Appena sarai inserito in una squadra, potrai consultare i tuoi 5 autori qui!
+                        </p>
+                        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-secondary" onclick="navigateTo('view-schede')"><i class="fa-solid fa-file-lines"></i> Esplora Schede Autore</button>
+                            <button class="btn btn-secondary" onclick="navigateTo('view-classifiche')"><i class="fa-solid fa-trophy"></i> Vedi Classifiche</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="glass text-center" style="padding: 35px 25px; border-radius: 16px; border: 1px solid rgba(212,175,55,0.25);">
+                        <div style="font-size: 3rem; margin-bottom: 12px;">🧭</div>
+                        <h2 style="font-size: 1.4rem; color: var(--accent-gold); margin: 0 0 10px 0;">Crea la tua Squadra Viandante</h2>
+                        <p style="font-size: 0.95rem; color: var(--text-muted); max-width: 500px; margin: 0 auto 20px auto; line-height: 1.5;">
+                            Non hai ancora iscritto la tua squadra al Campionato Viandanti. Scegli il tuo nome e acquista i tuoi 5 autori per scendere in campo!
+                        </p>
+                        <button class="btn btn-primary" onclick="navigateTo('view-squadra')" style="font-size: 1rem; padding: 12px 24px;">
+                            <i class="fa-solid fa-plus-circle"></i> Crea la tua Squadra
+                        </button>
+                    </div>
+                `;
+            }
+            return;
+        }
+
+        // Squadra trovata: calcolo punteggi e autori
+        const teamDocId = myTeam.docId || myTeam.id;
+        const teamMode = myTeam.mode || 'terze';
+        const modeCfg = GAME_MODES[teamMode] || GAME_MODES.terze;
+        const currentPool = modeCfg.authors || AUTHORS;
+
+        const rawAuthors = Array.isArray(myTeam.authors) ? myTeam.authors : [];
+        const isDraftComplete = !!myTeam.draftCompleted || rawAuthors.length === 5;
+
+        // Calcolo punteggio autori
+        let authPoints = 0;
+        const resolvedAuthors = rawAuthors.map(aid => {
+            const authorId = (typeof aid === 'object' && aid !== null) ? aid.id : aid;
+            let a = currentPool.find(x => x.id === authorId);
+            if (!a) {
+                Object.values(GAME_MODES).forEach(cfg => {
+                    if (!a && cfg.authors) a = cfg.authors.find(x => x.id === authorId);
+                });
+            }
+            if (!a) a = AUTHORS.find(x => x.id === authorId);
+            if (!a) return { id: authorId, name: authorId, cost: 0, points: 0, isPointsRevealed: false, image: 'assets/branding/fantaletteratura-badge.png' };
+
+            if (a.isPointsRevealed) {
+                authPoints += (a.points || 0);
+            }
+            return a;
+        });
+
+        const missionPoints = (myTeam.missionsCompleted || 0) * 5;
+        const minigamePoints = (myTeam.minigamePoints || 0);
+        const totalPoints = authPoints + (isStudent ? missionPoints : minigamePoints);
+
+        // Calcolo posizione in classifica
+        const targetType = window.getTeamType ? window.getTeamType(myTeam) : (isStudent ? 'scuola' : 'viandante');
+        const peers = allTeams.filter(t => {
+            const tType = window.getTeamType ? window.getTeamType(t) : (t.teamType || 'scuola');
+            return tType === targetType && (t.mode || 'terze') === teamMode;
+        });
+        peers.sort((a, b) => (b.points || 0) - (a.points || 0));
+        const rankIndex = peers.findIndex(p => (p.docId || p.id) === teamDocId);
+        const rankDisplay = rankIndex >= 0 ? `#${rankIndex + 1}` : '-';
+
+        // Verifica finestra di mercato
+        const isMarketOpen = (window.ImprevistiService && typeof window.ImprevistiService.isMarketOpenToday === 'function') 
+            ? window.ImprevistiService.isMarketOpenToday() 
+            : false;
+        const hasUsedExchange = !!myTeam.mercatoExchangeUsed;
+
+        // Membri della squadra (se presenti)
+        const membersList = Array.isArray(myTeam.members) ? myTeam.members : [];
+        const membersBadgesHtml = membersList.map(m => {
+            const mName = (typeof m === 'object' && m !== null) ? (m.nickname || m.name) : String(m);
+            return `<span style="display: inline-flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; color: #f1f5f9;"><i class="fa-solid fa-user-graduate" style="color: var(--accent-gold); font-size: 0.72rem;"></i> ${mName}</span>`;
+        }).join('');
+
+        // Rendering HTML Completo della Scheda Squadra
+        container.innerHTML = `
+            <!-- HEADER SQUADRA -->
+            <div class="glass" style="padding: 22px 24px; border-radius: 16px; margin-bottom: 20px; border: 1px solid rgba(212,175,55,0.3); background: rgba(15,23,42,0.65);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
+                    <div>
+                        <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; color: var(--accent-gold); background: rgba(212,175,55,0.15); padding: 3px 10px; border-radius: 12px;">
+                            🏆 LA TUA SQUADRA
+                        </span>
+                        <h2 style="margin: 8px 0 4px 0; font-family: var(--font-heading); font-size: 1.6rem; color: #fff;">
+                            ${myTeam.name || 'Squadra Senza Nome'}
+                        </h2>
+                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 6px;">
+                            ${isStudent 
+                                ? `<span style="font-size: 0.85rem; color: #cbd5e1;"><i class="fa-solid fa-school" style="color: var(--primary-color);"></i> Classe: <strong style="color: #fff;">${myTeam.classe || myTeam.className || classCode || '-'}</strong></span>`
+                                : `<span style="font-size: 0.85rem; color: #cbd5e1;"><i class="fa-solid fa-compass" style="color: var(--accent-gold);"></i> Profilo: <strong style="color: #fff;">Viandante Singolo</strong></span>`
+                            }
+                            <span class="mode-badge ${modeCfg.colorClass}" style="font-size: 0.75rem; padding: 3px 8px; border-radius: 6px;">
+                                ${modeCfg.emoji} ${modeCfg.shortLabel}
+                            </span>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <button class="btn btn-secondary" onclick="navigateTo('view-classifiche')" style="padding: 6px 14px; font-size: 0.82rem; border-radius: 20px;">
+                            <i class="fa-solid fa-trophy"></i> Classifiche
+                        </button>
+                    </div>
+                </div>
+
+                ${membersList.length > 0 ? `
+                    <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px; margin-top: 12px;">
+                        <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 6px; font-weight: 600;">COMPAGNI DI SQUADRA (${membersList.length}/5):</span>
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                            ${membersBadgesHtml}
+                        </div>
+                    </div>
+                ` : ''}
+            </div>
+
+            <!-- KPI PUNTEGGI IN TEMPO REALE -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 22px;">
+                <div class="glass text-center" style="padding: 14px; border-radius: 14px; border: 1px solid rgba(212,175,55,0.3); background: rgba(212,175,55,0.06);">
+                    <div style="font-size: 0.72rem; color: var(--accent-gold); font-weight: 700; text-transform: uppercase;">Punti Totali</div>
+                    <div style="font-size: 1.8rem; font-weight: 900; color: #fff; margin-top: 2px;">${totalPoints}</div>
+                </div>
+                <div class="glass text-center" style="padding: 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08);">
+                    <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Punti Autori</div>
+                    <div style="font-size: 1.5rem; font-weight: 800; color: #86efac; margin-top: 2px;">${authPoints}</div>
+                </div>
+                <div class="glass text-center" style="padding: 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08);">
+                    <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">${isStudent ? 'Punti Missioni' : 'Punti Giochi'}</div>
+                    <div style="font-size: 1.5rem; font-weight: 800; color: #38bdf8; margin-top: 2px;">${isStudent ? missionPoints : minigamePoints}</div>
+                </div>
+                <div class="glass text-center" style="padding: 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08);">
+                    <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Posizione</div>
+                    <div style="font-size: 1.5rem; font-weight: 800; color: var(--accent-gold); margin-top: 2px;">${rankDisplay}</div>
+                </div>
+            </div>
+
+            <!-- BANNER FINESTRA DI MERCATO & SOSTITUZIONI -->
+            <div style="margin-bottom: 22px;">
+                ${isMarketOpen ? `
+                    <div class="glass" style="padding: 16px 20px; border-radius: 14px; border: 1.5px solid #38bdf8; background: rgba(56,189,248,0.1); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="font-size: 1.8rem; color: #38bdf8;">🔁</div>
+                            <div>
+                                <strong style="color: #38bdf8; font-size: 0.95rem; display: block;">Finestra di Mercato Aperta!</strong>
+                                <span style="font-size: 0.82rem; color: #e2e8f0;">
+                                    ${hasUsedExchange 
+                                        ? 'Hai già effettuato la sostituzione di riparazione per questa sessione.' 
+                                        : 'Puoi effettuare 1 sostituzione strategica nella tua cinquina di autori.'}
+                                </span>
+                            </div>
+                        </div>
+                        ${hasUsedExchange ? `
+                            <span class="badge" style="background: rgba(34,197,94,0.2); color: #86efac; border: 1px solid rgba(34,197,94,0.3); padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">
+                                <i class="fa-solid fa-check"></i> Cambio già utilizzato
+                            </span>
+                        ` : `
+                            <span class="badge" style="background: rgba(56,189,248,0.2); color: #38bdf8; border: 1px solid rgba(56,189,248,0.3); padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">
+                                1 Cambio Disponibile
+                            </span>
+                        `}
+                    </div>
+                ` : `
+                    <div class="glass" style="padding: 12px 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); background: rgba(0,0,0,0.25); display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: var(--text-muted);">
+                        <i class="fa-solid fa-lock" style="color: var(--text-muted); font-size: 1rem;"></i>
+                        <span><strong>Mercato Chiuso:</strong> La rosa dei 5 autori è confermata. Le sostituzioni si apriranno nelle finestre ufficiali annunciate dalla Gazzetta.</span>
+                    </div>
+                `}
+            </div>
+
+            <!-- SEZIONE AUTORI (DRAFT vs ROSA COMPLETA) -->
+            ${!isDraftComplete ? `
+                <div class="glass text-center" style="padding: 30px 20px; border-radius: 16px; border: 2px dashed var(--accent-gold); background: rgba(212,175,55,0.06); margin-bottom: 25px;">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">⭐</div>
+                    <h3 style="color: var(--accent-gold); font-size: 1.35rem; margin: 0 0 8px 0;">Componi i 5 Autori della tua Squadra</h3>
+                    <p style="font-size: 0.92rem; color: #f1f5f9; max-width: 520px; margin: 0 auto 20px auto; line-height: 1.5;">
+                        ${isStudent 
+                            ? 'Uno studente del gruppo può completare la formazione per tutta la squadra! Scegliete insieme i 5 autori letterari rispettando il budget di 20.000 lire.'
+                            : 'Acquista i tuoi 5 autori letterari per scendere in campo nel rispetto del budget di 20.000 lire.'}
+                    </p>
+                    <button class="btn" onclick="window.avviaDraftSquadra('${teamDocId}')" style="background: linear-gradient(135deg, var(--accent-gold), #b89628); color: #1a1614; font-weight: 800; font-size: 1.05rem; padding: 14px 32px; border-radius: 14px; border: none; cursor: pointer; box-shadow: 0 4px 18px rgba(212,175,55,0.35);">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Scegli i 5 Autori Adesso
+                    </button>
+                </div>
+            ` : `
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                        <h3 style="margin: 0; font-size: 1.15rem; color: #fff; display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-star text-gold"></i> I 5 Autori Schierati
+                        </h3>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">Budget residuo: <strong style="color: var(--accent-gold);">${myTeam.budgetRemaining ? myTeam.budgetRemaining.toLocaleString('it-IT') : 0} lire</strong></span>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px;">
+                        ${resolvedAuthors.map(author => {
+                            const isRevealed = !!author.isPointsRevealed;
+                            const ptsBadge = isRevealed 
+                                ? `<span class="badge" style="background: rgba(34,197,94,0.2); color: #86efac; border: 1px solid rgba(34,197,94,0.3); font-weight: 700; font-size: 0.82rem; padding: 3px 8px; border-radius: 6px;">+${author.points || 0} pt</span>`
+                                : `<span class="badge" style="background: rgba(255,255,255,0.06); color: var(--text-muted); font-size: 0.75rem; padding: 3px 8px; border-radius: 6px;" title="Punti non ancora sbloccati dal Game Master"><i class="fa-solid fa-eye-slash"></i> ? pt</span>`;
+
+                            const canSubstitute = isMarketOpen && !hasUsedExchange;
+
+                            return `
+                                <div class="glass" style="padding: 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; justify-content: space-between; gap: 10px; background: rgba(0,0,0,0.35);">
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <div style="width: 52px; height: 52px; flex-shrink: 0; border-radius: 50%; overflow: hidden; border: 2px solid var(--accent-gold); background: #000; box-shadow: 0 2px 8px rgba(0,0,0,0.4);">
+                                            <img src="${author.image || 'assets/branding/fantaletteratura-badge.png'}" alt="${author.name}" style="width: 100%; height: 100%; object-fit: cover; aspect-ratio: 1/1;">
+                                        </div>
+                                        <div style="flex: 1; min-width: 0;">
+                                            <div style="font-weight: 700; color: #fff; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                ${author.name}
+                                            </div>
+                                            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+                                                Costo: <span style="color: var(--accent-gold); font-weight: 600;">${(author.cost || 0).toLocaleString('it-IT')} lire</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;">
+                                        <div>${ptsBadge}</div>
+                                        ${canSubstitute ? `
+                                            <button type="button" class="btn btn-secondary" onclick="window.apriSostituzioneMercato('${author.id}', ${author.cost || 0}, '${teamDocId}', '${teamMode}')" style="padding: 4px 10px; font-size: 0.75rem; border-radius: 8px; border-color: #38bdf8; color: #38bdf8; cursor: pointer;">
+                                                <i class="fa-solid fa-repeat"></i> Sostituisci
+                                            </button>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `}
+        `;
+
+    } catch (err) {
+        console.error("Errore renderMiaSquadraView:", err);
+        container.innerHTML = `
+            <div class="glass text-center" style="padding: 25px; border-radius: 14px; color: var(--danger-color);">
+                <i class="fa-solid fa-triangle-exclamation" style="font-size: 2rem; margin-bottom: 8px;"></i>
+                <p>Impossibile caricare i dati della squadra. Riprova tra poco.</p>
+            </div>
+        `;
+    }
+};
+
+/* =========================================================
+   MODULO DI SOSTITUZIONE: MERCATO RIPARAZIONE
+========================================================= */
+
+window._currentMercatoSwap = null;
+
+window.apriSostituzioneMercato = async function(oldAuthorId, oldAuthorCost, teamDocId, mode) {
+    const modal = document.getElementById('modal-sostituzione-mercato');
+    const infoBox = document.getElementById('mercato-info-box');
+    const grid = document.getElementById('mercato-autori-disponibili');
+    if (!modal || !infoBox || !grid) return;
+
+    try {
+        const teamDocRef = await window.fanta_db.getTeamDocRef(teamDocId);
+        const teamSnap = await teamDocRef.get();
+        if (!teamSnap.exists) { alert("Squadra non trovata."); return; }
+        const teamData = teamSnap.data() || {};
+
+        if (teamData.mercatoExchangeUsed) {
+            alert("Hai già effettuato la sostituzione consentita per questa sessione di mercato!");
+            return;
+        }
+
+        const modeCfg = GAME_MODES[mode || teamData.mode || 'terze'] || GAME_MODES.terze;
+        const pool = modeCfg.authors || AUTHORS;
+        const oldAuthor = pool.find(a => a.id === oldAuthorId) || AUTHORS.find(a => a.id === oldAuthorId) || { id: oldAuthorId, name: oldAuthorId, cost: oldAuthorCost };
+
+        const currentBudgetRemaining = Number(teamData.budgetRemaining || 0);
+        const maxBudgetAvailable = currentBudgetRemaining + Number(oldAuthorCost || oldAuthor.cost || 0);
+
+        window._currentMercatoSwap = {
+            teamDocId: teamDocId,
+            oldAuthorId: oldAuthorId,
+            oldAuthorName: oldAuthor.name,
+            oldAuthorCost: Number(oldAuthorCost || oldAuthor.cost || 0),
+            maxBudgetAvailable: maxBudgetAvailable,
+            teamAuthors: Array.isArray(teamData.authors) ? teamData.authors : [],
+            mode: mode || teamData.mode || 'terze'
+        };
+
+        infoBox.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <div>
+                    <span style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Autore da Svincolare:</span>
+                    <div style="font-weight:700; color:#fff; font-size:1.05rem;">${oldAuthor.name}</div>
+                    <small style="color:#86efac;">Recuperi: +${(Number(oldAuthorCost || oldAuthor.cost || 0)).toLocaleString('it-IT')} lire</small>
+                </div>
+                <div style="text-align:right;">
+                    <span style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Budget Massimo Disponibile:</span>
+                    <div style="font-weight:900; color:var(--accent-gold); font-size:1.3rem;">${maxBudgetAvailable.toLocaleString('it-IT')} lire</div>
+                </div>
+            </div>
+        `;
+
+        // Filtra autori disponibili: appartengono al campionato corrente e non sono già schierati
+        const currentAuthorIds = window._currentMercatoSwap.teamAuthors.map(a => (typeof a === 'object' && a !== null) ? a.id : a);
+        const candidates = pool.filter(a => a && a.id !== oldAuthorId && !currentAuthorIds.includes(a.id));
+
+        grid.innerHTML = candidates.map(candidate => {
+            const cost = Number(candidate.cost || 0);
+            const isAffordable = cost <= maxBudgetAvailable;
+
+            return `
+                <div class="glass" style="padding:10px; border-radius:12px; border:1px solid ${isAffordable ? 'rgba(56,189,248,0.3)' : 'rgba(255,255,255,0.06)'}; background:rgba(0,0,0,0.4); text-align:center; display:flex; flex-direction:column; justify-content:space-between; opacity:${isAffordable ? '1' : '0.5'};">
+                    <div>
+                        <img src="${candidate.image || 'assets/branding/fantaletteratura-badge.png'}" alt="${candidate.name}" style="width:42px; height:42px; border-radius:50%; object-fit:cover; margin:0 auto 6px auto; display:block; border:1.5px solid ${isAffordable ? '#38bdf8' : '#64748b'};">
+                        <div style="font-size:0.82rem; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${candidate.name}</div>
+                        <div style="font-size:0.72rem; color:var(--accent-gold); font-weight:600;">${cost.toLocaleString('it-IT')} lire</div>
+                    </div>
+                    <div style="margin-top:8px;">
+                        ${isAffordable ? `
+                            <button type="button" class="btn" onclick="window.confermaSostituzioneMercato('${candidate.id}')" style="width:100%; padding:5px 8px; font-size:0.75rem; font-weight:700; background:linear-gradient(135deg, #38bdf8, #0284c7); color:#fff; border:none; border-radius:6px; cursor:pointer;">
+                                Inserisci
+                            </button>
+                        ` : `
+                            <button type="button" class="btn btn-secondary" disabled style="width:100%; padding:5px 8px; font-size:0.72rem; opacity:0.5; border-radius:6px;">
+                                Fuori Budget
+                            </button>
+                        `}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        modal.style.display = 'block';
+
+    } catch (err) {
+        console.error("Errore apertura sostituzione mercato:", err);
+        alert("Impossibile caricare il catalogo di mercato.");
+    }
+};
+
+window.chiudiSostituzioneMercato = function() {
+    const modal = document.getElementById('modal-sostituzione-mercato');
+    if (modal) modal.style.display = 'none';
+    window._currentMercatoSwap = null;
+};
+
+window.confermaSostituzioneMercato = async function(newAuthorId) {
+    if (!window._currentMercatoSwap) return;
+
+    const { teamDocId, oldAuthorId, oldAuthorName, oldAuthorCost, maxBudgetAvailable, teamAuthors, mode } = window._currentMercatoSwap;
+    const modeCfg = GAME_MODES[mode || 'terze'] || GAME_MODES.terze;
+    const pool = modeCfg.authors || AUTHORS;
+    const newAuthor = pool.find(a => a.id === newAuthorId) || AUTHORS.find(a => a.id === newAuthorId);
+
+    if (!newAuthor) { alert("Autore selezionato non valido."); return; }
+
+    const newCost = Number(newAuthor.cost || 0);
+    if (newCost > maxBudgetAvailable) {
+        alert(`Budget insufficiente! Hai a disposizione ${maxBudgetAvailable} lire, mentre ${newAuthor.name} costa ${newCost} lire.`);
+        return;
+    }
+
+    if (!confirm(`Confermi la sostituzione?\n\nCedi: ${oldAuthorName}\nAcquisti: ${newAuthor.name}\n\nQuesta azione utilizzerà il cambio a disposizione della tua squadra per questa sessione di mercato.`)) {
+        return;
+    }
+
+    try {
+        const teamDocRef = await window.fanta_db.getTeamDocRef(teamDocId);
+        
+        // Sostituisci l'autore nell'array mantenendo la posizione
+        const updatedAuthors = teamAuthors.map(a => {
+            const aid = (typeof a === 'object' && a !== null) ? a.id : a;
+            return (aid === oldAuthorId) ? newAuthor.id : aid;
+        });
+
+        const newRemaining = maxBudgetAvailable - newCost;
+
+        await teamDocRef.update({
+            authors: updatedAuthors,
+            budgetRemaining: newRemaining,
+            mercatoExchangeUsed: true,
+            lastUpdated: new Date().toISOString()
+        });
+
+        window.chiudiSostituzioneMercato();
+        alert(`Sostituzione confermata con successo! ${newAuthor.name} è ora schierato nella tua squadra.`);
+
+        if (typeof window.renderMiaSquadraView === 'function') {
+            await window.renderMiaSquadraView();
+        }
+
+    } catch (err) {
+        console.error("Errore salvataggio sostituzione mercato:", err);
+        alert("Errore durante la registrazione del cambio: " + err.message);
+    }
+};
+
