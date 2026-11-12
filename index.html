@@ -345,7 +345,7 @@
                     </div>
 
                     <!-- SELEZIONE MODALITÀ -->
-                    <label style="margin-bottom: 12px; display: block; font-size:0.9rem; color:var(--text-muted);">Scegli la modalità di gioco per questa squadra</label>
+                    <label id="team-mode-label" style="margin-bottom: 12px; display: block; font-size:0.9rem; color:var(--text-muted);">Scegli la modalità di gioco per questa squadra</label>
                     <div class="mode-selector-grid" id="mode-selector-grid">
                         <button class="mode-selector-btn" id="mode-btn-terze" onclick="selectTeamMode('terze')">
                             <div class="mode-btn-title color-green">📘 Contemporanea: Autori Italiani</div>
@@ -359,6 +359,20 @@
                             <div class="mode-btn-title color-gold">📒 Contemporanea: Autori Italiani e Internazionali</div>
                             <div class="mode-btn-desc">Autori italiani e internazionali</div>
                         </button>
+                    </div>
+
+                    <!-- Badge Campionato Blindato (mostrato solo in modalità draft per squadre assegnate da docente) -->
+                    <div id="team-mode-locked-badge" style="display:none; padding:14px 18px; border-radius:12px; background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.3); margin-bottom:15px; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span style="font-size:1.5rem;">🏛️</span>
+                            <div>
+                                <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:var(--accent-gold); font-weight:700;">Campionato Assegnato dal Docente</div>
+                                <div id="locked-mode-title" style="font-size:1.05rem; font-weight:800; color:#fff;">-</div>
+                            </div>
+                        </div>
+                        <span class="badge" style="background:rgba(34,197,94,0.15); color:#86efac; border:1px solid rgba(34,197,94,0.3); padding:4px 10px; border-radius:12px; font-size:0.78rem;">
+                            <i class="fa-solid fa-lock"></i> Fissato per la tua classe
+                        </span>
                     </div>
 
                     <!-- SELEZIONE ROSTER & GRIGLIA AUTORI (nascosti finché non si sceglie modalità) -->
@@ -1026,6 +1040,16 @@
                        </div>
                    </div>
             </section>
+
+            <!-- VIEW: La mia Squadra (Studenti & Viandanti) -->
+            <section id="view-mia-squadra" class="view">
+                <div id="mia-squadra-container" style="max-width: 900px; margin: 0 auto; padding-bottom: 25px;">
+                    <div class="glass text-center" style="padding: 35px 20px; border-radius: 16px;">
+                        <i class="fa-solid fa-spinner fa-spin" style="font-size: 2.2rem; color: var(--accent-gold); margin-bottom: 12px;"></i>
+                        <p style="color: var(--text-muted); margin: 0; font-size: 0.95rem;">Caricamento della tua squadra in corso...</p>
+                    </div>
+                </div>
+            </section>
         </main>
 
         
@@ -1190,10 +1214,14 @@
                 <i class="fa-solid fa-gamepad"></i>
                 <span>Sala Giochi</span>
             </a>
-            <a href="#" class="tab-item hidden" data-action="navigate" data-view="view-profilo" id="tab-item-profilo" data-tooltip="Profilo" style="position: relative;">
-                <i class="fa-solid fa-user"></i>
-                <span>Profilo</span>
+            <a href="#" class="tab-item hidden" data-action="navigate" data-view="view-profilo" id="tab-item-profilo" data-tooltip="Pannello" style="position: relative;">
+                <i class="fa-solid fa-chalkboard-user"></i>
+                <span>Pannello</span>
                 <span id="tab-notification-badge" style="display: none; position: absolute; top: 4px; right: 22%; background: #e63946; border: 1.5px solid var(--bg-dark); width: 8px; height: 8px; border-radius: 50%; box-shadow: 0 0 5px #e63946;"></span>
+            </a>
+            <a href="#" class="tab-item hidden" data-action="navigate" data-view="view-mia-squadra" id="tab-item-squadra" data-tooltip="La mia Squadra" style="position: relative;">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Squadra</span>
             </a>
             <a href="admin.html" class="tab-item hidden" id="tab-item-admin" data-tooltip="Admin">
                 <i class="fa-solid fa-lock"></i>
@@ -1205,6 +1233,25 @@
     <!-- ========================
          MODALI GLOBALI (fuori dalle view per garantire visibilità)
          ======================== -->
+
+    <!-- Modale Sostituzione Mercato (Studenti & Viandanti) -->
+    <div id="modal-sostituzione-mercato" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.85); z-index:3000; overflow-y:auto; backdrop-filter:blur(8px);">
+        <div style="padding: 15px 20px; position: sticky; top: 0; z-index:10; display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid rgba(255,255,255,0.1); background: var(--bg-dark);">
+            <h3 style="margin:0; font-size:1.15rem; color:var(--accent-gold); display:flex; align-items:center; gap:8px;">
+                <i class="fa-solid fa-repeat"></i> Finestra di Mercato: Sostituzione Autore
+            </h3>
+            <button class="btn-secondary" onclick="window.chiudiSostituzioneMercato()" style="padding: 5px 15px; width:auto; border-radius:20px; border:none; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div style="padding: 20px; max-width:640px; margin:0 auto;">
+            <div id="mercato-info-box" style="background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.3); border-radius:12px; padding:15px; margin-bottom:20px;">
+                <!-- Dettaglio autore ceduto e budget disponibile generato da JS -->
+            </div>
+            <h4 style="color:#fff; font-size:0.95rem; margin:0 0 12px 0;">Scegli il nuovo autore da acquistare:</h4>
+            <div id="mercato-autori-disponibili" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap:12px;">
+                <!-- Griglia autori disponibili -->
+            </div>
+        </div>
+    </div>
 
     <!-- Modale Nuova Missione -->
     <div id="nuova-missione-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-dark); z-index:2000; overflow-y:auto;">
