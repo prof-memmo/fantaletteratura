@@ -345,7 +345,7 @@
                     </div>
 
                     <!-- SELEZIONE MODALITÀ -->
-                    <label style="margin-bottom: 12px; display: block; font-size:0.9rem; color:var(--text-muted);">Scegli la modalità di gioco per questa squadra</label>
+                    <label id="team-mode-label" style="margin-bottom: 12px; display: block; font-size:0.9rem; color:var(--text-muted);">Scegli la modalità di gioco per questa squadra</label>
                     <div class="mode-selector-grid" id="mode-selector-grid">
                         <button class="mode-selector-btn" id="mode-btn-terze" onclick="selectTeamMode('terze')">
                             <div class="mode-btn-title color-green">📘 Contemporanea: Autori Italiani</div>
@@ -359,6 +359,20 @@
                             <div class="mode-btn-title color-gold">📒 Contemporanea: Autori Italiani e Internazionali</div>
                             <div class="mode-btn-desc">Autori italiani e internazionali</div>
                         </button>
+                    </div>
+
+                    <!-- Badge Campionato Blindato (mostrato solo in modalità draft per squadre assegnate da docente) -->
+                    <div id="team-mode-locked-badge" style="display:none; padding:14px 18px; border-radius:12px; background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.3); margin-bottom:15px; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span style="font-size:1.5rem;">🏛️</span>
+                            <div>
+                                <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:var(--accent-gold); font-weight:700;">Campionato Assegnato dal Docente</div>
+                                <div id="locked-mode-title" style="font-size:1.05rem; font-weight:800; color:#fff;">-</div>
+                            </div>
+                        </div>
+                        <span class="badge" style="background:rgba(34,197,94,0.15); color:#86efac; border:1px solid rgba(34,197,94,0.3); padding:4px 10px; border-radius:12px; font-size:0.78rem;">
+                            <i class="fa-solid fa-lock"></i> Fissato per la tua classe
+                        </span>
                     </div>
 
                     <!-- SELEZIONE ROSTER & GRIGLIA AUTORI (nascosti finché non si sceglie modalità) -->

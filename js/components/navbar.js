@@ -99,6 +99,11 @@ function navigateTo(viewId, pushHistory = true) {
     if(viewId === 'view-profilo') {
         renderProfilo();
     }
+    if(viewId === 'view-squadra' && !window.draftingTeamId) {
+        if(typeof window.resetTeamCreationForm === 'function') {
+            window.resetTeamCreationForm();
+        }
+    }
     if(viewId === 'view-mia-squadra') {
         if(typeof window.renderMiaSquadraView === 'function') {
             window.renderMiaSquadraView();

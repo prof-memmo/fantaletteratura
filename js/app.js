@@ -342,6 +342,11 @@ let activeSlot = null;
    GAME MODE SELECTION (team registration)
 ───────────────────────────────────────────────────────────── */
 function selectTeamMode(modeId) {
+    if (window.draftingTeamId && window.draftingTeamMode && modeId !== window.draftingTeamMode) {
+        console.warn("Campionato blindato dal docente per questa squadra:", window.draftingTeamMode);
+        return;
+    }
+
     const mode = GAME_MODES[modeId];
     if (!mode) return;
 
@@ -352,6 +357,7 @@ function selectTeamMode(modeId) {
     }
 
     currentTeamMode = modeId;
+    window.currentTeamMode = modeId;
 
     // Update button styles
     const colorClassMap = { terze: 'active-green', seconde: 'active-orange', avanzato: 'active-gold' };
@@ -1963,27 +1969,46 @@ function setupTeamSave() {
             return;
         }
         
-        // --- Controllo Limiti Piano Base ---
+        // --- Controllo Limiti Piano Base / Viandante ---
         if (window.FantaPermissions && !window.FantaPermissions.can('create_team')) {
             alert("Hai raggiunto il limite per il tuo piano.");
             return;
         }
-        if (window.FantaPermissions) {
-            let planKey = 'base';
-            if (window.currentUserPiano) {
-                const p = window.currentUserPiano.toLowerCase();
-                if (p.includes('viandante')) planKey = 'viandante';
-                else if (p.includes('docente') && p.includes('ecosistema')) planKey = 'docente_ecosistema';
-                else if (p.includes('docente')) planKey = 'docente_didattico';
-            }
+        let planKey = 'base';
+        if (window.currentUserPiano) {
+            const p = window.currentUserPiano.toLowerCase();
+            if (p.includes('viandante')) planKey = 'viandante';
+            else if (p.includes('docente') && p.includes('ecosistema')) planKey = 'docente_ecosistema';
+            else if (p.includes('docente')) planKey = 'docente_didattico';
+        }
+        const userRole = (typeof currentUserRole !== 'undefined' ? currentUserRole : '') || localStorage.getItem('fanta_user_role') || '';
+        const isViandante = userRole === 'fantamico' || userRole === 'viandante';
+        const cleanEmail = (currentUserEmail || '').toLowerCase().trim();
+
+        if (isViandante && !window.draftingTeamId) {
+            const userTeams = await fanta_db.getUserTeams(cleanEmail);
+            const activeTeams = userTeams.filter(t => t.status !== 'archived');
             if (planKey === 'base') {
-                const cleanEmail = (currentUserEmail || '').toLowerCase().trim();
-                const userTeams = await fanta_db.getUserTeams(cleanEmail);
-                const activeTeams = userTeams.filter(t => t.status !== 'archived');
-                if (activeTeams.length >= 4) {
-                    alert("Limite Raggiunto: Il piano Base consente massimo 4 squadre per la tua classe. Passa a un piano superiore nell'Hub per creare squadre illimitate!");
+                if (activeTeams.length >= 1) {
+                    alert("Limite Raggiunto: Il piano Base consente di creare 1 squadra a scelta nel Campionato Viandanti. Passa al Piano Viandante nell'Hub per partecipare a tutti i campionati contemporaneamente!");
                     return;
                 }
+            } else if (planKey === 'viandante') {
+                if (activeTeams.length >= 3) {
+                    alert("Hai già creato una squadra per ciascuno dei 3 campionati disponibili!");
+                    return;
+                }
+                if (activeTeams.some(t => (t.mode || 'terze') === currentTeamMode)) {
+                    alert("Hai già una squadra iscritta a questa modalità di gioco. Con il Piano Viandante puoi avere 1 squadra per ciascuna epoca letteraria!");
+                    return;
+                }
+            }
+        } else if (!isViandante && planKey === 'base' && !window.draftingTeamId) {
+            const userTeams = await fanta_db.getUserTeams(cleanEmail);
+            const activeTeams = userTeams.filter(t => t.status !== 'archived');
+            if (activeTeams.length >= 4) {
+                alert("Limite Raggiunto: Il piano Base consente massimo 4 squadre per la tua classe. Passa a un piano superiore nell'Hub per creare squadre illimitate!");
+                return;
             }
         }
         // --- Fine Controllo Limiti ---
@@ -2006,23 +2031,27 @@ function setupTeamSave() {
         // Se stiamo salvando il Draft di una Squadra Assegnata (Studente o LIM Docente)
         if (window.draftingTeamId) {
             const teamDocRef = window.db.collection('fanta_teams').doc(window.draftingTeamId);
+            const enforcedMode = window.draftingTeamMode || currentTeamMode || 'terze';
             teamDocRef.update({
                 authors: authorsSelected,
                 budgetRemaining: currentBudget,
                 draftCompleted: true,
-                mode: currentTeamMode || 'terze'
+                mode: enforcedMode
             }).then(() => {
                 alert("Complimenti! I 5 autori della squadra sono stati salvati con successo!");
-                window.draftingTeamId = null;
-
-                // Reset form
-                const nameInp = document.querySelector('#view-squadra input[placeholder="Es: I Promessi Sposi"]');
-                const clsInp = document.getElementById('team-classe-input');
-                if (nameInp) { nameInp.value = ""; nameInp.readOnly = false; }
-                if (clsInp) { clsInp.value = ""; clsInp.readOnly = false; }
-                currentTeamMode = null;
-                teamSelection = { 1: null, 2: null, 3: null, 4: null, 5: null };
-                calculateBudget();
+                if (typeof window.resetTeamCreationForm === 'function') {
+                    window.resetTeamCreationForm();
+                } else {
+                    window.draftingTeamId = null;
+                    window.draftingTeamMode = null;
+                    const nameInp = document.querySelector('#view-squadra input[placeholder="Es: I Promessi Sposi"]');
+                    const clsInp = document.getElementById('team-classe-input');
+                    if (nameInp) { nameInp.value = ""; nameInp.readOnly = false; }
+                    if (clsInp) { clsInp.value = ""; clsInp.readOnly = false; }
+                    currentTeamMode = null;
+                    teamSelection = { 1: null, 2: null, 3: null, 4: null, 5: null };
+                    calculateBudget();
+                }
 
                 const isStud = currentUserRole === 'studente';
                 const isFant = currentUserRole === 'fantamico' || currentUserRole === 'viandante';
@@ -4692,6 +4721,30 @@ window.eliminaSquadraClasse = async function(teamDocId, teamName) {
     }
 };
 
+window.resetTeamCreationForm = function() {
+    window.draftingTeamId = null;
+    window.draftingTeamMode = null;
+    const nameInp = document.querySelector('#view-squadra input[placeholder="Es: I Promessi Sposi"]');
+    const clsInp = document.getElementById('team-classe-input');
+    if (nameInp) { nameInp.value = ""; nameInp.readOnly = false; }
+    if (clsInp) { clsInp.value = ""; clsInp.readOnly = false; }
+
+    const modeLabel = document.getElementById('team-mode-label');
+    const modeGrid = document.getElementById('mode-selector-grid');
+    const lockedBadge = document.getElementById('team-mode-locked-badge');
+    if (modeLabel) modeLabel.style.display = 'block';
+    if (modeGrid) modeGrid.style.display = 'grid';
+    if (lockedBadge) lockedBadge.style.display = 'none';
+
+    currentTeamMode = null;
+    teamSelection = { 1: null, 2: null, 3: null, 4: null, 5: null };
+    const authSlots = document.getElementById('author-slots-section');
+    const budgetCont = document.getElementById('budget-container');
+    if (authSlots) authSlots.style.display = 'none';
+    if (budgetCont) budgetCont.style.display = 'none';
+    calculateBudget();
+};
+
 window.avviaDraftSquadra = async function(teamDocId) {
     try {
         const docRef = window.db.collection('fanta_teams').doc(teamDocId);
@@ -4700,6 +4753,8 @@ window.avviaDraftSquadra = async function(teamDocId) {
 
         const teamData = docSnap.data();
         window.draftingTeamId = teamDocId;
+        const mode = teamData.mode || 'terze';
+        window.draftingTeamMode = mode;
 
         // Naviga a view-squadra
         navigateTo('view-squadra');
@@ -4716,7 +4771,20 @@ window.avviaDraftSquadra = async function(teamDocId) {
             classeInput.readOnly = true;
         }
 
-        const mode = teamData.mode || 'terze';
+        // Blindatura Campionato: mostra badge informativo e nasconde i selettori cliccabili
+        const modeLabel = document.getElementById('team-mode-label');
+        const modeGrid = document.getElementById('mode-selector-grid');
+        const lockedBadge = document.getElementById('team-mode-locked-badge');
+        const lockedTitle = document.getElementById('locked-mode-title');
+
+        if (modeLabel) modeLabel.style.display = 'none';
+        if (modeGrid) modeGrid.style.display = 'none';
+        if (lockedBadge) {
+            lockedBadge.style.display = 'flex';
+            const modeCfg = GAME_MODES[mode] || GAME_MODES.terze;
+            if (lockedTitle) lockedTitle.innerHTML = `${modeCfg.emoji || '📘'} ${modeCfg.label || mode}`;
+        }
+
         selectTeamMode(mode);
 
         if (Array.isArray(teamData.authors) && teamData.authors.length > 0) {
@@ -5126,6 +5194,7 @@ window.renderMiaSquadraView = async function() {
         const allTeams = await getAllTeams(true);
         let myTeam = null;
 
+        let viandanteTeams = [];
         if (isStudent) {
             // 1. Ricerca per identificativo studente tra i membri
             if (uid || studentName || studentId) {
@@ -5160,12 +5229,16 @@ window.renderMiaSquadraView = async function() {
                 }
             }
         } else {
-            // Viandante: ricerca per email proprietario
-            myTeam = allTeams.find(t => {
+            // Viandante: ricerca squadre per email proprietario (supporto multi-campionato per abbonati)
+            viandanteTeams = allTeams.filter(t => {
                 if (t.status === 'archived' || t.archivedYear) return false;
                 return (email && t.ownerEmail && t.ownerEmail.toLowerCase() === email) ||
                        (t.userRole === 'viandante' && t.ownerEmail === email);
             });
+            if (viandanteTeams.length > 0) {
+                const activeMode = window._activeViandanteTeamMode || (viandanteTeams[0].mode || 'terze');
+                myTeam = viandanteTeams.find(t => (t.mode || 'terze') === activeMode) || viandanteTeams[0];
+            }
         }
 
         // Se nessuna squadra è stata trovata
@@ -5257,8 +5330,42 @@ window.renderMiaSquadraView = async function() {
             return `<span style="display: inline-flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; color: #f1f5f9;"><i class="fa-solid fa-user-graduate" style="color: var(--accent-gold); font-size: 0.72rem;"></i> ${mName}</span>`;
         }).join('');
 
+        // Selettore Multi-Squadra per Viandante con Abbonamento
+        let viandanteSelectorHtml = '';
+        if (isViandante && viandanteTeams.length > 1) {
+            viandanteSelectorHtml = `
+                <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center;">
+                    <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Le tue Squadre:</span>
+                    ${viandanteTeams.map(t => {
+                        const tMode = t.mode || 'terze';
+                        const tCfg = GAME_MODES[tMode] || GAME_MODES.terze;
+                        const isSelected = (t.docId || t.id) === (myTeam.docId || myTeam.id);
+                        return `
+                            <button type="button" class="btn" onclick="window._activeViandanteTeamMode='${tMode}'; window.renderMiaSquadraView();" style="padding: 6px 14px; font-size: 0.82rem; border-radius: 20px; font-weight: 700; cursor: pointer; ${isSelected ? 'background: linear-gradient(135deg, var(--accent-gold), #b89628); color: #000; border: none; box-shadow: 0 2px 8px rgba(212,175,55,0.3);' : 'background: rgba(255,255,255,0.06); color: #cbd5e1; border: 1px solid rgba(255,255,255,0.15);'}">
+                                ${tCfg.emoji || '📘'} ${t.name} (${t.points || 0} pt)
+                            </button>
+                        `;
+                    }).join('')}
+                    ${viandanteTeams.length < 3 ? `
+                        <button type="button" class="btn btn-secondary" onclick="navigateTo('view-squadra')" style="padding: 6px 14px; font-size: 0.82rem; border-radius: 20px; border-color: rgba(212,175,55,0.4); color: var(--accent-gold); cursor: pointer;">
+                            <i class="fa-solid fa-plus"></i> Altro Campionato
+                        </button>
+                    ` : ''}
+                </div>
+            `;
+        } else if (isViandante && viandanteTeams.length === 1 && window.currentUserPiano && window.currentUserPiano.toLowerCase().includes('viandante')) {
+            viandanteSelectorHtml = `
+                <div style="display: flex; justify-content: flex-end; margin-bottom: 12px;">
+                    <button type="button" class="btn btn-secondary" onclick="navigateTo('view-squadra')" style="padding: 5px 14px; font-size: 0.8rem; border-radius: 20px; border-color: rgba(212,175,55,0.4); color: var(--accent-gold); cursor: pointer;">
+                        <i class="fa-solid fa-plus"></i> Iscrivi squadra in un altro campionato
+                    </button>
+                </div>
+            `;
+        }
+
         // Rendering HTML Completo della Scheda Squadra
         container.innerHTML = `
+            ${viandanteSelectorHtml}
             <!-- HEADER SQUADRA -->
             <div class="glass" style="padding: 22px 24px; border-radius: 16px; margin-bottom: 20px; border: 1px solid rgba(212,175,55,0.3); background: rgba(15,23,42,0.65);">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">

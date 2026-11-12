@@ -177,6 +177,7 @@ service cloud.firestore {
           request.resource.data.ownerEmail == resource.data.ownerEmail &&
           request.resource.data.name == resource.data.name &&
           request.resource.data.points == resource.data.points &&
+          request.resource.data.mode == resource.data.mode &&
           (request.resource.data.classe == resource.data.classe || !('classe' in resource.data))
         )
       ));
