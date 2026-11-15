@@ -425,14 +425,18 @@
 
 @media (max-width: 768px) {
     .app-header {
-        height: 65px;
-        padding: 0 12px;
+        height: 60px;
+        padding: 0 10px;
     }
     .header-game-logo {
-        height: 42px;
+        height: 32px;
+        max-width: 110px;
+        object-fit: contain;
     }
     .header-prof-logo {
-        height: 40px;
+        height: 32px;
+        width: 32px;
+        object-fit: contain;
     }
     .user-trigger-text {
         display: none;
@@ -442,7 +446,9 @@
         border-radius: 50%;
     }
     .user-avatar-circle {
-        width: 32px;
+        width: 28px;
+        height: 28px;
+    }
         height: 32px;
     }
     .user-trigger-chevron {
