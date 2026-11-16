@@ -769,6 +769,15 @@ function calculateBudget() {
         }
     }
 
+    const budgetBadge = document.getElementById('budget-badge');
+    if (budgetBadge) {
+        if (spent > totalBudget) {
+            budgetBadge.classList.add('over');
+        } else {
+            budgetBadge.classList.remove('over');
+        }
+    }
+
     // Update Save Team Button
     const saveBtn = document.getElementById('btn-save-team');
     if (saveBtn) {
