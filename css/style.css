@@ -3407,6 +3407,52 @@ h3 {
         line-height: 1.3 !important;
         opacity: 0.85;
     }
+
+    /* Modale Miniguida fluido e anti-sbordamento su smartphone */
+    #modal-miniguida {
+        padding: 10px !important;
+    }
+    #modal-miniguida .modal-content {
+        max-height: 88dvh !important;
+        border-radius: 18px !important;
+    }
+    .miniguida-content-col {
+        padding: 24px 16px 16px 16px !important;
+        min-height: auto !important;
+    }
+    #miniguida-title {
+        font-size: 1.4rem !important;
+        margin-bottom: 15px !important;
+    }
+    .miniguida-step i {
+        font-size: 3rem !important;
+        margin-bottom: 12px !important;
+    }
+    .miniguida-step p {
+        font-size: 0.92rem !important;
+        line-height: 1.45 !important;
+    }
+    .miniguida-footer-row {
+        flex-wrap: wrap !important;
+        gap: 12px !important;
+        justify-content: center !important;
+        margin-top: 15px !important;
+    }
+    #miniguida-dots {
+        gap: 6px !important;
+        justify-content: center !important;
+    }
+    #miniguida-dots .dot {
+        width: 9px !important;
+        height: 9px !important;
+    }
+    #miniguida-next-btn {
+        padding: 10px 24px !important;
+        font-size: 0.95rem !important;
+        border-radius: 10px !important;
+        width: 100% !important;
+        max-width: 220px !important;
+    }
 }
 
 /* Admin navigation bar styling (pulsanti compatti affiancati grandi quanto il testo) */
