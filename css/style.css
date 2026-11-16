@@ -425,14 +425,18 @@
 
 @media (max-width: 768px) {
     .app-header {
-        height: 65px;
-        padding: 0 12px;
+        height: 60px;
+        padding: 0 10px;
     }
     .header-game-logo {
-        height: 42px;
+        height: 32px;
+        max-width: 110px;
+        object-fit: contain;
     }
     .header-prof-logo {
-        height: 40px;
+        height: 32px;
+        width: 32px;
+        object-fit: contain;
     }
     .user-trigger-text {
         display: none;
@@ -442,7 +446,9 @@
         border-radius: 50%;
     }
     .user-avatar-circle {
-        width: 32px;
+        width: 28px;
+        height: 28px;
+    }
         height: 32px;
     }
     .user-trigger-chevron {
@@ -558,6 +564,21 @@ h1, h2, h3, h4 {
     font-family: var(--font-heading);
     color: var(--text-main);
     font-weight: 600;
+}
+
+h1 {
+    font-size: clamp(1.3rem, 4.5vw, 1.8rem);
+    line-height: 1.25;
+}
+
+h2 {
+    font-size: clamp(1.15rem, 3.8vw, 1.5rem);
+    line-height: 1.3;
+}
+
+h3 {
+    font-size: clamp(1.05rem, 3vw, 1.25rem);
+    line-height: 1.35;
 }
 
 #app-container {
@@ -683,9 +704,14 @@ h1, h2, h3, h4 {
     overflow-y: hidden;
     flex-wrap: nowrap;
     -webkit-overflow-scrolling: touch;
-    padding: 0 15px;
+    padding: 0 24px 0 15px;
     gap: 15px;
     scrollbar-width: none;
+}
+
+.bottom-bar::after {
+    content: '';
+    flex: 0 0 24px;
 }
 
 .bottom-bar::-webkit-scrollbar {
