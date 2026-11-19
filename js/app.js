@@ -1255,9 +1255,19 @@ function checkLoginSession() {
             
             // 1. Verifica sull'Hub Centrale (Single Sign-On Auth)
             let isSuperAdmin = (email === "prof.memmo@gmail.com");
-            let hubRole = isSuperAdmin ? 'docente' : 'docente';
+            const isStudentVirtual = (user.uid && user.uid.startsWith('stud_')) || (email && email.includes('@studente.profmemmo.it'));
+            let hubRole = isSuperAdmin ? 'admin' : (isStudentVirtual ? 'studente' : 'docente');
             let hubStudentClass = '';
             let hubStudentTeamId = '';
+
+            if (isStudentVirtual) {
+                try {
+                    const tokRes = await user.getIdTokenResult();
+                    if (tokRes && tokRes.claims) {
+                        if (tokRes.claims.classId) hubStudentClass = tokRes.claims.classId;
+                    }
+                } catch(eTok) {}
+            }
             
             try {
                 const hubDoc = await window.db.collection('hub_users').doc(user.uid).get();
@@ -1277,7 +1287,7 @@ function checkLoginSession() {
                     } else {
                         hubRole = 'studente';
                     }
-                    hubStudentClass = hubData.classCode || hubData.className || hubData.classe || '';
+                    hubStudentClass = hubData.classCode || hubData.className || hubData.classe || hubStudentClass;
                     hubStudentTeamId = hubData.teamId || '';
                 }
             } catch (err) {
@@ -4899,9 +4909,13 @@ window.renderSalaGiochiView = function() {
     const select = document.getElementById('salagiochi-author-select');
     const historySec = document.getElementById('salagiochi-history-section');
     
-    const isDocente = !!currentUserEmail;
+    const isStudentUser = (typeof currentUserRole !== 'undefined' && currentUserRole === 'studente') ||
+                          (typeof currentUserEmail === 'string' && (currentUserEmail.includes('@studente.profmemmo.it') || currentUserEmail.startsWith('stud_'))) ||
+                          localStorage.getItem('hub_user_role') === 'studente' ||
+                          localStorage.getItem('fanta_user_role') === 'studente';
+    const isDocente = !isStudentUser && (currentUserRole === 'docente' || currentUserRole === 'admin' || (!!currentUserEmail && currentUserRole !== 'fantamico' && currentUserRole !== 'viandante'));
     const hasStudentCode = localStorage.getItem('fanta_active_team_code');
-    const userRole = (typeof currentUserRole !== 'undefined' ? currentUserRole : '') || localStorage.getItem('fanta_user_role') || (hasStudentCode && !isDocente ? 'studente' : '');
+    const userRole = (typeof currentUserRole !== 'undefined' ? currentUserRole : '') || localStorage.getItem('fanta_user_role') || (isStudentUser ? 'studente' : (hasStudentCode && !isDocente ? 'studente' : ''));
 
     // 1. Render Banner Ruolo
     if (banner) {
