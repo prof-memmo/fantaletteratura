@@ -35,12 +35,16 @@ function navigateTo(viewId, pushHistory = true) {
     ].includes(viewId);
 
     const hasStudentCode = localStorage.getItem('fanta_active_team_code') || localStorage.getItem('pm_student_class') || localStorage.getItem('hub_user_class');
-    const isDocente = !!(currentUserEmail || (typeof window !== 'undefined' && window.auth && window.auth.currentUser && window.auth.currentUser.email) || localStorage.getItem('fanta_user_email') || localStorage.getItem('hub_user_email'));
+    const isStudentUser = (typeof currentUserRole !== 'undefined' && currentUserRole === 'studente') ||
+                          (typeof currentUserEmail === 'string' && (currentUserEmail.includes('@studente.profmemmo.it') || currentUserEmail.startsWith('stud_'))) ||
+                          localStorage.getItem('hub_user_role') === 'studente' ||
+                          localStorage.getItem('fanta_user_role') === 'studente';
+    const isDocente = !isStudentUser && (currentUserRole === 'docente' || currentUserRole === 'admin' || (!!(currentUserEmail || (typeof window !== 'undefined' && window.auth && window.auth.currentUser && window.auth.currentUser.email) || localStorage.getItem('fanta_user_email') || localStorage.getItem('hub_user_email')) && currentUserRole !== 'fantamico' && currentUserRole !== 'viandante'));
 
     // Controllo Centralizzato HubSubscriptionGuard
     if (window.HubSubscriptionGuard && typeof window.HubSubscriptionGuard.verifyAccess === 'function') {
         const currentUser = window.auth ? window.auth.currentUser : null;
-        const currentRole = (typeof currentUserRole !== 'undefined' ? currentUserRole : '') || localStorage.getItem('fanta_user_role') || (hasStudentCode && !isDocente ? 'studente' : '');
+        const currentRole = (typeof currentUserRole !== 'undefined' ? currentUserRole : '') || localStorage.getItem('fanta_user_role') || (isStudentUser ? 'studente' : (hasStudentCode && !isDocente ? 'studente' : ''));
         window.HubSubscriptionGuard.verifyAccess({
             user: currentUser,
             role: currentRole,
@@ -51,7 +55,7 @@ function navigateTo(viewId, pushHistory = true) {
 
     // Restrizioni per Studenti e Reindirizzamento Squadra per Viandanti
     const isRestrictedForStudents = ['view-profilo', 'view-squadra', 'view-missioni'].includes(viewId);
-    const userRole = (typeof currentUserRole !== 'undefined' ? currentUserRole : '') || localStorage.getItem('fanta_user_role') || (hasStudentCode && !isDocente ? 'studente' : '');
+    const userRole = (typeof currentUserRole !== 'undefined' ? currentUserRole : '') || localStorage.getItem('fanta_user_role') || (isStudentUser ? 'studente' : (hasStudentCode && !isDocente ? 'studente' : ''));
 
     // Studenti e Viandanti vengono reindirizzati a "La mia Squadra" anziché al Pannello Docente
     if (viewId === 'view-profilo' && (userRole === 'studente' || userRole === 'viandante' || userRole === 'fantamico' || (hasStudentCode && !isDocente))) {
