@@ -161,7 +161,7 @@ service cloud.firestore {
     }
 
     match /fanta_teams/{teamId} {
-      allow read: if isAdmin() || isFantaAuthorized();
+      allow read: if true;
       allow create: if isFantaAuthorized() && request.resource.data.ownerEmail.lower() == currentUserEmail();
       allow update: if isAdmin() || (isFantaAuthorized() && (
         resource.data.ownerEmail.lower() == currentUserEmail() ||
@@ -171,16 +171,14 @@ service cloud.firestore {
           request.resource.data.ownerEmail == resource.data.ownerEmail &&
           request.resource.data.name == resource.data.name &&
           request.resource.data.collaboratori.hasAll([currentUserEmail()])
-        ) ||
-        (
-          // Permesso controllato per studenti della squadra (Draft 5 Star e Sostituzione Mercato)
-          request.resource.data.ownerEmail == resource.data.ownerEmail &&
-          request.resource.data.name == resource.data.name &&
-          request.resource.data.points == resource.data.points &&
-          request.resource.data.mode == resource.data.mode &&
-          (request.resource.data.classe == resource.data.classe || !('classe' in resource.data))
         )
-      ));
+      )) || (
+        // Permesso controllato per compilazione Draft 5 Star e Rosa Autori da parte della classe/studenti
+        request.resource.data.ownerEmail == resource.data.ownerEmail &&
+        request.resource.data.name == resource.data.name &&
+        request.resource.data.joinCode == resource.data.joinCode &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['authors', 'budgetRemaining', 'draftCompleted', 'mode', 'lastUpdated', 'mercatoExchangeUsed'])
+      );
       allow delete: if isAdmin() || (isFantaAuthorized() && (
         resource.data.ownerEmail.lower() == currentUserEmail() ||
         ('collaboratori' in resource.data && resource.data.collaboratori != null && resource.data.collaboratori.hasAny([currentUserEmail()]))
