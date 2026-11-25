@@ -1617,18 +1617,18 @@
             </div>
         </footer>
         <script>
-            (functio n() {
+            (function () {
                 var fl = document.querySelector('.footer-legal-links');
                 if (fl && window.MutationObserver) {
                     var expected = fl.innerHTML;
-                    var obs = new MutationObserver(functio n() {
+                    var obs = new MutationObserver(function () {
                         if(!fl.querySelector('a[href*="condividi-esperienza"]')) {
                             fl.innerHTML = expected;
+                        }
+                    });
+                    obs.observe(fl, { childList: true, subtree: true });
                 }
-            });
-            obs.observe(fl, { childList: true, subtree: true });
-                }
-            }) ();
+            })();
         </script>
 
         <!-- Bottom Navigation Tabs (Floating Dock on PC) -->
