@@ -794,6 +794,48 @@ function calculateBudget() {
             saveBtn.disabled = true;
         }
     }
+
+    // Salvagente Locale: auto-salvataggio della bozza in tempo reale
+    if (typeof saveDraftSelectionToLocalStorage === 'function') {
+        saveDraftSelectionToLocalStorage();
+    }
+}
+
+// ── SALVAGENTE LOCALE ANTI-PERDITA DATI (DRAFT BOZZA) ───────
+function saveDraftSelectionToLocalStorage() {
+    try {
+        const teamKey = window.draftingTeamId ? ('fanta_draft_' + window.draftingTeamId) : 'fanta_draft_temp';
+        const hasAnySelection = Object.values(teamSelection).some(a => a !== null);
+        if (hasAnySelection) {
+            localStorage.setItem(teamKey, JSON.stringify(teamSelection));
+        } else {
+            localStorage.removeItem(teamKey);
+        }
+    } catch(e) {}
+}
+
+function restoreDraftSelectionFromLocalStorage() {
+    try {
+        const teamKey = window.draftingTeamId ? ('fanta_draft_' + window.draftingTeamId) : 'fanta_draft_temp';
+        const saved = localStorage.getItem(teamKey);
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            if (parsed && typeof parsed === 'object') {
+                teamSelection = { 1: null, 2: null, 3: null, 4: null, 5: null, ...parsed };
+                renderRosterSlots();
+                updateAuthorCardsSelection();
+                calculateBudget();
+            }
+        }
+    } catch(e) {}
+}
+
+function clearDraftSelectionFromLocalStorage() {
+    try {
+        const teamKey = window.draftingTeamId ? ('fanta_draft_' + window.draftingTeamId) : 'fanta_draft_temp';
+        localStorage.removeItem(teamKey);
+        localStorage.removeItem('fanta_draft_temp');
+    } catch(e) {}
 }
 
 // ── SPOSTAMENTO STUDENTI ────────────────────────────────────
@@ -1526,6 +1568,15 @@ async function checkStudentConsent() {
         if (team.classCode) localStorage.setItem('pm_student_class', team.classCode);
         else localStorage.setItem('pm_student_class', codeInput);
         
+        currentUserRole = 'studente';
+        window.currentUserRole = 'studente';
+        localStorage.setItem('fanta_user_role', 'studente');
+        localStorage.setItem('hub_user_role', 'studente');
+        if (!currentUserEmail) {
+            currentUserEmail = 'studente@classe.local';
+            window.currentUserEmail = currentUserEmail;
+        }
+        
         // Imposta automaticamente il campionato della squadra
         if (team.mode) {
             localStorage.setItem('fanta_active_mode', team.mode);
@@ -1976,7 +2027,13 @@ function setupTeamSave() {
             currentUserEmail = window.auth.currentUser.email.toLowerCase();
         }
 
-        const isStudDraft = window.draftingTeamId && (currentUserRole === 'studente' || localStorage.getItem('hub_user_role') === 'studente');
+        const isStudDraft = !!window.draftingTeamId && (
+            currentUserRole === 'studente' || 
+            localStorage.getItem('hub_user_role') === 'studente' || 
+            localStorage.getItem('fanta_user_role') === 'studente' ||
+            !!localStorage.getItem('fanta_active_team_code') ||
+            !!localStorage.getItem('pm_student_class')
+        );
         if (!currentUserEmail && !isStudDraft) {
             alert("Devi identificarti nella Home prima di salvare una squadra!");
             navigateTo('view-welcome');
@@ -2057,6 +2114,9 @@ function setupTeamSave() {
                 draftCompleted: true,
                 mode: enforcedMode
             }).then(() => {
+                if (typeof clearDraftSelectionFromLocalStorage === 'function') {
+                    clearDraftSelectionFromLocalStorage();
+                }
                 alert("Complimenti! I 5 autori della squadra sono stati salvati con successo!");
                 if (typeof window.resetTeamCreationForm === 'function') {
                     window.resetTeamCreationForm();
@@ -2067,15 +2127,18 @@ function setupTeamSave() {
                     const clsInp = document.getElementById('team-classe-input');
                     if (nameInp) { nameInp.value = ""; nameInp.readOnly = false; }
                     if (clsInp) { clsInp.value = ""; clsInp.readOnly = false; }
-                    currentTeamMode = null;
+                    if (typeof clearDraftSelectionFromLocalStorage === 'function') {
+        clearDraftSelectionFromLocalStorage();
+    }
+    currentTeamMode = null;
                     teamSelection = { 1: null, 2: null, 3: null, 4: null, 5: null };
                     calculateBudget();
                 }
 
-                const isStud = currentUserRole === 'studente';
+                const isStud = currentUserRole === 'studente' || localStorage.getItem('hub_user_role') === 'studente' || localStorage.getItem('fanta_user_role') === 'studente' || !!localStorage.getItem('fanta_active_team_code');
                 const isFant = currentUserRole === 'fantamico' || currentUserRole === 'viandante';
                 if (isStud || isFant) {
-                    if (typeof setLoggedIn === 'function') setLoggedIn(currentUserEmail || 'studente', currentUserRole || 'studente');
+                    if (typeof setLoggedIn === 'function') setLoggedIn(currentUserEmail || 'studente@classe.local', isStud ? 'studente' : currentUserRole);
                     navigateTo('view-mia-squadra');
                 } else {
                     renderProfilo();
@@ -2084,7 +2147,7 @@ function setupTeamSave() {
                 }
             }).catch(err => {
                 console.error("Errore salvataggio draft squadra:", err);
-                alert("Errore durante il salvataggio del draft. Riprova.");
+                alert("Errore durante il salvataggio del draft: " + (err.message || "Verifica la connessione e riprova."));
             });
             return;
         }
@@ -2125,7 +2188,10 @@ function setupTeamSave() {
         if (nameInp2) nameInp2.value = "";
         const clsInp2 = document.getElementById('team-classe-input');
         if (clsInp2) clsInp2.value = "";
-        currentTeamMode = null;
+        if (typeof clearDraftSelectionFromLocalStorage === 'function') {
+        clearDraftSelectionFromLocalStorage();
+    }
+    currentTeamMode = null;
         teamSelection = { 1: null, 2: null, 3: null, 4: null, 5: null };
 
         // Reset mode buttons
@@ -4755,6 +4821,9 @@ window.resetTeamCreationForm = function() {
     if (modeGrid) modeGrid.style.display = 'grid';
     if (lockedBadge) lockedBadge.style.display = 'none';
 
+    if (typeof clearDraftSelectionFromLocalStorage === 'function') {
+        clearDraftSelectionFromLocalStorage();
+    }
     currentTeamMode = null;
     teamSelection = { 1: null, 2: null, 3: null, 4: null, 5: null };
     const authSlots = document.getElementById('author-slots-section');
@@ -4813,6 +4882,11 @@ window.avviaDraftSquadra = async function(teamDocId) {
             });
             updateSlotsUI();
             calculateBudget();
+        } else {
+            // Ripristina eventuale bozza non ancora salvata sul cloud (anti-flicker / anti-ricarica)
+            if (typeof restoreDraftSelectionFromLocalStorage === 'function') {
+                restoreDraftSelectionFromLocalStorage();
+            }
         }
     } catch (err) {
         console.error("Errore avvio draft:", err);
