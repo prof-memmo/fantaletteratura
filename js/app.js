@@ -2108,9 +2108,21 @@ function setupTeamSave() {
         if (window.draftingTeamId) {
             const teamDocRef = window.db.collection('fanta_teams').doc(window.draftingTeamId);
             const enforcedMode = window.draftingTeamMode || currentTeamMode || 'terze';
+
+            const modeCfg = (typeof GAME_MODES !== 'undefined' && GAME_MODES[enforcedMode]) || (typeof GAME_MODES !== 'undefined' && GAME_MODES.terze) || {};
+            const pool = modeCfg.authors || (typeof AUTHORS !== 'undefined' ? AUTHORS : []);
+            const totalBudget = modeCfg.budget || 20000;
+            let spent = 0;
+            authorsSelected.forEach(aid => {
+                const aId = (typeof aid === 'object' && aid !== null) ? aid.id : aid;
+                const a = pool.find(x => x.id === aId);
+                if (a) spent += (a.cost || a.points || 0);
+            });
+            const remainingBudget = totalBudget - spent;
+
             teamDocRef.update({
                 authors: authorsSelected,
-                budgetRemaining: currentBudget,
+                budgetRemaining: remainingBudget,
                 draftCompleted: true,
                 mode: enforcedMode
             }).then(() => {
