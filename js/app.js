@@ -790,8 +790,14 @@ function calculateBudget() {
         }
         if (allSlotsFilled && remaining >= 0) {
             saveBtn.disabled = false;
+            saveBtn.style.opacity = '1';
+            saveBtn.style.cursor = 'pointer';
         } else {
-            saveBtn.disabled = true;
+            // Manteniamo il pulsante cliccabile (senza disabled HTML bloccante)
+            // in modo che se l'utente clicca riceva l'alert esplicito con la guida su cosa manca
+            saveBtn.disabled = false;
+            saveBtn.style.opacity = '0.65';
+            saveBtn.style.cursor = 'pointer';
         }
     }
 
@@ -2100,7 +2106,24 @@ function setupTeamSave() {
 
         const authorsSelected = Object.values(teamSelection).filter(a => a !== null);
         if(authorsSelected.length !== 5) {
-            alert("Devi selezionare esattamente 5 autori.");
+            alert("Devi selezionare esattamente 5 autori! Al momento ne hai selezionati " + authorsSelected.length + " su 5.\n(Nota: gli autori con etichetta 'FUORI MERCATO' non possono essere acquistati per questo campionato).");
+            return;
+        }
+
+        const modeKeyForValidation = window.draftingTeamMode || currentTeamMode || 'terze';
+        const modeCfgForValidation = (typeof GAME_MODES !== 'undefined' && GAME_MODES[modeKeyForValidation]) || (typeof GAME_MODES !== 'undefined' && GAME_MODES.terze) || {};
+        const poolForValidation = modeCfgForValidation.authors || (typeof AUTHORS !== 'undefined' ? AUTHORS : []);
+        const totalBudgetForValidation = modeCfgForValidation.budget || 20000;
+        let spentValidation = 0;
+        authorsSelected.forEach(aid => {
+            const aId = (typeof aid === 'object' && aid !== null) ? aid.id : aid;
+            const a = poolForValidation.find(x => x.id === aId);
+            if (a) spentValidation += (a.cost || a.points || 0);
+        });
+        const remainingBudgetValidation = totalBudgetForValidation - spentValidation;
+
+        if (remainingBudgetValidation < 0) {
+            alert("Budget superato di " + Math.abs(remainingBudgetValidation).toLocaleString() + " " + (modeCfgForValidation.currencyLabel || 'lire') + "! Sostituisci uno o più autori per rientrare nel budget di " + totalBudgetForValidation.toLocaleString() + " " + (modeCfgForValidation.currencyLabel || 'lire') + ".");
             return;
         }
 
@@ -2108,17 +2131,7 @@ function setupTeamSave() {
         if (window.draftingTeamId) {
             const teamDocRef = window.db.collection('fanta_teams').doc(window.draftingTeamId);
             const enforcedMode = window.draftingTeamMode || currentTeamMode || 'terze';
-
-            const modeCfg = (typeof GAME_MODES !== 'undefined' && GAME_MODES[enforcedMode]) || (typeof GAME_MODES !== 'undefined' && GAME_MODES.terze) || {};
-            const pool = modeCfg.authors || (typeof AUTHORS !== 'undefined' ? AUTHORS : []);
-            const totalBudget = modeCfg.budget || 20000;
-            let spent = 0;
-            authorsSelected.forEach(aid => {
-                const aId = (typeof aid === 'object' && aid !== null) ? aid.id : aid;
-                const a = pool.find(x => x.id === aId);
-                if (a) spent += (a.cost || a.points || 0);
-            });
-            const remainingBudget = totalBudget - spent;
+            const remainingBudget = remainingBudgetValidation;
 
             teamDocRef.update({
                 authors: authorsSelected,
